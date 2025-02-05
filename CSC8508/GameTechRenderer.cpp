@@ -4,6 +4,9 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_opengl3.h"
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8508;
@@ -72,6 +75,13 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_InitForOpenGL(hostWindow.GetHandle());
+	ImGui_ImplOpenGL3_Init("#version 460");
 }
 
 GameTechRenderer::~GameTechRenderer()	{
@@ -122,6 +132,18 @@ void GameTechRenderer::LoadSkybox() {
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::SetNextWindowPos(ImVec2(100, 100));
+	ImGui::SetNextWindowSize(ImVec2(500, 250));
+	ImGui::Begin("Test Window");
+	ImGui::Text("Test Text");
+	ImGui::Button("Test Button", ImVec2(100, 100));
+	ImGui::End();
+
 	BuildObjectList();
 	SortObjectList();
 	RenderShadowMap();
@@ -134,6 +156,11 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderLines();
 	NewRenderTextures();
 	NewRenderText();
+
+	ImGui::Render();
+	ImGui::EndFrame();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -91,6 +91,8 @@ Win32Window::Win32Window(const WindowInitialisation& winInitInfo) {
 	winMouse->Wake();
 	winKeyboard->Wake();
 
+	windowHand = GetHandle();
+
 	LockMouseToWindow(lockMouse);
 	ShowOSPointer(showMouse);
 

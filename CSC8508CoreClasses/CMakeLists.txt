@@ -98,6 +98,7 @@ set(Source_Files
     "Debug.cpp"
     "GameObject.cpp"
     "GameWorld.cpp"
+	"PriorityQueue.h"
     "RenderObject.cpp"
     "Transform.cpp"
 )
@@ -135,7 +136,7 @@ set(ALL_FILES
     ${Collision_Detection}
     ${Networking}
     ${Physics}
-    ${enet_Files}   
+    ${enet_Files}
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)

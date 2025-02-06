@@ -54,5 +54,5 @@ bool	Window::UpdateWindow() {
 }
 
 HWND Window::GetHandle() {
-	return windowHand;
+	return handle;
 }

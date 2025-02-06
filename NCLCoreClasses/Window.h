@@ -118,6 +118,6 @@ namespace NCL {
 		static Mouse*		mouse;
 
 		static GameTimer	timer;
-		HWND                windowHand;
+		HWND                handle;
 	};
 }

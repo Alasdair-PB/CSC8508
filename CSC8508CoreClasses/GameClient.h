@@ -16,7 +16,6 @@ namespace NCL {
 
 			void SendPacket(GamePacket&  payload);
 			void ReceivePacket(int type, GamePacket* payload, int source);
-
 			void UpdateClient();
 		protected:	
 			_ENetPeer*	netPeer;

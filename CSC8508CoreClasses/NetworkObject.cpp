@@ -4,10 +4,11 @@ using namespace NCL;
 using namespace CSC8508;
 
 
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
+NetworkObject::NetworkObject(GameObject& o, int objId, int ownId) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;
-	networkID   = id;
+	objectID = objId;
+	ownerID = ownId;
 }
 
 NetworkObject::~NetworkObject()	{
@@ -24,7 +25,7 @@ bool NetworkObject::WritePacket(GamePacket** p, bool deltaFrame, int stateID) {
 bool NetworkObject::WriteFullPacket(GamePacket** p) {
 	FullPacket* fp = new FullPacket();
 
-	fp->objectID = networkID;
+	fp->objectID = objectID;
 	fp->fullState.position = object.GetTransform().GetPosition();
 	fp->fullState.orientation = object.GetTransform().GetOrientation();
 	fp->fullState.stateID = lastFullState.stateID++;
@@ -40,7 +41,7 @@ bool NetworkObject::WriteDeltaPacket(GamePacket** p, int stateID) {
 	}
 
 	dp->fullID = stateID;
-	dp->objectID = networkID;
+	dp->objectID = objectID;
 
 	Vector3 currentPos = object.GetTransform().GetPosition();
 	Quaternion currentOrientation = object.GetTransform().GetOrientation();
@@ -69,9 +70,11 @@ bool NetworkObject::ReadPacket(GamePacket& p) {
 }
 
 bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
+	if (p.objectID != objectID)
+		return false;
+
 	if (p.fullID != lastFullState.stateID) 
 		return false; 
-
 	UpdateStateHistory(p.fullID);
 
 	Vector3 fullPos = lastFullState.position;
@@ -93,6 +96,9 @@ bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
 
 bool NetworkObject::ReadFullPacket(FullPacket& p) 
 {
+	if (p.objectID != objectID)
+		return false;
+
 	if (p.fullState.stateID < lastFullState.stateID) 
 		return false; 
 

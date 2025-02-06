@@ -4,6 +4,8 @@
 namespace NCL {
 	namespace CSC8508 {
 		class GameWorld;
+		class GameObject;
+		class NetworkObject;
 		class GameServer : public NetworkBase {
 		public:
 			GameServer(int onPort, int maxClients);
@@ -19,7 +21,6 @@ namespace NCL {
 			bool SendPacketToPeer(GamePacket* packet, int playerID);
 			void ReceivePacket(int type, GamePacket* payload, int source);
 
-
 			std::unordered_map<int, _ENetPeer*> playerPeers;
 
 			virtual void UpdateServer();
@@ -28,6 +29,7 @@ namespace NCL {
 			int			port;
 			int			clientMax;
 			int			clientCount;
+			int nextPlayerIndex;
 
 			GameWorld*	gameWorld;
 			std::unordered_map<int, int> playerStates;

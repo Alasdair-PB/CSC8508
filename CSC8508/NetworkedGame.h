@@ -19,7 +19,9 @@ namespace NCL {
 
 			void UpdateGame(float dt) override;
 
-			void SpawnPlayer();
+			void SpawnPlayerClient(int ownerId, int objectId, GameObject* object);
+			void SpawnPlayerServer(int ownerId, GameObject* object);
+
 
 			void StartLevel();
 
@@ -39,6 +41,7 @@ namespace NCL {
 
 			void BroadcastSnapshot(bool deltaFrame);
 			void BroadcastOwnedObjects(bool deltaFrame);
+			void SpawnNetworkedObject(int ownerId, int objectId, GameObject* object);
 			void UpdateMinimumState();
 			std::map<int, int> stateIDs;
 
@@ -47,8 +50,10 @@ namespace NCL {
 			float timeToNextPacket;
 			int packetsToSnapshot;
 
-			std::map<int, GameObject*> serverPlayers;
-			GameObject* localPlayer;
+			int nextObjectId;
+
+			std::map<int, GameObject*> ownedObjects;
+			GameObject* GetPlayerPrefab();
 			std::vector<int> playerStates;
 
 

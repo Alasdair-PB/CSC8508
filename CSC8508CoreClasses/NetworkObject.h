@@ -28,28 +28,30 @@ namespace NCL::CSC8508 {
 		}
 	};
 
-	struct ClientPacket : public GamePacket {
-		int		lastID;
-		float score;
+	struct SetClientId : public GamePacket {
+		int clientPeerId;
 
-		ClientPacket() {
-			size = sizeof(ClientPacket);
+		SetClientId() {
+			size = sizeof(SetClientId) - sizeof(GamePacket);
+			type = Player_Connected;
 		}
 	};
+
 
 	class NetworkObject		
 	{
 	public:
-		NetworkObject(GameObject& o, int id);
+		NetworkObject(GameObject& o, int objId, int ownId);
 		virtual ~NetworkObject();
 		virtual bool ReadPacket(GamePacket& p);
 		virtual bool WritePacket(GamePacket** p, bool deltaFrame, int stateID);
-		int GetNetworkID() { return networkID; }
+		int GetObjectID() { return objectID; }
+		int GetOwnerID() { return ownerID;  }
 		void UpdateStateHistory(int minID);
+		NetworkState& GetLatestNetworkState();
 
 	protected:
 
-		NetworkState& GetLatestNetworkState();
 
 		bool GetNetworkState(int frameID, NetworkState& state);
 
@@ -65,6 +67,7 @@ namespace NCL::CSC8508 {
 
 		int deltaErrors;
 		int fullErrors;
-		int networkID;
+		int objectID;
+		int ownerID;
 	};
 }

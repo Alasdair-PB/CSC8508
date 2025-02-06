@@ -8,6 +8,7 @@ enum BasicNetworkMessages {
 	None,
 	Hello,
 	Message,
+	Spawn_Object,
 	String_Message,
 	Delta_State,	//1 byte per channel since the last state
 	Full_State,		//Full transform etc
@@ -15,6 +16,7 @@ enum BasicNetworkMessages {
 	Player_Connected,
 	Player_Disconnected,
 	Acknowledge_State,
+
 	Shutdown
 };
 
@@ -70,10 +72,16 @@ public:
 	void RegisterPacketHandler(int msgID, PacketReceiver* receiver) {
 		packetHandlers.insert(std::make_pair(msgID, receiver));
 	}
+
+	void SetPeerId(int newId) { peerID = newId; }
+	int GetPeerId() { return peerID; }
+
+
 protected:
 	NetworkBase();
 	~NetworkBase();
 
+	int peerID = -1;
 	bool ProcessPacket(GamePacket* p, int peerID = -1);
 
 	typedef std::multimap<int, PacketReceiver*>::const_iterator PacketHandlerIterator;

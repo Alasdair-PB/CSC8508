@@ -43,7 +43,7 @@ NetworkedGame::NetworkedGame()	{
 	mainMenu = new MainMenu([&](bool state) -> void { this->SetPause(state); },
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
-		[&]() -> void { this->StartOfflineCallBack(); });
+		[&]() -> void { this->StartOfflineCallBack();});
 
 	NetworkBase::Initialise();
 	timeToNextPacket  = 0.0f;
@@ -62,6 +62,8 @@ void NetworkedGame::StartAsServer()
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 	thisServer->RegisterPacketHandler(Received_State, this);
 	thisServer->RegisterPacketHandler(Spawn_Object, this);
+
+	SpawnPlayerServer(thisServer->GetPeerId(), GetPlayerPrefab());
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) 
@@ -123,9 +125,8 @@ void NetworkedGame::UpdateAsClient(float dt)
 		BroadcastOwnedObjects(false);
 		packetsToSnapshot = 5;	
 	}
-	else {
+	else 
 		BroadcastOwnedObjects(true);
-	}	
 	thisClient->UpdateClient();
 }
 
@@ -223,6 +224,26 @@ void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, GameObject* obj
 	SpawnNetworkedObject(ownerId, objectId, play);
 	if (thisClient->GetPeerId() == ownerId)
 		ownedObjects[objectId] = object;
+}
+
+void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
+{
+	std::vector<GameObject*>::const_iterator first;
+	std::vector<GameObject*>::const_iterator last;
+	world->GetObjectIterators(first, last);
+
+	for (auto i = first; i != last; ++i)
+	{
+		NetworkObject* o = (*i)->GetNetworkObject();
+
+		if (!o)
+			continue;
+
+		SpawnPacket* newPacket;
+		newPacket->ownerId = o->GetOwnerID();
+		newPacket->objectId = o->GetObjectID();
+		thisServer->SendPacketToPeer(newPacket, clientId);
+	}
 }
 
 void NetworkedGame::SpawnPlayerServer(int ownerId, GameObject* object)

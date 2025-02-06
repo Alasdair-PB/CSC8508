@@ -1,6 +1,6 @@
 #include "GameClient.h"
 #include "./enet/enet.h"
-#include "NetworkObject.h";
+
 using namespace NCL;
 using namespace CSC8508;
 

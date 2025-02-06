@@ -1,12 +1,8 @@
 #pragma once
 #include "NetworkBase.h"
-#include <stdint.h>
-#include <thread>
-#include <atomic>
 
 namespace NCL {
 	namespace CSC8508 {
-		class GameObject;
 		class GameClient : public NetworkBase {
 		public:
 			GameClient();

@@ -1,5 +1,6 @@
 #include "NetworkBase.h"
 #include "./enet/enet.h"
+
 NetworkBase::NetworkBase()	{
 	netHandle = nullptr;
 }
@@ -9,6 +10,8 @@ NetworkBase::~NetworkBase()	{
 		enet_host_destroy(netHandle);
 	}
 }
+
+class ClientConnectedEvent { ClientConnectedEvent() = default; };
 
 void NetworkBase::Initialise() {
 	enet_initialize();

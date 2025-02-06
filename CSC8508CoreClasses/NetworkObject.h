@@ -28,15 +28,6 @@ namespace NCL::CSC8508 {
 		}
 	};
 
-	struct SetClientId : public GamePacket {
-		int clientPeerId;
-
-		SetClientId() {
-			size = sizeof(SetClientId) - sizeof(GamePacket);
-			type = Player_Connected;
-		}
-	};
-
 
 	class NetworkObject		
 	{

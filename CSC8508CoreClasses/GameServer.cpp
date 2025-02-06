@@ -1,9 +1,6 @@
 #include "GameServer.h"
-#include "GameWorld.h"
-#include "GameObject.h"
-#include "NetworkObject.h"
-
 #include "./enet/enet.h"
+
 using namespace NCL;
 using namespace CSC8508;
 
@@ -88,14 +85,14 @@ void GameServer::UpdateServer() {
 			playerStates[playerID] = 0;
 			nextPlayerIndex++;
 
-			SetClientId* newPacket;
+			SetClientId* newPacket = new SetClientId();
 			newPacket->clientPeerId = playerID;
 			SendPacketToPeer(newPacket, playerID);
 
 			// Spawn this player locally using:
 				// SpawnPlayerServer
-			// Spawn Server Player using:
-				// ? 
+			// Send spawn packets for exisiting players using:
+				// SendSpawnPacketsOnClientConnect
 
 			std::cout << "player connected" << std::endl;
 		}
@@ -116,11 +113,6 @@ void GameServer::UpdateServer() {
 		}		
 		enet_packet_destroy(event.packet);
 	}
-}
-
-void GameServer::SetGameWorld(GameWorld &g) 
-{
-	gameWorld = &g;
 }
 
 bool GameServer::SendPacketToPeer(GamePacket* packet, int playerID) 

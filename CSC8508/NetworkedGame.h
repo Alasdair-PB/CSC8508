@@ -38,7 +38,7 @@ namespace NCL {
 
 			void StartOfflineCallBack();
 
-
+			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastSnapshot(bool deltaFrame);
 			void BroadcastOwnedObjects(bool deltaFrame);
 			void SpawnNetworkedObject(int ownerId, int objectId, GameObject* object);

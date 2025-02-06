@@ -3,8 +3,6 @@
 
 namespace NCL {
 	namespace CSC8508 {
-		class GameWorld;
-		class GameObject;
 		class NetworkObject;
 		class GameServer : public NetworkBase {
 		public:
@@ -13,8 +11,6 @@ namespace NCL {
 
 			bool Initialise();
 			void Shutdown();
-
-			void SetGameWorld(GameWorld &g);
 
 			bool SendGlobalPacket(int msgID);
 			bool SendGlobalPacket(GamePacket& packet);
@@ -26,14 +22,12 @@ namespace NCL {
 			virtual void UpdateServer();
 
 		protected:
-			int			port;
-			int			clientMax;
-			int			clientCount;
+			int port;
+			int clientMax;
+			int clientCount;
 			int nextPlayerIndex;
 
-			GameWorld*	gameWorld;
 			std::unordered_map<int, int> playerStates;
-
 
 			int incomingDataRate;
 			int outgoingDataRate;

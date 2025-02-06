@@ -6,7 +6,6 @@ struct _ENetEvent;
 
 enum BasicNetworkMessages {
 	None,
-	Hello,
 	Message,
 	Spawn_Object,
 	String_Message,
@@ -20,6 +19,14 @@ enum BasicNetworkMessages {
 	Shutdown
 };
 
+struct SetClientId : public GamePacket {
+	int clientPeerId;
+
+	SetClientId() {
+		size = sizeof(SetClientId) - sizeof(GamePacket);
+		type = Player_Connected;
+	}
+};
 
 struct GamePacket {
 	short size;

@@ -11,6 +11,11 @@ https://research.ncl.ac.uk/game/
 #include "Mouse.h"
 
 #include "Vector.h"
+#include <windows.h>
+#include <io.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string>
 
 namespace NCL {
 	class GameTimer;

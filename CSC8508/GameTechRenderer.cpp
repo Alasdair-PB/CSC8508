@@ -4,9 +4,9 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_opengl3.h"
+#include "../ImGui/imgui_impl_win32.h"
+#include "../ImGui/imgui_impl_opengl3.h"
+#include "../ImGui/imgui.h"
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8508;
@@ -76,6 +76,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000);
 
+	/*Initialises ImGui for use with Win32 and OpenGL*/
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -137,12 +138,7 @@ void GameTechRenderer::RenderFrame() {
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::SetNextWindowPos(ImVec2(100, 100));
-	ImGui::SetNextWindowSize(ImVec2(500, 250));
-	ImGui::Begin("Test Window");
-	ImGui::Text("Test Text");
-	ImGui::Button("Test Button", ImVec2(100, 100));
-	ImGui::End();
+	DrawMenu();
 
 	BuildObjectList();
 	SortObjectList();
@@ -548,4 +544,13 @@ void GameTechRenderer::SetDebugLineBufferSizes(size_t newVertCount) {
 
 		glBindVertexArray(0);
 	}
+}
+
+void GameTechRenderer::DrawMenu() {
+	ImGui::SetNextWindowPos(ImVec2(100, 100));
+	ImGui::SetNextWindowSize(ImVec2(200, 200));
+	ImGui::Begin("Test Window");
+	ImGui::Text("Test Text");
+	ImGui::Button("Test Button", ImVec2(100, 100));
+	ImGui::End();
 }

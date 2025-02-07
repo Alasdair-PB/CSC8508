@@ -76,6 +76,7 @@ endif()
 # Sub-projects
 ################################################################################
 add_subdirectory(NCLCoreClasses)
+add_subdirectory(Event)
 add_subdirectory(CSC8508CoreClasses)
 add_subdirectory(OpenGLRendering)
 add_subdirectory(CSC8508)

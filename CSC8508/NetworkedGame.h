@@ -54,7 +54,7 @@ namespace NCL {
 
 			int nextObjectId;
 
-			std::map<int, GameObject*> ownedObjects;
+			vector<GameObject*> ownedObjects;
 			GameObject* GetPlayerPrefab();
 			std::vector<int> playerStates;
 

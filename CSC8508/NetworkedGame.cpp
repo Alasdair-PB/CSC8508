@@ -31,11 +31,9 @@ struct SpawnPacket : public GamePacket {
 	}
 };
 
-
 void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
-
 
 NetworkedGame::NetworkedGame()	{
 	EventManager::RegisterListener(this);
@@ -53,7 +51,6 @@ NetworkedGame::NetworkedGame()	{
 	playerStates = std::vector<int>();
 }
 
-
 NetworkedGame::~NetworkedGame()	{
 	delete thisServer;
 	delete thisClient;
@@ -64,6 +61,9 @@ void NetworkedGame::StartAsServer()
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 	thisServer->RegisterPacketHandler(Received_State, this);
 	thisServer->RegisterPacketHandler(Spawn_Object, this);
+
+	thisServer->RegisterPacketHandler(Delta_State, this);
+	thisServer->RegisterPacketHandler(Full_State, this);
 
 	SpawnPlayerServer(thisServer->GetPeerId(), GetPlayerPrefab());
 }
@@ -87,7 +87,6 @@ void NetworkedGame::OnEvent(ClientConnectedEvent* e)
 	int id = e->GetClientId();
 	SendSpawnPacketsOnClientConnect(id);	
 	SpawnPlayerServer(id, GetPlayerPrefab());
-
 }
 
 void NetworkedGame::UpdateGame(float dt) 
@@ -103,11 +102,6 @@ void NetworkedGame::UpdateGame(float dt)
 	TutorialGame::UpdateGame(dt);
 }
 
-
-/*
-	Every 5 packets send a full packet instead of delta to confirm sync
-*/
-
 void NetworkedGame::UpdateAsServer(float dt)
 {
 	packetsToSnapshot--;
@@ -120,11 +114,6 @@ void NetworkedGame::UpdateAsServer(float dt)
 		BroadcastSnapshot(true);
 	thisServer->UpdateServer();
 }
-
-/*
-	Every 5 packets send a full packet instead of delta to confirm sync
-	Syncs scores every 5 also
-*/
 
 void NetworkedGame::UpdateAsClient(float dt) 
 {
@@ -139,29 +128,24 @@ void NetworkedGame::UpdateAsClient(float dt)
 	thisClient->UpdateClient();
 }
 
-
 // Could be reworked if the client is able to learn their owning Id
 // Client send all objects in their world not owned by server
-void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) {
-
-	std::vector<GameObject*>::const_iterator first, last;
-	world->GetObjectIterators(first, last);
-
-	for (auto i = first; i != last; ++i)
-	{
-		NetworkObject* o = (*i)->GetNetworkObject();
-
+void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) 
+{
+	for (GameObject* i : ownedObjects) {
+		NetworkObject* o = i->GetNetworkObject();
 		if (!o)
 			continue;
 
-		if (thisClient->GetPeerId() != o->GetOwnerID())
-			continue;
-
+		//if (thisClient->GetPeerId() != o->GetOwnerID())
+		//	continue;
 		GamePacket* newPacket = new GamePacket();
 		if (o->WritePacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
 			thisClient->SendPacket(*newPacket);
 		delete newPacket;
 	}
+
+
 }
 
 // Server goes through each object in their world and sends delta or full packets for each. 
@@ -224,15 +208,13 @@ void NetworkedGame::SpawnNetworkedObject(int ownerId, int objectId, GameObject* 
 {
 	NetworkObject* netObject = new NetworkObject(*object, objectId, ownerId);
 	object->SetNetworkObject(netObject);
-	world->AddGameObject(object);	
 }
 
 void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, GameObject* object)
 {
-	auto play = TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
-	SpawnNetworkedObject(ownerId, objectId, play);
+	SpawnNetworkedObject(ownerId, objectId, object);
 	if (thisClient->GetPeerId() == ownerId)
-		ownedObjects[objectId] = object;
+		ownedObjects.emplace_back(object);
 }
 
 void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
@@ -257,11 +239,10 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 
 void NetworkedGame::SpawnPlayerServer(int ownerId, GameObject* object)
 {
-	auto play = TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
-	SpawnNetworkedObject(ownerId, nextObjectId, play);
+	SpawnNetworkedObject(ownerId, nextObjectId, object);
 
 	if (thisServer->GetPeerId() == ownerId)
-		ownedObjects[nextObjectId] = object;
+		ownedObjects.emplace_back(object);
 
 	SpawnPacket* newPacket = new SpawnPacket();
 	newPacket->ownerId = ownerId;
@@ -283,18 +264,21 @@ void NetworkedGame::StartLevel()
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
 	if (type == Full_State || type == Delta_State) {
+
+		if (thisServer)
+			std::cout << "Recieved Client Transform packet" << std::endl;
+		else {
+			std::cout << "Recieved Client Transform packet" << std::endl;
+		}
+
 		std::vector<GameObject*>::const_iterator first, last;
 		world->GetObjectIterators(first, last);
+
 		for (auto i = first; i != last; ++i)
 		{
 			NetworkObject* o = (*i)->GetNetworkObject();
 			if (!o)
 				continue;
-
-			if ((thisClient && thisClient->GetPeerId() == o->GetOwnerID()) ||
-				(thisServer && thisServer->GetPeerId() == o->GetOwnerID()))
-				continue;
-
 			o->ReadPacket(*payload);
 		}
 	}
@@ -308,8 +292,10 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 
 	if (thisClient) 
 		thisClient->ReceivePacket(type, payload, source);
-	else if (thisServer) 
+	else if (thisServer) {
+		std::cout << "Recieved not full_state/delata state" << std::endl;
 		thisServer->ReceivePacket(type, payload, source);
+	}
 }
 
 void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {

@@ -3,7 +3,6 @@
 using namespace NCL;
 using namespace CSC8508;
 
-
 NetworkObject::NetworkObject(GameObject& o, int objId, int ownId) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;
@@ -11,14 +10,11 @@ NetworkObject::NetworkObject(GameObject& o, int objId, int ownId) : object(o)	{
 	ownerID = ownId;
 }
 
-NetworkObject::~NetworkObject()	{
-}
+NetworkObject::~NetworkObject()	{}
 
 bool NetworkObject::WritePacket(GamePacket** p, bool deltaFrame, int stateID) {
-	if (deltaFrame) {
-		if (!WriteDeltaPacket(p, stateID)) 
-			return WriteFullPacket(p);
-	}
+	if (deltaFrame) 
+		return WriteDeltaPacket(p, stateID) ? true : WriteFullPacket(p);
 	return WriteFullPacket(p);
 }
 
@@ -36,9 +32,8 @@ bool NetworkObject::WriteFullPacket(GamePacket** p) {
 bool NetworkObject::WriteDeltaPacket(GamePacket** p, int stateID) {
 	DeltaPacket* dp = new DeltaPacket();
 	NetworkState state;
-	if (!GetNetworkState(stateID, state)) {
-		return false; // can't delta!
-	}
+	if (!GetNetworkState(stateID, state)) 
+		return false;
 
 	dp->fullID = stateID;
 	dp->objectID = objectID;

@@ -58,10 +58,11 @@ void GameServer::ReceivePacket(int type, GamePacket* payload, int source)
 {
 	if (payload->type == Received_State) 
 	{
-		// The player has recieved their peerId on connect
 		AcknowledgePacket* ackPacket = (AcknowledgePacket*) payload;
-		playerStates[source] = ackPacket->stateID;
-		std::cout << "packet recieved" << std::endl;
+
+		ClientConnectedEvent event = ClientConnectedEvent(ackPacket->GetStateID());
+		EventManager::Call(&event);
+
 	}
 }
 
@@ -77,8 +78,6 @@ void GameServer::UpdateServer() {
 		ENetPeer* p = event.peer;
 		int peer = p->incomingPeerID;
 
-		std::cout << "Updating event: " << type << std::endl;
-
 		if (type == ENET_EVENT_TYPE_CONNECT) 
 		{		
 			int playerID = nextPlayerIndex;
@@ -89,10 +88,6 @@ void GameServer::UpdateServer() {
 			SetClientId* newPacket = new SetClientId();
 			newPacket->clientPeerId = playerID;
 			SendPacketToPeer(newPacket, playerID);
-
-			ClientConnectedEvent event = ClientConnectedEvent(playerID);
-			EventManager::Call(&event);
-
 			std::cout << "player connected" << std::endl;
 		}
 		else if (type == ENET_EVENT_TYPE_DISCONNECT) 
@@ -107,6 +102,8 @@ void GameServer::UpdateServer() {
 		}		
 		else if (type == ENetEventType::ENET_EVENT_TYPE_RECEIVE) 
 		{
+			std::cout << "Sever: client Packet received..." << std::endl;
+
 			GamePacket* packet = (GamePacket*)event.packet->data;
 			ProcessPacket(packet, peer);
 		}		

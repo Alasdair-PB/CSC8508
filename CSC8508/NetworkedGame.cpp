@@ -4,6 +4,7 @@
 #include "GameServer.h"
 #include "GameClient.h"
 #include "RenderObject.h"
+#include "EventManager.h"
 
 
 #define COLLISION_MSG 30
@@ -37,6 +38,7 @@ void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vect
 
 
 NetworkedGame::NetworkedGame()	{
+	EventManager::RegisterListener(this);
 	thisServer = nullptr;
 	thisClient = nullptr;
 
@@ -80,6 +82,13 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
 }
 
+void NetworkedGame::OnEvent(ClientConnectedEvent* e) 
+{
+	int id = e->GetClientId();
+	SendSpawnPacketsOnClientConnect(id);	
+	SpawnPlayerServer(id, GetPlayerPrefab());
+
+}
 
 void NetworkedGame::UpdateGame(float dt) 
 {

@@ -2,6 +2,8 @@
 #include "TutorialGame.h"
 #include "NetworkBase.h"
 #include "NetworkObject.h"
+#include "EventListener.h"
+
 
 namespace NCL {
 	namespace CSC8508 {
@@ -9,7 +11,7 @@ namespace NCL {
 		class GameClient;
 		class NetworkPlayer;
 
-		class NetworkedGame : public TutorialGame, public PacketReceiver {
+		class NetworkedGame : public TutorialGame, public PacketReceiver, public EventListener<ClientConnectedEvent> {
 		public:
 			NetworkedGame();
 			~NetworkedGame();
@@ -26,7 +28,7 @@ namespace NCL {
 			void StartLevel();
 
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
-
+			void OnEvent(ClientConnectedEvent* e) override;
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
 		protected:

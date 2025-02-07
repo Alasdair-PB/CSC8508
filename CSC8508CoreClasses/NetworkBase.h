@@ -1,4 +1,6 @@
 #pragma once
+#include "Event.h"
+
 //#include "./enet/enet.h"
 struct _ENetHost;
 struct _ENetPeer;
@@ -62,6 +64,13 @@ struct AcknowledgePacket : public GamePacket {
 	}
 };
 
+class ClientConnectedEvent : Event {
+public:
+	ClientConnectedEvent(int clientId) { this->clientId = clientId; }
+	int GetClientId() { return clientId;  }
+protected:
+	int clientId;
+};
 
 class PacketReceiver {
 public:

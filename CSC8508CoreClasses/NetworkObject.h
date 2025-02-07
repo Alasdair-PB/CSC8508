@@ -29,7 +29,7 @@ namespace NCL::CSC8508 {
 	};
 
 
-	class NetworkObject		
+	class NetworkObject
 	{
 	public:
 		NetworkObject(GameObject& o, int objId, int ownId);

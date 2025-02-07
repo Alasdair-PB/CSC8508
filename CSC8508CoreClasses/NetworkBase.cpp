@@ -11,8 +11,6 @@ NetworkBase::~NetworkBase()	{
 	}
 }
 
-class ClientConnectedEvent { ClientConnectedEvent() = default; };
-
 void NetworkBase::Initialise() {
 	enet_initialize();
 }

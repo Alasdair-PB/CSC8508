@@ -1,4 +1,5 @@
 #include "GameServer.h"
+#include "EventManager.h"
 #include "./enet/enet.h"
 
 using namespace NCL;
@@ -89,10 +90,8 @@ void GameServer::UpdateServer() {
 			newPacket->clientPeerId = playerID;
 			SendPacketToPeer(newPacket, playerID);
 
-			// Spawn this player locally using:
-				// SpawnPlayerServer
-			// Send spawn packets for exisiting players using:
-				// SendSpawnPacketsOnClientConnect
+			ClientConnectedEvent event = ClientConnectedEvent(playerID);
+			EventManager::Call(&event);
 
 			std::cout << "player connected" << std::endl;
 		}

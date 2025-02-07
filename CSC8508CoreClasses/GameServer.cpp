@@ -59,10 +59,8 @@ void GameServer::ReceivePacket(int type, GamePacket* payload, int source)
 	if (payload->type == Received_State) 
 	{
 		AcknowledgePacket* ackPacket = (AcknowledgePacket*) payload;
-
 		ClientConnectedEvent event = ClientConnectedEvent(ackPacket->GetStateID());
 		EventManager::Call(&event);
-
 	}
 }
 
@@ -79,16 +77,19 @@ void GameServer::UpdateServer() {
 		int peer = p->incomingPeerID;
 
 		if (type == ENET_EVENT_TYPE_CONNECT) 
-		{		
-			int playerID = nextPlayerIndex;
+		{					
+			nextPlayerIndex++;
+			int playerID = nextPlayerIndex;			
+
 			playerPeers[playerID] = p;
 			playerStates[playerID] = 0;
-			nextPlayerIndex++;
 
 			SetClientId* newPacket = new SetClientId();
 			newPacket->clientPeerId = playerID;
 			SendPacketToPeer(newPacket, playerID);
 			std::cout << "player connected" << std::endl;
+			delete newPacket;
+
 		}
 		else if (type == ENET_EVENT_TYPE_DISCONNECT) 
 		{

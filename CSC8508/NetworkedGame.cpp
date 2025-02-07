@@ -234,6 +234,8 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 		newPacket->ownerId = o->GetOwnerID();
 		newPacket->objectId = o->GetObjectID();
 		thisServer->SendPacketToPeer(newPacket, clientId);
+
+		delete newPacket;
 	}
 }
 
@@ -253,6 +255,8 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, GameObject* object)
 		int playerID = player.first;
 		thisServer->SendPacketToPeer(newPacket, playerID);
 	}
+
+	delete newPacket;
 	nextObjectId++;
 }
 
@@ -309,5 +313,6 @@ void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
 
 		newPacket.playerID = b->GetPlayerNum();
 		thisClient->SendPacket(newPacket);
+
 	}
 }

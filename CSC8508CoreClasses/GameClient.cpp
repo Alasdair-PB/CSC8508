@@ -25,8 +25,8 @@ void GameClient::ReceivePacket(int type, GamePacket* payload, int source)
 {
 	if (payload->type == Player_Connected) 
 	{
-		SetClientId* ackPacket = (SetClientId*)payload;
-		peerID = ackPacket->clientPeerId;
+		SetClientId* recievedPacket = (SetClientId*)payload;
+		peerID = recievedPacket->clientPeerId;
 		AcknowledgePacket* ackPacket = new AcknowledgePacket(peerID);
 		std::cout << "Sending ackowledge package" << std::endl;
 		SendPacket(*ackPacket);

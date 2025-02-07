@@ -19,14 +19,7 @@ enum BasicNetworkMessages {
 	Shutdown
 };
 
-struct SetClientId : public GamePacket {
-	int clientPeerId;
 
-	SetClientId() {
-		size = sizeof(SetClientId) - sizeof(GamePacket);
-		type = Player_Connected;
-	}
-};
 
 struct GamePacket {
 	short size;
@@ -46,6 +39,14 @@ struct GamePacket {
 	}
 };
 
+struct SetClientId : public GamePacket {
+	int clientPeerId;
+
+	SetClientId() {
+		size = sizeof(SetClientId) - sizeof(GamePacket);
+		type = Player_Connected;
+	}
+};
 
 struct AcknowledgePacket : public GamePacket {
 	int stateID;

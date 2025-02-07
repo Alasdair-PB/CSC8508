@@ -170,7 +170,7 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame)
 			if (!o) 
 				continue;
 
-			if (o->GetOwnerID() != playerID)
+			if (o->GetOwnerID() == playerID)
 				continue;
 
 			GamePacket* newPacket = new GamePacket();
@@ -239,7 +239,7 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 		if (!o)
 			continue;
 
-		SpawnPacket* newPacket;
+		SpawnPacket* newPacket = new SpawnPacket();
 		newPacket->ownerId = o->GetOwnerID();
 		newPacket->objectId = o->GetObjectID();
 		thisServer->SendPacketToPeer(newPacket, clientId);

@@ -41,7 +41,7 @@ namespace NCL {
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
-			void DrawMenu();
+			void DrawUIExample();
 
 			vector<const RenderObject*> activeObjects;
 
@@ -77,6 +77,8 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
+
+			bool showDemo = true;
 		};
 	}
 }

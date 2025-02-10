@@ -7,6 +7,11 @@
 #include "../ImGui/imgui_impl_win32.h"
 #include "../ImGui/imgui_impl_opengl3.h"
 #include "../ImGui/imgui.h"
+
+#include <windows.h>
+#include <GL/GL.h>
+#include <tchar.h>
+
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8508;
@@ -82,12 +87,15 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_InitForOpenGL(hostWindow.GetHandle());
-	ImGui_ImplOpenGL3_Init("#version 460");
+	ImGui_ImplOpenGL3_Init();
 }
 
 GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &shadowTex);
 	glDeleteFramebuffers(1, &shadowFBO);
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -138,7 +146,7 @@ void GameTechRenderer::RenderFrame() {
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	DrawMenu();
+	DrawUIExample();
 
 	BuildObjectList();
 	SortObjectList();
@@ -546,11 +554,18 @@ void GameTechRenderer::SetDebugLineBufferSizes(size_t newVertCount) {
 	}
 }
 
-void GameTechRenderer::DrawMenu() {
+void GameTechRenderer::DrawUIExample() {
 	ImGui::SetNextWindowPos(ImVec2(100, 100));
-	ImGui::SetNextWindowSize(ImVec2(200, 200));
+	ImGui::SetNextWindowSize(ImVec2(200, 100));
 	ImGui::Begin("Test Window");
-	ImGui::Text("Test Text");
-	ImGui::Button("Test Button", ImVec2(100, 100));
+	if (ImGui::Button("Hide Demo Window")) {
+		showDemo = false;
+	}
+	if (ImGui::Button("Show Demo Window")) {
+		showDemo = true;
+	}
 	ImGui::End();
+	if (showDemo == true) {
+		ImGui::ShowDemoWindow();
+	}
 }

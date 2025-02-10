@@ -14,7 +14,7 @@ NetworkPlayer::~NetworkPlayer()	{
 
 }
 
-void NetworkPlayer::OnCollisionBegin(GameObject* otherObject) {
+void NetworkPlayer::OnCollisionBegin(BoundsComponent* otherObject) {
 	if (game) {
 		if (dynamic_cast<NetworkPlayer*>(otherObject))
 		{

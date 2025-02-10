@@ -111,8 +111,8 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 		Vector3 rayPos;
 		Vector3 rayDir;
 
-		rayDir = selectionObject->GetTransform().GetOrientation() * Vector3(0, 0, -1);
-		rayPos = selectionObject->GetTransform().GetPosition();
+		rayDir = selectionObject->GetGameObject().GetTransform().GetOrientation() * Vector3(0, 0, -1);
+		rayPos = selectionObject->GetGameObject().GetTransform().GetPosition();
 
 		Ray r = Ray(rayPos, rayDir);
 		bool hit = world->Raycast(r, closestCollision, true, selectionObject, new std::vector<Layers::LayerID>({ Layers::LayerID::Player,  Layers::LayerID::Enemy }));
@@ -159,21 +159,16 @@ void TutorialGame::UpdateGame(float dt)
 
 	mainMenu->Update(dt);
 	renderer->Render();
-	//renderer->Update(dt);
 	Debug::UpdateRenderables(dt);
 
 	if (inPause)
 		return;
 
 	UpdateDrawScreen(dt);
-
-	for (auto& obj : updateObjects) {
-		obj->Update(dt);
-	}
+	world->UpdateWorld(dt);
 
 	Window::GetWindow()->ShowOSPointer(true);
 	//Window::GetWindow()->LockMouseToWindow(true);
-	//world->UpdateWorld(dt);
 
 	physics->Update(dt);
 	UpdateCamera(dt);
@@ -189,12 +184,17 @@ void TutorialGame::LockedObjectMovement()
 	fwdAxis.y = 0.0f;
 	fwdAxis = Vector::Normalise(fwdAxis);
 
+	auto phys = selectionObject->GetPhysicsComponent();
+
+	if(!phys)
+		return;
+
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::UP)) 
-		selectionObject->GetPhysicsObject()->AddForce(fwdAxis);
+		phys->GetPhysicsObject()->AddForce(fwdAxis);
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::DOWN)) 
-		selectionObject->GetPhysicsObject()->AddForce(-fwdAxis);
+		phys->GetPhysicsObject()->AddForce(-fwdAxis);
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::NEXT)) 
-		selectionObject->GetPhysicsObject()->AddForce(Vector3(0,-10,0));
+		phys->GetPhysicsObject()->AddForce(Vector3(0,-10,0));
 }
 
 void TutorialGame::InitCamera() {
@@ -322,9 +322,12 @@ bool TutorialGame::SelectObject() {
 	if (inSelectionMode) {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::Left)) {
+
+			RenderObject* ro = selectionObject->GetGameObject().GetRenderObject();
+
 			if (selectionObject)
 			{
-				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				ro->SetColour(Vector4(1, 1, 1, 1));
 				selectionObject = nullptr;
 			}
 
@@ -333,8 +336,8 @@ bool TutorialGame::SelectObject() {
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) 
 			{
-				selectionObject = (GameObject*)closestCollision.node;
-				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+				selectionObject = (BoundsComponent*)closestCollision.node;
+				ro->SetColour(Vector4(0, 1, 0, 1));
 				return true;
 			}
 			else 
@@ -364,9 +367,14 @@ void TutorialGame::MoveSelectedObject() {
 		Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
 		RayCollision closestCollision;
 
-		if (world->Raycast(ray, closestCollision, true)) 
-			if (closestCollision.node == selectionObject) 
-				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+		if (world->Raycast(ray, closestCollision, true)) {
+			if (closestCollision.node == selectionObject) {
+
+				auto phys = selectionObject->GetPhysicsComponent();
+				if (phys)
+					phys->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+			}
+		}
 	}
 }
 

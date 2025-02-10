@@ -3,13 +3,12 @@ using namespace NCL;
 using namespace CSC8508;
 
 
-Swarm::Swarm(NavigationMesh* navMesh) : NavMeshAgent(navMesh)
+Swarm::Swarm()
 {
     //sequence = new BehaviourSequence("Swarm Sequence");
     //sequence->AddChild(chase);
     objects = vector<Kitten*>();
     //state = Ongoing;
-    speed = 5.0f;
     //sequence->Reset();
 }
 
@@ -19,7 +18,7 @@ Swarm::~Swarm() {
 
 Vector3 lastPos;
 
-void ReduceVelocityOnStop(float roundingPrecision, Vector3 currentPos, vector<Kitten*> objects) {
+void Swarm::ReduceVelocityOnStop(float roundingPrecision, Vector3 currentPos, vector<Kitten*> objects) {
     
     auto roundToDP = [](float value, int dp) {
         float factor = std::pow(10.0f, dp);
@@ -32,7 +31,7 @@ void ReduceVelocityOnStop(float roundingPrecision, Vector3 currentPos, vector<Ki
 
         for (auto obj : objects) {
             if (obj) {
-                auto physicsObject = obj->GetPhysicsObject();
+                auto physicsObject = physicsComponent->GetPhysicsObject();
                 Vector3 velocity = physicsObject->GetLinearVelocity();
 
                 Vector3 dampingForce = -velocity * 0.9f;
@@ -58,7 +57,7 @@ void Swarm::MoveObjectsAlongSwarm()
             Vector3 v3 = rule3(obj, objects);
 
             Vector3 combinedForce = Vector::Normalise(v1 * ruleConfig.rule1Weight + v2 * ruleConfig.rule2Weight + v3 * ruleConfig.rule3Weight);            
-            auto physObj = obj->GetPhysicsObject();
+            auto physObj = physicsComponent->GetPhysicsObject();
 
             physObj->AddForce(combinedForce * ruleConfig.forceMultiplier);
             auto pos = obj->GetTransform().GetPosition();
@@ -122,7 +121,7 @@ Vector3 Swarm::rule3(Kitten*& b, std::vector<Kitten*>& boids) {
         if (!other->GetYearnsForSwarm() || !other->GetSelected())
             continue;
         if (&other != &b && Vector::Length(b->GetTransform().GetPosition() - other->GetTransform().GetPosition()) < ruleConfig.minDistanceRule3) {
-            perceived_velocity += other->GetPhysicsObject()->GetLinearVelocity();
+            perceived_velocity += physicsComponent->GetPhysicsObject()->GetLinearVelocity();
             count++;
         }
     }

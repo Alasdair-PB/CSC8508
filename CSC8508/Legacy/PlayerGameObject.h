@@ -1,5 +1,7 @@
 #pragma once
 #include "PhysicsObject.h"
+#include "InputComponent.h"
+
 #include "Ray.h"
 #include "Kitten.h"
 #include "CollectMe.h"
@@ -22,10 +24,6 @@ namespace NCL {
                 this->endGame = endGame;
             }
 
-            void SetController(const Controller& c) {
-                activeController = &c;
-            }
-
            /**
             * Function invoked each frame after Update.
             * @param deltaTime Time since last frame
@@ -33,6 +31,7 @@ namespace NCL {
             void OnAwake() override
             {
                 physicsComponent = this->TryGetComponent<PhysicsComponent>();
+                inputComponent = this->TryGetComponent<InputComponent>();
 
                 if (physicsComponent)
                     physicsObj = physicsComponent->GetPhysicsObject();
@@ -44,11 +43,11 @@ namespace NCL {
              */
             void Update(float deltaTime) override
             {
-                if (activeController == nullptr || physicsObj == nullptr)
+                if (physicsObj == nullptr || physicsComponent == nullptr)
                     return;
 
                 Vector3 dir;
-                yaw -= activeController->GetNamedAxis("XLook");
+                yaw -= inputComponent->GetNamedAxis("XLook");
 
                 if (yaw < 0)
                     yaw += 360.0f;
@@ -57,8 +56,8 @@ namespace NCL {
 
                 Matrix3 yawRotation = Matrix::RotationMatrix3x3(yaw, Vector3(0, 1, 0));
 
-                dir += yawRotation * Vector3(0, 0, -activeController->GetNamedAxis("Forward"));
-                dir += yawRotation * Vector3(activeController->GetNamedAxis("Sidestep"), 0, 0);
+                dir += yawRotation * Vector3(0, 0, -inputComponent->GetNamedAxis("Forward"));
+                dir += yawRotation * Vector3(inputComponent->GetNamedAxis("Sidestep"), 0, 0);
 
                 Matrix3 offsetRotation = Matrix::RotationMatrix3x3(-55.0f, Vector3(0, 1, 0));
                 dir = offsetRotation * dir;
@@ -86,12 +85,12 @@ namespace NCL {
             }
  
         protected:
-            const Controller* activeController = nullptr;
             float speed = 10.0f;
             float	yaw = 0;
             EndGame endGame;
             IncreaseScore increaseScore;
 
+            InputComponent* inputComponent = nullptr;
             PhysicsComponent* physicsComponent = nullptr;
             PhysicsObject* physicsObj = nullptr;
         };

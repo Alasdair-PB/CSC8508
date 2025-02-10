@@ -11,7 +11,11 @@ namespace NCL {
 		class GameClient;
 		class NetworkPlayer;
 
-		class NetworkedGame : public TutorialGame, public PacketReceiver, public EventListener<ClientConnectedEvent> {
+		class NetworkedGame : 
+			public TutorialGame,
+			public PacketReceiver, 
+			public EventListener<NetworkEvent>, 
+			public EventListener<ClientConnectedEvent> {
 		public:
 			NetworkedGame();
 			~NetworkedGame();
@@ -26,9 +30,11 @@ namespace NCL {
 
 
 			void StartLevel();
-
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
+
 			void OnEvent(ClientConnectedEvent* e) override;
+			void OnEvent(NetworkEvent* e) override;
+
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
 		protected:

@@ -4,6 +4,8 @@
 #include "GameServer.h"
 #include "GameClient.h"
 #include "RenderObject.h"
+#include "INetworkComponent.h"
+
 #include "EventManager.h"
 
 
@@ -36,7 +38,9 @@ void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 
 NetworkedGame::NetworkedGame()	{
-	EventManager::RegisterListener(this);
+	EventManager::RegisterListener<NetworkEvent>(this);
+	EventManager::RegisterListener<ClientConnectedEvent>(this);
+
 	thisServer = nullptr;
 	thisClient = nullptr;
 
@@ -87,6 +91,21 @@ void NetworkedGame::OnEvent(ClientConnectedEvent* e)
 	int id = e->GetClientId();
 	SendSpawnPacketsOnClientConnect(id);	
 	SpawnPlayerServer(id, GetPlayerPrefab());
+}
+
+void NetworkedGame::OnEvent(NetworkEvent* e)
+{
+	auto dataPacket = e->eventData;
+	if (thisServer) {
+		for (const auto& player : thisServer->playerPeers)
+		{
+			int playerID = player.first;
+			thisServer->SendPacketToPeer(dataPacket, playerID);
+		}
+	}
+	else 
+		thisClient->SendPacket(*dataPacket);
+	delete e;
 }
 
 void NetworkedGame::UpdateGame(float dt) 
@@ -146,8 +165,6 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 			thisClient->SendPacket(*newPacket);
 		delete newPacket;
 	}
-
-
 }
 
 // Server goes through each object in their world and sends delta or full packets for each. 
@@ -156,25 +173,21 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame)
 	for (const auto& player : thisServer->playerPeers)
 	{	
 		int playerID = player.first;
-		std::vector<GameObject*>::const_iterator first, last;
-		world->GetObjectIterators(first, last);
+		std::vector<INetworkComponent*>::const_iterator first, last;
+		world->GetINetIterators(first, last);
 
 		for (auto i = first; i != last; ++i) 
 		{
-			NetworkObject* o = (*i)->GetNetworkObject();
-			if (!o) 
+			if ((*i)->GetOwnerID() == playerID)
 				continue;
 
-			if (o->GetOwnerID() == playerID)
-				continue;
-
-			GamePacket* newPacket = new GamePacket();
-			if (o->WritePacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
+			auto packets = (*i)->WritePacket(deltaFrame, (*i)->GetLatestNetworkState().stateID);
+			for (int pck =0; pck < packets.size(); pck++)
 			{
-				thisServer->SendPacketToPeer(newPacket, playerID);
-				std::cout << "sending packet to peer: " << playerID<< ", " << o->GetObjectID() << std::endl;
+				thisServer->SendPacketToPeer(packets[pck], playerID);
+				std::cout << "sending packet to peer: " << playerID<< ", " << (*i)->GetObjectID() << std::endl;
+				delete packets[pck];
 			}				
-			delete newPacket;
 		}
 	}
 }

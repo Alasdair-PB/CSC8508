@@ -10,14 +10,12 @@ enum BasicNetworkMessages {
 	None,
 	Message,
 	Spawn_Object,
-	String_Message,
-	Delta_State,	//1 byte per channel since the last state
-	Full_State,		//Full transform etc
-	Received_State, //received from a client, informs that its received packet n
+	Delta_State,	
+	Full_State,		
+	Received_State,
 	Player_Connected,
 	Player_Disconnected,
-	Acknowledge_State,
-
+	Component_Event,
 	Shutdown
 };
 

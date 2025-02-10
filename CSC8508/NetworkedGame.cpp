@@ -140,6 +140,8 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		//if (thisClient->GetPeerId() != o->GetOwnerID())
 		//	continue;
 		GamePacket* newPacket = new GamePacket();
+		std::cout << "sending packet to server: " << o->GetObjectID() << std::endl;
+
 		if (o->WritePacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
 			thisClient->SendPacket(*newPacket);
 		delete newPacket;
@@ -170,7 +172,7 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame)
 			if (o->WritePacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
 			{
 				thisServer->SendPacketToPeer(newPacket, playerID);
-				std::cout << "sending packet to peer" << std::endl;
+				std::cout << "sending packet to peer: " << playerID<< ", " << o->GetObjectID() << std::endl;
 			}				
 			delete newPacket;
 		}
@@ -271,9 +273,8 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 
 		if (thisServer)
 			std::cout << "Recieved Client Transform packet" << std::endl;
-		else {
-			std::cout << "Recieved Client Transform packet" << std::endl;
-		}
+		else 
+			std::cout << "Recieved Server Transform packet" << std::endl;
 
 		std::vector<GameObject*>::const_iterator first, last;
 		world->GetObjectIterators(first, last);
@@ -296,10 +297,8 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 
 	if (thisClient) 
 		thisClient->ReceivePacket(type, payload, source);
-	else if (thisServer) {
-		std::cout << "Recieved not full_state/delata state" << std::endl;
+	else if (thisServer) 
 		thisServer->ReceivePacket(type, payload, source);
-	}
 }
 
 void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {

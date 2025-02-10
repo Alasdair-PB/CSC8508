@@ -65,6 +65,9 @@ bool NetworkObject::ReadPacket(GamePacket& p) {
 }
 
 bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
+
+	std::cout << p.objectID << std::endl;
+
 	if (p.objectID != objectID)
 		return false;
 
@@ -91,6 +94,8 @@ bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
 
 bool NetworkObject::ReadFullPacket(FullPacket& p) 
 {
+	std::cout << p.objectID << std::endl;
+
 	if (p.objectID != objectID)
 		return false;
 

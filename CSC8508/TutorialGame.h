@@ -13,6 +13,8 @@
 #endif
 #include "PhysicsSystem.h"
 #include "Legacy/PlayerGameObject.h"
+#include "BoundsComponent.h"
+
 
 namespace NCL {
 	namespace CSC8508 {
@@ -88,7 +90,7 @@ namespace NCL {
 			float time = 0;
 			int score = 0;
 
-			GameObject* selectionObject = nullptr;
+			BoundsComponent* selectionObject = nullptr;
 
 			Mesh* navigationMesh = nullptr;
 			NavigationPath outPath;
@@ -103,9 +105,10 @@ namespace NCL {
 
 			MainMenu* mainMenu = nullptr;
 
-			GameObject* lockedObject	= nullptr;
+			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset		= Vector3(0, 14, 20);
-			void LockCameraToObject(GameObject* o) {
+
+			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
 			}
 
@@ -121,9 +124,6 @@ namespace NCL {
 
 			GameObject* objClosest = nullptr;
 			PlayerGameObject* players = nullptr;
-		
-			vector<UpdateObject*> updateObjects = vector<UpdateObject*>();
-
 		};
 	}
 }

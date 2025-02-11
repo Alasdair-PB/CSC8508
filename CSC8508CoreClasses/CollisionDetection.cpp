@@ -74,7 +74,7 @@ bool CollisionDetection::RayBoxIntersection(const Ray& r, const Vector3& boxPos,
 	for (int i = 0; i < 3; ++i) {
 		if (intersection[i] + epsilon < boxMin[i] ||
 			intersection[i] - epsilon > boxMax[i]) {
-			return false; // best intersection doesn ’t touch the box !
+			return false; // best intersection doesn ï¿½t touch the box !
 		}
 	}
 	collision.collidedAt = intersection;
@@ -505,14 +505,15 @@ bool CollisionDetection::AABBCapsuleIntersection(
 	CollisionInfo& collisionInfo) {
 
 	// OBB done instead AABBs don't currently exist in game
-	/*Vector3 capsuleStart = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, -volumeA.GetHalfHeight(), 0));
+	Vector3 capsuleStart = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, -volumeA.GetHalfHeight(), 0));
 	Vector3 capsuleEnd = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, volumeA.GetHalfHeight(), 0));
 
 	Vector3 boxMin = worldTransformB.GetPosition() - volumeB.GetHalfDimensions();
 	Vector3 boxMax = worldTransformB.GetPosition() + volumeB.GetHalfDimensions();
+	Vector3 closestPointInBox = Vector::Clamp(worldTransformA.GetPosition(), boxMin, boxMax);
 
-	//Vector3 closestPoint = Vector::ClosestPointOnLineSegment(capsuleStart, capsuleEnd, boxMin, boxMax);
-	Vector3 delta = closestPoint - boxMin;
+	Vector3 closestPoint = Vector::ClosestPointOnLineSegment(capsuleStart, capsuleEnd, closestPointInBox);
+	Vector3 delta = closestPoint - closestPointInBox;
 
 	float distance = Vector::Length(delta);
 	if (distance < volumeA.GetRadius()) {
@@ -521,7 +522,7 @@ bool CollisionDetection::AABBCapsuleIntersection(
 
 		collisionInfo.AddContactPoint(Vector3(), -normal * volumeA.GetRadius(), normal, penetration);
 		return true;
-	}*/
+	}
 	return false;
 }
 
@@ -529,7 +530,6 @@ bool CollisionDetection::OBBSphereIntersection(
 	const OBBVolume& volumeA, const Transform& worldTransformA,
 	const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo)
 {
-
 	Matrix3 orientation = Quaternion::RotationMatrix<Matrix3>(worldTransformA.GetOrientation());
 	Vector3 boxSize = volumeA.GetHalfDimensions();
 	Vector3 delta = worldTransformB.GetPosition() - worldTransformA.GetPosition();
@@ -560,27 +560,39 @@ bool CollisionDetection::OBBCapsuleIntersection(
 	const OBBVolume& volumeB, const Transform& worldTransformB,
 	CollisionInfo& collisionInfo) {
 
+	// Orientation matrix of the OBB to world-space
 	Matrix3 orientation = Quaternion::RotationMatrix<Matrix3>(worldTransformB.GetOrientation());
+	// Half dimensions of the OBB
 	Vector3 boxSize = volumeB.GetHalfDimensions();
+	// Difference from the capsule's origin to the OBB's origin
 	Vector3 delta = worldTransformA.GetPosition() - worldTransformB.GetPosition();
 
+	// Capsule's origin in local space
 	Vector3 localPoint = Matrix::Transpose(orientation) * delta;
+	// Negative half dimensions of the OBB
 	Vector3 negativeBoxSize = -boxSize;
+	// Closest point vector in the OBB volume to the capsule in local space
 	Vector3 closestPointOnBox = Vector::Clamp(localPoint, negativeBoxSize, boxSize);
 
 	// As Capsule
 	Vector3 capsuleStart = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, -volumeA.GetHalfHeight(), 0));
 	Vector3 capsuleEnd = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, volumeA.GetHalfHeight(), 0));
-	Vector3 closestPoint = Vector::ClosestPointOnLineSegment(capsuleStart, capsuleEnd, closestPointOnBox);
-	Vector3 localToCapsule =   closestPoint - closestPointOnBox;
+	Vector3 localCapsuleStart = Matrix::Transpose(orientation) * (capsuleStart - worldTransformB.GetPosition());
+	Vector3 localCapsuleEnd = Matrix::Transpose(orientation) * (capsuleEnd - worldTransformB.GetPosition());
+	// Closest point on capsule's centre line to the closest point of the OBB (LOCAL SPACE)
+	Vector3 closestPoint = Vector::ClosestPointOnLineSegment(localCapsuleStart, localCapsuleEnd, closestPointOnBox);
+
+	// Difference between the closest point in the capsule's centre line and the closest point in the OBB
+	Vector3 localToCapsule =  closestPoint - closestPointOnBox;
 
 	// As Sphere
+	// Difference from the capsule's origin to the closest point in the OBB
 	Vector3 localToSphere = localPoint - closestPointOnBox;
-	float distance = Vector::Length(localToSphere); 
+	// Distance between the capsule's origin and the closest point in the OBB
+	float distance = Vector::Length(localToCapsule);
 
 	if (distance < volumeA.GetRadius())
 	{
-		//Vector3 collisionNormal = orientation * Vector::Normalise(localToCapsule);
 		Vector3 collisionNormal = orientation * Vector::Normalise(localToSphere);
 
 		float penetration = volumeA.GetRadius() - distance;
@@ -588,6 +600,7 @@ bool CollisionDetection::OBBCapsuleIntersection(
 		Vector3 localA = orientation * closestPointOnBox;
 		Vector3 localB = -collisionNormal * volumeA.GetRadius();
 		collisionInfo.AddContactPoint(localA, localB, collisionNormal, penetration);
+
 		return true;
 	}
 	return false;

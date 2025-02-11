@@ -35,8 +35,7 @@ namespace NCL::CSC8508
             requires std::is_base_of_v<IComponent, T>
         static T* AddComponent(Args&&... args) {
             T* component = new T(std::forward<Args>(args)...);
-            components<T>.push_back(component);
-            //allComponents[typeid(T)].push_back(component);            
+            allComponents[typeid(T)].push_back(component);            
             return component;
         }
 
@@ -52,14 +51,12 @@ namespace NCL::CSC8508
         ComponentManager() = default;
 
         template <typename T> requires std::is_base_of_v<IComponent,T>static vector<T*> components;
-        static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
-
+        inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
     };
 
     template <typename T>
         requires std::is_base_of_v<IComponent, T>
     vector<T*> ComponentManager::components = vector<T*>();
-    //std::unordered_map<std::type_index, std::vector<IComponent*>> ComponentManager::allComponents = std::unordered_map<std::type_index, std::vector<IComponent*>>();
 }
 
 #endif //COMPONENTMANAGER_H

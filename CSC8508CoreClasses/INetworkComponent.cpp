@@ -7,15 +7,15 @@ using namespace NCL::CSC8508;
 using namespace NCL;
 using namespace CSC8508;
 
-INetworkComponent::INetworkComponent(int objId, int ownId, bool clientOwned)
+INetworkComponent::INetworkComponent(int objId, int ownId, int componentId, bool clientOwned)
 {
-	objectID = objId;
-	ownerID = ownId;
-	clientOwned = clientOwned;
+	this->objectID = objId;
+	this->ownerID = ownId;
+	this->clientOwned = clientOwned;
+	this->componentID = componentId;
 }
 
-INetworkComponent::~INetworkComponent() {}
-
+/*
 vector<GamePacket*> INetworkComponent::WritePacket(bool deltaFrame, int stateID){
 	if (deltaFrame) {
 		bool foundDelta = true;
@@ -47,4 +47,4 @@ bool INetworkComponent::GetNetworkState(int stateID, NetworkState& state) {
 		}
 	}
 	return false;
-}
+}*/

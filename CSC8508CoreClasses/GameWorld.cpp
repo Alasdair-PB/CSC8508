@@ -49,6 +49,12 @@ void GameWorld::AddGameObject(GameObject* o) {
 	if (phys)
 		physicsComponents.emplace_back(phys);
 
+	auto newComponents = o->GetAllComponents();
+
+	for (IComponent* component : newComponents) {
+		this->components.push_back(component);
+		component->InvokeOnAwake();
+	}
 	o->InvokeOnAwake();
 }
 
@@ -104,7 +110,19 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 	}
 }
 
+void GameWorld::OperateOnComponentContents(IComponentFunc f) {
+	for (IComponent* c : components) {
+		f(c);
+	}
+}
+
 void GameWorld::UpdateWorld(float dt){
+	OperateOnComponentContents(
+		[&](IComponent* c) {
+			if (c->IsEnabled()) {
+				c->InvokeUpdate(dt);
+			}
+		});
 	OperateOnContents(
 		[&](GameObject* o) {
 			if (o->IsEnabled()) {

@@ -19,8 +19,6 @@ enum BasicNetworkMessages {
 	Shutdown
 };
 
-
-
 struct GamePacket {
 	short size;
 	short type;

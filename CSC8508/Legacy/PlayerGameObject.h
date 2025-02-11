@@ -5,12 +5,16 @@
 #include "Ray.h"
 #include "Kitten.h"
 #include "CollectMe.h"
+#include "EventListener.h"
+
 #include "Window.h"
 #include "CollisionDetection.h"
 
 namespace NCL {
     namespace CSC8508 {
-        class PlayerGameObject : public GameObject {
+
+        class OnJumpEvent : public Event {};
+        class PlayerGameObject : public GameObject, public EventListener<OnJumpEvent> {
         public:
 
             PlayerGameObject();
@@ -19,6 +23,10 @@ namespace NCL {
             typedef std::function<void(bool hasWon)> EndGame;
             typedef std::function<void(float points)> IncreaseScore;
 
+            void OnEvent(OnJumpEvent* e) override
+            {
+                // do math stuff
+            }
 
             void SetEndGame(EndGame endGame) {
                 this->endGame = endGame;
@@ -43,7 +51,7 @@ namespace NCL {
              */
             void Update(float deltaTime) override
             {
-                if (physicsObj == nullptr || physicsComponent == nullptr)
+                if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr)
                     return;
 
                 Vector3 dir;

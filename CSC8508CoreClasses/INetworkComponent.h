@@ -10,6 +10,7 @@
 #include "NetworkBase.h"
 #include "NetworkState.h"
 #include "Event.h"
+#include "EventManager.h"
 
 using std::vector;
 
@@ -17,12 +18,9 @@ namespace NCL::CSC8508
 {
 	struct INetworkPacket : GamePacket 
 	{
-		int objectID = -1;
+		int ownerID = -1;
 		int componentID = -1;
 		short packetSubType = 0;
-		int state = -1;
-
-		virtual void GetData() {}
 
 		INetworkPacket() {
 			size = sizeof(INetworkPacket) - sizeof(GamePacket);
@@ -41,29 +39,40 @@ namespace NCL::CSC8508
 	class INetworkComponent
 	{
 	public:
-		INetworkComponent(int objId, int ownId, bool clientOwned);
+		INetworkComponent(int objId, int ownId, int componentID, bool clientOwned);
 
 		virtual ~INetworkComponent() = default;
+		virtual bool ReadEventPacket(INetworkPacket& p) { return false; }
 
-		virtual bool ReadPacket(GamePacket& p) {}
 
 		int GetObjectID() { return objectID; }
 		int GetComponentID() { return objectID; }
 		int GetOwnerID() { return ownerID; }
 
-		vector<GamePacket*> WritePacket(bool deltaFrame, int stateID);
+		/*vector<GamePacket*> WritePacket(bool deltaFrame, int stateID);
 		void UpdateStateHistory(int minID);
-		NetworkState& GetLatestNetworkState();
+		NetworkState& GetLatestNetworkState();*/
 
 	protected:
-		virtual bool ReadEventPacket(INetworkPacket& p) {}
 
 		int objectID;
 		int ownerID;
 		bool clientOwned;
 		int componentID;
-		
-		virtual bool ReadDeltaPacket(INetworkPacket& p) {}
+
+
+		void SendEventPacket(INetworkPacket* packet)
+		{
+			std::cout << "Sending Input packet Event" << std::endl;
+
+			packet->componentID = componentID;
+			packet->ownerID = ownerID;
+
+			NetworkEvent networkPacket = NetworkEvent(packet);
+			EventManager::Call<NetworkEvent>(&networkPacket);
+		}
+
+		/*virtual bool ReadDeltaPacket(INetworkPacket& p) {}
 		virtual bool ReadFullPacket(INetworkPacket& p) {}
 		virtual vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame, int stateID) {}
 		virtual vector<GamePacket*> WriteFullPacket() {}
@@ -73,7 +82,7 @@ namespace NCL::CSC8508
 		std::vector<NetworkState> stateHistory;
 
 		int deltaErrors;
-		int fullErrors;
+		int fullErrors;*/
 	};
 }
 

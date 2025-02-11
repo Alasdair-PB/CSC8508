@@ -7,56 +7,59 @@
 #include <typeindex>
 #include <iostream>
 #include <fstream>
-
-
-#include "IComponent.h"
+using std::vector;
+#include <vector>
 
 namespace NCL::CSC8508 
 {
-    class IComponent;
-    class ComponentManager {
-    public:
-        static ComponentManager& Instance() {
-            static ComponentManager instance;
-            return instance;
-        }
 
-        ComponentManager(const ComponentManager&) = delete;
-        ComponentManager& operator=(const ComponentManager&) = delete;
+    class IComponent;
+
+    class ComponentManager final {
+    public:
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        static std::vector<T*> GetAllComponents() {
+            std::vector<T*> result;
+            auto it = allComponents.find(typeid(T));
+            if (it != allComponents.end()) {
+                for (auto* comp : it->second) {
+                    if (auto* derived = dynamic_cast<T*>(comp)) 
+                        result.push_back(derived);
+                }
+            }
+            return result;
+        }
 
         template <typename T, typename... Args>
             requires std::is_base_of_v<IComponent, T>
-        T* AddComponent(Args&&... args) {
+        static T* AddComponent(Args&&... args) {
             T* component = new T(std::forward<Args>(args)...);
-            componentsByType[typeid(T)].push_back(component);
+            components<T>.push_back(component);
+            //allComponents[typeid(T)].push_back(component);            
             return component;
         }
 
-        template <typename T>
-            requires std::is_base_of_v<IComponent, T>
-        T* TryGetComponent() {
-            auto& components = componentsByType[typeid(T)];
-            for (IComponent* component : components) {
-                if (std::strcmp(component->GetType(), typeid(T).name()) == 0) {
-                    return static_cast<T*>(component);
-                }
+        static void Clear() {
+            for (auto& [type, componentsList] : allComponents) {
+                for (auto* comp : componentsList) 
+                    delete comp;
             }
-            return nullptr;
-        }
-
-        void Clear() {
-            for (auto& [type, components] : componentsByType) {
-                for (IComponent* component : components) {
-                    delete component;
-                }
-                components.clear();
-            }
+            allComponents.clear();
         }
 
     private:
         ComponentManager() = default;
-        std::unordered_map<std::type_index, std::vector<IComponent*>> componentsByType;
+
+        template <typename T> requires std::is_base_of_v<IComponent,T>static vector<T*> components;
+        static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
+
     };
+
+    template <typename T>
+        requires std::is_base_of_v<IComponent, T>
+    vector<T*> ComponentManager::components = vector<T*>();
+    //std::unordered_map<std::type_index, std::vector<IComponent*>> ComponentManager::allComponents = std::unordered_map<std::type_index, std::vector<IComponent*>>();
 }
 
 #endif //COMPONENTMANAGER_H

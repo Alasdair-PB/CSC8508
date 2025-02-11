@@ -21,6 +21,7 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
+
 struct SpawnPacket : public GamePacket {
 
 	short ownerId;
@@ -65,11 +66,12 @@ void NetworkedGame::StartAsServer()
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 	thisServer->RegisterPacketHandler(Received_State, this);
 	thisServer->RegisterPacketHandler(Spawn_Object, this);
+	thisServer->RegisterPacketHandler(Component_Event, this);
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
 
-	SpawnPlayerServer(thisServer->GetPeerId(), GetPlayerPrefab());
+	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) 
@@ -79,6 +81,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 
 	thisClient->RegisterPacketHandler(Delta_State, this);
 	thisClient->RegisterPacketHandler(Full_State, this);
+	thisClient->RegisterPacketHandler(Component_Event, this);
 
 	thisClient->RegisterPacketHandler(Player_Connected, this);
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
@@ -90,11 +93,14 @@ void NetworkedGame::OnEvent(ClientConnectedEvent* e)
 {
 	int id = e->GetClientId();
 	SendSpawnPacketsOnClientConnect(id);	
-	SpawnPlayerServer(id, GetPlayerPrefab());
+	SpawnPlayerServer(id, Prefab::Player);
 }
 
 void NetworkedGame::OnEvent(NetworkEvent* e)
 {
+
+	std::cout << "Sending Input packet Data" << std::endl;
+
 	auto dataPacket = e->eventData;
 	if (thisServer) {
 		for (const auto& player : thisServer->playerPeers)
@@ -105,7 +111,6 @@ void NetworkedGame::OnEvent(NetworkEvent* e)
 	}
 	else 
 		thisClient->SendPacket(*dataPacket);
-	delete e;
 }
 
 void NetworkedGame::UpdateGame(float dt) 
@@ -151,7 +156,7 @@ void NetworkedGame::UpdateAsClient(float dt)
 // Client send all objects in their world not owned by server
 void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) 
 {
-	for (GameObject* i : ownedObjects) {
+	/*for (GameObject* i : ownedObjects) {
 		NetworkObject* o = i->GetNetworkObject();
 		if (!o)
 			continue;
@@ -164,13 +169,13 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		if (o->WritePacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
 			thisClient->SendPacket(*newPacket);
 		delete newPacket;
-	}
+	}*/
 }
 
 // Server goes through each object in their world and sends delta or full packets for each. 
 void NetworkedGame::BroadcastSnapshot(bool deltaFrame) 
 {
-	for (const auto& player : thisServer->playerPeers)
+	/*for (const auto& player : thisServer->playerPeers)
 	{	
 		int playerID = player.first;
 		std::vector<INetworkComponent*>::const_iterator first, last;
@@ -189,12 +194,12 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame)
 				delete packets[pck];
 			}				
 		}
-	}
+	}*/
 }
 
 void NetworkedGame::UpdateMinimumState() 
 {
-	int minID = INT_MAX;
+	/*int minID = INT_MAX;
 	int maxID = 0; 
 
 	for (auto i : stateIDs) {
@@ -212,24 +217,56 @@ void NetworkedGame::UpdateMinimumState()
 		if (!o) 
 			continue;
 		o->UpdateStateHistory(minID); 
-	}
+	}*/
 }
 
-GameObject* NetworkedGame::GetPlayerPrefab() {
-	return TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
-}
-
-void NetworkedGame::SpawnNetworkedObject(int ownerId, int objectId, GameObject* object)
+GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) 
 {
-	NetworkObject* netObject = new NetworkObject(*object, objectId, ownerId);
-	object->SetNetworkObject(netObject);
+	return TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50), spawnPacket);
 }
 
-void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, GameObject* object)
+
+void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, Prefab prefab)
 {
-	SpawnNetworkedObject(ownerId, objectId, object);
-	if (thisClient->GetPeerId() == ownerId)
+	// Will be prefab reference in the future
+	NetworkSpawnData data = NetworkSpawnData();
+	bool clientOwned = ownerId == thisClient->GetPeerId();
+
+	data.clientOwned = clientOwned;
+	data.objId = objectId;
+	data.ownId = ownerId;
+	auto object = GetPlayerPrefab(&data);
+
+	if (clientOwned)
 		ownedObjects.emplace_back(object);
+}
+
+void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
+{
+	// Will be prefab reference in the future
+
+	NetworkSpawnData data = NetworkSpawnData();
+	bool serverOwned = ownerId == thisServer->GetPeerId();
+	data.clientOwned = serverOwned;
+	data.objId = nextObjectId;
+	data.ownId = ownerId;
+	auto object = GetPlayerPrefab(&data);
+
+	if (serverOwned)
+		ownedObjects.emplace_back(object);
+
+	SpawnPacket* newPacket = new SpawnPacket();
+	newPacket->ownerId = ownerId;
+	newPacket->objectId = nextObjectId;
+
+	for (const auto& player : thisServer->playerPeers)
+	{
+		int playerID = player.first;
+		thisServer->SendPacketToPeer(newPacket, playerID);
+	}
+
+	delete newPacket;
+	nextObjectId++;
 }
 
 void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
@@ -254,26 +291,7 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 	}
 }
 
-void NetworkedGame::SpawnPlayerServer(int ownerId, GameObject* object)
-{
-	SpawnNetworkedObject(ownerId, nextObjectId, object);
 
-	if (thisServer->GetPeerId() == ownerId)
-		ownedObjects.emplace_back(object);
-
-	SpawnPacket* newPacket = new SpawnPacket();
-	newPacket->ownerId = ownerId;
-	newPacket->objectId = nextObjectId;
-
-	for (const auto& player : thisServer->playerPeers)
-	{
-		int playerID = player.first;
-		thisServer->SendPacketToPeer(newPacket, playerID);
-	}
-
-	delete newPacket;
-	nextObjectId++;
-}
 
 void NetworkedGame::StartLevel() 
 {
@@ -300,11 +318,40 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 			o->ReadPacket(*payload);
 		}
 	}
+	if (type == Component_Event)
+	{
+		std::vector<INetworkComponent*>::const_iterator first, last;
+		world->GetINetIterators(first, last);
+
+		for (auto i = first; i != last; ++i)
+		{
+			INetworkComponent* c = (*i);
+			INetworkPacket* p = (INetworkPacket*) payload;
+
+			if (p->componentID != (c->GetComponentID()))
+				continue;
+
+			c->ReadEventPacket(*p);
+
+			if (thisServer) 
+			{
+				for (const auto& player : thisServer->playerPeers)
+				{
+					int playerID = player.first;
+					if (playerID != p->ownerID) {
+						int playerID = player.first;
+						thisServer->SendPacketToPeer(payload, playerID);
+					}
+				}
+			}
+		}
+		
+	}
 
 	if (type == Spawn_Object) {
 		if (thisClient) {
 			SpawnPacket* ackPacket = (SpawnPacket*)payload;
-			SpawnPlayerClient(ackPacket->ownerId, ackPacket->objectId, GetPlayerPrefab());
+			SpawnPlayerClient(ackPacket->ownerId, ackPacket->objectId, Prefab::Player);
 		}
 	}
 

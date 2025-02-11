@@ -10,6 +10,7 @@ namespace NCL {
 		class GameServer;
 		class GameClient;
 		class NetworkPlayer;
+		enum Prefab { Player, EnemyA };
 
 		class NetworkedGame : 
 			public TutorialGame,
@@ -25,8 +26,8 @@ namespace NCL {
 
 			void UpdateGame(float dt) override;
 
-			void SpawnPlayerClient(int ownerId, int objectId, GameObject* object);
-			void SpawnPlayerServer(int ownerId, GameObject* object);
+			void SpawnPlayerClient(int ownerId, int objectId, Prefab prefab);
+			void SpawnPlayerServer(int ownerId, Prefab prefab);
 
 
 			void StartLevel();
@@ -49,9 +50,8 @@ namespace NCL {
 			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastSnapshot(bool deltaFrame);
 			void BroadcastOwnedObjects(bool deltaFrame);
-			void SpawnNetworkedObject(int ownerId, int objectId, GameObject* object);
 			void UpdateMinimumState();
-			std::map<int, int> stateIDs;
+			//std::map<int, int> stateIDs;
 
 			GameServer* thisServer;
 			GameClient* thisClient;
@@ -61,7 +61,8 @@ namespace NCL {
 			int nextObjectId;
 
 			vector<GameObject*> ownedObjects;
-			GameObject* GetPlayerPrefab();
+
+			GameObject* GetPlayerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 			std::vector<int> playerStates;
 
 

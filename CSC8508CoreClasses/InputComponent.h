@@ -18,7 +18,7 @@ namespace NCL::CSC8508
 	class InputComponent : public IComponent
 	{
 	public:
-		InputComponent(GameObject& gameObject) : IComponent(gameObject) {}
+		InputComponent(GameObject& gameObject, Controller* controller) : IComponent(gameObject), activeController(controller) {}
 		~InputComponent() = default;
 
 		virtual void Update(float deltaTime) override

@@ -6,12 +6,10 @@
 #define ICOMPONENT_H
 
 #include "Transform.h"
+#include "GameObject.h"
 
 namespace NCL::CSC8508 
 {
-
-	class GameObject;
-
 	class IComponent
 	{
 	public:

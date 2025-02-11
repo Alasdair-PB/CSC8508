@@ -3,6 +3,7 @@
 #include "Constraint.h"
 #include "CollisionDetection.h"
 #include "Camera.h"
+#include "ComponentManager.h"
 
 
 using namespace NCL;
@@ -98,11 +99,6 @@ void GameWorld::GetObjectIterators(
 	last	= gameObjects.end();
 }
 
-void GameWorld::OperateOnPhysicsContents(PhysicsComponentFunc f) {
-	for (PhysicsComponent* g : physicsComponents) {
-		f(g);
-	}
-}
 
 void GameWorld::OperateOnContents(GameObjectFunc f) {
 	for (GameObject* g : gameObjects) {
@@ -110,17 +106,14 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 	}
 }
 
-void GameWorld::OperateOnComponentContents(IComponentFunc f) {
-	for (IComponent* c : components) {
-		f(c);
-	}
-}
 
 void GameWorld::UpdateWorld(float dt){
-	OperateOnComponentContents(
+	ComponentManager::OperateOnBufferContentsDynamicType<IComponent>(
 		[&](IComponent* c) {
 			if (c->IsEnabled()) {
 				c->InvokeUpdate(dt);
+				std::cout << "This happens" << std::endl;
+
 			}
 		});
 	OperateOnContents(

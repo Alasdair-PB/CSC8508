@@ -17,19 +17,6 @@ namespace NCL::CSC8508 {
 
     class ComponentManager final {
     public:
-        template <typename T>
-            requires std::is_base_of_v<IComponent, T>
-        static std::vector<T*> GetAllComponents() {
-            std::vector<T*> result;
-            auto it = allComponents.find(typeid(T));
-            if (it != allComponents.end()) {
-                for (auto* comp : it->second) {
-                    if (auto* derived = dynamic_cast<T*>(comp))
-                        result.push_back(derived);
-                }
-            }
-            return result;
-        }
 
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
@@ -52,31 +39,46 @@ namespace NCL::CSC8508 {
             }
         }
 
+        // Does not currently work: works for parent types e.g<InputComponent>
+        // but will not for NetworkInputComponent
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        static std::vector<T*> GetAllComponents() {
+            std::vector<T*> result;
+            auto it = allComponents.find(typeid(T));
+            if (it != allComponents.end()) {
+                for (auto* comp : it->second) {
+                    if (auto* derived = dynamic_cast<T*>(comp))
+                        result.push_back(derived);
+                }
+            }
+            return result;
+        }
+
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnBufferContents(std::function<void(T*)> func) {
             T* buffer = GetComponentsBuffer<T>();
-            size_t count = componentCount<T>();
+            size_t count = componentCount<T>;
             for (size_t i = 0; i < count; ++i) 
                 func(&buffer[i]); 
         }
 
 
+
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
-        void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
+        static void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
         {
             for (auto& entry : allComponents) {
-                if (std::is_base_of_v<T, decltype(*entry.first)>) {
+                if (std::is_base_of_v<T, decltype(entry.first)>)
+                {
                     for (auto* component : entry.second) {
-                        if (auto* castedComponent = dynamic_cast<T*>(component))
-                            OperateOnBufferContents<*entry.first>(func);
+                        func(component);
                     }
                 }
             }
         }
-
-
 
         template <typename T, typename... Args>
             requires std::is_base_of_v<IComponent, T>

@@ -61,8 +61,6 @@ namespace NCL {
 			virtual void UpdateWorld(float dt);
 
 			void OperateOnContents(GameObjectFunc f);
-			void OperateOnPhysicsContents(PhysicsComponentFunc f);
-			void OperateOnComponentContents(IComponentFunc f);
 
 			void GetObjectIterators(
 				GameObjectIterator& first,

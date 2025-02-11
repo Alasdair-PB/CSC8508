@@ -31,6 +31,53 @@ namespace NCL::CSC8508 {
             return result;
         }
 
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        static T* GetComponentsBuffer() {
+            return reinterpret_cast<T*>(componentBuffer<T>);
+        }
+
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        static std::pair<T*, size_t> GetComponentsIterator() {
+            return { componentBuffer<T>, componentCount<T> };
+        }
+
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        static void OperateOnContents(std::function<void(T*)> func) {
+            auto [buffer, count] = GetComponentsIterator<T>();
+            for (size_t i = 0; i < count; ++i) {
+                func(&buffer[i]);
+            }
+        }
+
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        static void OperateOnBufferContents(std::function<void(T*)> func) {
+            T* buffer = GetComponentsBuffer<T>();
+            size_t count = componentCount<T>();
+            for (size_t i = 0; i < count; ++i) 
+                func(&buffer[i]); 
+        }
+
+
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
+        {
+            for (auto& entry : allComponents) {
+                if (std::is_base_of_v<T, decltype(*entry.first)>) {
+                    for (auto* component : entry.second) {
+                        if (auto* castedComponent = dynamic_cast<T*>(component))
+                            OperateOnBufferContents<*entry.first>(func);
+                    }
+                }
+            }
+        }
+
+
+
         template <typename T, typename... Args>
             requires std::is_base_of_v<IComponent, T>
         static T* AddComponent(Args&&... args) {

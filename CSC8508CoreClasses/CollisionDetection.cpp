@@ -1,3 +1,7 @@
+//
+// Contributors: Alasdair, Alfie
+//
+
 #include "CollisionDetection.h"
 #include "CollisionVolume.h"
 #include "AABBVolume.h"
@@ -559,51 +563,44 @@ bool CollisionDetection::OBBCapsuleIntersection(
 	const CapsuleVolume& volumeA, const Transform& worldTransformA,
 	const OBBVolume& volumeB, const Transform& worldTransformB,
 	CollisionInfo& collisionInfo) {
+	// All local space variables use the suffix "local". Otherwise, it's either world space or applicable to both
 
-	// Orientation matrix of the OBB to world-space
-	Matrix3 orientation = Quaternion::RotationMatrix<Matrix3>(worldTransformB.GetOrientation());
+	// Orientation matrix of the OBB to world-space (Used to translate between WS and LS)
+	auto orientation = Quaternion::RotationMatrix<Matrix3>(worldTransformB.GetOrientation());
 	// Half dimensions of the OBB
-	Vector3 boxSize = volumeB.GetHalfDimensions();
+	Vector3 boxHalfDimensions = volumeB.GetHalfDimensions();
 	// Difference from the capsule's origin to the OBB's origin
 	Vector3 delta = worldTransformA.GetPosition() - worldTransformB.GetPosition();
-
 	// Capsule's origin in local space
-	Vector3 localPoint = Matrix::Transpose(orientation) * delta;
-	// Negative half dimensions of the OBB
-	Vector3 negativeBoxSize = -boxSize;
+	Vector3 localCapsuleOrigin = Matrix::Transpose(orientation) * delta;
 	// Closest point vector in the OBB volume to the capsule in local space
-	Vector3 closestPointOnBox = Vector::Clamp(localPoint, negativeBoxSize, boxSize);
+	Vector3 localClosestPointOnBox = Vector::Clamp(localCapsuleOrigin, -boxHalfDimensions, boxHalfDimensions);
 
-	// As Capsule
-	Vector3 capsuleStart = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, -volumeA.GetHalfHeight(), 0));
-	Vector3 capsuleEnd = worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, volumeA.GetHalfHeight(), 0));
+	// World space capsule start and end positions
+	Vector3 capsuleStart = worldTransformA.GetPosition() + worldTransformA.GetOrientation() * Vector3(0, -volumeA.GetHalfHeight(), 0);
+	Vector3 capsuleEnd = worldTransformA.GetPosition() + worldTransformA.GetOrientation() * Vector3(0, volumeA.GetHalfHeight(), 0);
+	// Local space capsule start and end positions
 	Vector3 localCapsuleStart = Matrix::Transpose(orientation) * (capsuleStart - worldTransformB.GetPosition());
 	Vector3 localCapsuleEnd = Matrix::Transpose(orientation) * (capsuleEnd - worldTransformB.GetPosition());
-	// Closest point on capsule's centre line to the closest point of the OBB (LOCAL SPACE)
-	Vector3 closestPoint = Vector::ClosestPointOnLineSegment(localCapsuleStart, localCapsuleEnd, closestPointOnBox);
+	// Closest point on capsule's centre line to the closest point of the OBB in local space
+	Vector3 localClosestPoint = Vector::ClosestPointOnLineSegment(localCapsuleStart, localCapsuleEnd, localClosestPointOnBox);
 
-	// Difference between the closest point in the capsule's centre line and the closest point in the OBB
-	Vector3 localToCapsule =  closestPoint - closestPointOnBox;
+	// Difference between the closest point in the capsule's centre line and the closest point in the OBB in local space
+	Vector3 localToCapsule =  localClosestPoint - localClosestPointOnBox;
 
-	// As Sphere
-	// Difference from the capsule's origin to the closest point in the OBB
-	Vector3 localToSphere = localPoint - closestPointOnBox;
 	// Distance between the capsule's origin and the closest point in the OBB
 	float distance = Vector::Length(localToCapsule);
 
-	if (distance < volumeA.GetRadius())
-	{
-		Vector3 collisionNormal = orientation * Vector::Normalise(localToSphere);
+	// If no collision
+	if (distance >= volumeA.GetRadius()) return false;
 
-		float penetration = volumeA.GetRadius() - distance;
-
-		Vector3 localA = orientation * closestPointOnBox;
-		Vector3 localB = -collisionNormal * volumeA.GetRadius();
-		collisionInfo.AddContactPoint(localA, localB, collisionNormal, penetration);
-
-		return true;
-	}
-	return false;
+	// If there is a collision
+	Vector3 collisionNormal = orientation * Vector::Normalise(localToCapsule);
+	float penetration = volumeA.GetRadius() - distance;
+	Vector3 localA = orientation * localClosestPointOnBox;
+	Vector3 localB = -collisionNormal * volumeA.GetRadius();
+	collisionInfo.AddContactPoint(localA, localB, collisionNormal, penetration);
+	return true;
 }
 
 bool CollisionDetection::SphereCapsuleIntersection(

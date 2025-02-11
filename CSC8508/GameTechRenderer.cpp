@@ -82,20 +82,14 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	SetDebugLineBufferSizes(1000);
 
 	/*Initialises ImGui for use with Win32 and OpenGL*/
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_InitForOpenGL(hostWindow.GetHandle());
-	ImGui_ImplOpenGL3_Init();
+	uiSystem = new UISystem(hostWindow.GetHandle());
 }
 
 GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &shadowTex);
 	glDeleteFramebuffers(1, &shadowFBO);
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+
+	delete uiSystem;
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -141,13 +135,6 @@ void GameTechRenderer::LoadSkybox() {
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
-
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
-	DrawUIExample();
-
 	BuildObjectList();
 	SortObjectList();
 	RenderShadowMap();
@@ -161,9 +148,7 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderTextures();
 	NewRenderText();
 
-	ImGui::Render();
-	ImGui::EndFrame();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	uiSystem->DrawDemo();
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -551,21 +536,5 @@ void GameTechRenderer::SetDebugLineBufferSizes(size_t newVertCount) {
 		glEnableVertexAttribArray(1);
 
 		glBindVertexArray(0);
-	}
-}
-
-void GameTechRenderer::DrawUIExample() {
-	ImGui::SetNextWindowPos(ImVec2(100, 100));
-	ImGui::SetNextWindowSize(ImVec2(200, 100));
-	ImGui::Begin("Test Window");
-	if (ImGui::Button("Hide Demo Window")) {
-		showDemo = false;
-	}
-	if (ImGui::Button("Show Demo Window")) {
-		showDemo = true;
-	}
-	ImGui::End();
-	if (showDemo == true) {
-		ImGui::ShowDemoWindow();
 	}
 }

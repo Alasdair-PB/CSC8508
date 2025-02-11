@@ -16,6 +16,7 @@ https://research.ncl.ac.uk/game/
 #include <stdio.h>
 #include <fcntl.h>
 #include <string>
+#include <functional>
 
 namespace NCL {
 	class GameTimer;
@@ -63,7 +64,7 @@ namespace NCL {
 
 		bool		HasInitialised()	const { return init; }
 
-		HWND	    GetHandle();
+		HWND	    GetHandle() const;
 
 		float		GetScreenAspect()	const {
 			return (float)size.x / (float)size.y;

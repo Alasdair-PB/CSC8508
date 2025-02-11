@@ -5,6 +5,7 @@
 #include "OGLMesh.h"
 
 #include "GameWorld.h"
+#include "UISystem.h"
 
 namespace NCL {
 	namespace CSC8508 {
@@ -79,6 +80,8 @@ namespace NCL {
 			size_t textCount;
 
 			bool showDemo = true;
+
+			UISystem* uiSystem;
 		};
 	}
 }

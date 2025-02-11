@@ -4,9 +4,6 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
-#include "../ImGui/imgui_impl_win32.h"
-#include "../ImGui/imgui_impl_opengl3.h"
-#include "../ImGui/imgui.h"
 
 #include <windows.h>
 #include <GL/GL.h>

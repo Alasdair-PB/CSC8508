@@ -203,7 +203,6 @@ void NetworkedGame::SpawnPlayer()
 	auto play = TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
 	NetworkObject* player = new NetworkObject(*play, 0); 
 	play->SetNetworkObject(player);
-	world->AddGameObject(play);
 }
 
 void NetworkedGame::StartLevel() 

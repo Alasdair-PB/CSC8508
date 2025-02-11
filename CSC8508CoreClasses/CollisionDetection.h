@@ -4,6 +4,7 @@
 
 #include "Transform.h"
 #include "GameObject.h"
+#include "BoundsComponent.h"
 
 #include "AABBVolume.h"
 #include "OBBVolume.h"
@@ -25,8 +26,8 @@ namespace NCL {
 			float	penetration;
 		};
 		struct CollisionInfo {
-			GameObject* a;
-			GameObject* b;		
+			BoundsComponent* a;
+			BoundsComponent* b;
 			int		framesLeft;
 
 			ContactPoint point;
@@ -77,7 +78,7 @@ namespace NCL {
 
 		static Ray BuildRayFromMouse(const PerspectiveCamera& c);
 
-		static bool RayIntersection(const Ray&r, GameObject& object, RayCollision &collisions);
+		static bool RayIntersection(const Ray&r, BoundsComponent& object, RayCollision &collisions);
 
 
 		static bool RayAABBIntersection(const Ray&r, const Transform& worldTransform, const AABBVolume&	volume, RayCollision& collision);
@@ -91,7 +92,7 @@ namespace NCL {
 		static bool	AABBTest(const Vector3& posA, const Vector3& posB, const Vector3& halfSizeA, const Vector3& halfSizeB);
 
 
-		static bool ObjectIntersection(GameObject* a, GameObject* b, CollisionInfo& collisionInfo);
+		static bool ObjectIntersection(BoundsComponent* a, BoundsComponent* b, CollisionInfo& collisionInfo);
 
 
 		static bool AABBIntersection(	const AABBVolume& volumeA, const Transform& worldTransformA,

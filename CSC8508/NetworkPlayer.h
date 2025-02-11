@@ -11,7 +11,7 @@ namespace NCL {
 			NetworkPlayer(NetworkedGame* game, int num);
 			~NetworkPlayer();
 
-			void OnCollisionBegin(GameObject* otherObject) override;
+			void OnCollisionBegin(BoundsComponent* otherObject) override;
 
 			int GetPlayerNum() const {
 				return playerNum;

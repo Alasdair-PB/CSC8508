@@ -1,4 +1,5 @@
 //
+// Original author: Rich Davison
 // Contributors: Alasdair, Alfie
 //
 
@@ -399,58 +400,234 @@ int TestOBBOBB(OBB& a, OBB& b)
 	return 1;
 }
 
+void GetAllOBBVertices(Vector3 array[8], Vector3 const& origin, Vector3 const& halfDimensions) {
+	for (int i = 0; i < 8; i++) {
+		array[i] = origin + halfDimensions * Vector3(
+			i & 1 ? 1 : -1,
+			i & 2 ? 1 : -1,
+			i & 4 ? 1 : -1
+			);
+	}
+}
 
 bool CollisionDetection::OBBIntersection(
 	const OBBVolume& volumeA, const Transform& worldTransformA,
 	const OBBVolume& volumeB, const Transform& worldTransformB,
 	CollisionInfo& collisionInfo) {
 
-	Matrix3 orientationA = Quaternion::RotationMatrix<Matrix3>(worldTransformA.GetOrientation());
-	Matrix3 orientationB = Quaternion::RotationMatrix<Matrix3>(worldTransformB.GetOrientation());
+	// Get all vertices
+	Vector3 aVertices[8], bVertices[8];
+	GetAllOBBVertices(aVertices, worldTransformA.GetPosition(), volumeA.GetHalfDimensions());
+	GetAllOBBVertices(bVertices, worldTransformB.GetPosition(), volumeB.GetHalfDimensions());
 
-	Vector3 positionA = worldTransformA.GetPosition();
-	Vector3 positionB = worldTransformB.GetPosition();
-
-	Vector3 halfSizeA = volumeA.GetHalfDimensions();
-	Vector3 halfSizeB = volumeB.GetHalfDimensions();
-
-	OBB obbA;
-	obbA.c = positionA;
-	obbA.u[0] = orientationA.GetRow(0);
-	obbA.u[1] = orientationA.GetRow(1);
-	obbA.u[2] = orientationA.GetRow(2);
-	obbA.e = halfSizeA;
-
-	OBB obbB;
-	obbB.c = positionB;
-	obbB.u[0] = orientationB.GetRow(0);
-	obbB.u[1] = orientationB.GetRow(1);
-	obbB.u[2] = orientationB.GetRow(2);
-	obbB.e = halfSizeB;
-
-	if (TestOBBOBB(obbA, obbB) == 0) {
-		return false; 
+	// Translate vertices to be local to the opposite shape
+	for (int i = 0; i < 8; i++) {
+		aVertices[i] = worldTransformB.GetOrientation() * (aVertices[i] - worldTransformB.GetPosition());
+		bVertices[i] = worldTransformA.GetOrientation() * (bVertices[i] - worldTransformA.GetPosition());
 	}
 
-	Vector3 closestPointA, closestPointB;
-	ClosestPtPointOBB(obbB.c, obbA, closestPointA);
-	ClosestPtPointOBB(obbA.c, obbB, closestPointB);
+	// Find min and max x, y and z in each vertex array
+	auto minA = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	auto maxA = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	auto minB = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	auto maxB = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	for (int i = 0; i < 8; i++) { // For each vertex in vertex arrays
+		for (int j = 0; j < 3; j++) { // For each axis
+			if (aVertices[i][j] < minA[j]) minA[j] = aVertices[i][j];
+			if (aVertices[i][j] > maxA[j]) maxA[j] = aVertices[i][j];
+			if (bVertices[i][j] < minB[j]) minB[j] = bVertices[i][j];
+			if (bVertices[i][j] > maxB[j]) maxB[j] = bVertices[i][j];
+		}
+	}
 
-	Vector3 collisionNormal = Vector::Normalise(closestPointB - closestPointA);
-	float penetration = sqrt(SqDistPointOBB(closestPointB, obbA));
+	// Check that their bounds lie within the half dimensions of the opposing shape
+	Vector3 aHalfDimensions = volumeA.GetHalfDimensions();
+	Vector3 bHalfDimensions = volumeB.GetHalfDimensions();
+	float minPenetration = FLT_MAX;
+	int axis = 0;
+	for (int i = 0; i < 3; i++) { // For each axis
+		if (minA[i] > bHalfDimensions[i] || maxA[i] < -bHalfDimensions[i]) return false;
+		float hold = std::min(bHalfDimensions[i] - minA[i], maxA[i] + bHalfDimensions[i]);
+		if (hold < minPenetration) {
+			minPenetration = hold;
+			axis = i;
+		}
 
-	Vector3 contactPointA = closestPointA + collisionNormal * penetration * 0.5f;
-	Vector3 contactPointB = closestPointB - collisionNormal * penetration * 0.5f;
+		if (minB[i] > aHalfDimensions[i] || maxB[i] < -aHalfDimensions[i]) return false;
+		hold = std::min(aHalfDimensions[i] - minB[i], maxB[i] + aHalfDimensions[i]);
+		if (hold < minPenetration) {
+			minPenetration = hold;
+			axis = -i;
+		}
+	}
+
+	// Find the point of collision
+	Vector3 pointOfCollision;
+	if (axis > 0) pointOfCollision = (maxA + minA) * 2.0f;
+	else if (axis < 0) pointOfCollision = (maxB + minB) * 2.0f;
+
+	std::cout << "COLLISION DETECTED!!! Min penetration = " << minPenetration << ", axis = " << axis << "\n";
+	std::cout << "Relative point of collision: " << pointOfCollision.x << ", " << pointOfCollision.y << ", " << pointOfCollision.z << '\n';
+
+	// std::cout << "Volume A vertices local to volume B:\n";
+	// for (Vector3 vert : aVertices) {
+	// 	std::cout << vert.x << ", " << vert.y << ", " << vert.z << '\n';
+	// }
+	// std::cout << "Volume B vertices local to volume A:\n";
+	// for (Vector3 vert : bVertices) {
+	// 	std::cout << vert.x << ", " << vert.y << ", " << vert.z << '\n';
+	// }
+
+	return false;
 
 
-	Vector3 delta = positionB - positionA;
+	// 	// Get all starting variables
+	// Vector3 boxSizeA = volumeA.GetHalfDimensions();
+	// Vector3 boxSizeB = volumeB.GetHalfDimensions();
+	// Quaternion quatA = worldTransformA.GetOrientation();
+	// auto rotationA = Quaternion::RotationMatrix<Matrix3>(quatA);
+	// Quaternion quatB = worldTransformB.GetOrientation();
+	// auto rotationB = Quaternion::RotationMatrix<Matrix3>(quatB);
+	//
+	// float minPenetration = FLT_MAX;
+	// //Vector3 collisionAxis; // TODO: Remove if useless
+	// //bool collisionDetected = true;
+	//
+	// auto projectOnAxis = [](const OBBVolume& volume, const Transform& transform, Matrix3 rotation, const Vector3& axis)->float {
+	// 	float projection = 0.0;
+	// 	Vector3 xAxis = rotation.GetColumn(0);
+	// 	Vector3 yAxis = rotation.GetColumn(1);
+	// 	Vector3 zAxis = rotation.GetColumn(2);
+	// 	projection += abs(Vector::Dot(axis, xAxis) * volume.GetHalfDimensions().x);
+	// 	projection += abs(Vector::Dot(axis, yAxis) * volume.GetHalfDimensions().y);
+	// 	projection += abs(Vector::Dot(axis, zAxis) * volume.GetHalfDimensions().z);
+	// 	return projection;
+	// };
+	//
+	// Vector3 testAxes[15];
+	// int axisIndex = 0;
+	//
+	// Vector3 axesA[3] = { rotationA.GetColumn(0), rotationA.GetColumn(1), rotationA.GetColumn(2) };
+	// for (int i = 0; i < 3; i++) {
+	// 	testAxes[axisIndex++] = axesA[i];
+	// }
+	//
+	// Vector3 axesB[3] = { rotationB.GetColumn(0), rotationB.GetColumn(1), rotationB.GetColumn(2) };
+	// for (int i = 0; i < 3; i++) {
+	// 	testAxes[axisIndex++] = axesB[i];
+	// }
+	//
+	// for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) {
+	// 	Vector3 crossAxis = Vector::Cross(axesA[i], axesB[j]);
+	// 	bool check = true;
+	// 	if (abs(crossAxis.x) < FLT_EPSILON && abs(crossAxis.y) < FLT_EPSILON && abs(crossAxis.z) < FLT_EPSILON) check = false;
+	// 	if (check) testAxes[axisIndex++] = Vector::Normalise(crossAxis);
+	// }
+	//
+	// for (int i = 0; i < 15; i++) {
+	// 	Vector3 axis = testAxes[i];
+	//
+	// 	float projectionA = projectOnAxis(volumeA, worldTransformA, rotationA, axis);
+	// 	float projectionB = projectOnAxis(volumeB, worldTransformB, rotationB, axis);
+	//
+	// 	float centreDistance = abs(Vector::Dot(axis, worldTransformB.GetPosition() - worldTransformA.GetPosition()));
+	// 	float overlap = projectionA + projectionB - centreDistance;
+	//
+	// 	// If there's no overlap on this axis
+	// 	//if (overlap <= -FLT_EPSILON) return false;
+	// 	if (overlap <= 0) return false;
+	// 	//if (overlap < FLT_EPSILON) return false;
+	//
+	// 	if (overlap < minPenetration) {
+	// 		minPenetration = overlap;
+	// 		//collisionAxis = axis; // TODO: Remove if useless
+	// 	}
+	// }
+	//
+	// Vector3 delta = worldTransformB.GetPosition() - worldTransformA.GetPosition();
+	//
+	// Vector3 centredPointA = delta - worldTransformA.GetPosition();
+	// Vector3 localPointA {
+	// 	Vector::Dot(centredPointA, axesA[0]),
+	// 	Vector::Dot(centredPointA, axesA[1]),
+	// 	Vector::Dot(centredPointA, axesA[2])
+	// };
+	//
+	// Vector3 centredPointB = delta - worldTransformB.GetPosition();
+	// Vector3 localPointB {
+	// 	Vector::Dot(centredPointB, axesB[0]),
+	// 	Vector::Dot(centredPointB, axesB[1]),
+	// 	Vector::Dot(centredPointB, axesB[2])
+	// };
+	//
+	// Vector3 localA = Vector::Clamp(localPointA, -boxSizeA, boxSizeA);
+	// Vector3 localB = Vector::Clamp(localPointB, -boxSizeB, boxSizeB);
+	//
+	// Vector3 localColPoint = delta - localA;
+	// Vector3 localCollisionNormal = Vector::Normalise(localColPoint);
+	// Vector3 collisionNormal = rotationA * localCollisionNormal;
+	// //if (Vector::Dot(collisionNormal, delta) > 0) collisionNormal = -collisionNormal; // TODO: Remove if useless
+	// if (Vector::Dot(collisionNormal, delta) < 0) collisionNormal = -collisionNormal;
+	//
+	// collisionInfo.AddContactPoint(localA, localB, collisionNormal, minPenetration);
+	// //std::cout << "There has been an OBB OBB collision!\n";
+	// //std::cout << "Normal: " << collisionNormal.x << ", " << collisionNormal.y << ", " << collisionNormal.z << '\n';
+	// //std::cout << "Penetration: " << minPenetration << '\n';
+	// std::cout << "====== Collision found! ======\n";
+	// std::cout << "Object A origin: " << worldTransformA.GetPosition().x << ", " << worldTransformA.GetPosition().y << ", " << worldTransformA.GetPosition().z << '\n';
+	// std::cout << "Object B origin: " << worldTransformB.GetPosition().x << ", " << worldTransformB.GetPosition().y << ", " << worldTransformB.GetPosition().z << '\n';
+	// std::cout << "Min penetration: " << minPenetration << '\n';
+	// if (minPenetration < FLT_EPSILON && minPenetration > -FLT_EPSILON) std::cout << "MinPenetration is 0!\n";
+	// std::cout << "Collision normal: " << collisionNormal.x << ", " << collisionNormal.y << ", " << collisionNormal.z << '\n';
+	//
+	// return true;
 
-	if (Vector::Dot(collisionNormal, delta) < 0)
-		collisionNormal = -collisionNormal;
-
-	collisionInfo.AddContactPoint(contactPointA, contactPointB, collisionNormal, penetration);
-
-	return true;
+	// Matrix3 orientationA = Quaternion::RotationMatrix<Matrix3>(worldTransformA.GetOrientation());
+	// Matrix3 orientationB = Quaternion::RotationMatrix<Matrix3>(worldTransformB.GetOrientation());
+	//
+	// Vector3 positionA = worldTransformA.GetPosition();
+	// Vector3 positionB = worldTransformB.GetPosition();
+	//
+	// Vector3 halfSizeA = volumeA.GetHalfDimensions();
+	// Vector3 halfSizeB = volumeB.GetHalfDimensions();
+	//
+	// OBB obbA;
+	// obbA.c = positionA;
+	// obbA.u[0] = orientationA.GetRow(0);
+	// obbA.u[1] = orientationA.GetRow(1);
+	// obbA.u[2] = orientationA.GetRow(2);
+	// obbA.e = halfSizeA;
+	//
+	// OBB obbB;
+	// obbB.c = positionB;
+	// obbB.u[0] = orientationB.GetRow(0);
+	// obbB.u[1] = orientationB.GetRow(1);
+	// obbB.u[2] = orientationB.GetRow(2);
+	// obbB.e = halfSizeB;
+	//
+	// if (TestOBBOBB(obbA, obbB) == 0) {
+	// 	return false;
+	// }
+	//
+	// Vector3 closestPointA, closestPointB;
+	// ClosestPtPointOBB(obbB.c, obbA, closestPointA);
+	// ClosestPtPointOBB(obbA.c, obbB, closestPointB);
+	//
+	// Vector3 collisionNormal = Vector::Normalise(closestPointB - closestPointA);
+	// float penetration = sqrt(SqDistPointOBB(closestPointB, obbA));
+	//
+	// Vector3 contactPointA = closestPointA + collisionNormal * penetration * 0.5f;
+	// Vector3 contactPointB = closestPointB - collisionNormal * penetration * 0.5f;
+	//
+	//
+	// Vector3 delta = positionB - positionA;
+	//
+	// if (Vector::Dot(collisionNormal, delta) < 0)
+	// 	collisionNormal = -collisionNormal;
+	//
+	// collisionInfo.AddContactPoint(contactPointA, contactPointB, collisionNormal, penetration);
+	//
+	// return true;
 }
 
 

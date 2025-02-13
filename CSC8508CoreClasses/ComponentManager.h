@@ -6,6 +6,8 @@
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
+
 #include <memory>
 #include <type_traits>
 
@@ -14,6 +16,7 @@ using std::vector;
 namespace NCL::CSC8508 {
 
     class IComponent;
+    class INetworkComponent;
 
     class ComponentManager final {
     public:
@@ -70,14 +73,20 @@ namespace NCL::CSC8508 {
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
         {
-            for (auto& entry : allComponents) {
-                if (std::is_base_of_v<T, decltype(entry.first)>)
-                {
-                    for (auto* component : entry.second) {
-                        func(component);
-                    }
+            for (auto& entry : allComponents) 
+            {
+                for (auto* component : entry.second) {
+                    if (!component->IsDerived(typeid(T)))
+                        break;
+                    func(component);
                 }
             }
+        }
+
+        static void OperateOnINetworkComponents(std::function<void(INetworkComponent*)> func)
+        {
+            for (INetworkComponent* component : allNetworkComponents)
+                func(component);
         }
 
         template <typename T, typename... Args>
@@ -90,8 +99,13 @@ namespace NCL::CSC8508 {
             T* component = new (componentBuffer<T> +componentCount<T> *sizeof(T)) T(std::forward<Args>(args)...);
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
+
+            if (component->IsDerived(typeid(INetworkComponent)))
+                allNetworkComponents.push_back((INetworkComponent*)component);
+
             return component;
         }
+
 
         static void Clear() 
         {
@@ -107,13 +121,14 @@ namespace NCL::CSC8508 {
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
         static constexpr size_t MAX_COMPONENTS = 1000;
-
         template <typename T> requires std::is_base_of_v<IComponent, T>
         static size_t componentCount;
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
         static alignas(T) char componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
+        inline static vector<INetworkComponent*> allNetworkComponents;
+
     };
 
     template <typename T>

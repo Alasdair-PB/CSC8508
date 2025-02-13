@@ -44,7 +44,6 @@ namespace NCL::CSC8508
 		virtual ~INetworkComponent() = default;
 		virtual bool ReadEventPacket(INetworkPacket& p) { return false; }
 
-
 		int GetObjectID() { return objectID; }
 		int GetComponentID() { return objectID; }
 		int GetOwnerID() { return ownerID; }
@@ -60,13 +59,10 @@ namespace NCL::CSC8508
 		bool clientOwned;
 		int componentID;
 
-
 		void SendEventPacket(INetworkPacket* packet)
 		{
-			std::cout << "Sending Input packet Event" << std::endl;
-
-			packet->componentID = componentID;
-			packet->ownerID = ownerID;
+			packet->componentID = this->componentID;
+			packet->ownerID = this->ownerID;
 
 			NetworkEvent networkPacket = NetworkEvent(packet);
 			EventManager::Call<NetworkEvent>(&networkPacket);

@@ -5,7 +5,7 @@
 #include "GameClient.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"
-
+#include "ComponentManager.h"
 #include "EventManager.h"
 
 
@@ -99,7 +99,7 @@ void NetworkedGame::OnEvent(ClientConnectedEvent* e)
 void NetworkedGame::OnEvent(NetworkEvent* e)
 {
 
-	std::cout << "Sending Input packet Data" << std::endl;
+	std::cout << "Sending Input packet Data" << ((INetworkPacket*) e->eventData)->componentID << std::endl;
 
 	auto dataPacket = e->eventData;
 	if (thisServer) {
@@ -109,8 +109,9 @@ void NetworkedGame::OnEvent(NetworkEvent* e)
 			thisServer->SendPacketToPeer(dataPacket, playerID);
 		}
 	}
-	else 
+	else {
 		thisClient->SendPacket(*dataPacket);
+	}
 }
 
 void NetworkedGame::UpdateGame(float dt) 
@@ -269,25 +270,39 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 	nextObjectId++;
 }
 
+bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId) {
+	for (auto component : object->GetAllComponents()) {
+		if (component->IsDerived(typeid(INetworkComponent))) {
+
+			INetworkComponent* networkComponent = ((INetworkComponent*)component);
+			objectId = networkComponent->GetObjectID();
+			ownerId = networkComponent->GetOwnerID();
+
+			return true;
+		}
+	}
+	return false;
+}
+
 void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 {
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	world->GetObjectIterators(first, last);
 
+	int ownerId;
+	int objectId;
 	for (auto i = first; i != last; ++i)
 	{
-		NetworkObject* o = (*i)->GetNetworkObject();
+		if (HasNetworkComponent(*i, objectId, ownerId))
+		{
+			SpawnPacket* newPacket = new SpawnPacket();
+			newPacket->ownerId = ownerId;
+			newPacket->objectId = objectId;
+			thisServer->SendPacketToPeer(newPacket, clientId);
 
-		if (!o)
-			continue;
-
-		SpawnPacket* newPacket = new SpawnPacket();
-		newPacket->ownerId = o->GetOwnerID();
-		newPacket->objectId = o->GetObjectID();
-		thisServer->SendPacketToPeer(newPacket, clientId);
-
-		delete newPacket;
+			delete newPacket;
+		}
 	}
 }
 
@@ -302,11 +317,6 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
 	if (type == Full_State || type == Delta_State) {
 
-		if (thisServer)
-			std::cout << "Recieved Client Transform packet" << std::endl;
-		else 
-			std::cout << "Recieved Server Transform packet" << std::endl;
-
 		std::vector<GameObject*>::const_iterator first, last;
 		world->GetObjectIterators(first, last);
 
@@ -318,34 +328,25 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 			o->ReadPacket(*payload);
 		}
 	}
-	if (type == Component_Event)
-	{
-		std::vector<INetworkComponent*>::const_iterator first, last;
-		world->GetINetIterators(first, last);
-
-		for (auto i = first; i != last; ++i)
-		{
-			INetworkComponent* c = (*i);
-			INetworkPacket* p = (INetworkPacket*) payload;
-
-			if (p->componentID != (c->GetComponentID()))
-				continue;
-
-			c->ReadEventPacket(*p);
-
-			if (thisServer) 
-			{
-				for (const auto& player : thisServer->playerPeers)
-				{
-					int playerID = player.first;
-					if (playerID != p->ownerID) {
-						int playerID = player.first;
-						thisServer->SendPacketToPeer(payload, playerID);
+	if (type == Component_Event) {
+		INetworkPacket* p = (INetworkPacket*) payload;
+		ComponentManager::OperateOnINetworkComponents(
+			[&](INetworkComponent* c) {	
+				if (p->componentID == (c->GetComponentID())) {
+					c->ReadEventPacket(*p);
+					if (thisServer)
+					{
+						for (const auto& player : thisServer->playerPeers)
+						{
+							int playerID = player.first;
+							if (playerID != p->ownerID) {
+								int playerID = player.first;
+								thisServer->SendPacketToPeer(payload, playerID);
+							}
+						}
 					}
 				}
-			}
-		}
-		
+			});
 	}
 
 	if (type == Spawn_Object) {

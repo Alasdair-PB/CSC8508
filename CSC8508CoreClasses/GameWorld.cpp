@@ -110,11 +110,8 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 void GameWorld::UpdateWorld(float dt){
 	ComponentManager::OperateOnBufferContentsDynamicType<IComponent>(
 		[&](IComponent* c) {
-			if (c->IsEnabled()) {
+			if (c->IsEnabled()) 
 				c->InvokeUpdate(dt);
-				std::cout << "This happens" << std::endl;
-
-			}
 		});
 	OperateOnContents(
 		[&](GameObject* o) {

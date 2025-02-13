@@ -27,7 +27,7 @@ namespace NCL::CSC8508
 		InputAxisPacket() {
 			type = Component_Event;
 			packetSubType = Axis;
-			size = sizeof(InputAxisPacket) - sizeof(INetworkPacket) - sizeof(GamePacket);
+			size = sizeof(InputAxisPacket) - sizeof(GamePacket);
 		}
 	};
 
@@ -39,7 +39,7 @@ namespace NCL::CSC8508
 		InputButtonPacket() {
 			type = Component_Event;
 			packetSubType = Button;
-			size = sizeof(InputButtonPacket) - sizeof(INetworkPacket) - sizeof(GamePacket);
+			size = sizeof(InputButtonPacket) - sizeof(GamePacket);
 		}
 	};
 
@@ -63,13 +63,20 @@ namespace NCL::CSC8508
 			}
 		}
 
+		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
+			static std::unordered_set<std::type_index> types = { 
+				std::type_index(typeid(IComponent)),
+				std::type_index(typeid(InputComponent)),
+				std::type_index(typeid(INetworkComponent))
+			};
+			return types;
+		}
+
 		void Update(float deltaTime) override
 		{
-			std::cout << "Updating data"  << std::endl;
-
 			if (clientOwned) 
 			{
-				for (auto binding : boundButtons) 
+				for (auto binding : boundButtons)
 				{
 					bool buttonDown = activeController->GetButton(binding.first);
 					if (buttonDown || lastBoundState[binding.first]);
@@ -121,8 +128,6 @@ namespace NCL::CSC8508
 
 		bool ReadEventPacket(INetworkPacket& p) override
 		{
-			std::cout << "Reading Input packet" << std::endl;
-
 			if (p.packetSubType == InputTypes::Axis) {
 				InputAxisPacket pck = (InputAxisPacket&)p;
 				lastAxisState[pck.axisID] = pck.axisValue;
@@ -133,7 +138,6 @@ namespace NCL::CSC8508
 				if (pck.held)
 					EventManager::Call(boundButtons[pck.buttonID]);
 				// May add events for on release
-
 				lastBoundState[pck.buttonID] = pck.held;
 			}
 

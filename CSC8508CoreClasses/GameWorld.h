@@ -9,17 +9,10 @@ namespace NCL {
 		using Maths::Ray;
 	namespace CSC8508 {
 		class GameObject;
-		class PhysicsComponent;
-		class BoundsComponent;
 		class Constraint;
 
-		typedef std::function<void(GameObject*)> GameObjectFunc;		
-		typedef std::function<void(PhysicsComponent*)> PhysicsComponentFunc;
-
+		typedef std::function<void(GameObject*)> GameObjectFunc;
 		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
-		typedef std::vector<PhysicsComponent*>::const_iterator PhysicsIterator;
-		typedef std::vector<BoundsComponent*>::const_iterator BoundsIterator;
-
 
 		class GameWorld	{
 		public:
@@ -38,7 +31,6 @@ namespace NCL {
 			PerspectiveCamera& GetMainCamera()  {
 				return mainCamera;
 			}
-			void ShuffleWorldConstraints();
 
 			void ShuffleConstraints(bool state) {
 				shuffleConstraints = state;
@@ -48,27 +40,15 @@ namespace NCL {
 				shuffleObjects = state;
 			}
 
-			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, BoundsComponent* ignoreThis = nullptr, vector<Layers::LayerID>* ignoreLayers = nullptr) const;
+			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, GameObject* ignoreThis = nullptr, vector<Layers::LayerID>* ignoreLayers = nullptr) const;
 
 			virtual void UpdateWorld(float dt);
 
 			void OperateOnContents(GameObjectFunc f);
-			void OperateOnPhysicsContents(PhysicsComponentFunc f);
 
 			void GetObjectIterators(
 				GameObjectIterator& first,
 				GameObjectIterator& last) const;
-
-
-			void GetPhysicsIterators(
-				PhysicsIterator& first,
-				PhysicsIterator& last) const;
-
-			void GetBoundsIterators(
-				BoundsIterator& first,
-				BoundsIterator& last) const;
-
-
 
 			void GetConstraintIterators(
 				std::vector<Constraint*>::const_iterator& first,
@@ -80,17 +60,14 @@ namespace NCL {
 
 		protected:
 			std::vector<GameObject*> gameObjects;
-			std::vector<PhysicsComponent*> physicsComponents;
-			std::vector<BoundsComponent*> boundsComponents;
-
 			std::vector<Constraint*> constraints;
 
 			PerspectiveCamera mainCamera;
 
 			bool shuffleConstraints;
 			bool shuffleObjects;
-			int worldIDCounter;
-			int worldStateCounter;
+			int		worldIDCounter;
+			int		worldStateCounter;
 		};
 	}
 }

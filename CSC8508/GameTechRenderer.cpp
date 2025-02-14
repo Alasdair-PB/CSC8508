@@ -69,14 +69,19 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	debugTexMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	debugTexMesh->UploadToGPU();
 
-
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000);
 }
 
 GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &shadowTex);
+	glDeleteTextures(1, &skyboxTex);
 	glDeleteFramebuffers(1, &shadowFBO);
+
+	glDeleteFramebuffers(1, &lineVertVBO);
+	glDeleteFramebuffers(1, &textVertVBO);
+	glDeleteFramebuffers(1, &textColourVBO);
+	glDeleteFramebuffers(1, &textTexVBO);
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -144,7 +149,7 @@ void GameTechRenderer::BuildObjectList() {
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsEnabled()) {
+			if (o->IsActive()) {
 				const RenderObject* g = o->GetRenderObject();
 				if (g) {
 					activeObjects.emplace_back(g);

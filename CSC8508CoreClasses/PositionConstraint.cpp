@@ -1,8 +1,6 @@
 #include "PositionConstraint.h"
 //#include "../../Common/Vector3.h"
-#include "PhysicsComponent.h"
 #include "GameObject.h"
-
 #include "PhysicsObject.h"
 //#include "Debug.h"
 
@@ -12,7 +10,7 @@ using namespace NCL;
 using namespace Maths;
 using namespace CSC8508;
 
-PositionConstraint::PositionConstraint(PhysicsComponent* a, PhysicsComponent* b, float d)
+PositionConstraint::PositionConstraint(GameObject* a, GameObject* b, float d)
 {
 	objectA		= a;
 	objectB		= b;
@@ -26,8 +24,7 @@ PositionConstraint::~PositionConstraint()
 
 
 void PositionConstraint::UpdateConstraint(float dt) {
-    objectA->GetGameObject().GetTransform().GetPosition(); 
-    Vector3 relativePos = objectA->GetGameObject().GetTransform().GetPosition() - objectB->GetGameObject().GetTransform().GetPosition();
+    Vector3 relativePos = objectA->GetTransform().GetPosition() - objectB->GetTransform().GetPosition();
     float currentDistance = Vector::Length(relativePos);
     float offset = distance - currentDistance;
 

@@ -9,7 +9,7 @@
 
 #include "PhysicsObject.h"
 #include "Ray.h"
-#include "NavMeshComponent.h"
+#include "NavMeshAgent.h"
 
 #include "CollisionDetection.h"
 
@@ -19,7 +19,7 @@
 
 namespace NCL {
     namespace CSC8508 {
-        class EnemyGameObject : public GameObject {
+        class EnemyGameObject : public NavMeshAgent, public UpdateObject {
         public:    
 
             typedef std::function<bool(Ray& r, float rayDistance)> RaycastToWorld; 
@@ -31,17 +31,6 @@ namespace NCL {
             void SetRay(RaycastToWorld rayHit){ this->rayHit = rayHit; }
             void SetGetPlayer(GetPlayerPos getPlayerPos) { this->getPlayerPos = getPlayerPos; }
 
-            /**
-          * Function invoked each frame after Update.
-          * @param deltaTime Time since last frame
-          */
-            void OnAwake() override
-            {
-                navMeshComponent = this->TryGetComponent<NavMeshComponent>();
-                physicsComponent = this->TryGetComponent<PhysicsComponent>();
-
-            }
-
             void Update(float dt) override 
             {
                 if (state != Ongoing) {
@@ -50,9 +39,9 @@ namespace NCL {
                 }
 
                 state = sequence->Execute(dt);
-                navMeshComponent->DisplayPathfinding(Vector4(0, 0, 1, 1));
-                navMeshComponent->MoveAlongPath();
-                physicsComponent->GetPhysicsObject()->RotateTowardsVelocity(-90);
+                DisplayPathfinding(Vector4(0, 0, 1, 1));
+                MoveAlongPath();
+                this->GetPhysicsObject()->RotateTowardsVelocity(-90);
             }
 
         protected:
@@ -61,8 +50,6 @@ namespace NCL {
 
             RaycastToWorld rayHit;
             GetPlayerPos getPlayerPos;
-            NavMeshComponent* navMeshComponent = nullptr;
-            PhysicsComponent* physicsComponent = nullptr;
 
             BehaviourSequence* sequence = nullptr;
             BehaviourState state;
@@ -92,7 +79,7 @@ namespace NCL {
 
                     if (state == Initialise)
                     {
-                        navMeshComponent->SetPath(wayPoints[wayPointIndex]);
+                        SetPath(pos, wayPoints[wayPointIndex]);
                         state = Ongoing;
                         timer = 0;
                     }
@@ -109,9 +96,14 @@ namespace NCL {
                             timer = 0;
                         }
 
-                        if (navMeshComponent->AtDestination()) {
+                        if (testNodes.size() <= 0) {
+                            SetPath(pos, wayPoints[wayPointIndex]);
+                            return state;
+                        }
+
+                        if (Vector::Length(pos - testNodes[0]) < minWayPointDistanceOffset) {
                             wayPointIndex >= wayPointsLength ? wayPointIndex = 0 : wayPointIndex++;
-                            navMeshComponent->SetPath(wayPoints[wayPointIndex]);
+                            SetPath(pos, wayPoints[wayPointIndex]);
                         }
 
                     }
@@ -126,16 +118,21 @@ namespace NCL {
                     Vector3 playerPos = getPlayerPos();
 
                     if (state == Initialise) {
-                        navMeshComponent->SetPath(playerPos);
+                        SetPath(pos, playerPos);
+                        testNodes.insert(testNodes.begin(), playerPos);
+                        outPathIndex++;
                         state = Ongoing;
                     }
                     else if (state == Ongoing)
                     {  
                         if (CanSeePlayer()) {
-                            navMeshComponent->SetPath(playerPos);
+                            SetPath(pos, playerPos);
+                            testNodes.insert(testNodes.begin(), playerPos);
+                            outPathIndex++;
+
                             return state;
                         }
-                        else if (navMeshComponent->AtDestination())
+                        else if (Vector::Length(pos - testNodes[0]) < minWayPointDistanceOffset) 
                             return  Failure;
                     }
                     return state;

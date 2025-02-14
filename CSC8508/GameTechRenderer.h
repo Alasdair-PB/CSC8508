@@ -26,9 +26,9 @@ namespace NCL {
 
 			void RenderFrame()	override;
 
-			OGLShader*		defaultShader;
+			OGLShader* defaultShader;
 
-			GameWorld&	gameWorld;
+			GameWorld& gameWorld;
 
 			void BuildObjectList();
 			void SortObjectList();

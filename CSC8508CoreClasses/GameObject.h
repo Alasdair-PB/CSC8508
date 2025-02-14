@@ -1,11 +1,6 @@
-//
-// Contributors: Alasdair
-//
-
 #pragma once
 #include "Transform.h"
 #include "CollisionVolume.h"
-#include "IComponent.h"
 
 using std::vector;
 
@@ -22,52 +17,34 @@ namespace NCL::CSC8508 {
 	class NetworkObject;
 	class RenderObject;
 	class PhysicsObject;
-	class BoundsComponent;
 
 	class GameObject	{
 	public:
-		GameObject(bool isStatic = false);
+		GameObject(const std::string& name = "");
 		~GameObject();
 
-		bool IsEnabled() const { return isEnabled;}
-		bool SetEnabled(bool isEnabled) { this->isEnabled = isEnabled;  }
+		void SetBoundingVolume(CollisionVolume* vol) {
+			boundingVolume = vol;
+		}
 
-		bool IsStatic() const { return isStatic;}
+		const CollisionVolume* GetBoundingVolume() const {
+			return boundingVolume;
+		}
 
-		Transform& GetTransform() {return transform;}
+		bool IsActive() const {
+			return isActive;
+		}
 
-
-		/**
-		 * Function invoked after the object and components have been instantiated.
-		 * @param deltaTime Time since last frame
-		 */
-		void InvokeOnAwake() { OnAwake(); }
-
-		/**
-		 * Function invoked each frame.
-		 * @param deltaTime Time since last frame
-		 */
-		void InvokeUpdate(float deltaTime) { Update(deltaTime); }
-
-		/**
-		 * Function invoked each frame after Update.
-		 * @param deltaTime Time since last frame
-		 */
-		void InvokeLateUpdate(float deltaTime) { LateUpdate(deltaTime); }
-
-		/**
-		 * Function invoked when the component is enabled.
-		 */
-		void InvokeOnEnable() { OnEnable(); }
-
-		/**
-		 * Function invoked when the component is disabled.
-		 */
-		void InvokeOnDisable() { OnDisable(); }
-
+		Transform& GetTransform() {
+			return transform;
+		}
 
 		RenderObject* GetRenderObject() const {
 			return renderObject;
+		}
+
+		PhysicsObject* GetPhysicsObject() const {
+			return physicsObject;
 		}
 
 		NetworkObject* GetNetworkObject() const {
@@ -82,14 +59,25 @@ namespace NCL::CSC8508 {
 			networkObject = newObject;
 		}
 
+		void SetPhysicsObject(PhysicsObject* newObject) {
+			physicsObject = newObject;
+		}
 
-		virtual void OnCollisionBegin(BoundsComponent* otherObject) {
+		const std::string& GetName() const {
+			return name;
+		}
+
+		virtual void OnCollisionBegin(GameObject* otherObject) {
 			//std::cout << "OnCollisionBegin event occured!\n";
 		}
 
-		virtual void OnCollisionEnd(BoundsComponent* otherObject) {
+		virtual void OnCollisionEnd(GameObject* otherObject) {
 			//std::cout << "OnCollisionEnd event occured!\n";
 		}
+
+		bool GetBroadphaseAABB(Vector3&outsize) const;
+
+		void UpdateBroadphaseAABB();
 
 		void SetWorldID(int newID) {
 			worldID = newID;
@@ -99,61 +87,36 @@ namespace NCL::CSC8508 {
 			return worldID;
 		}	
 
-		template <typename T, typename... Args>
-		requires std::is_base_of_v<IComponent, T>
-		T* AddComponent(Args&&... args) {
-			T* component = new T(*this, std::forward<Args>(args)...);
-			components.push_back(component);
-			return component;
-		}
-
-		template <typename T>
-		requires std::is_base_of_v<IComponent, T>
-		T* TryGetComponent() {
-			for (IComponent* component : components) {
-				if (std::strcmp(component->GetType(), typeid(T).name()) == 0) {
-					return static_cast<T*>(component);
-				}
-			}
-			return nullptr;
-		}
-
-		void AddChild(GameObject* child);
-		GameObject* TryGetParent();
-		void SetParent(GameObject* parent);
-		bool HasParent();
-		void UpdateComponents();
-		bool HasTag(Tags::Tag tag);
-		template <typename T> bool HasComponent(T type);
-
-
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
 		void SetTag(Tags::Tag newTag) {  tag = newTag;}
 		Tags::Tag GetTag() const { return tag;}
 
+		void AddToIgnoredLayers(Layers::LayerID layerID) { ignoreLayers.push_back(layerID); }
+		const std::vector<Layers::LayerID>& GetIgnoredLayers() const { return ignoreLayers; }
+
+		float GetRestitution() { return restitution; }
+		void SetRestitution(float newRestitution) { restitution = newRestitution;}
 
 
 	protected:
-		virtual void OnAwake() {}
-		virtual void Update(float deltaTime) {}
-		virtual void LateUpdate(float deltaTime) {}
-		virtual void OnEnable() {}
-		virtual void OnDisable() {}
+		Transform			transform;
 
-		Transform transform;
-		RenderObject* renderObject;
-		NetworkObject* networkObject;
-		GameObject* parent;
+		CollisionVolume*	boundingVolume;
+		PhysicsObject*		physicsObject;
+		RenderObject*		renderObject;
+		NetworkObject*		networkObject;
 
-		vector<IComponent*> components; 
-
-		bool isEnabled;
-		const bool isStatic;
+		bool isActive;
 		int	worldID;
+		float restitution = 0.2f; 
 
 		Layers::LayerID	layerID;
-		Tags::Tag	tag; // Change to vector
+		Tags::Tag	tag;
+		std::string	name;
+
+		Vector3 broadphaseAABB;
+		vector<Layers::LayerID> ignoreLayers; // Made only for ignoring impluse resolution. Triggers will still activate
 	};
 }
 

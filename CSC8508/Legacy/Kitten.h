@@ -10,34 +10,24 @@
 
 #include "PhysicsObject.h"
 #include "Ray.h"
+#include "UpdateObject.h"
 
-#include "NavMeshComponent.h"
+#include "NavMeshAgent.h"
 #include "CollisionDetection.h"
 #include "GameWorld.h"
 
 namespace NCL {
     namespace CSC8508 {
-        class Kitten : public GameObject {
+        class Kitten : public NavMeshAgent, public UpdateObject {
         public:
-            Kitten(GameObject* swarm);
 
+            Kitten(NavigationMesh* navMesh, GameObject* swarm);
             ~Kitten();
+            void SetSelected(bool state) { selected = state; }
+            bool GetSelected() { return selected; }
+            bool GetYearnsForSwarm() { return yearnsForTheSwarm; }
 
-            /**
-            * Function invoked each frame after Update.
-            * @param deltaTime Time since last frame
-            */
-            void OnAwake() override 
-            {
-                physicsComponent = this->TryGetComponent<PhysicsComponent>();
-                navMeshComponent = this->TryGetComponent<NavMeshComponent>();
-            }
-
-            /**
-             * Function invoked each frame.
-             * @param deltaTime Time since last frame
-             */
-            void Update(float deltaTime) override
+            void Update(float dt) override
             {
                 if (!alive) {
                     selected = false;
@@ -51,39 +41,33 @@ namespace NCL {
                 }
 
                 if (selected) {
-                    state = sequence->Execute(deltaTime);
-                    navMeshComponent->MoveAlongPath();
+                    state = sequence->Execute(dt);
+                    //DisplayPathfinding(Vector4(0, 1, 0, 1));
+                    MoveAlongPath();
                 }
             }
 
-
-            void OnCollisionBegin(BoundsComponent* otherBounds) override {
-                if (!otherBounds)
-                    return;
-                GameObject& otherObject = otherBounds->GetGameObject();
-                if (otherObject.GetTag() == Tags::CursorCast) {
+            virtual void OnCollisionBegin(GameObject* otherObject) override {
+                if (otherObject->GetTag() == Tags::CursorCast) {
                     selected = true;
                 }
-                if (otherObject.GetTag() == Tags::Enemy) {
+                if (otherObject->GetTag() == Tags::Enemy) {
                     alive = false;
                     Quaternion rot = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 90);
                     this->GetTransform().SetOrientation(rot);
                     this->GetRenderObject()->SetColour(Vector4(1.0f, 0, 0, 1));
+                    this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
                 }
             }
 
             void ThrowSelf(Vector3 dir);
-            void SetSelected(bool state) { selected = state; }
-            bool GetSelected() { return selected; }
-            bool GetYearnsForSwarm() { return yearnsForTheSwarm; }
+
 
         protected:
 
             BehaviourSequence* sequence = nullptr;
             BehaviourState state;
             GameObject* swarmCenter = nullptr;
-            PhysicsComponent* physicsComponent = nullptr;
-            NavMeshComponent* navMeshComponent = nullptr;
 
             bool alive = true;
             bool selected;
@@ -111,7 +95,8 @@ namespace NCL {
                     Vector3 swarmPos  = swarmCenter->GetTransform().GetPosition();
 
                     if (state == Initialise) {
-                        navMeshComponent->SetPath(swarmPos);
+                        SetPath(pos, swarmPos);
+                        testNodes.insert(testNodes.begin(), swarmPos);
                         yearnsForTheSwarm = false;
                         state = Ongoing;
                     }
@@ -120,14 +105,16 @@ namespace NCL {
                         if (Vector::Length(pos - swarmPos) < 6.0f)
                         {
                             yearnsForTheSwarm = true;
-                            navMeshComponent->ClearPath();
+                            testNodes.clear();
                             return Success;
                         }
 
-                        if (navMeshComponent->AtDestination()) {
-                            navMeshComponent->SetPath(swarmPos);
+                        if (Vector::Length(pos - testNodes[0]) < minWayPointDistanceOffset) {
+                            SetPath(pos, swarmPos);
+                            testNodes.insert(testNodes.begin(), swarmPos);
                             return state;
                         }
+
                     }
                     return state;
                 }
@@ -141,13 +128,13 @@ namespace NCL {
                     Vector3 swarmPos = swarmCenter->GetTransform().GetPosition();
 
                     if (state == Initialise) {
-                        navMeshComponent->ClearPath();
+                        testNodes.clear();
                         state = Ongoing;
                     }
                     else if (state == Ongoing)
                     {
                         if (Vector::Length(pos - swarmPos) > 10.0f) {
-                            navMeshComponent->ClearPath();
+                            testNodes.clear();
                             yearnsForTheSwarm = false;
                             selected = false;
                             return Failure;

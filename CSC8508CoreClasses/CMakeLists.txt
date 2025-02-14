@@ -88,10 +88,6 @@ source_group("Physics" FILES ${Physics})
 set(Header_Files
     "Debug.h"
     "GameObject.h"
-    "IComponent.h"
-    "ComponentManager.h"
-    "PhysicsComponent.h"
-    "BoundsComponent.h"
     "GameWorld.h"
     "RenderObject.h"
     "Transform.h"
@@ -101,9 +97,6 @@ source_group("Header Files" FILES ${Header_Files})
 set(Source_Files
     "Debug.cpp"
     "GameObject.cpp"
-    "IComponent.cpp"
-    "PhysicsComponent.cpp"
-    "BoundsComponent.cpp"
     "GameWorld.cpp"
     "RenderObject.cpp"
     "Transform.cpp"
@@ -142,7 +135,7 @@ set(ALL_FILES
     ${Collision_Detection}
     ${Networking}
     ${Physics}
-    ${enet_Files}
+    ${enet_Files}   
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
@@ -154,15 +147,8 @@ add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
 
 #set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS c;C;M;c++;cc;cpp;cxx;m;mm;mpp;CPP;ixx;cppm)
 
-use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set(ROOT_NAMESPACE CSC8508CoreClasses)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    VS_GLOBAL_KEYWORD "Win32Proj"
-)
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
-)
 ################################################################################
 # Compile definitions
 ################################################################################

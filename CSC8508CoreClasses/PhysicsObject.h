@@ -37,10 +37,6 @@ namespace NCL {
 				return inverseMass;
 			}
 
-
-			float GetRestitution() { return cRestitution; }
-			void SetRestitution(float newRestitution) { cRestitution = newRestitution; }
-
 			void RotateTowardsVelocity(float offset = 90);
 
 			void ApplyAngularImpulse(const Vector3& force);
@@ -70,7 +66,6 @@ namespace NCL {
 
 			void UpdateInertiaTensor();
 
-
 			Matrix3 GetInertiaTensor() const {
 				return inverseInteriaTensor;
 			}
@@ -82,7 +77,6 @@ namespace NCL {
 			float inverseMass;
 			float elasticity;
 			float friction;
-			float cRestitution; 
 
 			//linear stuff
 			Vector3 linearVelocity;

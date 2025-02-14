@@ -3,18 +3,18 @@
 
 namespace NCL {
 	namespace CSC8508 {
-		class PhysicsComponent;
+		class GameObject;
 
 		class PositionConstraint : public Constraint	{
 		public:
-			PositionConstraint(PhysicsComponent* a, PhysicsComponent* b, float d);
+			PositionConstraint(GameObject* a, GameObject* b, float d);
 			~PositionConstraint();
 
 			void UpdateConstraint(float dt) override;
 
 		protected:
-			PhysicsComponent* objectA;
-			PhysicsComponent* objectB;
+			GameObject* objectA;
+			GameObject* objectB;
 
 			float distance;
 		};

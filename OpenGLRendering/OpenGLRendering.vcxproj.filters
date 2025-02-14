@@ -1,69 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\cmake_pch.cxx">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\cmake_pch.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLTexture.h">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLTexture.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLShader.h">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLShader.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLRenderer.h">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLRenderer.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLMesh.h">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLMesh.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLComputeShader.h">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLComputeShader.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLTexture.cpp">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLShader.cpp">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLRenderer.cpp">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLMesh.cpp">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLComputeShader.cpp">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\OGLComputeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\glad\gl.h">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\glad\gl.h">
       <Filter>GLAD</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\glad\gl.c">
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\glad\gl.c">
       <Filter>GLAD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Debug\cmake_pch.hxx">
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Debug\cmake_pch.hxx">
       <Filter>Precompile Header File</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Release\cmake_pch.hxx">
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Release\cmake_pch.hxx">
       <Filter>Precompile Header File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\Lab\OpenGLRendering\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GLAD">
-      <UniqueIdentifier>{9E37B0B8-16E5-3C13-8E3F-7B2DE33ED527}</UniqueIdentifier>
+      <UniqueIdentifier>{1183CC87-CA2C-3A96-9B30-F4C4DA2B0B3D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{CDF8C557-29D9-34AA-846C-16E77F574EF5}</UniqueIdentifier>
+      <UniqueIdentifier>{C39DFC57-621F-3328-81EC-FDC9DFD3E803}</UniqueIdentifier>
     </Filter>
     <Filter Include="Precompile Header File">
-      <UniqueIdentifier>{9F9134C8-648F-3914-B2E6-AFD94B0DAC77}</UniqueIdentifier>
+      <UniqueIdentifier>{867ADAA5-3981-3D2F-9174-0C7FBEF7E076}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{05275E9A-8182-3406-A443-172E61D702F0}</UniqueIdentifier>
+      <UniqueIdentifier>{3DB1FF50-9EFE-325D-AA22-C1EFBC341BBC}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

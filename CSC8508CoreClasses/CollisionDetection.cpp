@@ -26,10 +26,10 @@ bool CollisionDetection::RayPlaneIntersection(const Ray&r, const Plane&p, RayCol
 	return true;
 }
 
-bool CollisionDetection::RayIntersection(const Ray& r, BoundsComponent& object, RayCollision& collision) {
+bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCollision& collision) {
 	bool hasCollided = false;
 
-	const Transform& worldTransform = object.GetGameObject().GetTransform();
+	const Transform& worldTransform = object.GetTransform();
 	const CollisionVolume* volume	= object.GetBoundingVolume();
 
 	if (!volume) {
@@ -138,7 +138,7 @@ bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& w
 	return false;
 }
 
-bool CollisionDetection::ObjectIntersection(BoundsComponent* a, BoundsComponent* b, CollisionInfo& collisionInfo) {
+bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, CollisionInfo& collisionInfo) {
 	const CollisionVolume* volA = a->GetBoundingVolume();
 	const CollisionVolume* volB = b->GetBoundingVolume();
 
@@ -149,8 +149,8 @@ bool CollisionDetection::ObjectIntersection(BoundsComponent* a, BoundsComponent*
 	collisionInfo.a = a;
 	collisionInfo.b = b;
 
-	Transform& transformA = a->GetGameObject().GetTransform();
-	Transform& transformB = b->GetGameObject().GetTransform();
+	Transform& transformA = a->GetTransform();
+	Transform& transformB = b->GetTransform();
 
 	VolumeType pairType = (VolumeType)((int)volA->type | (int)volB->type);
 

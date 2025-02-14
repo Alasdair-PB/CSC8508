@@ -9,7 +9,7 @@ https://research.ncl.ac.uk/game/
 #pragma once
 #include "Keyboard.h"
 #include "Mouse.h"
-
+#include <functional>
 #include "Vector.h"
 
 namespace NCL {

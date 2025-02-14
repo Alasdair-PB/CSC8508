@@ -3,12 +3,13 @@ using namespace NCL;
 using namespace CSC8508;
 
 
-Kitten::Kitten(GameObject* swarm) : GameObject()
+Kitten::Kitten(NavigationMesh* navMesh, GameObject* swarm) : NavMeshAgent(navMesh)
 {
     sequence = new BehaviourSequence("Kitten Sequence");
     sequence->AddChild(idle);
     sequence->AddChild(goToSwarm);
     sequence->AddChild(followSwarm);
+    speed = 7.5f;
     swarmCenter = swarm;
     selected = false;
 
@@ -30,7 +31,7 @@ void Kitten::ThrowSelf(Vector3 dir)
 
     this->GetTransform().SetPosition(pos);
     dir.y += 1.0f;
-   physicsComponent->GetPhysicsObject()->AddForce(dir * 80.0f);
+    this->GetPhysicsObject()->AddForce(dir * 80.0f);
 
 }
 

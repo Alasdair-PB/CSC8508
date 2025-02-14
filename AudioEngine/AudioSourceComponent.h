@@ -1,3 +1,7 @@
+//
+// Contributors: Max Bolton
+//
+
 #ifndef ASSETROOTLOCATION
 #define ASSETROOTLOCATION "../Assets/"
 #endif
@@ -17,7 +21,7 @@ using namespace NCL::CSC8508;
 /**
 * Audio Source class for audio engine
 */
-class AudioSource : public AudioObject
+class AudioSourceComponent : public AudioObject
 {
 public:
 
@@ -26,10 +30,11 @@ public:
 	* Constructor for Audio Source
 	* Sets default file path for audio files
 	*/
-	AudioSource(Transform* transform) : AudioObject(transform) {
+	AudioSourceComponent(GameObject& gameObject) : AudioObject(gameObject) {
 		soundDir = std::string(ASSETROOTLOCATION) + "Audio/";
 
 		fChannel = nullptr;
+		fVolume = 1.0f;
 	}
 
 	/**
@@ -51,7 +56,7 @@ public:
 			return false;
 		}
 		
-		volume = vol;
+		fVolume = vol;
 		fSound->set3DMinMaxDistance(0.5f, 500.0f);
 		return true;
 	}
@@ -78,7 +83,7 @@ public:
 
 		if (fChannel) {
 			fChannel->setPaused(false);
-			fChannel->setVolume(volume);
+			fChannel->setVolume(fVolume);
 			return true;
 		}
 	}
@@ -95,14 +100,30 @@ public:
 	/**
 	* Update position vectors of source for use by FMOD  
 	*/
-	void Update() override {
+	void Update(float deltaTime) override {
 
 		Vector3 pos = transform->GetPosition();
 		fPosition = VecToFMOD(pos);
 
+		PhysicsComponent* physComp = GetGameObject().TryGetComponent<PhysicsComponent>();
+
+		if (physComp) {
+			Vector3 vel = physComp->GetPhysicsObject()->GetLinearVelocity();
+			fVelocity = VecToFMOD(vel);
+		}
+		else if(debug) {
+			std::cout << "No Physics Component found for AudioSourceComponentComponent!" << std::endl;
+		}
+
+
+
 		fChannel->set3DAttributes(&fPosition, &fVelocity);
 
 		fSystem->update();
+ 
+		if (debug) {
+			Debug::Print("Source Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z), Vector2(5, 5));
+		}
 	}
 
 private:
@@ -110,12 +131,12 @@ private:
 	/**
 	* Destructor for Audio Source
 	*/
-	~AudioSource() {
+	~AudioSourceComponent() {
 		fChannel ? fChannel->stop() : 0;
 	}
 
 	FMOD::Channel* fChannel;
 	std::string soundDir;
 	FMOD::Sound* fSound = nullptr;
-	float volume;
+	float fVolume;
 };

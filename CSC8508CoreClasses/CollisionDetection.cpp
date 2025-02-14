@@ -400,13 +400,13 @@ int TestOBBOBB(OBB& a, OBB& b)
 	return 1;
 }
 
-void GetAllOBBVertices(Vector3 array[8], Vector3 const& origin, Vector3 const& halfDimensions) {
+void GetAllOBBVertices(Vector3 array[8], Transform const& worldTransform, Vector3 const& halfDimensions) {
 	for (int i = 0; i < 8; i++) {
-		array[i] = origin + halfDimensions * Vector3(
+		array[i] = worldTransform.GetPosition() + worldTransform.GetOrientation() * (halfDimensions * Vector3(
 			i & 1 ? 1 : -1,
 			i & 2 ? 1 : -1,
 			i & 4 ? 1 : -1
-			);
+			));
 	}
 }
 
@@ -417,14 +417,42 @@ bool CollisionDetection::OBBIntersection(
 
 	// Get all vertices
 	Vector3 aVertices[8], bVertices[8];
-	GetAllOBBVertices(aVertices, worldTransformA.GetPosition(), volumeA.GetHalfDimensions());
-	GetAllOBBVertices(bVertices, worldTransformB.GetPosition(), volumeB.GetHalfDimensions());
+	GetAllOBBVertices(aVertices, worldTransformA, volumeA.GetHalfDimensions());
+	GetAllOBBVertices(bVertices, worldTransformB, volumeB.GetHalfDimensions());
+
+	//std::cout << "A WS vertices:\n";
+	for (int i = 0; i < 8; i++) {
+		//std::cout << aVertices[i].x << ", " << aVertices[i].y << ", " << aVertices[i].z << '\n';
+		for (int j = i + 1; j < 8; j++) {
+			Debug::DrawLine(aVertices[i], aVertices[j], Vector4(1, 0, 0, 1));
+		}
+	}
+	//std::cout << "B WS vertices:\n";
+	for (int i = 0; i < 8; i++) {
+		//std::cout << bVertices[i].x << ", " << bVertices[i].y << ", " << bVertices[i].z << '\n';
+		for (int j = i + 1; j < 8; j++) {
+			Debug::DrawLine(bVertices[i], bVertices[j], Vector4(0, 1, 0, 1));
+		}
+	}
 
 	// Translate vertices to be local to the opposite shape
 	for (int i = 0; i < 8; i++) {
-		aVertices[i] = worldTransformB.GetOrientation() * (aVertices[i] - worldTransformB.GetPosition());
-		bVertices[i] = worldTransformA.GetOrientation() * (bVertices[i] - worldTransformA.GetPosition());
+		aVertices[i] = worldTransformB.GetOrientation().Conjugate() * (aVertices[i] - worldTransformB.GetPosition());
+		bVertices[i] = worldTransformA.GetOrientation().Conjugate() * (bVertices[i] - worldTransformA.GetPosition());
 	}
+
+	//Debug::DrawLine(worldTransformA.GetPosition(), worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(10, 0, 0)), Vector4(1, 0, 0, 1));
+	//Debug::DrawLine(worldTransformA.GetPosition(), worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, 10, 0)), Vector4(0, 1, 0, 1));
+	//Debug::DrawLine(worldTransformA.GetPosition(), worldTransformA.GetPosition() + (worldTransformA.GetOrientation() * Vector3(0, 0, 10)), Vector4(0, 0, 1, 1));
+
+	//std::cout << "A LS to B vertices:\n";
+	//for (int i = 0; i < 8; i++) {
+	//	std::cout << aVertices[i].x << ", " << aVertices[i].y << ", " << aVertices[i].z << '\n';
+	//}
+	//std::cout << "B LS to A vertices:\n";
+	//for (int i = 0; i < 8; i++) {
+	//	std::cout << bVertices[i].x << ", " << bVertices[i].y << ", " << bVertices[i].z << '\n';
+	//}
 
 	// Find min and max x, y and z in each vertex array
 	auto minA = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -440,20 +468,31 @@ bool CollisionDetection::OBBIntersection(
 		}
 	}
 
+	//std::cout << "minA:" << minA.x << ", " << minA.y << ", " << minA.z << '\n';
+	//std::cout << "maxA:" << maxA.x << ", " << maxA.y << ", " << maxA.z << '\n';
+	//std::cout << "minB:" << minB.x << ", " << minB.y << ", " << minB.z << '\n';
+	//std::cout << "maxB:" << maxB.x << ", " << maxB.y << ", " << maxB.z << '\n';
+
 	// Check that their bounds lie within the half dimensions of the opposing shape
 	Vector3 aHalfDimensions = volumeA.GetHalfDimensions();
 	Vector3 bHalfDimensions = volumeB.GetHalfDimensions();
 	float minPenetration = FLT_MAX;
 	int axis = 0;
 	for (int i = 0; i < 3; i++) { // For each axis
-		if (minA[i] > bHalfDimensions[i] || maxA[i] < -bHalfDimensions[i]) return false;
+		if (minA[i] > bHalfDimensions[i] || maxA[i] < -bHalfDimensions[i]) {
+			//std::cout << "Failed on axis " << i << "!\n";
+			return false;
+		}
 		float hold = std::min(bHalfDimensions[i] - minA[i], maxA[i] + bHalfDimensions[i]);
 		if (hold < minPenetration) {
 			minPenetration = hold;
 			axis = i;
 		}
 
-		if (minB[i] > aHalfDimensions[i] || maxB[i] < -aHalfDimensions[i]) return false;
+		if (minB[i] > aHalfDimensions[i] || maxB[i] < -aHalfDimensions[i]) {
+			//std::cout << "Failed on axis -" << i << "!\n";
+			return false;
+		}
 		hold = std::min(aHalfDimensions[i] - minB[i], maxB[i] + aHalfDimensions[i]);
 		if (hold < minPenetration) {
 			minPenetration = hold;
@@ -463,11 +502,51 @@ bool CollisionDetection::OBBIntersection(
 
 	// Find the point of collision
 	Vector3 pointOfCollision;
-	if (axis > 0) pointOfCollision = (maxA + minA) * 2.0f;
-	else if (axis < 0) pointOfCollision = (maxB + minB) * 2.0f;
+	if (axis > 0) pointOfCollision = (maxA + minA) / 2.0f;
+	else if (axis < 0) pointOfCollision = (maxB + minB) / 2.0f;
 
-	std::cout << "COLLISION DETECTED!!! Min penetration = " << minPenetration << ", axis = " << axis << "\n";
-	std::cout << "Relative point of collision: " << pointOfCollision.x << ", " << pointOfCollision.y << ", " << pointOfCollision.z << '\n';
+	// TODO: For some reason, the detection isn't working with objects with a non-default orientation
+
+	//std::cout << "OBB COLLISION DETECTED!!! Min penetration = " << minPenetration << ", axis = " << axis << "\n";
+	//std::cout << "Relative point of collision: " << pointOfCollision.x << ", " << pointOfCollision.y << ", " << pointOfCollision.z;
+	//std::cout << " (in local space of " << (axis > 0 ? 'B' : 'A') << ")\n";
+
+	//Vector3 testVec(1.0f, 2.0f, 3.0f);
+	//testVec = worldTransformB.GetOrientation() * (testVec - worldTransformB.GetPosition());
+	//auto resultVec = worldTransformB.GetOrientation().Conjugate() * testVec + worldTransformB.GetPosition();
+	//std::cout << "TestVec: " << testVec.x << ", " << testVec.y << ", " << testVec.z << '\n';
+	//std::cout << "resultVec: " << resultVec.x << ", " << resultVec.y << ", " << resultVec.z << '\n';
+
+	float magnitude = axis > 0 ? 1 : -1;
+	Vector3 collisionNormal = Vector3(
+		abs(axis) % 3 == 0 ? magnitude : 0.0f,
+		abs(axis) % 3 == 1 ? magnitude : 0.0f,
+		abs(axis) % 3 == 2 ? magnitude : 0.0f
+		);
+
+	Vector3 localA, localB, worldPos;
+	if (axis > 0) {
+		localB = Vector::Clamp(pointOfCollision, -volumeB.GetHalfDimensions(), volumeB.GetHalfDimensions());
+		//worldPos = worldTransformB.GetOrientation().Conjugate() * localB + worldTransformB.GetPosition();
+		worldPos = worldTransformB.GetOrientation() * localB + worldTransformB.GetPosition();
+		localA = worldTransformA.GetOrientation().Conjugate() * (worldPos - worldTransformA.GetPosition());
+		localA = Vector::Clamp(localA, -volumeA.GetHalfDimensions(), volumeA.GetHalfDimensions());
+		//collisionNormal = worldTransformB.GetOrientation().Conjugate() * collisionNormal;
+		collisionNormal = worldTransformB.GetOrientation() * collisionNormal;
+	} else {
+		localA = Vector::Clamp(pointOfCollision, -volumeA.GetHalfDimensions(), volumeA.GetHalfDimensions());
+		//worldPos = worldTransformA.GetOrientation().Conjugate() * localA + worldTransformA.GetPosition();
+		worldPos = worldTransformA.GetOrientation() * localA + worldTransformA.GetPosition();
+		localB = worldTransformB.GetOrientation().Conjugate() * (worldPos - worldTransformB.GetPosition());
+		localB = Vector::Clamp(localB, -volumeB.GetHalfDimensions(), volumeB.GetHalfDimensions());
+		//collisionNormal = worldTransformA.GetOrientation().Conjugate() * collisionNormal;
+		collisionNormal = worldTransformA.GetOrientation() * collisionNormal;
+	}
+
+	if (Vector::Dot(collisionNormal, worldTransformB.GetPosition() - worldTransformA.GetPosition()) < 0) { collisionNormal = -collisionNormal; }
+
+	Debug::DrawLine(worldPos, worldPos + collisionNormal * (minPenetration * 5));
+	collisionInfo.AddContactPoint(localA, localB, collisionNormal, minPenetration);
 
 	// std::cout << "Volume A vertices local to volume B:\n";
 	// for (Vector3 vert : aVertices) {
@@ -478,7 +557,7 @@ bool CollisionDetection::OBBIntersection(
 	// 	std::cout << vert.x << ", " << vert.y << ", " << vert.z << '\n';
 	// }
 
-	return false;
+	return true;
 
 
 	// 	// Get all starting variables

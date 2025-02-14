@@ -175,10 +175,21 @@ endif()
 include_directories("../OpenGLRendering/")
 include_directories("../NCLCoreClasses/")
 include_directories("../CSC8508CoreClasses/")
+include_directories("../AudioEngine/")
+include_directories("${FMOD_DIR}/inc")
 
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8508CoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC AudioEngine)
+
+# Handle `fmod.dll` copying here instead of `AudioEngine`
+add_custom_command(TARGET CSC8508 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${FMOD_DIR}/lib/x64/fmod.dll"
+    "$<TARGET_FILE_DIR:CSC8508>"
+)
+
 
 if(USE_VULKAN)
     include_directories("../VulkanRendering/")

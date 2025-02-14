@@ -1,3 +1,7 @@
+//
+// Contributors: Alasdair
+//
+
 #ifndef COMPONENTMANAGER_H
 #define COMPONENTMANAGER_H
 
@@ -97,8 +101,14 @@ namespace NCL::CSC8508 {
                 return nullptr;
             }
 
-            //T* component = new (componentBuffer<T> +componentCount<T> *sizeof(T)) T(std::forward<Args>(args)...);
-            T* component = new (reinterpret_cast<T*>(componentBuffer<T>) + componentCount<T>) T(std::forward<Args>(args)...);
+            void* memory = static_cast<void*>(componentBuffer<T>);
+            std::size_t space = MAX_COMPONENTS<T> *sizeof(T);
+            void* alignedMemory = std::align(alignof(T), sizeof(T), memory, space);
+            if (!alignedMemory)
+                throw std::bad_alloc();
+            T* component = new (alignedMemory) T(std::forward<Args>(args)...);
+
+            //T* component = new (reinterpret_cast<T*>(componentBuffer<T>) + componentCount<T>) T(std::forward<Args>(args)...);
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 

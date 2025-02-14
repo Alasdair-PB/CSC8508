@@ -4,6 +4,11 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
+
+#include <windows.h>
+#include <GL/GL.h>
+#include <tchar.h>
+
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8508;
@@ -72,11 +77,16 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000);
+
+	/*Initialises ImGui for use with Win32 and OpenGL*/
+	uiSystem = new UISystem(hostWindow.GetHandle());
 }
 
 GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &shadowTex);
 	glDeleteFramebuffers(1, &shadowFBO);
+
+	delete uiSystem;
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -122,6 +132,7 @@ void GameTechRenderer::LoadSkybox() {
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
+	uiSystem->StartFrame();
 	BuildObjectList();
 	SortObjectList();
 	RenderShadowMap();
@@ -134,6 +145,11 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderLines();
 	NewRenderTextures();
 	NewRenderText();
+
+	/*uiSystem->DrawDemo();*/
+	uiSystem->DisplayFramerate(hostWindow.GetTimer().GetTimeDeltaSeconds());
+	uiSystem->EndFrame();
+
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

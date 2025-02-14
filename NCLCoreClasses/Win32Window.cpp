@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <io.h>
+#include "../CSC8508/ImGui/imgui.h"
 using namespace NCL;
 using namespace Win32Code;
 
@@ -90,6 +91,8 @@ Win32Window::Win32Window(const WindowInitialisation& winInitInfo) {
 
 	winMouse->Wake();
 	winKeyboard->Wake();
+
+	handle = GetHandle();
 
 	LockMouseToWindow(lockMouse);
 	ShowOSPointer(showMouse);
@@ -208,10 +211,15 @@ void Win32Window::CheckMessages(MSG &msg)	{
 	}
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK Win32Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)	{
 	Win32Window* thisWindow = (Win32Window*)window;
 
 	bool applyResize = false;
+
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
 
     switch(message)	 {
         case(WM_DESTROY):	{

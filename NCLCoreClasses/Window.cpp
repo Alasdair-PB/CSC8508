@@ -52,3 +52,7 @@ bool	Window::UpdateWindow() {
 
 	return InternalUpdate();
 }
+
+HWND Window::GetHandle() const {
+	return handle;
+}

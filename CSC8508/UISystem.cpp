@@ -2,6 +2,7 @@
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_opengl3.h"
 #include "ImGui/imgui.h"
+#include <filesystem>
 
 using namespace NCL;
 using namespace CSC8508;
@@ -21,11 +22,19 @@ UISystem::~UISystem() {
 	ImGui::DestroyContext();
 }
 
-void UISystem::DrawDemo() {
+void UISystem::StartFrame() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+}
 
+void UISystem::EndFrame() {
+	ImGui::Render();
+	ImGui::EndFrame();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void UISystem::DrawDemo() {
 	ImGui::SetNextWindowPos(ImVec2(100, 100));
 	ImGui::SetNextWindowSize(ImVec2(200, 100));
 	ImGui::Begin("Test Window");
@@ -39,8 +48,12 @@ void UISystem::DrawDemo() {
 	if (showDemo == true) {
 		ImGui::ShowDemoWindow();
 	}
+}
 
-	ImGui::Render();
-	ImGui::EndFrame();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+void UISystem::DisplayFramerate(float dt) {
+	ImGui::SetNextWindowPos(ImVec2(50, 50));
+	ImGui::SetNextWindowSize(ImVec2(100, 50));
+	ImGui::Begin("Framerate");
+	ImGui::Text(std::to_string(1.0f / dt).c_str());
+	ImGui::End();
 }

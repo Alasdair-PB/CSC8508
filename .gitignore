@@ -56,6 +56,8 @@ _deps
 *.code-workspace
 *.ninja
 build.ninja
+*.vcxproj
+*.vcxproj.*
 
 # Debugging files
 *.pdb
@@ -70,3 +72,8 @@ lcov.info
 
 # Testing
 Testing/
+
+# ThirdParty Contents
+/ThirdParty/*
+
+

@@ -1,3 +1,8 @@
+//
+// Original author: Rich Davison
+// Contributors: Alasdair
+//
+
 #include "NetworkedGame.h"
 #include "NetworkPlayer.h"
 #include "NetworkObject.h"

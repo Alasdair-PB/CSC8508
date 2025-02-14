@@ -1,5 +1,6 @@
 #include "NetworkBase.h"
 #include "./enet/enet.h"
+
 NetworkBase::NetworkBase()	{
 	netHandle = nullptr;
 }
@@ -20,7 +21,6 @@ void NetworkBase::Destroy() {
 
 bool NetworkBase::ProcessPacket(GamePacket* packet, int peerID) 
 {
-
     PacketHandlerIterator firstHandler;
     PacketHandlerIterator lastHandler;
 

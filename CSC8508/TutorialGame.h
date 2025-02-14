@@ -14,10 +14,21 @@
 #include "PhysicsSystem.h"
 #include "Legacy/PlayerGameObject.h"
 #include "BoundsComponent.h"
+#include <vector>
+using std::vector;
 
 
 namespace NCL {
 	namespace CSC8508 {
+
+		struct NetworkSpawnData
+		{
+			int objId;
+			int ownId;
+			bool clientOwned;
+		};
+
+
 		class TutorialGame		{
 		public:
 			TutorialGame();
@@ -51,7 +62,7 @@ namespace NCL {
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 
 			GameObject* AddNavMeshToWorld(const Vector3& position, Vector3 dimensions);
-			GameObject* AddPlayerToWorld(const Vector3& position);
+			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 
 			void EndGame(bool hasWon);
 

@@ -4,8 +4,8 @@
 
 #pragma once
 #include "Transform.h"
-#include "CollisionVolume.h"
-#include "IComponent.h"
+#include "ComponentManager.h"
+#include <vector>
 
 using std::vector;
 
@@ -18,6 +18,7 @@ namespace NCL::CSC8508 {
 	namespace Layers {
 		enum LayerID { Default, Ignore_RayCast, UI, Player, Enemy, Ignore_Collisions };
 	}
+	class IComponent;
 
 	class NetworkObject;
 	class RenderObject;
@@ -99,24 +100,27 @@ namespace NCL::CSC8508 {
 			return worldID;
 		}	
 
+		vector<IComponent*> GetAllComponents() const { return components; }
+
 		template <typename T, typename... Args>
-		requires std::is_base_of_v<IComponent, T>
+			requires std::is_base_of_v<IComponent, T>
 		T* AddComponent(Args&&... args) {
-			T* component = new T(*this, std::forward<Args>(args)...);
+			T* component = ComponentManager::AddComponent<T>(*this, std::forward<Args>(args)...);
 			components.push_back(component);
 			return component;
 		}
 
 		template <typename T>
-		requires std::is_base_of_v<IComponent, T>
+			requires std::is_base_of_v<IComponent, T>
 		T* TryGetComponent() {
 			for (IComponent* component : components) {
-				if (std::strcmp(component->GetType(), typeid(T).name()) == 0) {
-					return static_cast<T*>(component);
+				if (T* casted = dynamic_cast<T*>(component)) {
+					return casted;
 				}
 			}
 			return nullptr;
 		}
+
 
 		void AddChild(GameObject* child);
 		GameObject* TryGetParent();

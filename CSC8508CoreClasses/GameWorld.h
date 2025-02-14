@@ -1,9 +1,11 @@
 #pragma once
 #include <random>
-
 #include "Ray.h"
+#include "INetworkComponent.h"
 #include "CollisionDetection.h"
 #include "QuadTree.h"
+
+
 namespace NCL {
 		class Camera;
 		using Maths::Ray;
@@ -15,10 +17,16 @@ namespace NCL {
 
 		typedef std::function<void(GameObject*)> GameObjectFunc;		
 		typedef std::function<void(PhysicsComponent*)> PhysicsComponentFunc;
+		typedef std::function<void(INetworkComponent*)> INetworkComponentFunc;
+		typedef std::function<void(IComponent*)> IComponentFunc;
+
 
 		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
 		typedef std::vector<PhysicsComponent*>::const_iterator PhysicsIterator;
 		typedef std::vector<BoundsComponent*>::const_iterator BoundsIterator;
+		typedef std::vector<INetworkComponent*>::const_iterator INetIterator;
+		typedef std::vector<IComponent*>::const_iterator ICompIterator;
+
 
 
 		class GameWorld	{
@@ -53,7 +61,6 @@ namespace NCL {
 			virtual void UpdateWorld(float dt);
 
 			void OperateOnContents(GameObjectFunc f);
-			void OperateOnPhysicsContents(PhysicsComponentFunc f);
 
 			void GetObjectIterators(
 				GameObjectIterator& first,
@@ -68,6 +75,10 @@ namespace NCL {
 				BoundsIterator& first,
 				BoundsIterator& last) const;
 
+			void GetINetIterators(
+				INetIterator& first,
+				INetIterator& last) const;
+
 
 
 			void GetConstraintIterators(
@@ -79,9 +90,12 @@ namespace NCL {
 			}
 
 		protected:
-			std::vector<GameObject*> gameObjects;
 			std::vector<PhysicsComponent*> physicsComponents;
 			std::vector<BoundsComponent*> boundsComponents;
+
+			std::vector<INetworkComponent*> networkComponents;
+			std::vector<GameObject*> gameObjects;
+			std::vector<IComponent*> components;
 
 			std::vector<Constraint*> constraints;
 

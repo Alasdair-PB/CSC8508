@@ -45,11 +45,21 @@ public:
     */
     void Shutdown();
 
+	void setMasterVolume(float volume) {
+		masterGroup->setVolume(volume);
+	}
+
+	FMOD::ChannelGroup* getMasterGroup() {
+		return masterGroup;
+	}
+
 private:
     AudioEngine();
     ~AudioEngine();
 
     FMOD::System* audioSystem;
+
+	FMOD::ChannelGroup* masterGroup;
 
 };
 

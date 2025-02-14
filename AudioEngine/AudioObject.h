@@ -36,7 +36,8 @@ public:
 protected:
 	AudioObject(GameObject& gameObject) : IComponent(gameObject) {
 
-		fSystem = AudioEngine::Instance().GetSystem();
+		audioEngine = &AudioEngine::Instance();
+		fSystem = audioEngine->GetSystem();
 
 		this->transform = &(gameObject.GetTransform());
 
@@ -47,6 +48,7 @@ protected:
 
 	Transform* transform;
 
+	AudioEngine* audioEngine;
 	FMOD::System* fSystem;
 
 	FMOD_VECTOR fPosition;

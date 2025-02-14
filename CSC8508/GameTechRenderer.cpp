@@ -132,6 +132,7 @@ void GameTechRenderer::LoadSkybox() {
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
+	uiSystem->StartFrame();
 	BuildObjectList();
 	SortObjectList();
 	RenderShadowMap();
@@ -145,7 +146,9 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderTextures();
 	NewRenderText();
 
-	uiSystem->DrawDemo();
+	/*uiSystem->DrawDemo();*/
+	uiSystem->DisplayFramerate(hostWindow.GetTimer().GetTimeDeltaSeconds());
+	uiSystem->EndFrame();
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);

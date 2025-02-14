@@ -12,7 +12,11 @@ namespace NCL {
 				uiWindow = handle;
 			}
 
+			void StartFrame();
+			void EndFrame();
+
 			void DrawDemo();
+			void DisplayFramerate(float dt); 
 
 		protected:
 			HWND uiWindow;

@@ -75,7 +75,7 @@ public:
 			return false;
 		}
 
-		FMOD_RESULT result = fSystem->playSound(fSound, nullptr, false, &fChannel);
+		FMOD_RESULT result = fSystem->playSound(fSound, audioEngine->getMasterGroup(), false, &fChannel);
 		if (result != FMOD_OK) {
 			std::cerr << "Error playing sound: " << result << std::endl;
 			return false;

@@ -21,8 +21,8 @@ add_library(AudioEngine STATIC
     AudioEngine.h
     AudioObject.cpp
     AudioObject.h
-    AudioListener.h
-    AudioSource.h
+    AudioListenerComponent.h
+    AudioSourceComponent.h
 )
 
 # Include directories
@@ -54,7 +54,6 @@ target_precompile_headers(AudioEngine PRIVATE
     "../NCLCoreClasses/GameTimer.h"
     "../CSC8508CoreClasses/Transform.h"
     "../CSC8508CoreClasses/Debug.h"
-    # "../CSC8508CoreClasses/PhysicsComponenet.h" TODO: Uncomment when PhysicsComponent is refactored
 )
 
 ################################################################################

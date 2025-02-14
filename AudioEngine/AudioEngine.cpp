@@ -1,3 +1,7 @@
+//
+// Contributors: Max Bolton
+//
+
 #include "AudioEngine.h"
 #include <fmod.hpp>
 #include <iostream>

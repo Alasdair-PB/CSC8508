@@ -96,7 +96,9 @@ namespace NCL::CSC8508 {
                 std::cerr << "The Component pool is filled:: Increase the max size or reduce component Count" << std::endl;
                 return nullptr;
             }
-            T* component = new (componentBuffer<T> +componentCount<T> *sizeof(T)) T(std::forward<Args>(args)...);
+
+            //T* component = new (componentBuffer<T> +componentCount<T> *sizeof(T)) T(std::forward<Args>(args)...);
+            T* component = new (reinterpret_cast<T*>(componentBuffer<T>) + componentCount<T>) T(std::forward<Args>(args)...);
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 

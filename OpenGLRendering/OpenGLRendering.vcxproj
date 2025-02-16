@@ -14,7 +14,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{D1A0E61A-6EB5-33D5-8C58-EF2D0EABDECE}</ProjectGuid>
+    <ProjectGuid>{B387041A-7CEF-31DC-AB49-0E765DC6D119}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -41,18 +41,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\12022\source\repos\CSC8508\OpenGLRendering\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">OpenGLRendering.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">OpenGLRendering</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\12022\source\repos\CSC8508\OpenGLRendering\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">OpenGLRendering.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">OpenGLRendering</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\c4071068\source\repos\CSC8503TutorialWork\NCLCoreClasses;C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\12022\source\repos\CSC8508\ThirdParty\FMOD\api\core\inc;C:\Users\12022\source\repos\CSC8508\NCLCoreClasses;C:\Users\12022\source\repos\CSC8508\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -62,22 +62,22 @@
       <MinimalRebuild></MinimalRebuild>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/OpenGLRendering.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile>C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>C:/Users/12022/source/repos/CSC8508/OpenGLRendering/OpenGLRendering.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ASSETROOTLOCATION="C:/Users/c4071068/source/repos/CSC8503TutorialWork/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ASSETROOTLOCATION="C:/Users/12022/source/repos/CSC8508/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ASSETROOTLOCATION=\"C:/Users/c4071068/source/repos/CSC8503TutorialWork/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\c4071068\source\repos\CSC8503TutorialWork\NCLCoreClasses;C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ASSETROOTLOCATION=\"C:/Users/12022/source/repos/CSC8508/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\12022\source\repos\CSC8508\ThirdParty\FMOD\api\core\inc;C:\Users\12022\source\repos\CSC8508\NCLCoreClasses;C:\Users\12022\source\repos\CSC8508\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\c4071068\source\repos\CSC8503TutorialWork\NCLCoreClasses;C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\12022\source\repos\CSC8508\ThirdParty\FMOD\api\core\inc;C:\Users\12022\source\repos\CSC8508\NCLCoreClasses;C:\Users\12022\source\repos\CSC8508\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -90,7 +90,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\c4071068\source\repos\CSC8503TutorialWork\NCLCoreClasses;C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\12022\source\repos\CSC8508\ThirdParty\FMOD\api\core\inc;C:\Users\12022\source\repos\CSC8508\NCLCoreClasses;C:\Users\12022\source\repos\CSC8508\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -99,24 +99,24 @@
       <MinimalRebuild></MinimalRebuild>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/OpenGLRendering.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile>C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>C:/Users/12022/source/repos/CSC8508/OpenGLRendering/OpenGLRendering.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION="C:/Users/c4071068/source/repos/CSC8503TutorialWork/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION="C:/Users/12022/source/repos/CSC8508/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION=\"C:/Users/c4071068/source/repos/CSC8503TutorialWork/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\c4071068\source\repos\CSC8503TutorialWork\NCLCoreClasses;C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION=\"C:/Users/12022/source/repos/CSC8508/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\12022\source\repos\CSC8508\ThirdParty\FMOD\api\core\inc;C:\Users\12022\source\repos\CSC8508\NCLCoreClasses;C:\Users\12022\source\repos\CSC8508\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\c4071068\source\repos\CSC8503TutorialWork\NCLCoreClasses;C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\12022\source\repos\CSC8508\ThirdParty\FMOD\api\core\inc;C:\Users\12022\source\repos\CSC8508\NCLCoreClasses;C:\Users\12022\source\repos\CSC8508\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -128,11 +128,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeLists.txt">
+    <CustomBuild Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -SC:/Users/c4071068/source/repos/CSC8503TutorialWork -BC:/Users/c4071068/source/repos/CSC8503TutorialWork --check-stamp-file C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/12022/source/repos/CSC8508 -BC:/Users/12022/source/repos/CSC8508 --check-stamp-file C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -141,11 +141,11 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\12022\source\repos\CSC8508\OpenGLRendering\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -SC:/Users/c4071068/source/repos/CSC8503TutorialWork -BC:/Users/c4071068/source/repos/CSC8503TutorialWork --check-stamp-file C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/12022/source/repos/CSC8508 -BC:/Users/12022/source/repos/CSC8508 --check-stamp-file C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -154,108 +154,108 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\12022\source\repos\CSC8508\OpenGLRendering\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\cmake_pch.cxx">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\cmake_pch.cxx">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/OpenGLRendering.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/OpenGLRendering.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/OpenGLRendering.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/OpenGLRendering.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLTexture.h">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLTexture.h">
       <ObjectFileName>$(IntDir)/OGLTexture.h.obj</ObjectFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLShader.h">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLShader.h">
       <ObjectFileName>$(IntDir)/OGLShader.h.obj</ObjectFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLRenderer.h">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLRenderer.h">
       <ObjectFileName>$(IntDir)/OGLRenderer.h.obj</ObjectFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLMesh.h">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLMesh.h">
       <ObjectFileName>$(IntDir)/OGLMesh.h.obj</ObjectFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLComputeShader.h">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLComputeShader.h">
       <ObjectFileName>$(IntDir)/OGLComputeShader.h.obj</ObjectFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLTexture.cpp">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLTexture.cpp">
       <ObjectFileName>$(IntDir)/OGLTexture.cpp.obj</ObjectFileName>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLShader.cpp">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLShader.cpp">
       <ObjectFileName>$(IntDir)/OGLShader.cpp.obj</ObjectFileName>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLRenderer.cpp">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLRenderer.cpp">
       <ObjectFileName>$(IntDir)/OGLRenderer.cpp.obj</ObjectFileName>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLMesh.cpp">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLMesh.cpp">
       <ObjectFileName>$(IntDir)/OGLMesh.cpp.obj</ObjectFileName>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\OGLComputeShader.cpp">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\OGLComputeShader.cpp">
       <ObjectFileName>$(IntDir)/OGLComputeShader.cpp.obj</ObjectFileName>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\glad\gl.h">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\glad\gl.h">
       <ObjectFileName>$(IntDir)/glad/gl.h.obj</ObjectFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\glad\gl.c">
+    <ClCompile Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\glad\gl.c">
       <ObjectFileName>$(IntDir)/glad/gl.c.obj</ObjectFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/c4071068/source/repos/CSC8503TutorialWork/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/12022/source/repos/CSC8508/OpenGLRendering/CMakeFiles/OpenGLRendering.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
-    <ClInclude Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Debug\cmake_pch.hxx" />
-    <ClInclude Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Release\cmake_pch.hxx" />
+    <ClInclude Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Debug\cmake_pch.hxx" />
+    <ClInclude Include="C:\Users\12022\source\repos\CSC8508\OpenGLRendering\CMakeFiles\OpenGLRendering.dir\Release\cmake_pch.hxx" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\ZERO_CHECK.vcxproj">
-      <Project>{84645941-B960-3A70-9CBC-F4B7173EB4D5}</Project>
+    <ProjectReference Include="C:\Users\12022\source\repos\CSC8508\ZERO_CHECK.vcxproj">
+      <Project>{9385672F-0F4F-3039-ACD0-D8B5EBF9BB1A}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\c4071068\source\repos\CSC8503TutorialWork\NCLCoreClasses\NCLCoreClasses.vcxproj">
-      <Project>{653BE862-7D40-3C5E-B1C7-3411FE5ED99E}</Project>
+    <ProjectReference Include="C:\Users\12022\source\repos\CSC8508\NCLCoreClasses\NCLCoreClasses.vcxproj">
+      <Project>{51F1BEF9-85E5-3500-B8CF-F088E731F006}</Project>
       <Name>NCLCoreClasses</Name>
     </ProjectReference>
   </ItemGroup>

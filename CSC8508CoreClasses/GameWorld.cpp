@@ -47,7 +47,7 @@ void GameWorld::AddGameObject(GameObject* o) {
 	if (bounds)
 		boundsComponents.emplace_back(bounds);
 
-	if (phys)
+	if (phys) 
 		physicsComponents.emplace_back(phys);
 
 	auto newComponents = o->GetAllComponents();

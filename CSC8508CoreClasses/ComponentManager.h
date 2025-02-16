@@ -1,26 +1,21 @@
-//
-// Contributors: Alasdair
-//
-
 #ifndef COMPONENTMANAGER_H
 #define COMPONENTMANAGER_H
 
 #include <typeindex>
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <memory>
+#include <new>    
+#include <utility>
 #include <type_traits>
-
+#include <iostream>
+#include <vector>
 using std::vector;
 
 namespace NCL::CSC8508 {
 
     class IComponent;
     class INetworkComponent;
+    class PhysicsComponent;
 
     class ComponentManager final {
     public:
@@ -46,45 +41,27 @@ namespace NCL::CSC8508 {
             }
         }
 
-        // Does not currently work: works for parent types e.g<InputComponent>
-        // but will not for NetworkInputComponent
-        template <typename T>
-            requires std::is_base_of_v<IComponent, T>
-        static std::vector<T*> GetAllComponents() {
-            std::vector<T*> result;
-            auto it = allComponents.find(typeid(T));
-            if (it != allComponents.end()) {
-                for (auto* comp : it->second) {
-                    if (auto* derived = dynamic_cast<T*>(comp))
-                        result.push_back(derived);
-                }
-            }
-            return result;
-        }
-
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnBufferContents(std::function<void(T*)> func) {
             T* buffer = GetComponentsBuffer<T>();
             size_t count = componentCount<T>;
-            for (size_t i = 0; i < count; ++i) 
-                func(&buffer[i]); 
+            for (size_t i = 0; i < count; ++i)
+                func(&buffer[i]);
         }
-
-
 
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
         {
-            for (auto& entry : allComponents) 
+            /*for (auto& entry : allComponents)
             {
                 for (auto* component : entry.second) {
                     if (!component->IsDerived(typeid(T)))
-                        break;
+                       break;
                     func(component);
                 }
-            }
+            }*/
         }
 
         static void OperateOnINetworkComponents(std::function<void(INetworkComponent*)> func)
@@ -97,32 +74,27 @@ namespace NCL::CSC8508 {
             requires std::is_base_of_v<IComponent, T>
         static T* AddComponent(Args&&... args) {
             if (componentCount<T> >= MAX_COMPONENTS<T>) {
-                std::cerr << "The Component pool is filled:: Increase the max size or reduce component Count" << std::endl;
+                std::cerr << "The Component pool is filled:: Increase the max size or reduce component count" << std::endl;
                 return nullptr;
             }
+            T* component = new (GetComponentsBuffer<T>() + componentCount<T>) T(std::forward<Args>(args)...);
+            //T* component = new (reinterpret_cast<T*>(&componentBuffer<T>[componentCount<T> *sizeof(T)])) T(std::forward<Args>(args)...);
 
-            void* memory = static_cast<void*>(componentBuffer<T>);
-            std::size_t space = MAX_COMPONENTS<T> *sizeof(T);
-            void* alignedMemory = std::align(alignof(T), sizeof(T), memory, space);
-            if (!alignedMemory)
-                throw std::bad_alloc();
-            T* component = new (alignedMemory) T(std::forward<Args>(args)...);
-
-            //T* component = new (reinterpret_cast<T*>(componentBuffer<T>) + componentCount<T>) T(std::forward<Args>(args)...);
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 
+            if (component->IsDerived(typeid(PhysicsComponent)))
+                ((PhysicsComponent*)component)->GetGameObject().GetTransform();
+
             if (component->IsDerived(typeid(INetworkComponent)))
                 allNetworkComponents.push_back((INetworkComponent*)component);
-
             return component;
         }
 
-
-        static void Clear() 
+        static void Clear()
         {
             for (auto& [type, componentsList] : allComponents) {
-                for (auto* comp : componentsList) 
+                for (auto* comp : componentsList)
                     delete comp;
             }
             allComponents.clear();
@@ -133,14 +105,15 @@ namespace NCL::CSC8508 {
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
         static constexpr size_t MAX_COMPONENTS = 1000;
+
         template <typename T> requires std::is_base_of_v<IComponent, T>
         static size_t componentCount;
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
-        static alignas(T) char componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
+        static alignas(T) std::byte componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
+
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static vector<INetworkComponent*> allNetworkComponents;
-
     };
 
     template <typename T>
@@ -149,8 +122,7 @@ namespace NCL::CSC8508 {
 
     template <typename T>
         requires std::is_base_of_v<IComponent, T>
-    char ComponentManager::componentBuffer<T>[MAX_COMPONENTS<T> *sizeof(T)] = {};
-
+    alignas(T) std::byte ComponentManager::componentBuffer<T>[MAX_COMPONENTS<T> *sizeof(T)] = {};
 }
 
 #endif // COMPONENTMANAGER_H

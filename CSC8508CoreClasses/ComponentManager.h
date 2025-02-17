@@ -94,9 +94,6 @@ namespace NCL::CSC8508 {
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 
-            if (component->IsDerived(typeid(PhysicsComponent)))
-                ((PhysicsComponent*)component)->GetGameObject().GetTransform();
-
             if (component->IsDerived(typeid(INetworkComponent)))
                 allNetworkComponents.push_back((INetworkComponent*)component);
             return component;
@@ -125,6 +122,20 @@ namespace NCL::CSC8508 {
 
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static vector<INetworkComponent*> allNetworkComponents;
+
+
+        // Testing for action lists on parent calls
+        /*template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        using Action = std::function<void(std::function<void(T*)> func)>;
+
+        template <typename T>
+            requires std::is_base_of_v<IComponent, T>
+        static Action<T> action;*/
+
+        //action = OperateOnBufferContents<PhysicsComponent>(func);
+
+
     };
 
     template <typename T>

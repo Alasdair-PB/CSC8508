@@ -54,14 +54,14 @@ namespace NCL::CSC8508 {
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
         {
-            /*for (auto& entry : allComponents)
+            for (auto& entry : allComponents)
             {
                 for (auto* component : entry.second) {
                     if (!component->IsDerived(typeid(T)))
                        break;
                     func(component);
                 }
-            }*/
+            }
         }
 
         static void OperateOnINetworkComponents(std::function<void(INetworkComponent*)> func)
@@ -78,8 +78,6 @@ namespace NCL::CSC8508 {
                 return nullptr;
             }
             T* component = new (GetComponentsBuffer<T>() + componentCount<T>) T(std::forward<Args>(args)...);
-            //T* component = new (reinterpret_cast<T*>(&componentBuffer<T>[componentCount<T> *sizeof(T)])) T(std::forward<Args>(args)...);
-
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 

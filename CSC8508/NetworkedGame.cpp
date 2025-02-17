@@ -104,13 +104,8 @@ void NetworkedGame::OnEvent(ClientConnectedEvent* e)
 void NetworkedGame::OnEvent(NetworkEvent* e)
 {
 	auto dataPacket = e->eventData;
-	if (thisServer) {
-		for (const auto& player : thisServer->playerPeers)
-		{
-			int playerID = player.first;
-			thisServer->SendPacketToPeer(dataPacket, playerID);
-		}
-	}
+	if (thisServer) 
+		SendToAllClients(dataPacket);
 	else 
 		thisClient->SendPacket(*dataPacket);
 }
@@ -154,24 +149,58 @@ void NetworkedGame::UpdateAsClient(float dt)
 	thisClient->UpdateClient();
 }
 
+bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
+{
+	if (!thisServer)
+		return false;
+
+	for (const auto& player : thisServer->playerPeers)
+	{
+		int playerID = player.first;
+		thisServer->SendPacketToPeer(dataPacket, playerID);
+	}
+	return true;
+}
+
+
+bool NetworkedGame::SendToAllOtherClients(GamePacket* dataPacket, int ownerId)
+{
+	if (!thisServer)
+		return false;
+
+	for (const auto& player : thisServer->playerPeers)
+	{
+		int playerID = player.first;
+		if (playerID != ownerId)
+			thisServer->SendPacketToPeer(dataPacket, playerID);
+	}
+	return true;
+}
+
 // Could be reworked if the client is able to learn their owning Id
 // Client send all objects in their world not owned by server
 void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) 
 {
-	/*for (GameObject* i : ownedObjects) {
-		NetworkObject* o = i->GetNetworkObject();
-		if (!o)
-			continue;
+	ComponentManager::OperateOnINetworkComponents(
+		[&](INetworkComponent* c) {
+			if (thisServer)
+			{
+				GamePacket* newPacket = new GamePacket();
+				if (c->IsOwner()) {
+					/*if (*c->WriteDeltaPacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
+					{
+						if (thisServer)
+							SendToAllClients(*newPacket);
+						else if (thisClient)
+							thisClient->SendPacket(*newPacket);
 
-		//if (thisClient->GetPeerId() != o->GetOwnerID())
-		//	continue;
-		GamePacket* newPacket = new GamePacket();
-		std::cout << "sending packet to server: " << o->GetObjectID() << std::endl;
+						std::cout << "sending delata packet " << o->GetObjectID() << std::endl;
 
-		if (o->WritePacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
-			thisClient->SendPacket(*newPacket);
-		delete newPacket;
-	}*/
+					}*/
+				}
+				delete newPacket;
+			}
+		});
 }
 
 // Server goes through each object in their world and sends delta or full packets for each. 
@@ -199,28 +228,6 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame)
 	}*/
 }
 
-void NetworkedGame::UpdateMinimumState() 
-{
-	/*int minID = INT_MAX;
-	int maxID = 0; 
-
-	for (auto i : stateIDs) {
-		minID = std::min(minID, i.second);
-		maxID = std::max(maxID, i.second);
-	}
-
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	world->GetObjectIterators(first, last);
-
-	for (auto i = first; i != last; ++i) 
-	{
-		NetworkObject* o = (*i)->GetNetworkObject();
-		if (!o) 
-			continue;
-		o->UpdateStateHistory(minID); 
-	}*/
-}
 
 GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) 
 {
@@ -261,11 +268,7 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 	newPacket->ownerId = ownerId;
 	newPacket->objectId = nextObjectId;
 
-	for (const auto& player : thisServer->playerPeers)
-	{
-		int playerID = player.first;
-		thisServer->SendPacketToPeer(newPacket, playerID);
-	}
+	SendToAllClients(newPacket);
 
 	delete newPacket;
 	nextObjectId++;
@@ -323,7 +326,6 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 
 		std::vector<GameObject*>::const_iterator first, last;
 		world->GetObjectIterators(first, last);
-
 		for (auto i = first; i != last; ++i)
 		{
 			NetworkObject* o = (*i)->GetNetworkObject();
@@ -336,19 +338,11 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 		INetworkPacket* p = (INetworkPacket*) payload;
 		ComponentManager::OperateOnINetworkComponents(
 			[&](INetworkComponent* c) {	
-				if (p->componentID == (c->GetComponentID())) {
+				if (p->componentID == (c->GetComponentID())) 
+				{
 					c->ReadEventPacket(*p);
 					if (thisServer)
-					{
-						for (const auto& player : thisServer->playerPeers)
-						{
-							int playerID = player.first;
-							if (playerID != p->ownerID) {
-								int playerID = player.first;
-								thisServer->SendPacketToPeer(payload, playerID);
-							}
-						}
-					}
+						SendToAllOtherClients(payload, p->ownerID);
 				}
 			});
 	}

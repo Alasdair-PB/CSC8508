@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <iostream>
 #include <vector>
+#include <memory>
 using std::vector;
 
 namespace NCL::CSC8508 {
@@ -48,6 +49,18 @@ namespace NCL::CSC8508 {
             size_t count = componentCount<T>;
             for (size_t i = 0; i < count; ++i)
                 func(&buffer[i]);
+        }
+
+        template <typename T, typename... Types>
+        void OperateOnBufferContentsAs(std::function<void(T*)> func) {
+            (([&] {
+                T* buffer = dynamic_cast<T*>(GetComponentsBuffer<Types>());
+                if (buffer) {
+                    size_t count = componentCount<Types>;
+                    for (size_t i = 0; i < count; ++i) 
+                        func(&buffer[i]);
+                }
+            }()), ...); 
         }
 
         template <typename T>

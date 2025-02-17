@@ -50,7 +50,10 @@ namespace NCL {
 			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastSnapshot(bool deltaFrame);
 			void BroadcastOwnedObjects(bool deltaFrame);
-			void UpdateMinimumState();
+
+			bool SendToAllClients(GamePacket* dataPacket);
+			bool SendToAllOtherClients(GamePacket* dataPacket, int ownerId);
+
 			//std::map<int, int> stateIDs;
 
 			GameServer* thisServer;

@@ -47,6 +47,7 @@ namespace NCL::CSC8508
 		int GetObjectID() { return objectID; }
 		int GetComponentID() { return componentID; }
 		int GetOwnerID() { return ownerID; }
+		bool IsOwner() { return clientOwned; }
 
 		/*vector<GamePacket*> WritePacket(bool deltaFrame, int stateID);
 		void UpdateStateHistory(int minID);

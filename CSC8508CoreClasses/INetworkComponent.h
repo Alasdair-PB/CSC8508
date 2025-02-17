@@ -45,7 +45,7 @@ namespace NCL::CSC8508
 		virtual bool ReadEventPacket(INetworkPacket& p) { return false; }
 
 		int GetObjectID() { return objectID; }
-		int GetComponentID() { return objectID; }
+		int GetComponentID() { return componentID; }
 		int GetOwnerID() { return ownerID; }
 
 		/*vector<GamePacket*> WritePacket(bool deltaFrame, int stateID);

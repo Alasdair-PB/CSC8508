@@ -18,13 +18,13 @@ struct Node {
         : x(_x), y(_y), width(_width), height(_height) {}
 
     bool split() {
-        if (left || right) return false; // 已分割
-        bool splitH = (rand() % 2 == 0); // 随机决定水平或垂直分割
-        if (width > height) splitH = false; // 如果宽度更大，优先垂直分割
-        if (height > width) splitH = true;  // 如果高度更大，优先水平分割
+        if (left || right) return false; 
+        bool splitH = (rand() % 2 == 0); 
+        if (width > height) splitH = false; // if width > height, split vertically
+        if (height > width) splitH = true;  // if height > width, split horizontally
 
         int maxSize = (splitH ? height : width) - 10;
-        if (maxSize <= 10) return false; // 区域太小，不再分割
+        if (maxSize <= 10) return false; // when the size is too small, stop splitting
 
         int splitPos = rand() % (maxSize - 10) + 5;
 
@@ -40,9 +40,9 @@ struct Node {
     }
 };
 
-// 递归分割
+// generate the dungeon using BSP
 void generateBSP(Node* node) {
-    if (rand() % 100 < 75) { // 75% 的几率继续分割
+    if (rand() % 100 < 75) { // 75% condition to split
         if (node->split()) {
             generateBSP(node->left);
             generateBSP(node->right);
@@ -50,7 +50,7 @@ void generateBSP(Node* node) {
     }
 }
 
-// 打印地图
+// print the dungeon
 void printDungeon(Node* node, char map[50][50]) {
     if (!node) return;
     if (node->left || node->right) {

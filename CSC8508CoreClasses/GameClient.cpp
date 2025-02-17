@@ -28,7 +28,7 @@ void GameClient::ReceivePacket(int type, GamePacket* payload, int source)
 		SetClientId* recievedPacket = (SetClientId*)payload;
 		peerID = recievedPacket->clientPeerId;
 		AcknowledgePacket* ackPacket = new AcknowledgePacket(peerID);
-		std::cout << "Sending ackowledge package" << std::endl;
+		//std::cout << "Sending ackowledge package" << std::endl;
 		SendPacket(*ackPacket);
 		delete ackPacket;
 	}
@@ -55,7 +55,6 @@ void GameClient::UpdateClient()
 // Modify for different channel when not local?
 void GameClient::SendPacket(GamePacket&  payload) 
 {
-	std::cout << "Sending package" << std::endl;
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);
 	enet_peer_send(netPeer, 0, dataPacket);
 }

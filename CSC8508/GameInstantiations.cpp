@@ -54,9 +54,7 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 	return navMeshObject;
 }
 
-size_t cantorPairing(int objectId, int index) {
-	return (objectId + index) * (objectId + index + 1) / 2 + index;
-}
+float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
 	float meshSize = 1.0f;
@@ -72,9 +70,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	if (spawnData)
 	{
-		int unqiueId = cantorPairing(spawnData->objId, componentIdCount);
+		int unqiueId = CantorPairing(spawnData->objId, componentIdCount);
 		componentIdCount++;
-
 		InputNetworkComponent* input = players->AddComponent<InputNetworkComponent>(
 			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
 	}

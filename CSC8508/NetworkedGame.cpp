@@ -35,7 +35,7 @@ struct SpawnPacket : public GamePacket {
 
 	SpawnPacket() {
 		type = Spawn_Object;
-		size = sizeof(short) * 2;
+		size = sizeof(SpawnPacket) - sizeof(GamePacket);
 	}
 };
 
@@ -103,9 +103,6 @@ void NetworkedGame::OnEvent(ClientConnectedEvent* e)
 
 void NetworkedGame::OnEvent(NetworkEvent* e)
 {
-
-	std::cout << "Sending Input packet Data" << ((INetworkPacket*) e->eventData)->componentID << std::endl;
-
 	auto dataPacket = e->eventData;
 	if (thisServer) {
 		for (const auto& player : thisServer->playerPeers)
@@ -114,9 +111,8 @@ void NetworkedGame::OnEvent(NetworkEvent* e)
 			thisServer->SendPacketToPeer(dataPacket, playerID);
 		}
 	}
-	else {
+	else 
 		thisClient->SendPacket(*dataPacket);
-	}
 }
 
 void NetworkedGame::UpdateGame(float dt) 
@@ -234,9 +230,9 @@ GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket)
 
 void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, Prefab prefab)
 {
-	// Will be prefab reference in the future
-	NetworkSpawnData data = NetworkSpawnData();
+	// Will be prefab reference in the future	
 	bool clientOwned = ownerId == thisClient->GetPeerId();
+	NetworkSpawnData data = NetworkSpawnData();
 
 	data.clientOwned = clientOwned;
 	data.objId = objectId;
@@ -250,9 +246,9 @@ void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, Prefab prefab)
 void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 {
 	// Will be prefab reference in the future
-
-	NetworkSpawnData data = NetworkSpawnData();
 	bool serverOwned = ownerId == thisServer->GetPeerId();
+	NetworkSpawnData data = NetworkSpawnData();
+
 	data.clientOwned = serverOwned;
 	data.objId = nextObjectId;
 	data.ownId = ownerId;
@@ -276,13 +272,17 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 }
 
 bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId) {
-	for (auto component : object->GetAllComponents()) {
-		if (component->IsDerived(typeid(INetworkComponent))) {
+	if (!object)
+		return false;
 
-			INetworkComponent* networkComponent = ((INetworkComponent*)component);
+	for (auto component : object->GetAllComponents()) {
+		if (component->IsDerived(typeid(INetworkComponent))) 
+		{
+			INetworkComponent* networkComponent = dynamic_cast<INetworkComponent*>(component);
+			if (!networkComponent)
+				std::cout << "NetworkComponent is not derived type" << std::endl;
 			objectId = networkComponent->GetObjectID();
 			ownerId = networkComponent->GetOwnerID();
-
 			return true;
 		}
 	}
@@ -305,7 +305,6 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 			newPacket->ownerId = ownerId;
 			newPacket->objectId = objectId;
 			thisServer->SendPacketToPeer(newPacket, clientId);
-
 			delete newPacket;
 		}
 	}
@@ -360,7 +359,6 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 			SpawnPlayerClient(ackPacket->ownerId, ackPacket->objectId, Prefab::Player);
 		}
 	}
-
 	if (thisClient) 
 		thisClient->ReceivePacket(type, payload, source);
 	else if (thisServer) 

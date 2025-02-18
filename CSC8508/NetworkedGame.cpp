@@ -336,8 +336,9 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 	}
 	if (type == Component_Event) {
 		INetworkPacket* p = (INetworkPacket*) payload;
-		ComponentManager::OperateOnINetworkComponents(
-			[&](INetworkComponent* c) {	
+		ComponentManager::OperateOnAllIcomponents(
+			[&](IComponent* ic) {	
+				INetworkComponent* c = dynamic_cast<INetworkComponent*>(ic);
 				if (p->componentID == (c->GetComponentID())) 
 				{
 					c->ReadEventPacket(*p);

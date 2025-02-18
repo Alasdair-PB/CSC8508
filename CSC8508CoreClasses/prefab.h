@@ -8,9 +8,21 @@
 #include "OrientationConstraint.h"
 
 
+struct Prefab {
+    std::string name;        // 预设名称
+    std::string modelPath;   // 3D 模型路径
+    std::string collider;    // 碰撞体类型 (Box, Sphere, Capsule)
+    bool isWalkable;         // 是否可行走（false 表示障碍物）
+    float width, height, depth; // 大小
+    std::vector<std::string> tags; // 额外的标记 (e.g. "Room", "Corridor", "Door")
 
-using namespace NCL;
-using namespace CSC8508;
+    // 构造函数
+    Prefab(std::string _name, std::string _model, std::string _collider,
+        bool _walkable, float w, float h, float d, std::vector<std::string> _tags)
+        : name(_name), modelPath(_model), collider(_collider), isWalkable(_walkable),
+        width(w), height(h), depth(d), tags(_tags) {}
+};
+
 class PrefabManager {
 private:
     std::vector<Prefab> prefabs; // 存储所有预设
@@ -40,3 +52,4 @@ Prefab* PrefabManager::getRandomPrefabByTag(const std::string& tag) {
     if (filtered.empty()) return nullptr;
     return filtered[rand() % filtered.size()];
 }
+

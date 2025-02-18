@@ -39,22 +39,17 @@ namespace NCL {
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
 		protected:
-			void UpdateAsServer(float dt);
-			void UpdateAsClient(float dt);
+			void UpdatePackets(float dt);
 
 			void StartClientCallBack();
 			void StartServerCallBack();
-
 			void StartOfflineCallBack();
 
 			void SendSpawnPacketsOnClientConnect(int clientId);
-			void BroadcastSnapshot(bool deltaFrame);
 			void BroadcastOwnedObjects(bool deltaFrame);
 
 			bool SendToAllClients(GamePacket* dataPacket);
 			bool SendToAllOtherClients(GamePacket* dataPacket, int ownerId);
-
-			//std::map<int, int> stateIDs;
 
 			GameServer* thisServer;
 			GameClient* thisClient;

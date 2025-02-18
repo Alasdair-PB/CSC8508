@@ -6,13 +6,13 @@
 #define INPUTNETWORKCOMPONENT_H
 
 #include "INetworkComponent.h"
+#include "INetworkDeltaComponent.h"
 #include "InputComponent.h"
 
 using std::vector;
 
 namespace NCL::CSC8508
 {
-
 	enum InputTypes {
 		None,
 		Axis,
@@ -22,7 +22,7 @@ namespace NCL::CSC8508
 	struct InputAxisPacket : INetworkPacket
 	{
 		uint32_t axisID = -1;
-		float axisValue; 
+		float axisValue = 0; 
 
 		InputAxisPacket() {
 			type = Component_Event;
@@ -34,7 +34,7 @@ namespace NCL::CSC8508
 	struct InputButtonPacket : INetworkPacket
 	{
 		uint32_t buttonID = -1;
-		bool held;
+		bool held = false;
 
 		InputButtonPacket() {
 			type = Component_Event;
@@ -43,12 +43,13 @@ namespace NCL::CSC8508
 		}
 	};
 
-	class InputNetworkComponent : public INetworkComponent, public InputComponent
+	class InputNetworkComponent :public InputComponent, public INetworkComponent
 	{
 	public:
 		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, bool clientOwned) :
 			InputComponent(gameObject, controller), 
-			INetworkComponent(objId, ownId, componId, clientOwned) {}
+			INetworkComponent(objId, ownId, componId, clientOwned)
+		{}
 
 		~InputNetworkComponent() = default;
 
@@ -64,51 +65,21 @@ namespace NCL::CSC8508
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
-			static std::unordered_set<std::type_index> types = { 
-				std::type_index(typeid(IComponent)),
-				std::type_index(typeid(InputComponent)),
-				std::type_index(typeid(INetworkComponent))
+			static std::unordered_set<std::type_index> types = {
+				std::type_index(typeid(IComponent)),				
+				std::type_index(typeid(InputComponent)),				
+				std::type_index(typeid(INetworkComponent)),
+
 			};
 			return types;
 		}
 
+	
+
 		void Update(float deltaTime) override
 		{
-			if (clientOwned) 
-			{
-				for (auto binding : boundButtons)
-				{
-					bool buttonDown = activeController->GetButton(binding.first);
-					if (buttonDown || lastBoundState[binding.first]);
-					{
-						InputButtonPacket* buttonPacket = new InputButtonPacket();
-						buttonPacket->buttonID = binding.first;
-						buttonPacket->held = buttonDown;
-
-						SendEventPacket(buttonPacket);
-						EventManager::Call(binding.second);
-
-						lastBoundState[binding.first] = buttonDown;
-						delete buttonPacket;
-					}
-				}
-
-				for (auto binding : boundAxis)
-				{
-					float axisValue = activeController->GetAxis(binding);
-					if (axisValue != lastAxisState[binding]) {
-
-						InputAxisPacket* axisPacket = new InputAxisPacket();
-						axisPacket->axisID = binding;
-						axisPacket->axisValue = axisValue;
-						
-						SendEventPacket(axisPacket);
-						lastAxisState[binding] = axisValue;
-						delete axisPacket;
-
-					}
-				}
-			}
+			if (clientOwned)
+				UpdateBoundAxis();
 		}
 
 		float GetNamedAxis(const std::string& name) override
@@ -142,6 +113,43 @@ namespace NCL::CSC8508
 			}
 
 			return true;
+		}	
+		
+		void UpdateBoundAxis() {
+			for (auto binding : boundAxis)
+			{
+				float axisValue = activeController->GetAxis(binding);
+				if (axisValue != lastAxisState[binding]) {
+
+					InputAxisPacket* axisPacket = new InputAxisPacket();
+					axisPacket->axisID = binding;
+					axisPacket->axisValue = axisValue;
+
+					SendEventPacket(axisPacket);
+					lastAxisState[binding] = axisValue;
+					delete axisPacket;
+				}
+			}
+		}
+
+		void UpdateBoundButtons() 
+		{
+			for (auto binding : boundButtons)
+			{
+				bool buttonDown = activeController->GetButton(binding.first);
+				if (buttonDown || lastBoundState[binding.first]);
+				{
+					InputButtonPacket* buttonPacket = new InputButtonPacket();
+					buttonPacket->buttonID = binding.first;
+					buttonPacket->held = buttonDown;
+
+					SendEventPacket(buttonPacket);
+					EventManager::Call(binding.second);
+
+					lastBoundState[binding.first] = buttonDown;
+					delete buttonPacket;
+				}
+			}
 		}
 	};
 }

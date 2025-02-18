@@ -10,6 +10,7 @@
 #include "GameClient.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"
+#include "INetworkDeltaComponent.h"
 #include "ComponentManager.h"
 #include "EventManager.h"
 
@@ -110,43 +111,32 @@ void NetworkedGame::OnEvent(NetworkEvent* e)
 		thisClient->SendPacket(*dataPacket);
 }
 
+//20hz server/client update
 void NetworkedGame::UpdateGame(float dt) 
 {
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
+
+		UpdatePackets(dt);
 		if (thisServer) 
-			UpdateAsServer(dt);
+			thisServer->UpdateServer();
 		else if (thisClient) 
-			UpdateAsClient(dt);
-		timeToNextPacket += 1.0f / 20.0f; //20hz server/client update
+			thisClient->UpdateClient();
+		timeToNextPacket += 1.0f / 20.0f; 
 	}
 	TutorialGame::UpdateGame(dt);
 }
 
-void NetworkedGame::UpdateAsServer(float dt)
+void NetworkedGame::UpdatePackets(float dt)
 {
 	packetsToSnapshot--;
 	if (packetsToSnapshot < 0) 
 	{
-		BroadcastSnapshot(false);
+		BroadcastOwnedObjects(false);
 		packetsToSnapshot = 5;
 	}
 	else 
-		BroadcastSnapshot(true);
-	thisServer->UpdateServer();
-}
-
-void NetworkedGame::UpdateAsClient(float dt) 
-{
-	packetsToSnapshot--;
-	if (packetsToSnapshot < 0)
-	{
-		BroadcastOwnedObjects(false);
-		packetsToSnapshot = 5;	
-	}
-	else 
 		BroadcastOwnedObjects(true);
-	thisClient->UpdateClient();
 }
 
 bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
@@ -162,7 +152,6 @@ bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
 	return true;
 }
 
-
 bool NetworkedGame::SendToAllOtherClients(GamePacket* dataPacket, int ownerId)
 {
 	if (!thisServer)
@@ -177,63 +166,31 @@ bool NetworkedGame::SendToAllOtherClients(GamePacket* dataPacket, int ownerId)
 	return true;
 }
 
-// Could be reworked if the client is able to learn their owning Id
-// Client send all objects in their world not owned by server
 void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) 
 {
-	ComponentManager::OperateOnINetworkComponents(
-		[&](INetworkComponent* c) {
-			if (thisServer)
-			{
-				GamePacket* newPacket = new GamePacket();
-				if (c->IsOwner()) {
-					/*if (*c->WriteDeltaPacket(&newPacket, deltaFrame, o->GetLatestNetworkState().stateID))
-					{
-						if (thisServer)
-							SendToAllClients(*newPacket);
-						else if (thisClient)
-							thisClient->SendPacket(*newPacket);
+	ComponentManager::OperateOnAllINetworkComponentBufferOperators(
+		[&](IComponent* ic) 
+		{
+			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
+			if (!c) return;
 
-						std::cout << "sending delata packet " << o->GetObjectID() << std::endl;
-
-					}*/
+			if ((thisClient && c->IsOwner()) || thisServer) {
+				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
+				for (GamePacket* packet : packets)
+				{
+					if (thisClient)
+						thisClient->SendPacket(*packet);
+					else if (thisServer)
+						SendToAllOtherClients(packet, c->GetOwnerID());
+					delete packet;
 				}
-				delete newPacket;
+				packets.clear();
 			}
 		});
 }
 
-// Server goes through each object in their world and sends delta or full packets for each. 
-void NetworkedGame::BroadcastSnapshot(bool deltaFrame) 
-{
-	/*for (const auto& player : thisServer->playerPeers)
-	{	
-		int playerID = player.first;
-		std::vector<INetworkComponent*>::const_iterator first, last;
-		world->GetINetIterators(first, last);
-
-		for (auto i = first; i != last; ++i) 
-		{
-			if ((*i)->GetOwnerID() == playerID)
-				continue;
-
-			auto packets = (*i)->WritePacket(deltaFrame, (*i)->GetLatestNetworkState().stateID);
-			for (int pck =0; pck < packets.size(); pck++)
-			{
-				thisServer->SendPacketToPeer(packets[pck], playerID);
-				std::cout << "sending packet to peer: " << playerID<< ", " << (*i)->GetObjectID() << std::endl;
-				delete packets[pck];
-			}				
-		}
-	}*/
-}
-
-
 GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) 
-{
-	return TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50), spawnPacket);
-}
-
+	{ return TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50), spawnPacket);}
 
 void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, Prefab prefab)
 {
@@ -313,30 +270,26 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 	}
 }
 
-
-
-void NetworkedGame::StartLevel() 
-{
-
-}
+void NetworkedGame::StartLevel() {}
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
 	if (type == Full_State || type == Delta_State) {
-
-		std::vector<GameObject*>::const_iterator first, last;
-		world->GetObjectIterators(first, last);
-		for (auto i = first; i != last; ++i)
-		{
-			NetworkObject* o = (*i)->GetNetworkObject();
-			if (!o)
-				continue;
-			o->ReadPacket(*payload);
-		}
+		INetworkPacket* p = (INetworkPacket*)payload;
+		ComponentManager::OperateOnAllINetworkDeltaComponentBufferOperators(
+			[&](IComponent* ic) {
+				INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
+				if (p->componentID == (c->GetComponentID()))
+				{
+					c->ReadDeltaFullPacket(*p);
+					if (thisServer)
+						SendToAllOtherClients(payload, p->ownerID);
+				}
+			});
 	}
 	if (type == Component_Event) {
 		INetworkPacket* p = (INetworkPacket*) payload;
-		ComponentManager::OperateOnAllIcomponents(
+		ComponentManager::OperateOnAllINetworkComponentBufferOperators(
 			[&](IComponent* ic) {	
 				INetworkComponent* c = dynamic_cast<INetworkComponent*>(ic);
 				if (p->componentID == (c->GetComponentID())) 

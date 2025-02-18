@@ -1,19 +1,11 @@
 #include "TutorialGame.h"
-#include "GameWorld.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-#include "TextureLoader.h"
-#include "Legacy/EnemyGameObject.h"
+
 #include "INetworkComponent.h"
 #include "InputNetworkComponent.h"
+#include "TransformNetworkComponent.h"
 
-
-
-#include "Legacy/Kitten.h"
-
-#include "PositionConstraint.h"
-#include "OrientationConstraint.h"
-#include "Legacy/StateGameObject.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -74,6 +66,11 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		componentIdCount++;
 		InputNetworkComponent* input = players->AddComponent<InputNetworkComponent>(
 			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+
+		unqiueId = CantorPairing(spawnData->objId, componentIdCount);
+		componentIdCount++;
+		TransformNetworkComponent* networkTransform = players->AddComponent<TransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
 	}
 	else {
 		InputComponent* input = players->AddComponent<InputComponent>(&controller);

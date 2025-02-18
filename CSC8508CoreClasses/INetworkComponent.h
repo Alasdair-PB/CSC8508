@@ -8,7 +8,6 @@
 #include "Transform.h"
 #include "IComponent.h"
 #include "NetworkBase.h"
-#include "NetworkState.h"
 #include "Event.h"
 #include "EventManager.h"
 
@@ -23,6 +22,7 @@ namespace NCL::CSC8508
 		short packetSubType = 0;
 
 		INetworkPacket() {
+			type = Component_Event;
 			size = sizeof(INetworkPacket) - sizeof(GamePacket);
 		}
 	};
@@ -49,10 +49,6 @@ namespace NCL::CSC8508
 		int GetOwnerID() { return ownerID; }
 		bool IsOwner() { return clientOwned; }
 
-		/*vector<GamePacket*> WritePacket(bool deltaFrame, int stateID);
-		void UpdateStateHistory(int minID);
-		NetworkState& GetLatestNetworkState();*/
-
 	protected:
 
 		int objectID;
@@ -69,17 +65,10 @@ namespace NCL::CSC8508
 			EventManager::Call<NetworkEvent>(&networkPacket);
 		}
 
-		/*virtual bool ReadDeltaPacket(INetworkPacket& p) {}
-		virtual bool ReadFullPacket(INetworkPacket& p) {}
-		virtual vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame, int stateID) {}
-		virtual vector<GamePacket*> WriteFullPacket() {}
-		bool GetNetworkState(int frameID, NetworkState& state);
-
-		NetworkState lastFullState;
-		std::vector<NetworkState> stateHistory;
-
-		int deltaErrors;
-		int fullErrors;*/
+		void SetPacketOwnership(INetworkPacket* packet) {
+			packet->componentID = this->componentID;
+			packet->ownerID = this->ownerID;
+		}
 	};
 }
 

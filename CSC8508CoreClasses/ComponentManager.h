@@ -77,6 +77,12 @@ namespace NCL::CSC8508 {
             }
         }
 
+        static void OperateOnAllIcomponents(std::function<void(IComponent*)> func) {
+            for (Action<IComponent>* myAction : operateOnAllComponentBuffer) {
+                (*myAction)(func);
+            }
+        }
+
         static void OperateOnINetworkComponents(std::function<void(INetworkComponent*)> func)
         {
             for (INetworkComponent* component : allNetworkComponents)
@@ -96,8 +102,31 @@ namespace NCL::CSC8508 {
 
             if (component->IsDerived(typeid(INetworkComponent)))
                 allNetworkComponents.push_back((INetworkComponent*)component);
+
+            if (component->IsDerived(typeid(INetworkComponent))) {
+                operateOnAllComponentBuffer.push_back(
+                    new Action(
+                        [](std::function<void(IComponent*)> func) {
+                            OperateOnBufferContents<T>(
+                                [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+                            );
+                        }
+                 ));
+            }
             return component;
         }
+
+        /*            Action<IComponent>* myAction = new Action(
+                [](std::function<void(IComponent*)> func) {
+                    OperateOnBufferContents<T>(
+                        [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+                    );
+                }
+            );
+
+            std::function<void(IComponent*)> func = [](IComponent* component) {};
+
+            (*myAction)(func);*/
 
         static void Clear()
         {
@@ -123,27 +152,18 @@ namespace NCL::CSC8508 {
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static vector<INetworkComponent*> allNetworkComponents;
 
-
-        // Testing for action lists on parent calls
-        /*template <typename T>
-            requires std::is_base_of_v<IComponent, T>
+        template <typename T> requires std::is_base_of_v<IComponent, T>
         using Action = std::function<void(std::function<void(T*)> func)>;
 
-        template <typename T>
-            requires std::is_base_of_v<IComponent, T>
-        static Action<T> action;*/
-
-        //action = OperateOnBufferContents<PhysicsComponent>(func);
-
-
+        inline static std::vector<Action<IComponent>*> operateOnAllComponentBuffer;
     };
 
-    template <typename T>
-        requires std::is_base_of_v<IComponent, T>
+    //static ComponentManager::Action<IComponent>* ComponentManager::myAction = nullptr;
+
+    template <typename T> requires std::is_base_of_v<IComponent, T>
     size_t ComponentManager::componentCount<T> = 0;
 
-    template <typename T>
-        requires std::is_base_of_v<IComponent, T>
+    template <typename T> requires std::is_base_of_v<IComponent, T>
     alignas(T) std::byte ComponentManager::componentBuffer<T>[MAX_COMPONENTS<T> *sizeof(T)] = {};
 }
 

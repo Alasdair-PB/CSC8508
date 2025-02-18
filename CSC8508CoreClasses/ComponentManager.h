@@ -16,6 +16,8 @@ namespace NCL::CSC8508 {
 
     class IComponent;
     class INetworkComponent;
+    class INetworkDeltaComponent;
+
     class PhysicsComponent;
 
     class ComponentManager final {
@@ -77,20 +79,44 @@ namespace NCL::CSC8508 {
             }
         }
 
-        static void OperateOnAllIcomponents(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : operateOnAllComponentBuffer) {
+        template <typename T> requires std::is_base_of_v<IComponent, T>
+        using Action = std::function<void(std::function<void(T*)> func)>;
+
+        static void OperateOnAllIComponentBufferOperators(std::function<void(IComponent*)> func) {
+            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) {
                 (*myAction)(func);
             }
         }
 
-        static void OperateOnINetworkComponents(std::function<void(INetworkComponent*)> func)
-        {
-            for (INetworkComponent* component : allNetworkComponents)
-                func(component);
+        static void OperateOnAllINetworkComponentBufferOperators(std::function<void(IComponent*)> func) {
+            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) {
+                (*myAction)(func);
+            }
         }
 
-        template <typename T, typename... Args>
-            requires std::is_base_of_v<IComponent, T>
+        static void OperateOnAllINetworkDeltaComponentBufferOperators(std::function<void(IComponent*)> func) {
+            for (Action<IComponent>* myAction : INetworkDeltaComponentBufferOperators) {
+                (*myAction)(func);
+            }
+        }
+
+        template <typename T, typename T2> requires std::is_base_of_v<IComponent, T>
+        static void CheckDerived(std::vector<Action<IComponent>*>& BufferOperators, T* component)
+        {
+            if (component->IsDerived(typeid(T2))) {
+                BufferOperators.push_back(
+                    new Action(
+                        [](std::function<void(IComponent*)> func) {
+                            OperateOnBufferContents<T>(
+                                [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+                            );
+                        }
+                    ));
+            }
+        }
+
+
+        template <typename T, typename... Args> requires std::is_base_of_v<IComponent, T>
         static T* AddComponent(Args&&... args) {
             if (componentCount<T> >= MAX_COMPONENTS<T>) {
                 std::cerr << "The Component pool is filled:: Increase the max size or reduce component count" << std::endl;
@@ -100,11 +126,12 @@ namespace NCL::CSC8508 {
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 
-            if (component->IsDerived(typeid(INetworkComponent)))
-                allNetworkComponents.push_back((INetworkComponent*)component);
+            CheckDerived<T, INetworkComponent>(INetworkComponentBufferOperators, component);
+            CheckDerived<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
 
-            if (component->IsDerived(typeid(INetworkComponent))) {
-                operateOnAllComponentBuffer.push_back(
+
+            /*if (component->IsDerived(typeid(INetworkComponent))) {
+                INetworkComponentBufferOperators.push_back(
                     new Action(
                         [](std::function<void(IComponent*)> func) {
                             OperateOnBufferContents<T>(
@@ -113,21 +140,20 @@ namespace NCL::CSC8508 {
                         }
                  ));
             }
+
+            if (component->IsDerived(typeid(INetworkDeltaComponent))) {
+                INetworkDeltaComponentBufferOperators.push_back(
+                    new Action(
+                        [](std::function<void(IComponent*)> func) {
+                            OperateOnBufferContents<T>(
+                                [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+                            );
+                        }
+                    ));
+            }*/
+
             return component;
         }
-
-        /*            Action<IComponent>* myAction = new Action(
-                [](std::function<void(IComponent*)> func) {
-                    OperateOnBufferContents<T>(
-                        [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
-                    );
-                }
-            );
-
-            std::function<void(IComponent*)> func = [](IComponent* component) {};
-
-            (*myAction)(func);*/
-
         static void Clear()
         {
             for (auto& [type, componentsList] : allComponents) {
@@ -152,13 +178,10 @@ namespace NCL::CSC8508 {
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static vector<INetworkComponent*> allNetworkComponents;
 
-        template <typename T> requires std::is_base_of_v<IComponent, T>
-        using Action = std::function<void(std::function<void(T*)> func)>;
+        inline static std::vector<Action<IComponent>*> INetworkComponentBufferOperators;
+        inline static std::vector<Action<IComponent>*> INetworkDeltaComponentBufferOperators;
 
-        inline static std::vector<Action<IComponent>*> operateOnAllComponentBuffer;
     };
-
-    //static ComponentManager::Action<IComponent>* ComponentManager::myAction = nullptr;
 
     template <typename T> requires std::is_base_of_v<IComponent, T>
     size_t ComponentManager::componentCount<T> = 0;

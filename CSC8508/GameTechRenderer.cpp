@@ -130,6 +130,7 @@ void GameTechRenderer::LoadSkybox() {
 }
 
 void GameTechRenderer::RenderFrame() {
+	framerateDelay += 1;
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
 	uiSystem->StartFrame();
@@ -146,8 +147,12 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderTextures();
 	NewRenderText();
 
-	/*uiSystem->DrawDemo();*/
-	uiSystem->DisplayFramerate(hostWindow.GetTimer().GetTimeDeltaSeconds());
+	uiSystem->DrawDemo();
+	if (framerateDelay > 10) {
+		latestFramerate = hostWindow.GetTimer().GetTimeDeltaSeconds();
+		framerateDelay = 0;
+	}
+	uiSystem->DisplayFramerate(latestFramerate);
 	uiSystem->EndFrame();
 
 	glDisable(GL_BLEND);

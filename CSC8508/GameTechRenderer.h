@@ -82,6 +82,8 @@ namespace NCL {
 			bool showDemo = true;
 
 			UISystem* uiSystem;
+			float framerateDelay = 0;
+			float latestFramerate;
 		};
 	}
 }

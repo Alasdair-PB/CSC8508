@@ -16,7 +16,8 @@ namespace NCL::CSC8508
 	enum InputTypes {
 		None,
 		Axis,
-		Button
+		Button,
+		Bound
 	};
 
 	struct InputAxisPacket : INetworkPacket
@@ -28,6 +29,20 @@ namespace NCL::CSC8508
 			type = Component_Event;
 			packetSubType = Axis;
 			size = sizeof(InputAxisPacket) - sizeof(GamePacket);
+		}
+	};
+
+	struct BoundPacket : INetworkPacket
+	{
+		uint32_t axisID_A = -1;		
+		uint32_t axisID_B = -1;
+		float axisValue_A = 0;
+		float axisValue_B = 0;
+
+		BoundPacket() {
+			type = Component_Event;
+			packetSubType = Bound;
+			size = sizeof(BoundPacket) - sizeof(GamePacket);
 		}
 	};
 

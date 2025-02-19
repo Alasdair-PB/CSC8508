@@ -30,11 +30,13 @@ public:
 	* Constructor for Audio Source
 	* Sets default file path for audio files
 	*/
-	AudioSourceComponent(GameObject& gameObject) : AudioObject(gameObject) {
+	AudioSourceComponent(GameObject& gameObject, ChannelGroupType type = ChannelGroupType::MASTER) : AudioObject(gameObject) {
 		soundDir = std::string(ASSETROOTLOCATION) + "Audio/";
 
 		fChannel = nullptr;
+		defaultChannelGroup = type;
 		fVolume = 1.0f;
+
 	}
 
 	/**
@@ -49,33 +51,42 @@ public:
 	* @param mode of sound
 	*/
 	bool LoadSound(const char* filename, float vol = 1.0f, FMOD_MODE mode = FMOD_3D) {
+		FMOD::Sound* sound;
+
 		std::string fullPath = soundDir + filename;
 
-		if (fSystem->createSound(fullPath.c_str(), mode, 0, &fSound) != FMOD_OK) {
+		std::string name = filename;
+		name = name.substr(0, name.find_last_of("."));
+
+		if (fSystem->createSound(fullPath.c_str(), mode, 0, &sound) != FMOD_OK) {
 			std::cerr << "Error loading sound (" << filename << "): " << std::endl;
 			return false;
 		}
 		
 		fVolume = vol;
-		fSound->set3DMinMaxDistance(0.5f, 500.0f);
+		sound->set3DMinMaxDistance(0.5f, 500.0f);
+		fSoundCol[name] = sound;
 		return true;
 	}
 
 
 	/**
 	* Play created sound
-	* Checks if sound is loaded
-	* Checks if sound played successfully
-	* Modifies Channel status and volume
+	* Sets selected sound to play
 	* @return sound played status (true if successful)
+	* @param name of sound
 	*/
-	bool PlaySound() {
+	bool PlaySound(const char* soundName) {
+
+		FMOD::Sound* fSound = fSoundCol[soundName];
+
+
 		if (!fSound) {
 			std::cerr << "Error: fSound is nullptr, cannot play sound!" << std::endl;
 			return false;
 		}
 
-		FMOD_RESULT result = fSystem->playSound(fSound, audioEngine->getMasterGroup(), false, &fChannel);
+		FMOD_RESULT result = fSystem->playSound(fSound, audioEngine->GetChannelGroup(defaultChannelGroup), false, &fChannel);
 		if (result != FMOD_OK) {
 			std::cerr << "Error playing sound: " << result << std::endl;
 			return false;
@@ -88,7 +99,16 @@ public:
 		}
 	}
 
+	/**
+	* Cycle through sounds in collection
+	*/
+	void cycleSounds();
 
+
+	/**
+	* Play random sound from collection using specified delay
+	*/
+	void randomSounds(int delay);
 
 	/**
 	* Stop Playback
@@ -136,7 +156,10 @@ private:
 	}
 
 	FMOD::Channel* fChannel;
+	ChannelGroupType defaultChannelGroup;
+
 	std::string soundDir;
-	FMOD::Sound* fSound = nullptr;
+	std::map<std::string, FMOD::Sound*> fSoundCol;
+
 	float fVolume;
 };

@@ -90,6 +90,7 @@ namespace NCL::CSC8508
 			dp->orientation[1] = (char)(currentOrientation.y * 127.0f);
 			dp->orientation[2] = (char)(currentOrientation.z * 127.0f);
 			dp->orientation[3] = (char)(currentOrientation.w * 127.0f);
+			dp->fullID = stateID;
 
 			SetPacketOwnership(dp);
 			packets.push_back(dp);

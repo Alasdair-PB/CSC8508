@@ -24,8 +24,6 @@ bool NetworkBase::ProcessPacket(GamePacket* packet, int peerID)
     PacketHandlerIterator firstHandler;
     PacketHandlerIterator lastHandler;
 
-    //std::cout << "Prcoessing package" << std::endl;
-
     bool canHandle = GetPacketHandlers(packet->type, firstHandler, lastHandler);
     if (canHandle) {
         for (auto i = firstHandler; i != lastHandler; ++i) {

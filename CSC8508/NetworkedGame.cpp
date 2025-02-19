@@ -116,14 +116,13 @@ void NetworkedGame::UpdateGame(float dt)
 {
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
-
 		UpdatePackets(dt);
-		if (thisServer) 
-			thisServer->UpdateServer();
-		else if (thisClient) 
-			thisClient->UpdateClient();
 		timeToNextPacket += 1.0f / 20.0f; 
 	}
+	if (thisServer) 
+		thisServer->UpdateServer();
+	else if (thisClient) 
+		thisClient->UpdateClient();
 	TutorialGame::UpdateGame(dt);
 }
 
@@ -168,12 +167,11 @@ bool NetworkedGame::SendToAllOtherClients(GamePacket* dataPacket, int ownerId)
 
 void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) 
 {
-	ComponentManager::OperateOnAllINetworkComponentBufferOperators(
+	ComponentManager::OperateOnAllINetworkDeltaComponentBufferOperators(
 		[&](IComponent* ic) 
 		{
 			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
 			if (!c) return;
-
 			if ((thisClient && c->IsOwner()) || thisServer) {
 				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
 				for (GamePacket* packet : packets)

@@ -106,6 +106,7 @@ namespace NCL::CSC8508
 			fp->fullState.stateID = lastFullState->stateID++;
 
 			SetPacketOwnership(fp);
+
 			packets.push_back(fp);
 			return packets;
 		}
@@ -119,7 +120,6 @@ namespace NCL::CSC8508
 		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override 
 		{
 			DeltaPacket p = ((DeltaPacket&)idp);
-
 			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);
 
 			Vector3 fullPos = lastTransformFullState->position;
@@ -148,7 +148,12 @@ namespace NCL::CSC8508
 			if (p.fullState.stateID < lastFullState->stateID)
 				return false;
 
-			*lastFullState = p.fullState;
+			std::cout << p.fullState.position.y << std::endl;
+
+			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
+			((TransformNetworkState*)lastFullState)->position = p.fullState.position;
+			((TransformNetworkState*)lastFullState)->stateID = p.fullState.stateID;
+
 			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);
 
 			if (!lastTransformFullState)

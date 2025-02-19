@@ -101,8 +101,11 @@ namespace NCL::CSC8508 {
         }
 
         template <typename T, typename T2> requires std::is_base_of_v<IComponent, T>
-        static void CheckDerived(std::vector<Action<IComponent>*>& BufferOperators, T* component)
+        static void AddOperatorBuffer(std::vector<Action<IComponent>*>& BufferOperators, T* component)
         {
+            if (allComponents.find(typeid(T)) == allComponents.end())
+                return;
+
             if (component->IsDerived(typeid(T2))) {
                 BufferOperators.push_back(
                     new Action(
@@ -126,31 +129,8 @@ namespace NCL::CSC8508 {
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 
-            CheckDerived<T, INetworkComponent>(INetworkComponentBufferOperators, component);
-            CheckDerived<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
-
-
-            /*if (component->IsDerived(typeid(INetworkComponent))) {
-                INetworkComponentBufferOperators.push_back(
-                    new Action(
-                        [](std::function<void(IComponent*)> func) {
-                            OperateOnBufferContents<T>(
-                                [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
-                            );
-                        }
-                 ));
-            }
-
-            if (component->IsDerived(typeid(INetworkDeltaComponent))) {
-                INetworkDeltaComponentBufferOperators.push_back(
-                    new Action(
-                        [](std::function<void(IComponent*)> func) {
-                            OperateOnBufferContents<T>(
-                                [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
-                            );
-                        }
-                    ));
-            }*/
+            AddOperatorBuffer<T, INetworkComponent>(INetworkComponentBufferOperators, component);
+            AddOperatorBuffer<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
 
             return component;
         }
@@ -176,8 +156,6 @@ namespace NCL::CSC8508 {
         static alignas(T) std::byte componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
 
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
-        inline static vector<INetworkComponent*> allNetworkComponents;
-
         inline static std::vector<Action<IComponent>*> INetworkComponentBufferOperators;
         inline static std::vector<Action<IComponent>*> INetworkDeltaComponentBufferOperators;
 

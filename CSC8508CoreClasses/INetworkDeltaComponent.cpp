@@ -15,12 +15,12 @@ INetworkDeltaComponent::INetworkDeltaComponent(int objId, int ownId, int compone
 }
 
 vector<GamePacket*> INetworkDeltaComponent::WriteDeltaFullPacket(bool deltaFrame){
-	if (deltaFrame) {
+	/*if (deltaFrame) {
 		bool foundDelta = true;
 		int stateId = lastFullState->stateID;
 		auto packets = WriteDeltaPacket(&foundDelta, stateId);
 		return foundDelta ? packets : WriteFullPacket();
-	}
+	}*/
 	return WriteFullPacket();
 }
 

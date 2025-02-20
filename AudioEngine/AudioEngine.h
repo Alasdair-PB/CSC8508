@@ -8,6 +8,20 @@
 
 #include <fmod.hpp>
 
+/**
+* Type of Channel Group
+* SFX
+* MUSIC
+* VOICE
+* MASTER
+*/
+enum class ChannelGroupType {
+	SFX,
+	MUSIC,
+	VOICE,
+	MASTER
+};
+
 
 /**
 * Audio Engine is a singleton class that manages the FMOD Audio System.
@@ -38,20 +52,45 @@ public:
 	* Reference needed for each AudioObject
 	* @return FMOD System instance
 	*/
-	FMOD::System* GetSystem() { return audioSystem; }
+	FMOD::System* GetSystem() {
+		return audioSystem;
+	}
 
 	/**
 	* Handle Destruction of Audio Engine
     */
     void Shutdown();
 
-	void setMasterVolume(float volume) {
-		masterGroup->setVolume(volume);
+	/**
+	* Get pointer to a channel group
+	* @return FMOD Channel Group
+	* @param type of channel group
+	*/
+	FMOD::ChannelGroup* GetChannelGroup(ChannelGroupType type) {
+		return channelGroups[type];
 	}
 
-	FMOD::ChannelGroup* getMasterGroup() {
-		return masterGroup;
+
+	/**
+	* Set volume of a channel group
+	* @param type of channel group
+	* @param volume to set
+	*/
+	void SetChannelVolume(ChannelGroupType type, float volume) {
+		GetChannelGroup(type)->setVolume(volume);
 	}
+
+	/**
+	* Get current volume of a channel group
+	* @return float volume of channel group
+	* @param type of channel group
+	*/
+	float GetChannelVolume(ChannelGroupType type) {
+		float volume;
+		GetChannelGroup(type)->getVolume(&volume);
+		return volume;
+	}
+
 
 private:
     AudioEngine();
@@ -59,8 +98,17 @@ private:
 
     FMOD::System* audioSystem;
 
+
+	std::map<ChannelGroupType, FMOD::ChannelGroup*> channelGroups;
+
 	FMOD::ChannelGroup* masterGroup;
 
+	FMOD::ChannelGroup* sfxGroup;
+	FMOD::ChannelGroup* musicGroup;
+	FMOD::ChannelGroup* voiceGroup;
+
+	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
+	
 };
 
 #endif

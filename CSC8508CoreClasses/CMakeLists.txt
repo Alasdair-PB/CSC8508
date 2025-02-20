@@ -48,7 +48,6 @@ set(Collision_Detection
     "CapsuleVolume.cpp"
     "CollisionDetection.h"
     "CollisionDetection.cpp"
-     "CollisionVolume.h"
     "OBBVolume.h"
     "QuadTree.h"
     "QuadTree.cpp"
@@ -73,7 +72,7 @@ source_group("Networking" FILES ${Networking})
 
 set(Physics
     "constraint.h"  
-     "constraint.h"  
+    "constraint.h"  
     "PositionConstraint.cpp"
     "PositionConstraint.h"
     "OrientationConstraint.cpp"
@@ -89,6 +88,11 @@ set(Header_Files
     "Debug.h"
     "GameObject.h"
     "IComponent.h"
+    "INetworkComponent.h"
+    "INetworkDeltaComponent.h"
+    "InputComponent.h"
+    "InputNetworkComponent.h"
+    "TransformNetworkComponent.h"
     "ComponentManager.h"
     "PhysicsComponent.h"
     "BoundsComponent.h"
@@ -102,6 +106,8 @@ set(Source_Files
     "Debug.cpp"
     "GameObject.cpp"
     "IComponent.cpp"
+    "INetworkComponent.cpp"    
+    "INetworkDeltaComponent.cpp"
     "PhysicsComponent.cpp"
     "BoundsComponent.cpp"
     "GameWorld.cpp"
@@ -190,6 +196,7 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
 	"../NCLCoreClasses/GameTimer.h"
+
 )
 
 ################################################################################
@@ -203,11 +210,16 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "NCLCoreClasses"
     "ws2_32.lib"
+    "Event"
 )
 
 include_directories("../NCLCoreClasses/")
 include_directories("./")
+include_directories("../Event/")
+
 
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")
-endif()
+endif()    
+
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Event)

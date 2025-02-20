@@ -53,7 +53,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	float inverseMass = 0.5f;
 
 	players = new PlayerGameObject();
-	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
+	CapsuleVolume* volume = new CapsuleVolume(2.5f, 0.5f);
 
 	PhysicsComponent* phys = players->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = players->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);

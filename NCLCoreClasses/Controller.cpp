@@ -43,3 +43,11 @@ bool	Controller::GetNamedButton(const std::string& button) const {
 	}
 	return false;
 }
+
+uint32_t Controller::GetNamedAxisBinding(const std::string& axis) const {
+	auto a = axisMappings.find(axis);
+	if (a != axisMappings.end()) {
+		return a->second;
+	}
+	return -1;
+}

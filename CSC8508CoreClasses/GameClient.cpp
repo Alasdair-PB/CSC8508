@@ -1,6 +1,6 @@
 #include "GameClient.h"
 #include "./enet/enet.h"
-#include "NetworkObject.h";
+
 using namespace NCL;
 using namespace CSC8508;
 
@@ -23,23 +23,22 @@ bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum
 
 void GameClient::ReceivePacket(int type, GamePacket* payload, int source)
 {
-	if (payload->type == Full_State)
+	if (payload->type == Player_Connected) 
 	{
-		int i = 0;
-		AcknowledgePacket* ackPacket = new AcknowledgePacket(i);
-		std::cout << "Sending ackowledge package" << std::endl;
+		SetClientId* recievedPacket = (SetClientId*)payload;
+		peerID = recievedPacket->clientPeerId;
+		AcknowledgePacket* ackPacket = new AcknowledgePacket(peerID);
+		//std::cout << "Sending ackowledge package" << std::endl;
 		SendPacket(*ackPacket);
 		delete ackPacket;
 	}
 }
-
 
 void GameClient::UpdateClient() 
 {
 	if (netHandle == nullptr) 
 		return;
 
-	// Handle all incoming packets
 	ENetEvent event;
 	while (enet_host_service(netHandle, &event, 0) > 0) {
 		if (event.type == ENET_EVENT_TYPE_CONNECT) 
@@ -53,7 +52,7 @@ void GameClient::UpdateClient()
 	}
 }
 
-
+// Modify for different channel when not local?
 void GameClient::SendPacket(GamePacket&  payload) 
 {
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);

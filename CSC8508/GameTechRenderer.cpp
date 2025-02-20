@@ -165,7 +165,7 @@ void GameTechRenderer::BuildObjectList() {
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsActive()) {
+			if (o->IsEnabled()) {
 				const RenderObject* g = o->GetRenderObject();
 				if (g) {
 					activeObjects.emplace_back(g);

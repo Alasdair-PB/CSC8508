@@ -3,11 +3,21 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <ctime>
 
 struct Room {
     int x, y, width, height;
 };
+
+struct Roomtype {
+    int id;
+    std::string type;  // 房间类型，例如 "hallway", "storage", "office"
+    std::vector<int> connections;  // 连接的房间 ID
+    int x, y, width, height;// 房间在地图中的位置
+};
+
 /*BSP(Binary Space Partitioning)*/
+
 struct Node {
     int x, y, width, height;
     Node* left = nullptr;

@@ -10,7 +10,8 @@
 
 #include "PhysicsObject.h"
 #include "Ray.h"
-#include "NavMeshAgent.h"
+#include "NavMeshComponent.h"
+#include "PhysicsComponent.h"
 
 #include "CollisionDetection.h"
 
@@ -21,12 +22,12 @@
 
 namespace NCL {
     namespace CSC8508 {
-        class Swarm : public NavMeshAgent, public UpdateObject {
+        class Swarm : public GameObject {
         public:
 
             typedef std::function<Vector3()> GetPlayerPos;
 
-            Swarm(NavigationMesh* navMesh);
+            Swarm();
             ~Swarm();
             void SetGetPlayer(GetPlayerPos getPlayerPos) { this->getPlayerPos = getPlayerPos; }
 
@@ -35,6 +36,13 @@ namespace NCL {
             void RemoveObjectFromSwarm(Kitten* object) {
                 objects.erase(std::remove(objects.begin(), objects.end(), object), objects.end());
             }
+
+            void OnAwake() override
+            {
+                physicsComponent = this->TryGetComponent<PhysicsComponent>();
+                navMeshComponent = this->TryGetComponent<NavMeshComponent>();
+            }
+
 
             void Update(float dt) override {
                 this->GetTransform().SetPosition(getPlayerPos());
@@ -59,11 +67,15 @@ namespace NCL {
 
             BoidRules ruleConfig;
             GetPlayerPos getPlayerPos;
+            NavMeshComponent* navMeshComponent;
+            PhysicsComponent* physicsComponent;
 
             BehaviourSequence* sequence = nullptr;
             BehaviourState state;
 
             void MoveObjectsAlongSwarm();
+            void  ReduceVelocityOnStop(float roundingPrecision, Vector3 currentPos, vector<Kitten*> objects);
+
 
             Vector3 rule1(Kitten*& b, std::vector<Kitten*>& boids);
             Vector3 rule2(Kitten*& b, std::vector<Kitten*>& boids);
@@ -79,16 +91,13 @@ namespace NCL {
 
                     if (state == Initialise)
                     {
-                        SetPath(pos, playerPos);
+                        navMeshComponent->SetPath(playerPos);
                         state = Ongoing;
                     }
                     else if (state == Ongoing)
                     {
-                        if (testNodes.size() == 0)
+                        if (navMeshComponent->AtDestination())
                             return state;
-
-                        if (!(Vector::Length(pos - testNodes[0]) < minWayPointDistanceOffset)) 
-                            SetPath(pos, playerPos);
                     }
                     return state;
                 }

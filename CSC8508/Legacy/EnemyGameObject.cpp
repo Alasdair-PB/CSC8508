@@ -5,8 +5,9 @@ using namespace NCL;
 using namespace CSC8508;
 
 
-EnemyGameObject::EnemyGameObject(NavigationMesh* navMesh) : NavMeshAgent(navMesh)
+EnemyGameObject::EnemyGameObject(NavigationMesh* navMesh) 
 {
+    playerVisible = false;
     sequence = new BehaviourSequence("Path Sequence");
 
     sequence->AddChild(patrol);

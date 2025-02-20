@@ -7,6 +7,7 @@ Comments and queries to: richard-gordon.davison AT ncl.ac.uk
 https://research.ncl.ac.uk/game/
 */
 #pragma once
+using std::vector;
 
 class Controller	{
 public:
@@ -31,6 +32,35 @@ public:
 	void MapButtonAnalogue(uint32_t axis, const std::string& name);
 
 	virtual void Update(float dt = 0.0f) {}
+
+
+	uint32_t GetNamedAxisBinding(const std::string& name) const;
+
+	vector<uint32_t> GetBoundButtons() const {
+		vector<uint32_t> boundButtons;
+		for (auto binding : buttonMappings) {
+			boundButtons.push_back(binding.second);
+		}
+		return boundButtons;
+	}
+
+	vector<uint32_t> GetBoundAnalogue() const {
+		vector<uint32_t> boundAnalogue;
+		for (auto binding : analogueMappings) {
+			boundAnalogue.push_back(binding.second);
+		}
+		return boundAnalogue;
+	}
+
+	vector<uint32_t> GetBoundAxis() const {
+		vector<uint32_t> boundAxis;
+		for (auto binding : axisMappings) {
+			boundAxis.push_back(binding.second);
+		}
+		return boundAxis;
+	}
+
+	
 
 protected:
 

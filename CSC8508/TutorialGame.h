@@ -13,9 +13,22 @@
 #endif
 #include "PhysicsSystem.h"
 #include "Legacy/PlayerGameObject.h"
+#include "BoundsComponent.h"
+#include <vector>
+using std::vector;
+
 
 namespace NCL {
 	namespace CSC8508 {
+
+		struct NetworkSpawnData
+		{
+			int objId;
+			int ownId;
+			bool clientOwned;
+		};
+
+
 		class TutorialGame		{
 		public:
 			TutorialGame();
@@ -49,7 +62,7 @@ namespace NCL {
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 
 			GameObject* AddNavMeshToWorld(const Vector3& position, Vector3 dimensions);
-			GameObject* AddPlayerToWorld(const Vector3& position);
+			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 
 			void EndGame(bool hasWon);
 
@@ -88,7 +101,7 @@ namespace NCL {
 			float time = 0;
 			int score = 0;
 
-			GameObject* selectionObject = nullptr;
+			BoundsComponent* selectionObject = nullptr;
 
 			Mesh* navigationMesh = nullptr;
 			NavigationPath outPath;
@@ -103,9 +116,10 @@ namespace NCL {
 
 			MainMenu* mainMenu = nullptr;
 
-			GameObject* lockedObject	= nullptr;
+			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset		= Vector3(0, 14, 20);
-			void LockCameraToObject(GameObject* o) {
+
+			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
 			}
 
@@ -121,9 +135,6 @@ namespace NCL {
 
 			GameObject* objClosest = nullptr;
 			PlayerGameObject* players = nullptr;
-		
-			vector<UpdateObject*> updateObjects = vector<UpdateObject*>();
-
 		};
 	}
 }

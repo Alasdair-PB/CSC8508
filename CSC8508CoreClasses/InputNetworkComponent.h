@@ -8,6 +8,7 @@
 #include "INetworkComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "InputComponent.h"
+#include <array>
 
 using std::vector;
 
@@ -17,6 +18,7 @@ namespace NCL::CSC8508
 		None,
 		Axis,
 		Button,
+		Delta,
 		Bound
 	};
 
@@ -32,18 +34,15 @@ namespace NCL::CSC8508
 		}
 	};
 
-	// May extend to make it a vector, but for current usecase dual bindings is fine
-	struct BoundPacket : INetworkPacket
-	{
-		uint32_t axisID_A = -1;		
-		uint32_t axisID_B = -1;
-		float axisValue_A = 0;
-		float axisValue_B = 0;
+	const int MAX_AXIS_COUNT = 5;
+	struct InputDeltaPacket : INetworkPacket {
+		uint32_t axisIDs[MAX_AXIS_COUNT];
+		float axisValues[MAX_AXIS_COUNT];
 
-		BoundPacket() {
+		InputDeltaPacket() {
 			type = Component_Event;
-			packetSubType = Bound;
-			size = sizeof(BoundPacket) - sizeof(GamePacket);
+			packetSubType = Delta;
+			size = sizeof(InputDeltaPacket) - sizeof(GamePacket);
 		}
 	};
 
@@ -97,15 +96,20 @@ namespace NCL::CSC8508
 
 		void Update(float deltaTime) override
 		{
-			if (clientOwned) UpdateBoundAxis();
+			if (clientOwned) UpdateDeltaAxis();
 		}
 
 		float GetNamedAxis(const std::string& name) override
 		{
 			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
-				auto binding = activeController->GetNamedAxisBinding(name);
-				return lastAxisState[binding];
+				uint32_t binding = activeController->GetNamedAxisBinding(name);
+				float axisSum = 0; 
+				while (!historyStack[binding].empty()) {
+					axisSum += historyStack[binding].top();
+					historyStack[binding].pop();
+				}
+				return axisSum;
 			}
 		}
 
@@ -113,26 +117,38 @@ namespace NCL::CSC8508
 		vector<uint32_t> boundAxis;
 		std::map<uint32_t, bool> lastBoundState;
 		std::map<uint32_t, float> lastAxisState;
+
+		std::map<uint32_t, std::stack<float>> historyStack;
 		std::map<uint32_t, uint32_t> dependentBindings;
+
+		bool ReadAxisPacket(InputAxisPacket pck) {
+			lastAxisState[pck.axisID] = pck.axisValue;
+			return true;
+		}
+
+		bool ReadDeltaPacket(InputDeltaPacket pck) 
+		{
+			for (int i = 0; i < MAX_AXIS_COUNT; i++) 
+				historyStack[pck.axisIDs[i]].push(pck.axisValues[i]);
+			return true;
+		}
+
+		bool ReadButtonPacket(InputButtonPacket pck) {
+			if (pck.held) CallInputEvent(boundButtons[pck.buttonID]);
+			// May add events for on release
+			lastBoundState[pck.buttonID] = pck.held;
+			return true;
+		}
 
 		bool ReadEventPacket(INetworkPacket& p) override
 		{
-			if (p.packetSubType == InputTypes::Axis) {
-				InputAxisPacket pck = (InputAxisPacket&)p;
-				lastAxisState[pck.axisID] = pck.axisValue;
-			}
-			else if (p.packetSubType == InputTypes::Bound) {
-				BoundPacket pck = (BoundPacket&)p;
-				lastAxisState[pck.axisID_A] = pck.axisValue_A;
-				lastAxisState[pck.axisID_B] = pck.axisValue_B;
-			}
-			else if (p.packetSubType == InputTypes::Button) {
-				InputButtonPacket pck = (InputButtonPacket&)p;
-				if (pck.held) CallInputEvent(boundButtons[pck.buttonID]);
-				// May add events for on release
-				lastBoundState[pck.buttonID] = pck.held;
-			}
-			return true;
+			if (p.packetSubType == InputTypes::Axis)
+				return ReadAxisPacket((InputAxisPacket&)p);
+			else if (p.packetSubType == InputTypes::Delta) 
+				return ReadDeltaPacket((InputDeltaPacket&)p);
+			else if (p.packetSubType == InputTypes::Button) 
+				return ReadButtonPacket((InputButtonPacket&)p);
+			return false;
 		}	
 		
 		void SendAxisPacket(uint32_t binding, float axisValue) {
@@ -145,28 +161,21 @@ namespace NCL::CSC8508
 			delete axisPacket;
 		}
 
-		void SendBoundPacket(uint32_t binding, float axisValue) {
-			InputAxisPacket* axisPacket = new InputAxisPacket();
-			axisPacket->axisID = binding;
-			axisPacket->axisValue = axisValue;
-
-			SendEventPacket(axisPacket);
-			lastAxisState[binding] = axisValue;
-			delete axisPacket;
-		}
-
-		void UpdateBoundAxis() {
-			std::unordered_set<uint32_t> dependentModifiedBindings;
-			for (auto binding : boundAxis) {
-				float axisValue = activeController->GetAxis(binding);
-				if (axisValue != lastAxisState[binding]) {
-					if (dependentBindings.contains(binding) && !dependentModifiedBindings.contains(dependentBindings[binding])) 
-						dependentModifiedBindings.insert(dependentBindings[binding]);
-					else SendAxisPacket(binding, axisValue);
+		void UpdateDeltaAxis() {
+			int t = boundAxis.size();
+			for (int i = 0; i < t; i += MAX_AXIS_COUNT) {
+				InputDeltaPacket* deltaPacket = new InputDeltaPacket();
+				for (int j = 0; j < MAX_AXIS_COUNT && (i + j) < t; j++) 
+				{
+					uint32_t binding = boundAxis[i + j];
+					float axisValue = activeController->GetAxis(binding);
+					deltaPacket->axisIDs[j] = binding;
+					deltaPacket->axisValues[j] = axisValue; // : axisValue - lastAxisState[binding];
+					lastAxisState[binding] = axisValue;
 				}
+				SendEventPacket(deltaPacket);
+				delete deltaPacket;
 			}
-			for (auto boundBinding : dependentModifiedBindings) 
-				SendBoundPacket(boundBinding, activeController->GetAxis(boundBinding));
 		}
 
 		void UpdateBoundButtons() 

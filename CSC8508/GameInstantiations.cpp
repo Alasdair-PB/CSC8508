@@ -66,6 +66,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		componentIdCount++;
 		InputNetworkComponent* input = players->AddComponent<InputNetworkComponent>(
 			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+		input->SetDependentAxisBindings("Sidestep", "XLook");
+		input->SetDependentAxisBindings("Forward", "XLook");
 
 		unqiueId = CantorPairing(spawnData->objId, componentIdCount);
 		componentIdCount++;

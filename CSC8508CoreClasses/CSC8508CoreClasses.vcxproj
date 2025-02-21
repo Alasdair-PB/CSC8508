@@ -79,7 +79,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -88,6 +88,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;UNICODE;_UNICODE;WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;NOMINMAX;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -112,7 +113,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -120,6 +121,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NDEBUG;UNICODE;_UNICODE;WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;NOMINMAX;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -144,7 +146,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -152,6 +154,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NDEBUG;UNICODE;_UNICODE;WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;NOMINMAX;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -176,7 +179,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -185,6 +188,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;UNICODE;_UNICODE;WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;NOMINMAX;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -218,7 +222,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeLists.txt</Message>
@@ -231,7 +235,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeLists.txt</Message>
@@ -244,7 +248,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeLists.txt</Message>
@@ -257,7 +261,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
     </CustomBuild>
@@ -834,162 +838,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PhysicsSystem.h">
       <ObjectFileName>$(IntDir)/PhysicsSystem.o</ObjectFileName>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\callbacks.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\list.h">
-      <ObjectFileName>$(IntDir)/enet/list.o</ObjectFileName>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\list.c">
-      <ObjectFileName>$(IntDir)/enet/list.o</ObjectFileName>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\protocol.h">
-      <ObjectFileName>$(IntDir)/enet/protocol.o</ObjectFileName>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\protocol.c">
-      <ObjectFileName>$(IntDir)/enet/protocol.o</ObjectFileName>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\win32.h">
-      <ObjectFileName>$(IntDir)/enet/win32.o</ObjectFileName>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\win32.c">
-      <ObjectFileName>$(IntDir)/enet/win32.o</ObjectFileName>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\enet.h">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\time.h">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\types.h">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\utility.h">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\compress.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\host.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\packet.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">CompileAsCpp</CompileAs>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\peer.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">CompileAsCpp</CompileAs>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">CompileAsCpp</CompileAs>

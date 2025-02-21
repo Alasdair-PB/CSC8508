@@ -1,0 +1,74 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CMakePredefinedTargets", "CMakePredefinedTargets", "{C1375314-2E91-3F43-AA40-A99033E0DBE5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ALL_BUILD", "ALL_BUILD.vcxproj", "{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2} = {F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255} = {A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "INSTALL", "INSTALL.vcxproj", "{86BFF842-0351-37A0-B21A-C6180CE6FE16}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C} = {CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2} = {F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZERO_CHECK", "..\..\\ZERO_CHECK.vcxproj", "{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "enet.vcxproj", "{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2} = {F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Prospero = Debug|Prospero
+		Release|Prospero = Release|Prospero
+		MinSizeRel|Prospero = MinSizeRel|Prospero
+		RelWithDebInfo|Prospero = RelWithDebInfo|Prospero
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.Debug|Prospero.ActiveCfg = Debug|Prospero
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.Debug|Prospero.Build.0 = Debug|Prospero
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.Release|Prospero.ActiveCfg = Release|Prospero
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.Release|Prospero.Build.0 = Release|Prospero
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.MinSizeRel|Prospero.ActiveCfg = MinSizeRel|Prospero
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.MinSizeRel|Prospero.Build.0 = MinSizeRel|Prospero
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.RelWithDebInfo|Prospero.ActiveCfg = RelWithDebInfo|Prospero
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C}.RelWithDebInfo|Prospero.Build.0 = RelWithDebInfo|Prospero
+		{86BFF842-0351-37A0-B21A-C6180CE6FE16}.Debug|Prospero.ActiveCfg = Debug|Prospero
+		{86BFF842-0351-37A0-B21A-C6180CE6FE16}.Release|Prospero.ActiveCfg = Release|Prospero
+		{86BFF842-0351-37A0-B21A-C6180CE6FE16}.MinSizeRel|Prospero.ActiveCfg = MinSizeRel|Prospero
+		{86BFF842-0351-37A0-B21A-C6180CE6FE16}.RelWithDebInfo|Prospero.ActiveCfg = RelWithDebInfo|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.Debug|Prospero.ActiveCfg = Debug|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.Debug|Prospero.Build.0 = Debug|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.Release|Prospero.ActiveCfg = Release|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.Release|Prospero.Build.0 = Release|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.MinSizeRel|Prospero.ActiveCfg = MinSizeRel|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.MinSizeRel|Prospero.Build.0 = MinSizeRel|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.RelWithDebInfo|Prospero.ActiveCfg = RelWithDebInfo|Prospero
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}.RelWithDebInfo|Prospero.Build.0 = RelWithDebInfo|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.Debug|Prospero.ActiveCfg = Debug|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.Debug|Prospero.Build.0 = Debug|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.Release|Prospero.ActiveCfg = Release|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.Release|Prospero.Build.0 = Release|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.MinSizeRel|Prospero.ActiveCfg = MinSizeRel|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.MinSizeRel|Prospero.Build.0 = MinSizeRel|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.RelWithDebInfo|Prospero.ActiveCfg = RelWithDebInfo|Prospero
+		{A06D346C-0CAF-3A6E-8B74-9F21B4C9A255}.RelWithDebInfo|Prospero.Build.0 = RelWithDebInfo|Prospero
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CF0C3CE3-D7C3-3AC8-AB42-2DD0BF4A106C} = {C1375314-2E91-3F43-AA40-A99033E0DBE5}
+		{86BFF842-0351-37A0-B21A-C6180CE6FE16} = {C1375314-2E91-3F43-AA40-A99033E0DBE5}
+		{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2} = {C1375314-2E91-3F43-AA40-A99033E0DBE5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F650115F-8452-3258-8233-7D8F5DFEB03B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

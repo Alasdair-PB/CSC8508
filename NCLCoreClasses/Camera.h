@@ -10,6 +10,7 @@ https://research.ncl.ac.uk/game/
 #include "Vector.h"
 #include "Matrix.h"
 #include "Controller.h"
+#include <functional>
 
 namespace NCL {
 	using namespace NCL::Maths;

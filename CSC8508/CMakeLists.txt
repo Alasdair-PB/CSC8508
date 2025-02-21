@@ -177,6 +177,7 @@ include_directories("../NCLCoreClasses/")
 include_directories("../CSC8508CoreClasses/")
 include_directories("../Event/")
 include_directories("../ImGui/")
+include_directories("../UISystem/")
 
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8508CoreClasses)
@@ -185,6 +186,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Event)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC AudioEngine)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC ImGui)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC UISystem)
 
 # Handle `fmod.dll` copying here instead of `AudioEngine`
 add_custom_command(TARGET CSC8508 POST_BUILD

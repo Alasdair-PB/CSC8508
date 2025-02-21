@@ -71,18 +71,9 @@ namespace NCL::CSC8508 {
 			return renderObject;
 		}
 
-		NetworkObject* GetNetworkObject() const {
-			return networkObject;
-		}
-
 		void SetRenderObject(RenderObject* newObject) {
 			renderObject = newObject;
 		}
-
-		void SetNetworkObject(NetworkObject* newObject) {
-			networkObject = newObject;
-		}
-
 
 		virtual void OnCollisionBegin(BoundsComponent* otherObject) {
 			//std::cout << "OnCollisionBegin event occured!\n";
@@ -147,7 +138,6 @@ namespace NCL::CSC8508 {
 
 		Transform transform;
 		RenderObject* renderObject;
-		NetworkObject* networkObject;
 		GameObject* parent;
 
 		vector<IComponent*> components; 

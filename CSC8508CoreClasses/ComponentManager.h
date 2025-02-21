@@ -134,7 +134,8 @@ namespace NCL::CSC8508 {
 
             return component;
         }
-        static void Clear()
+
+        static void CleanUp()
         {
             for (auto& [type, componentsList] : allComponents) {
                 for (auto* comp : componentsList)

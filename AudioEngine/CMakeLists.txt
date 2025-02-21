@@ -22,6 +22,7 @@ add_library(AudioEngine STATIC
     AudioObject.cpp
     AudioObject.h
     AudioListenerComponent.h
+    AudioListenerComponent.cpp
     AudioSourceComponent.h
 )
 

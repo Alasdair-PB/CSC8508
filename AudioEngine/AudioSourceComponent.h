@@ -70,9 +70,9 @@ public:
 	}
 
 
+
 	/**
 	* Play created sound
-	* Sets selected sound to play
 	* @return sound played status (true if successful)
 	* @param name of sound
 	*/
@@ -92,6 +92,28 @@ public:
 			return false;
 		}
 
+		if (fChannel) {
+			fChannel->setPaused(false);
+			fChannel->setVolume(fVolume);
+			return true;
+		}
+	}
+
+	/**
+	* Play sound object
+	* @return sound played status (true if successful)
+	* @param sound object to play
+	*/
+	bool PlaySoundObj(FMOD::Sound* sound) {
+		if (!sound) {
+			std::cerr << "Error: fSound is nullptr, cannot play sound!" << std::endl;
+			return false;
+		}
+		FMOD_RESULT result = fSystem->playSound(sound, audioEngine->GetChannelGroup(ChannelGroupType::CHAT), false, &fChannel);
+		if (result != FMOD_OK) {
+			std::cerr << "Error playing sound: " << result << std::endl;
+			return false;
+		}
 		if (fChannel) {
 			fChannel->setPaused(false);
 			fChannel->setVolume(fVolume);

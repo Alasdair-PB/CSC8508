@@ -8,6 +8,8 @@ https://research.ncl.ac.uk/game/
 */
 #pragma once
 
+#include <chrono>
+
 namespace NCL {
 	typedef  std::chrono::time_point<std::chrono::high_resolution_clock>  Timepoint;
 

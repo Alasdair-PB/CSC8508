@@ -153,7 +153,7 @@ void TutorialGame::UpdateDrawScreen(float dt) {
 void TutorialGame::UpdateGame(float dt) 
 {
 	if (OnEndGame(dt))
-		return;
+		return; 
 
 	mainMenu->Update(dt);
 	renderer->Render();

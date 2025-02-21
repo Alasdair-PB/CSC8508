@@ -149,8 +149,6 @@ namespace NCL::CSC8508
 			if (p.fullState.stateID < lastFullState->stateID)
 				return false;
 
-			std::cout << p.fullState.position.y << std::endl;
-
 			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;
 			((TransformNetworkState*)lastFullState)->stateID = p.fullState.stateID;
@@ -166,7 +164,6 @@ namespace NCL::CSC8508
 			stateHistory.emplace_back(lastFullState);
 			return true;
 		}
-
 		bool ReadEventPacket(INetworkPacket& p) override { return true;}
 	};
 }

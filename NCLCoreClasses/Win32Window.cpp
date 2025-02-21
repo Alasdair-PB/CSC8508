@@ -218,8 +218,9 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 
 	bool applyResize = false;
 
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam)) {
 		return true;
+	}
 
     switch(message)	 {
         case(WM_DESTROY):	{
@@ -292,10 +293,10 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 		}break;
 		case(WM_MOUSELEAVE):{
 			thisWindow->mouseLeftWindow = true;
-			if (thisWindow->init) {
+			/*if (thisWindow->init) {
 				thisWindow->winMouse->Sleep();
 				thisWindow->winKeyboard->Sleep();
-			}
+			}*/
 		}break;
 		case(WM_SIZE): {
 			float newX = (float)LOWORD(lParam);

@@ -5,6 +5,7 @@
 #include "OGLMesh.h"
 
 #include "GameWorld.h"
+#include "UISystem.h"
 
 namespace NCL {
 	namespace CSC8508 {
@@ -40,7 +41,6 @@ namespace NCL {
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
-
 			vector<const RenderObject*> activeObjects;
 
 			OGLShader*  debugShader;
@@ -75,6 +75,12 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
+
+			bool showDemo = true;
+
+			UISystem* uiSystem;
+			float framerateDelay = 0;
+			float latestFramerate;
 		};
 	}
 }

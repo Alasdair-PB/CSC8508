@@ -33,7 +33,7 @@ public:
     std::vector<T> GetValues() const { return vec; }
 
     [[nodiscard]]
-    unsigned int GetLength() const { return vec.size(); }
+    size_t GetLength() const { return vec.size(); }
 
 protected:
     unsigned short int maxPriority;

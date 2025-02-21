@@ -8,6 +8,7 @@
 #include "Quaternion.h"
 
 #include "Constraint.h"
+#include "ComponentManager.h"
 
 #include "Debug.h"
 #include "Window.h"
@@ -363,7 +364,7 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 }
 
 void PhysicsSystem::ClearForces() {
-	gameWorld.OperateOnPhysicsContents(
+	ComponentManager::OperateOnBufferContents<PhysicsComponent>(
 		[](PhysicsComponent* o) {
 			if (o->GetPhysicsObject())
 				o->GetPhysicsObject()->ClearForces();

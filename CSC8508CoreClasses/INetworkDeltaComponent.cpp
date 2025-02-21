@@ -1,0 +1,65 @@
+//
+// Contributors: Alasdair
+//
+
+#include "INetworkDeltaComponent.h"
+using namespace NCL::CSC8508;
+using namespace NCL;
+using namespace CSC8508;
+
+INetworkDeltaComponent::INetworkDeltaComponent(int objId, int ownId, int componentId, bool clientOwned, INetworkState* state)
+	: INetworkComponent(objId, ownId, componentId, clientOwned),
+	deltaErrors(0), fullErrors(0),
+	lastFullState(state)
+{
+}
+
+vector<GamePacket*> INetworkDeltaComponent::WriteDeltaFullPacket(bool deltaFrame){
+	if (deltaFrame) {
+		bool foundDelta = true;
+		int stateId = lastFullState->stateID;
+		auto packets = WriteDeltaPacket(&foundDelta, stateId);
+		return foundDelta ? packets : WriteFullPacket();
+	}
+	return WriteFullPacket();
+}
+
+bool INetworkDeltaComponent::ReadDeltaFullPacket(INetworkPacket& p)
+{
+	if (p.type == Delta_State)
+		return ReadDeltaPacketState((IDeltaNetworkPacket&)p);
+	if (p.type == Full_State)
+		return ReadFullPacket((IFullNetworkPacket&)p);
+	return false;
+}
+
+bool INetworkDeltaComponent::ReadDeltaPacketState(IDeltaNetworkPacket& p)
+{
+	if (p.fullID != lastFullState->stateID)
+		return false;
+	UpdateStateHistory(p.fullID);
+	return ReadDeltaPacket(p);
+}
+
+void INetworkDeltaComponent::UpdateStateHistory(int minID) {
+	for (auto i = stateHistory.begin(); i < stateHistory.end();) {
+		if ((*i)->stateID < minID)
+			i = stateHistory.erase(i);
+		else
+			++i;
+	}
+}
+
+bool INetworkDeltaComponent::GetNetworkState(int stateID, INetworkState* state) {
+
+	if (!state)
+		return false;
+
+	for (auto i = stateHistory.begin(); i < stateHistory.end(); ++i) {
+		if ((*i)->stateID == stateID) {
+			state = *i;
+			return true;
+		}
+	}
+	return false;
+}

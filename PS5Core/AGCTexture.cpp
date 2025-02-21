@@ -10,6 +10,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Assets.h"
 
 #include <fstream>
+#include <filesystem>
 
 using namespace NCL;
 using namespace PS5;

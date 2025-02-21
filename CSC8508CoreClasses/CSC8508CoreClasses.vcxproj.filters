@@ -187,51 +187,6 @@
     <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PhysicsSystem.h">
       <Filter>Physics</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\callbacks.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\list.h">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\list.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\protocol.h">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\protocol.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\win32.h">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\win32.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\enet.h">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\time.h">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\types.h">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\utility.h">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\compress.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\host.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\packet.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\enet\peer.c">
-      <Filter>eNet</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\CSC8508CoreClasses.dir\Debug\cmake_pch.hxx">
@@ -283,9 +238,6 @@
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{621742AB-EB97-3B8C-8A15-9AED7F78FD54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="eNet">
-      <UniqueIdentifier>{B68E3B0C-A378-37E3-840F-AE77C86A780E}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

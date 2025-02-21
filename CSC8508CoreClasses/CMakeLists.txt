@@ -103,8 +103,9 @@ set(Source_Files
 )
 source_group("Source Files" FILES ${Source_Files})
 
+#[[
 set(enet_Files
-    #"./enet/callbacks.h"
+    "./enet/callbacks.h"
     "./enet/callbacks.c"
     "./enet/list.h"
     "./enet/list.c"
@@ -112,6 +113,8 @@ set(enet_Files
     "./enet/protocol.c"
     "./enet/win32.h"
     "./enet/win32.c"
+	"./enet/unix.h"
+    "./enet/unix.c"
 
     "./enet/enet.h"
     "./enet/time.h"
@@ -124,6 +127,7 @@ set(enet_Files
     "./enet/peer.c"
 )
 source_group("eNet" FILES ${enet_Files})
+]]
 
 set(ALL_FILES
     ${Header_Files}
@@ -135,7 +139,7 @@ set(ALL_FILES
     ${Collision_Detection}
     ${Networking}
     ${Physics}
-    ${enet_Files}   
+    # ${enet_Files}   PS5?
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
@@ -191,6 +195,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "ws2_32.lib"
 )
 
+add_subdirectory(enet)
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 

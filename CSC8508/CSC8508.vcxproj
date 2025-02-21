@@ -77,9 +77,9 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -88,6 +88,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/Debug/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -97,10 +98,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;ASSETROOTLOCATION=\"/app0/Assets/\";USEAGC;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -110,9 +111,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -120,6 +121,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/Release/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NDEBUG;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -129,10 +131,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NDEBUG;ASSETROOTLOCATION=\"/app0/Assets/\";USEAGC;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -142,9 +144,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -152,6 +154,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/MinSizeRel/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/MinSizeRel/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NDEBUG;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -161,10 +164,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NDEBUG;ASSETROOTLOCATION=\"/app0/Assets/\";USEAGC;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -174,9 +177,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <CppLanguageStd>Cpp17</CppLanguageStd>
+      <CppLanguageStd>Cpp20</CppLanguageStd>
       <DisableSpecificWarnings>pragma-once-outside-header</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -185,6 +188,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/RelWithDebInfo/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeFiles/CSC8508.dir/RelWithDebInfo/cmake_pch.hxx.pch</PrecompiledHeaderOutputFile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;ASSETROOTLOCATION="/app0/Assets/";USEAGC;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
@@ -194,10 +198,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;ASSETROOTLOCATION=\"/app0/Assets/\";USEAGC;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\OpenGLRendering;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\..\CSC8508CoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -218,7 +222,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeLists.txt</Message>
@@ -231,7 +235,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeLists.txt</Message>
@@ -244,7 +248,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/CSC8508/CMakeLists.txt</Message>
@@ -257,7 +261,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
     </CustomBuild>
@@ -401,6 +405,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ProjectReference Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\NCLCoreClasses\NCLCoreClasses.vcxproj">
       <Project>{0D15BB08-4EE1-3823-8887-2E28CAA684E0}</Project>
       <Name>NCLCoreClasses</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\OpenGLRendering\OpenGLRendering.vcxproj">
+      <Project>{11920EA3-51D6-3DE7-BE28-C0EB9359D635}</Project>
+      <Name>OpenGLRendering</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

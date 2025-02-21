@@ -25,6 +25,9 @@
 #include "BehaviourAction.h"
 
 #include "RenderObject.h"
+#include "../Event/CancellableEvent.h"
+#include "../Event/EventListener.h"
+#include "../Event/EventManager.h"
 
 
 using namespace NCL;
@@ -297,26 +300,38 @@ void UpdateWindow(Window* w, NetworkedGame* g)
 	g->UpdateGame(dt);
 }
 
+class Listener final : public EventListener<CancellableEvent> {
+	void OnEvent(CancellableEvent* e) override {
+		std::cout << "Listener heard CancellableEvent!\n";
+	}
+};
+
 int main(int argc, char** argv) 
 {
-	WindowInitialisation initInfo;
-	initInfo.width		= 1920;
-	initInfo.height		= 1200;
-	initInfo.windowTitle = "CSC8508 Game technology!";
+	auto e = CancellableEvent();
+	auto l = Listener();
 
-	Window* w = Window::CreateGameWindow(initInfo);
-	NetworkedGame* g = new NetworkedGame();
+	EventManager::RegisterListener(&l);
+	EventManager::Call(&e);
 
-	if (!w->HasInitialised()) 
-		return -1;
-		
-	w->ShowOSPointer(true);
-	w->LockMouseToWindow(true);
-	w->GetTimer().GetTimeDeltaSeconds(); 
-
-	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
-	{
-		UpdateWindow(w, g);
-	}
-	Window::DestroyGameWindow();
+	// WindowInitialisation initInfo;
+	// initInfo.width		= 1920;
+	// initInfo.height		= 1200;
+	// initInfo.windowTitle = "CSC8508 Game technology!";
+	//
+	// Window* w = Window::CreateGameWindow(initInfo);
+	// NetworkedGame* g = new NetworkedGame();
+	//
+	// if (!w->HasInitialised())
+	// 	return -1;
+	//
+	// w->ShowOSPointer(true);
+	// w->LockMouseToWindow(true);
+	// w->GetTimer().GetTimeDeltaSeconds();
+	//
+	// while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
+	// {
+	// 	UpdateWindow(w, g);
+	// }
+	// Window::DestroyGameWindow();
 }

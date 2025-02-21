@@ -25,9 +25,6 @@
 #include "BehaviourAction.h"
 
 #include "RenderObject.h"
-#include "../Event/CancellableEvent.h"
-#include "../Event/EventListener.h"
-#include "../Event/EventManager.h"
 
 
 using namespace NCL;
@@ -299,12 +296,6 @@ void UpdateWindow(Window* w, NetworkedGame* g)
 	w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
 	g->UpdateGame(dt);
 }
-
-class Listener final : public EventListener<CancellableEvent> {
-	void OnEvent(CancellableEvent* e) override {
-		std::cout << "Listener heard CancellableEvent!\n";
-	}
-};
 
 int main(int argc, char** argv) 
 {

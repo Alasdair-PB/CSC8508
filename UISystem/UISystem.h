@@ -1,5 +1,5 @@
 #pragma once
-#include "OGLRenderer.h"
+#include "../OpenGLRendering/OGLRenderer.h"
 
 namespace NCL {
 	namespace CSC8508 {

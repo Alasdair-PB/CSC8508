@@ -44,8 +44,8 @@ protected:
 };
 
 
-// EventType must be a child class of Event, not including Event or CancellableEvent
+// EventType must be a child class of Event
 template <typename T>
-concept EventType = std::is_base_of_v<Event, T> && !(std::is_same_v<Event, T> || std::is_same_v<CancellableEvent, T>);
+concept EventType = std::is_base_of_v<Event, T>;
 
 #endif //EVENT_H

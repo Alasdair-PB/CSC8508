@@ -30,10 +30,9 @@ int main(int argc, char** argv)
 	NetworkedGame* g = new NetworkedGame();
 
 	if (!w->HasInitialised()) return -1;
-		
 	w->ShowOSPointer(true);
 	w->LockMouseToWindow(true);
-	w->GetTimer().GetTimeDeltaSeconds(); 
+	w->GetTimer().GetTimeDeltaSeconds();
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{

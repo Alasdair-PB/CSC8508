@@ -19,7 +19,6 @@ endif()
 add_library(AudioEngine STATIC
     AudioEngine.cpp
     AudioEngine.h
-    AudioObject.cpp
     AudioObject.h
     AudioListenerComponent.h
     AudioListenerComponent.cpp

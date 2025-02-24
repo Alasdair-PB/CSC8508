@@ -49,6 +49,12 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
+int GetUniqueId(int objectId, int& componentCount) {
+	int unqiueId = CantorPairing(objectId, componentCount);
+	componentCount++;
+	return unqiueId;
+}
+
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
 	float meshSize = 1.0f;
 	float inverseMass = 0.5f;
@@ -63,15 +69,12 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	if (spawnData)
 	{
-		int unqiueId = CantorPairing(spawnData->objId, componentIdCount);
-		componentIdCount++;
+		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
 		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
-			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+			&controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
-		unqiueId = CantorPairing(spawnData->objId, componentIdCount);
-		componentIdCount++;
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
-			spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
 		if (spawnData->clientOwned) 
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
@@ -79,7 +82,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	else {
 		InputComponent* input = player->AddComponent<InputComponent>(&controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
-
 	}
 
 	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);

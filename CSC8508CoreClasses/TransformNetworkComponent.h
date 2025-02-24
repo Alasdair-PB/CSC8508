@@ -52,9 +52,6 @@ namespace NCL::CSC8508
 		
 		~TransformNetworkComponent() = default;
 
-		void OnAwake() override { 
-			lastFullState = new TransformNetworkState();
-		}
 		void Update(float deltaTime) override {}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -66,12 +63,13 @@ namespace NCL::CSC8508
 			return types;
 		}
 
-		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame, int stateID) override 
+		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override 
 		{ 
 			vector<GamePacket*> packets;
 
 			DeltaPacket* dp = new DeltaPacket();
 			TransformNetworkState state;
+			int stateID = lastFullState->stateID;
 
 			if (!GetNetworkState(stateID, &state))
 				return packets;
@@ -146,17 +144,16 @@ namespace NCL::CSC8508
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override
 		{
 			FullPacket p = ((FullPacket&) ifp);
-			if (p.fullState.stateID < lastFullState->stateID)
-				return false;
 
 			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;
 			((TransformNetworkState*)lastFullState)->stateID = p.fullState.stateID;
 
-			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);
+			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);				
+			
+			std::cout << "YES full state:" << lastTransformFullState->position.z << std::endl;
 
-			if (!lastTransformFullState)
-				return false;
+			if (!lastTransformFullState) return false;
 
 			myObject.GetTransform().SetPosition(lastTransformFullState->position);
 			myObject.GetTransform().SetOrientation(lastTransformFullState->orientation);

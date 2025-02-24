@@ -310,7 +310,7 @@ void NetworkedGame::ReceiveSpawnPacket(int type, GamePacket* payload) {
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
 	ReceiveFullDeltaStatePacket(type, payload);
-	ReceiveComponentEventPacket(type, payload);
+	//ReceiveComponentEventPacket(type, payload);
 	ReceiveSpawnPacket(type, payload);
 	if (thisClient) thisClient->ReceivePacket(type, payload, source);
 	else if (thisServer) thisServer->ReceivePacket(type, payload, source);

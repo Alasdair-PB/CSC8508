@@ -388,7 +388,7 @@ void TutorialGame::DrawUIElements() {
 
 	uiSystem->StartFrame();
 
-	uiSystem->DrawDemo();
+	/*uiSystem->DrawDemo();*/
 	if (framerateDelay > 10) {
 		latestFramerate = Window::GetTimer().GetTimeDeltaSeconds();
 		framerateDelay = 0;

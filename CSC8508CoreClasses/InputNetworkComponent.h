@@ -38,6 +38,8 @@ namespace NCL::CSC8508
 	struct InputDeltaPacket : INetworkPacket {
 		uint32_t axisIDs[MAX_AXIS_COUNT];
 		float axisValues[MAX_AXIS_COUNT];
+		float deltaTime = 0;
+		float mouseYaw = 0;
 
 		InputDeltaPacket() {
 			type = Component_Event;
@@ -86,16 +88,20 @@ namespace NCL::CSC8508
 
 		void EarlyUpdate(float deltaTime) override
 		{
-			if (clientOwned) UpdateDeltaAxis();
+			if (clientOwned) {
+				UpdateMouseGameWorldPitchYaw();
+				UpdateDeltaAxis(deltaTime);
+			}
 			else {
-				if (!historyQueue.empty()) {
-					lastAxisState = historyQueue.front();
+				while (!historyQueue.empty()) {
+					HistoryData data = historyQueue.front();
+					lastAxisState = data.axisMap;
+					mouseGameWorldYaw = data.mouseGameWorldYaw;
 					historyQueue.pop();
+					GetGameObject().InvokeUpdate(data.deltaTime);
 				}
-				else {
-					for (auto state : lastAxisState)
-						state.second = 0;
-				}
+				for (auto state : lastAxisState)
+					state.second = 0;
 			}
 		}
 
@@ -109,13 +115,26 @@ namespace NCL::CSC8508
 		}
 
 	protected:
-		bool clearLastFrame = false;
+
+		struct HistoryData
+		{
+			float deltaTime;
+			float mouseGameWorldYaw;
+			std::map<uint32_t, float> axisMap;
+
+			HistoryData(std::map<uint32_t, float> axisMap, float mouseGameWorldYaw, float deltaTime) {
+				this->axisMap = axisMap;
+				this->deltaTime = deltaTime;
+				this->mouseGameWorldYaw = mouseGameWorldYaw;
+			}
+		};
+
 		vector<uint32_t> boundAxis;
 		std::map<uint32_t, float> lastAxisState;
-
 		std::map<uint32_t, bool> lastBoundState;
-		std::queue<std::map<uint32_t, float>> historyQueue;
+		std::queue<HistoryData> historyQueue;
 
+			 
 		bool ReadAxisPacket(InputAxisPacket pck) {
 			lastAxisState[pck.axisID] = pck.axisValue;
 			return true;
@@ -126,7 +145,8 @@ namespace NCL::CSC8508
 			std::map<uint32_t, float> elements = std::map<uint32_t, float>();
 			for (int i = 0; i < MAX_AXIS_COUNT; i++)
 				elements[pck.axisIDs[i]] = pck.axisValues[i];
-			historyQueue.push(elements);
+			HistoryData data = HistoryData(elements, pck.mouseYaw, pck.deltaTime);
+			historyQueue.push(data);
 			return true;
 		}
 
@@ -158,7 +178,7 @@ namespace NCL::CSC8508
 			delete axisPacket;
 		}
 
-		void UpdateDeltaAxis() {
+		void UpdateDeltaAxis(float deltaTime) {
 			int t = boundAxis.size();
 			for (int i = 0; i < t; i += MAX_AXIS_COUNT) {
 				InputDeltaPacket* deltaPacket = new InputDeltaPacket();
@@ -170,6 +190,8 @@ namespace NCL::CSC8508
 					deltaPacket->axisValues[j] = axisValue; // : axisValue - lastAxisState[binding];
 					lastAxisState[binding] = axisValue;
 				}
+				deltaPacket->deltaTime = deltaTime;
+				deltaPacket->mouseYaw = mouseGameWorldYaw;
 				SendEventPacket(deltaPacket);
 				delete deltaPacket;
 			}

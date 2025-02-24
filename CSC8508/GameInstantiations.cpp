@@ -5,6 +5,7 @@
 #include "INetworkComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
+#include "CameraComponent.h"
 
 
 using namespace NCL;
@@ -52,11 +53,11 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	float meshSize = 1.0f;
 	float inverseMass = 0.5f;
 
-	players = new PlayerGameObject();
+	GameObject* player = new PlayerGameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 
-	PhysicsComponent* phys = players->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = players->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
+	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	int componentIdCount = 0;
 
@@ -64,35 +65,37 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	{
 		int unqiueId = CantorPairing(spawnData->objId, componentIdCount);
 		componentIdCount++;
-		InputNetworkComponent* input = players->AddComponent<InputNetworkComponent>(
+		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
 			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
 
 		unqiueId = CantorPairing(spawnData->objId, componentIdCount);
 		componentIdCount++;
-		TransformNetworkComponent* networkTransform = players->AddComponent<TransformNetworkComponent>(
+		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+
+		if (spawnData->clientOwned) 
+			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 	}
 	else {
-		InputComponent* input = players->AddComponent<InputComponent>(&controller);
+		InputComponent* input = player->AddComponent<InputComponent>(&controller);
+		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
+
 	}
 
-	players->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
-	players->SetLayerID(Layers::LayerID::Player);
-	players->SetTag(Tags::Player);
+	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
+	player->SetLayerID(Layers::LayerID::Player);
+	player->SetTag(Tags::Player);
 
-	players->SetRenderObject(new RenderObject(&players->GetTransform(), capsuleMesh, nullptr, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&players->GetTransform(), bounds->GetBoundingVolume()));
+	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, nullptr, basicShader));
+	player->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
+
+	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform(), bounds->GetBoundingVolume()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
-	players->SetEndGame([&](bool hasWon) {EndGame(hasWon); });
 
-	bounds->AddToIgnoredLayers(Layers::Enemy);
-
-	players->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
-
-	world->AddGameObject(players);
-	return players;
+	world->AddGameObject(player);
+	return player;
 }
 
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)

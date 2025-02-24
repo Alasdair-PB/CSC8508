@@ -31,6 +31,10 @@ public:
 	*/
 	void Update(float deltaTime) override;
 
+	void SetCamOrientation();
+
+	void SetPlayerOrientation();
+
 	/**
 	* Start Microphone recording of selected input device
 	*/

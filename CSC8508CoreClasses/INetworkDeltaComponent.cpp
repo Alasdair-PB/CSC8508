@@ -17,8 +17,7 @@ INetworkDeltaComponent::INetworkDeltaComponent(int objId, int ownId, int compone
 vector<GamePacket*> INetworkDeltaComponent::WriteDeltaFullPacket(bool deltaFrame){
 	if (deltaFrame) {
 		bool foundDelta = true;
-		int stateId = lastFullState->stateID;
-		auto packets = WriteDeltaPacket(&foundDelta, stateId);
+		auto packets = WriteDeltaPacket(&foundDelta);
 		return foundDelta ? packets : WriteFullPacket();
 	}
 	return WriteFullPacket();
@@ -29,7 +28,7 @@ bool INetworkDeltaComponent::ReadDeltaFullPacket(INetworkPacket& p)
 	if (p.type == Delta_State)
 		return ReadDeltaPacketState((IDeltaNetworkPacket&)p);
 	if (p.type == Full_State)
-		return ReadFullPacket((IFullNetworkPacket&)p);
+		return ReadFullPacketState((IFullNetworkPacket&)p);
 	return false;
 }
 
@@ -39,6 +38,17 @@ bool INetworkDeltaComponent::ReadDeltaPacketState(IDeltaNetworkPacket& p)
 		return false;
 	UpdateStateHistory(p.fullID);
 	return ReadDeltaPacket(p);
+}
+
+
+bool INetworkDeltaComponent::ReadFullPacketState(IFullNetworkPacket& p)
+{
+	if (p.fullState.stateID < lastFullState->stateID) {
+		std::cout << "Bad State: " << p.fullState.stateID << " :: " << lastFullState->stateID << std::endl;
+		return false;
+	}
+	std::cout << "Good State: " << p.fullState.stateID << " :: " << lastFullState->stateID << std::endl;
+	return ReadFullPacket(p);
 }
 
 void INetworkDeltaComponent::UpdateStateHistory(int minID) {

@@ -10,7 +10,6 @@ https://research.ncl.ac.uk/game/
 #include "Vector.h"
 #include "Matrix.h"
 #include "Controller.h"
-#include "Quaternion.h"
 
 namespace NCL {
 	using namespace NCL::Maths;
@@ -76,16 +75,6 @@ namespace NCL {
 
 		float	GetSpeed() const	{ return speed; }
 		Camera& SetSpeed(float s)	{ speed = s; return *this; }
-
-		Vector3 GetForward() const {
-			Quaternion rotation = Quaternion::EulerAnglesToQuaternion(pitch, yaw, 0.0f);
-			return rotation * Vector3(0, 0, -1);
-		}
-
-		Vector3 GetUp() const {
-			Quaternion rotation = Quaternion::EulerAnglesToQuaternion(pitch, yaw, 0.0f);
-			return rotation * Vector3(0, 1, 0);
-		}
 
 	protected:
 		float	nearPlane;

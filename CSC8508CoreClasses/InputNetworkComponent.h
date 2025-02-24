@@ -98,7 +98,6 @@ namespace NCL::CSC8508
 					lastAxisState = data.axisMap;
 					mouseGameWorldYaw = data.mouseGameWorldYaw;
 					historyQueue.pop();
-					GetGameObject().InvokeUpdate(data.deltaTime);
 				}
 				for (auto state : lastAxisState)
 					state.second = 0;

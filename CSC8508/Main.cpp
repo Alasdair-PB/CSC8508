@@ -234,12 +234,12 @@ int main(int argc, char** argv)
 	Window* w = Window::CreateGameWindow(initInfo);
 	NetworkedGame* g = new NetworkedGame();
 
-	if (!w->HasInitialised()) 
+	if (!w->HasInitialised())
 		return -1;
-		
+
 	w->ShowOSPointer(true);
 	w->LockMouseToWindow(true);
-	w->GetTimer().GetTimeDeltaSeconds(); 
+	w->GetTimer().GetTimeDeltaSeconds();
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{

@@ -8,7 +8,7 @@
 #include "INetworkComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "InputComponent.h"
-#include <array>
+#include <queue>
 
 using std::vector;
 
@@ -73,7 +73,6 @@ namespace NCL::CSC8508
 			boundAxis = activeController->GetBoundAxis();
 			for (uint32_t binding : boundButtons) lastBoundState[binding] = false;
 			for (uint32_t binding : boundAxis) lastAxisState[binding] = false;
-			
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -85,18 +84,19 @@ namespace NCL::CSC8508
 			return types;
 		}
 
-		void SetDependentAxisBindings(const std::string& bindingA, const std::string& bindingB) 
-		{
-			uint32_t uBindingA = GetNamedAxis(bindingA);
-			uint32_t uBindingB = GetNamedAxis(bindingB);
-			dependentBindings[uBindingA] = uBindingB;
-			dependentBindings[uBindingB] = uBindingA;
-		}
-	
-
-		void Update(float deltaTime) override
+		void EarlyUpdate(float deltaTime) override
 		{
 			if (clientOwned) UpdateDeltaAxis();
+			else {
+				if (!historyQueue.empty()) {
+					lastAxisState = historyQueue.front();
+					historyQueue.pop();
+				}
+				else {
+					for (auto state : lastAxisState)
+						state.second = 0;
+				}
+			}
 		}
 
 		float GetNamedAxis(const std::string& name) override
@@ -104,22 +104,17 @@ namespace NCL::CSC8508
 			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
 				uint32_t binding = activeController->GetNamedAxisBinding(name);
-				float axisSum = 0; 
-				while (!historyStack[binding].empty()) {
-					axisSum += historyStack[binding].top();
-					historyStack[binding].pop();
-				}
-				return axisSum;
+				return lastAxisState[binding];
 			}
 		}
 
 	protected:
+		bool clearLastFrame = false;
 		vector<uint32_t> boundAxis;
-		std::map<uint32_t, bool> lastBoundState;
 		std::map<uint32_t, float> lastAxisState;
 
-		std::map<uint32_t, std::stack<float>> historyStack;
-		std::map<uint32_t, uint32_t> dependentBindings;
+		std::map<uint32_t, bool> lastBoundState;
+		std::queue<std::map<uint32_t, float>> historyQueue;
 
 		bool ReadAxisPacket(InputAxisPacket pck) {
 			lastAxisState[pck.axisID] = pck.axisValue;
@@ -128,8 +123,10 @@ namespace NCL::CSC8508
 
 		bool ReadDeltaPacket(InputDeltaPacket pck) 
 		{
-			for (int i = 0; i < MAX_AXIS_COUNT; i++) 
-				historyStack[pck.axisIDs[i]].push(pck.axisValues[i]);
+			std::map<uint32_t, float> elements = std::map<uint32_t, float>();
+			for (int i = 0; i < MAX_AXIS_COUNT; i++)
+				elements[pck.axisIDs[i]] = pck.axisValues[i];
+			historyQueue.push(elements);
 			return true;
 		}
 

@@ -31,26 +31,43 @@ AudioListenerComponent::AudioListenerComponent(GameObject& gameObject, Perspecti
 
 	// Initialise position and orientation vectors
 	fPosition = VecToFMOD(transform->GetPosition());
-	fForward = VecToFMOD(camera.GetForward());
-	fUp = VecToFMOD(camera.GetUp());
+
+	// Comment out for where you want the up and forward vectors to be updated from for testing
+	//SetCamOrientation();
+	SetPlayerOrientation();
 
 }
 
 void AudioListenerComponent::Update(float deltatime) {
 	Vector3 pos = transform->GetPosition();
-	Vector3 forward = transform->GetOrientation() * Vector3(0, 0, -1);
-	Vector3 up = transform->GetOrientation() * Vector3(0, 1, 0);
-
-
 	fPosition = VecToFMOD(transform->GetPosition());
-	fForward = VecToFMOD(camera->GetForward());
-	fUp = VecToFMOD(camera->GetUp());
+
+
+	// Comment out for where you want the up and forward vectors to be updated from for testing
+	//SetCamOrientation();
+	SetPlayerOrientation();
 
 	fSystem ? fSystem->set3DListenerAttributes(fIndex, &fPosition, &fVelocity, &fForward, &fUp) : 0;
 
 	if (debug) {
 		Debug::Print("Listener Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z), Vector2(5, 5));
 	}
+
+}
+
+void AudioListenerComponent::SetCamOrientation() {
+		Quaternion forwardRotation = Quaternion::EulerAnglesToQuaternion(camera->GetPitch(), camera->GetYaw(), 0.0f);
+		fForward = VecToFMOD(forwardRotation * Vector3(0, 0, -1));
+
+
+		Quaternion upRotation = Quaternion::EulerAnglesToQuaternion(camera->GetPitch(), camera->GetYaw(), 0.0f);
+		fUp = VecToFMOD(upRotation * Vector3(0, 1, 0));
+}
+
+void AudioListenerComponent::SetPlayerOrientation() {
+
+	fForward = VecToFMOD(transform->GetOrientation() * Vector3(0, 0, -1));
+	fUp = VecToFMOD(transform->GetOrientation() * Vector3(0, 1, 0));
 
 }
 

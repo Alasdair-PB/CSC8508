@@ -76,9 +76,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 
 	SetDebugStringBufferSizes(10000);
-	SetDebugLineBufferSizes(1000);
-
-	/*Initialises ImGui for use with Win32 and OpenGL*/
+	SetDebugLineBufferSizes(1000); 
 }
 
 GameTechRenderer::~GameTechRenderer()	{

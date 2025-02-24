@@ -78,10 +78,6 @@ namespace NCL {
 			GLuint textTexVBO;
 			size_t textCount;
 
-			bool showDemo = true;
-			float framerateDelay = 0;
-			float latestFramerate;
-
 			UISystem* uiSystem;
 		};
 	}

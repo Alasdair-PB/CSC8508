@@ -140,9 +140,7 @@ void NetworkedGame::UpdatePackets(float dt)
 
 bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
 {
-	if (!thisServer)
-		return false;
-
+	if (!thisServer) return false;
 	for (const auto& player : thisServer->playerPeers)
 	{
 		int playerID = player.first;
@@ -153,9 +151,7 @@ bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
 
 bool NetworkedGame::SendToAllOtherClients(GamePacket* dataPacket, int ownerId)
 {
-	if (!thisServer)
-		return false;
-
+	if (!thisServer) return false;
 	for (const auto& player : thisServer->playerPeers)
 	{
 		int playerID = player.first;
@@ -270,9 +266,8 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 
 void NetworkedGame::StartLevel() {}
 
-void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
-{
-	/*if (type == Full_State || type == Delta_State) {
+void NetworkedGame::ReceiveFullDeltaStatePacket(int type, GamePacket* payload) {
+	if (type == Full_State || type == Delta_State) {
 		INetworkPacket* p = (INetworkPacket*)payload;
 		ComponentManager::OperateOnAllINetworkDeltaComponentBufferOperators(
 			[&](IComponent* ic) {
@@ -284,13 +279,16 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 						SendToAllOtherClients(payload, p->ownerID);
 				}
 			});
-	}*/
+	}
+}
+
+void NetworkedGame::ReceiveComponentEventPacket(int type, GamePacket* payload) {
 	if (type == Component_Event) {
-		INetworkPacket* p = (INetworkPacket*) payload;
+		INetworkPacket* p = (INetworkPacket*)payload;
 		ComponentManager::OperateOnAllINetworkComponentBufferOperators(
-			[&](IComponent* ic) {	
+			[&](IComponent* ic) {
 				INetworkComponent* c = dynamic_cast<INetworkComponent*>(ic);
-				if (p->componentID == (c->GetComponentID())) 
+				if (p->componentID == (c->GetComponentID()))
 				{
 					c->ReadEventPacket(*p);
 					if (thisServer)
@@ -298,17 +296,24 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 				}
 			});
 	}
+}
 
+void NetworkedGame::ReceiveSpawnPacket(int type, GamePacket* payload) {
 	if (type == Spawn_Object) {
 		if (thisClient) {
 			SpawnPacket* ackPacket = (SpawnPacket*)payload;
 			SpawnPlayerClient(ackPacket->ownerId, ackPacket->objectId, Prefab::Player);
 		}
 	}
-	if (thisClient) 
-		thisClient->ReceivePacket(type, payload, source);
-	else if (thisServer) 
-		thisServer->ReceivePacket(type, payload, source);
+}
+
+void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
+{
+	//ReceiveFullDeltaStatePacket(type, payload);
+	ReceiveComponentEventPacket(type, payload);
+	ReceiveSpawnPacket(type, payload);
+	if (thisClient) thisClient->ReceivePacket(type, payload, source);
+	else if (thisServer) thisServer->ReceivePacket(type, payload, source);
 }
 
 void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {

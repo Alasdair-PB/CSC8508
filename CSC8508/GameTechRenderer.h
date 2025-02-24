@@ -20,6 +20,8 @@ namespace NCL {
 			Texture*	LoadTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
 
+			void SetUISystem(UISystem* ui) { uiSystem = ui;}
+
 		protected:
 			void NewRenderLines();
 			void NewRenderText();
@@ -77,10 +79,10 @@ namespace NCL {
 			size_t textCount;
 
 			bool showDemo = true;
-
-			UISystem* uiSystem;
 			float framerateDelay = 0;
 			float latestFramerate;
+
+			UISystem* uiSystem;
 		};
 	}
 }

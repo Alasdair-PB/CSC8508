@@ -64,8 +64,6 @@ namespace NCL {
 
 		bool		HasInitialised()	const { return init; }
 
-		HWND	    GetHandle() const;
-
 		float		GetScreenAspect()	const {
 			return (float)size.x / (float)size.y;
 		}
@@ -90,6 +88,7 @@ namespace NCL {
 		static const Keyboard*	 GetKeyboard() { return keyboard; }
 		static const Mouse*		 GetMouse() { return mouse; }
 		static const GameTimer&	 GetTimer() { return timer; }
+		static const HWND        GetHandle() { return handle; }
 
 		static Window*	const GetWindow() { return window; }
 
@@ -119,6 +118,6 @@ namespace NCL {
 		static Mouse*		mouse;
 
 		static GameTimer	timer;
-		HWND                handle;
+		static HWND         handle;
 	};
 }

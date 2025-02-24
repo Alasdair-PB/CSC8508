@@ -16,7 +16,7 @@ namespace NCL {
 			void EndFrame();
 
 			void DrawDemo();
-			void DisplayFramerate(float dt); 
+			void DisplayFramerate(float dt);
 
 		protected:
 			HWND uiWindow;

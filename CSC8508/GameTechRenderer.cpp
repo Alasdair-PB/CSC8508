@@ -17,7 +17,7 @@ using namespace CSC8508;
 
 Matrix4 biasMatrix = Matrix::Translation(Vector3(0.5f, 0.5f, 0.5f)) * Matrix::Scale(Vector3(0.5f, 0.5f, 0.5f));
 
-GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world)	{
+GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world)      {
 	glEnable(GL_DEPTH_TEST);
 
 	debugShader  = new OGLShader("debug.vert", "debug.frag");
@@ -79,14 +79,11 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	SetDebugLineBufferSizes(1000);
 
 	/*Initialises ImGui for use with Win32 and OpenGL*/
-	uiSystem = new UISystem(hostWindow.GetHandle());
 }
 
 GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &shadowTex);
 	glDeleteFramebuffers(1, &shadowFBO);
-
-	delete uiSystem;
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -130,10 +127,8 @@ void GameTechRenderer::LoadSkybox() {
 }
 
 void GameTechRenderer::RenderFrame() {
-	framerateDelay += 1;
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
-	uiSystem->StartFrame();
 	BuildObjectList();
 	SortObjectList();
 	RenderShadowMap();
@@ -146,13 +141,6 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderLines();
 	NewRenderTextures();
 	NewRenderText();
-
-	uiSystem->DrawDemo();
-	if (framerateDelay > 10) {
-		latestFramerate = hostWindow.GetTimer().GetTimeDeltaSeconds();
-		framerateDelay = 0;
-	}
-	uiSystem->DisplayFramerate(latestFramerate);
 	uiSystem->EndFrame();
 
 	glDisable(GL_BLEND);

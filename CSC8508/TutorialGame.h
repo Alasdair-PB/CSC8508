@@ -8,6 +8,7 @@
 
 #pragma once
 #include "GameTechRenderer.h"
+#include "UISystem.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
 #endif
@@ -54,8 +55,7 @@ namespace NCL {
 			void MoveSelectedObject();
 			void LockedObjectMovement();
 
-
-
+			void DrawUIElements();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
@@ -135,6 +135,9 @@ namespace NCL {
 
 			GameObject* objClosest = nullptr;
 			PlayerGameObject* players = nullptr;
+			UISystem* uiSystem;
+			float framerateDelay = 0;
+			float latestFramerate;
 		};
 	}
 }

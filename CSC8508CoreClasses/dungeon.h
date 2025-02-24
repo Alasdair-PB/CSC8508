@@ -3,9 +3,8 @@
 #include <cstdlib>
 #include <ctime>
 
-// ----------------------------
+
 // 地下城类定义
-// ----------------------------
 class Dungeon {
 public:
     std::vector<Room*> rooms;  // 存储所有生成的房间

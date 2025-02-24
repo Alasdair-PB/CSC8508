@@ -29,7 +29,7 @@ public:
      * @tparam S Scene type (child class)
      * @param scene Scene instance
      */
-    template <typename S>
+    template <SceneType S>
     static void SetInstance(S* const scene) { sceneInstance<S> = scene; }
 
     /**
@@ -37,14 +37,14 @@ public:
      * @tparam S Scene type (child class)
      * @return Scene instance or NULLPTR if not set
      */
-    template <typename S>
+    template <SceneType S>
     static S* GetInstance() { return sceneInstance<S>; }
 
     /**
      * Sets the current Scene pointer to the static singleton instance of a target scene type.
      * @tparam S
      */
-    template <typename S>
+    template <SceneType S>
     static void SetCurrentToInstance() { SetCurrent(sceneInstance<S>); }
 
 private:
@@ -54,16 +54,16 @@ private:
      * Static singleton Scene instance: When making a new Scene type, a pointer to the scene should be stored here.
      * @tparam S
      */
-    template <typename S>
+    template <SceneType S>
     static S* sceneInstance;
 };
 
 
-template <typename S>
+template <SceneType S>
 S* SceneManager::sceneInstance = nullptr;
 
 
-inline void SceneManager::SetCurrent(Scene* scene) {
+void SceneManager::SetCurrent(Scene* scene) {
     Scene* old = current;
     current = scene;
     if (old) old->OnUnload();

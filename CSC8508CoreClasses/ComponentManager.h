@@ -83,21 +83,18 @@ namespace NCL::CSC8508 {
         using Action = std::function<void(std::function<void(T*)> func)>;
 
         static void OperateOnAllIComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) {
+            for (Action<IComponent>* myAction : IComponentBufferOperators) 
                 (*myAction)(func);
-            }
         }
 
         static void OperateOnAllINetworkComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) {
+            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) 
                 (*myAction)(func);
-            }
         }
 
         static void OperateOnAllINetworkDeltaComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkDeltaComponentBufferOperators) {
+            for (Action<IComponent>* myAction : INetworkDeltaComponentBufferOperators)
                 (*myAction)(func);
-            }
         }
 
         template <typename T, typename T2> requires std::is_base_of_v<IComponent, T>
@@ -129,6 +126,7 @@ namespace NCL::CSC8508 {
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 
+            AddOperatorBuffer<T, IComponent>(IComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkComponent>(INetworkComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
 
@@ -158,6 +156,7 @@ namespace NCL::CSC8508 {
 
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static std::vector<Action<IComponent>*> INetworkComponentBufferOperators;
+        inline static std::vector<Action<IComponent>*> IComponentBufferOperators;
         inline static std::vector<Action<IComponent>*> INetworkDeltaComponentBufferOperators;
 
     };

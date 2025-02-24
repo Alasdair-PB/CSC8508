@@ -272,7 +272,7 @@ void NetworkedGame::StartLevel() {}
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
-	if (type == Full_State || type == Delta_State) {
+	/*if (type == Full_State || type == Delta_State) {
 		INetworkPacket* p = (INetworkPacket*)payload;
 		ComponentManager::OperateOnAllINetworkDeltaComponentBufferOperators(
 			[&](IComponent* ic) {
@@ -284,7 +284,7 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 						SendToAllOtherClients(payload, p->ownerID);
 				}
 			});
-	}
+	}*/
 	if (type == Component_Event) {
 		INetworkPacket* p = (INetworkPacket*) payload;
 		ComponentManager::OperateOnAllINetworkComponentBufferOperators(

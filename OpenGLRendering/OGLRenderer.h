@@ -7,6 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 */////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "RendererBase.h"
+#include "../CSC8508/GameTechRendererInterface.h"
 
 #ifdef _WIN32
 #include "windows.h"
@@ -28,7 +29,7 @@ namespace NCL::Rendering {
 
 	class SimpleFont;
 		
-	class OGLRenderer : public RendererBase	{
+	class OGLRenderer : public RendererBase, public NCL::CSC8508::GameTechRendererInterface {
 	public:
 		friend class OGLRenderer;
 		OGLRenderer(Window& w);
@@ -46,6 +47,8 @@ namespace NCL::Rendering {
 		void RenderFrame()	override;
 		void EndFrame()		override;
 		void SwapBuffers()  override;
+
+		void Render() { RendererBase::Render(); };
 
 		void UseShader(const OGLShader& s);
 		void BindTextureToShader(const OGLTexture& t, const std::string& uniform, int texUnit) const;

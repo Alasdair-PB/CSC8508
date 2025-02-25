@@ -52,7 +52,7 @@ int main() {
 	c->MapButton(0, "Up");
 	c->MapButton(2, "Down");
 
-	std::unique_ptr<TutorialGame> g = std::make_unique<TutorialGame>(*world, *renderer, *physics);
+	std::unique_ptr<TutorialGame> g = std::make_unique<TutorialGame>();
 
 	while (window->UpdateWindow()) {
 		float dt = window->GetTimer().GetTimeDeltaSeconds();

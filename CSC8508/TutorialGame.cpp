@@ -9,37 +9,48 @@
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
 #include "Legacy/StateGameObject.h"
+#include "GameTechRenderer.h"
 
+#ifdef USE_PS5
+//#include "../PS5Starter/GameTechAGCRenderer.h"
+//#include "../PS5Core/PS5Window.h"
+#endif // USE_PS5
 
 using namespace NCL;
 using namespace CSC8508;
 
-TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
+TutorialGame::TutorialGame() 
 {
 	world = new GameWorld();
+
+#ifdef USE_PS5
+	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
+	renderer = new GameTechAGCRenderer(*world);
+#else
+	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
 #ifdef USEVULKAN
-	renderer	= new GameTechVulkanRenderer(*world);
+	renderer = new GameTechVulkanRenderer(*world);
 	renderer->Init();
 	renderer->InitStructures();
-#else 
+#else
 	renderer = new GameTechRenderer(*world);
 #endif
-
+#endif
 	physics = new PhysicsSystem(*world);
 
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
 
-	world->GetMainCamera().SetController(controller);
+	world->GetMainCamera().SetController(*controller);
 	world->GetMainCamera().SetGetPlayer([&]() -> Vector3 { return GetPlayerPos(); });
 
-	controller.MapAxis(0, "Sidestep");
-	controller.MapAxis(1, "UpDown");
-	controller.MapAxis(2, "Forward");
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(1, "UpDown");
+	controller->MapAxis(2, "Forward");
 
-	controller.MapAxis(3, "XLook");
-	controller.MapAxis(4, "YLook");
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
 
 	InitialiseAssets();	
 	
@@ -60,7 +71,7 @@ void TutorialGame::EndGame(bool hasWon) {
 }
 
 void TutorialGame::InitialiseAssets() {
-	cubeMesh	= renderer->LoadMesh("cube.msh");
+	cubeMesh = renderer->LoadMesh("cube.msh");
 	navigationMesh = renderer->LoadMesh("NavMeshObject.msh");
 	capsuleMesh = renderer->LoadMesh("capsule.msh");
 	sphereMesh = renderer->LoadMesh("sphere.msh");
@@ -79,13 +90,13 @@ TutorialGame::~TutorialGame()
 	delete capsuleMesh;
 	delete sphereMesh;
 
-
 	delete basicTex;
 	delete basicShader;
 
 	delete physics;
 	delete renderer;
 	delete world;
+	delete controller;
 
 	delete navigationMesh;
 	delete navMesh;
@@ -159,7 +170,7 @@ void TutorialGame::UpdateGame(float dt)
 
 	mainMenu->Update(dt);
 	renderer->Render();
-	//renderer->Update(dt);
+	renderer->Update(dt);
 	Debug::UpdateRenderables(dt);
 
 	if (inPause)

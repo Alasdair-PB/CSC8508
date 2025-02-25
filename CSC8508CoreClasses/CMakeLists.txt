@@ -156,6 +156,8 @@ set(ROOT_NAMESPACE CSC8508CoreClasses)
 ################################################################################
 # Compile definitions
 ################################################################################
+
+#[[
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "UNICODE"
     "_UNICODE"
@@ -163,18 +165,29 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_WINSOCK_DEPRECATED_NO_WARNINGS"
 	"NOMINMAX"
 )
+]]
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
-    <vector>
-    <map>
-    <stack>
-    <string>
-    <list>
-    <thread>
-    <atomic>
+	<fstream>
+    <sstream>
+	<iostream>
+	<iosfwd>
+	
+    <memory>
+	<string>
+	<thread>
+    <filesystem>
     <functional>
-    <iostream>
-    <set>
+	<assert.h>  
+	<chrono>	
+  
+    <unordered_set>
+	<set>
+    <vector>
+	<unordered_map>
+    <map> 
+	<stack> 
+	
     "../NCLCoreClasses/Vector.h"
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"

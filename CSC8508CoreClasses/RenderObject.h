@@ -15,17 +15,8 @@ namespace NCL {
 		class RenderObject
 		{
 		public:
-			RenderObject(Transform* inTransform, Mesh* inMesh, Texture* inTex, Shader* inShader) {
-				buffer = nullptr;
-				anim = nullptr;
-
-				transform = inTransform;
-				mesh = inMesh;
-				texture = inTex;
-				shader = inShader;
-				colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-			}
-			~RenderObject() {}
+			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader);
+			~RenderObject();
 
 			void SetDefaultTexture(Texture* t) {
 				texture = t;

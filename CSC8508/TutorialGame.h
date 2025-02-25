@@ -7,7 +7,8 @@
 
 
 #pragma once
-#include "GameTechRenderer.h"
+// #include "GameTechRenderer.h"
+#include "GameTechRendererInterface.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
 #endif
@@ -66,16 +67,15 @@ namespace NCL {
 
 			MainMenu* GetMainMenu() { return mainMenu; }
 
-
+			GameTechRendererInterface* renderer;
 #ifdef USEVULKAN
-			GameTechVulkanRenderer*	renderer;
-#else
-			GameTechRenderer* renderer;
+#endif			
+#ifdef USE_PS5
 #endif
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
-			KeyboardMouseController controller;
+			Controller* controller;
 
 			bool useGravity;
 			bool inPause = false;

@@ -6,7 +6,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#ifdef _WIN32 //Change to PS5
+#ifdef _SCE_TARGET_OS_PROSPERO //Change to PS5
 #include <sys/ioctl.h>
 #include <netdb.h>
 #endif
@@ -24,6 +24,15 @@
 #ifndef SOMAXCONN 
 #define SOMAXCONN 128
 #endif
+#ifndef HAS_FCNTL
+#define HAS_FCNTL 1
+#endif
+#define HAS_INET_NTOP 1 
+#define HAS_INET_PTON 1
+#ifndef HAS_GETADDRINFO
+// #define HAS_GETADDRINFO 1
+#endif
+#include <net.h>
  /* PS5 */
 
 #include <sys/time.h>
@@ -134,6 +143,19 @@ enet_address_set_host_ip (ENetAddress * address, const char * name)
 int
 enet_address_set_host (ENetAddress * address, const char * name)
 {
+    //#ifdef _SCE_TARGET_OS_PROSPERO 
+#ifndef _WIN32
+    struct in_addr in;
+
+    // Try to convert the input string directly into an IPv4 address
+    if (inet_pton(AF_INET, name, &in) == 1) {
+        address->host = in.s_addr; // Successfully converted and assigned
+        return 0;
+    }
+
+    // If resolution fails, return an error
+    return -1;
+#else
 #ifdef HAS_GETADDRINFO
     struct addrinfo hints, * resultList = NULL, * result = NULL;
 
@@ -182,7 +204,7 @@ enet_address_set_host (ENetAddress * address, const char * name)
         return 0;
     }
 #endif
-
+#endif
     return enet_address_set_host_ip (address, name);
 }
 
@@ -206,9 +228,21 @@ enet_address_get_host_ip (const ENetAddress * address, char * name, size_t nameL
     return 0;
 }
 
+
 int
 enet_address_get_host (const ENetAddress * address, char * name, size_t nameLength)
 {
+//#ifdef _SCE_TARGET_OS_PROSPERO 
+#ifndef _WIN32
+    struct in_addr in;
+    in.s_addr = address->host;
+
+    if (!inet_ntop(AF_INET, &in, name, nameLength)) {
+        return -1; // Failed to convert IP to string
+    }
+
+    return 0; // Successfully converted IP to string
+#else
 #ifdef HAS_GETNAMEINFO
     struct sockaddr_in sin;
     int err;
@@ -257,6 +291,7 @@ enet_address_get_host (const ENetAddress * address, char * name, size_t nameLeng
        memcpy (name, hostEntry -> h_name, hostLen + 1);
        return 0;
     }
+#endif
 #endif
 
     return enet_address_get_host_ip (address, name, nameLength);

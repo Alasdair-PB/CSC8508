@@ -1,8 +1,8 @@
 #pragma once
-#include "OGLRenderer.h"
-#include "OGLShader.h"
-#include "OGLTexture.h"
-#include "OGLMesh.h"
+#include "../OpenGLRendering/OGLRenderer.h"
+#include "../OpenGLRendering/OGLShader.h"
+#include "../OpenGLRendering/OGLTexture.h"
+#include "../OpenGLRendering/OGLMesh.h"
 
 #include "GameWorld.h"
 
@@ -10,7 +10,7 @@ namespace NCL {
 	namespace CSC8508 {
 		class RenderObject;
 
-		class GameTechRenderer : public OGLRenderer	{
+		class GameTechRenderer : public OGLRenderer {
 		public:
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();

@@ -73,7 +73,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 
 
 	players->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
-	players->SetController(controller);
+	players->SetController(*controller);
 
 
 	world->AddGameObject(players);

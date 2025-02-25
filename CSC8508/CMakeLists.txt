@@ -3,7 +3,7 @@ set(PROJECT_NAME CSC8508)
 file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 source_group("Header Files" FILES ${Header_Files})
 file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-
+source_group("Source Files" FILES ${Source_Files})
 if(USE_VULKAN)
 	file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
 else()
@@ -11,7 +11,11 @@ else()
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechVulkanRenderer.cpp)
 endif()
 
-source_group("Source Files" FILES ${Source_Files})
+if(PS5)
+	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
+	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.cpp)
+endif()
+
 
 set(ALL_FILES
     ${Header_Files}
@@ -71,10 +75,24 @@ endif()
 ################################################################################
 # Target
 ################################################################################
+if(PS5)
 add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
 
 set(ROOT_NAMESPACE CSC8508)
 
+else()
+add_executable(${PROJECT_NAME}  ${ALL_FILES})
+
+use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
+set(ROOT_NAMESPACE CSC8508)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VS_GLOBAL_KEYWORD "Win32Proj"
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
+)
+endif()
 ################################################################################
 # Compile definitions
 ################################################################################
@@ -164,13 +182,26 @@ if(MSVC)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC  "Winmm.lib")
 endif()
 
-include_directories("../OpenGLRendering/")
+
 include_directories("../NCLCoreClasses/")
 include_directories("../CSC8508CoreClasses/")
+include_directories("../OpenGLRendering/")
 
+
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8508CoreClasses)
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC enet)
+
+if(PS5)
+	#include_directories("../PS5Core/")
+	#target_link_libraries(${PROJECT_NAME} LINK_PUBLIC PS5Core)
+	#include_directories("../PS5Starter/")
+	#target_link_libraries(${PROJECT_NAME} LINK_PUBLIC PS5Starter)
+# else() PS5
+#=target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+#include_directories("../OpenGLRendering/")
+endif()
 
 if(USE_VULKAN)
     include_directories("../VulkanRendering/")

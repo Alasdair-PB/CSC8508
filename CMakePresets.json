@@ -11,7 +11,10 @@
         "CMAKE_TOOLCHAIN_FILE": "C:/Program Files (x86)/SCE/Prospero/Tools/CMake/PS5.cmake",
         "DEBUG_ASSET_ROOT": "/app0/Assets/",
         "CMAKE_CXX_FLAGS": "-Wno-unknown-warning-option",
-        "PS5_hidden": true
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "TRUE"
+        }
       }
     },
     {
@@ -20,7 +23,10 @@
       "generator": "Visual Studio 17 2022",  
       "binaryDir": "${sourceDir}/build_windows",
       "cacheVariables": {
-        "PS5_hidden": false
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        }
       }
     }
   ]

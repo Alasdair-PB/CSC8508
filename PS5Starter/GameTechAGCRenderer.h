@@ -1,15 +1,15 @@
 #pragma once
 #include "../CSC8508CoreClasses/GameWorld.h"
 
-#include "GameTechRendererInterface.h"
+#include "../CSC8508/GameTechRendererInterface.h"
 
 #include "../PS5Core/AGCRenderer.h"
 
 #include "../PS5Core/AGCBuffer.h"
 
-#include "./Shaders/PSSL/Interop.h"				//Always include this before any PSSL headers
-#include "./Shaders/PSSL/ShaderConstants.psslh"
-#include "./Shaders/PSSL/TechObject.psslh"
+#include "../Assets/Shaders/PSSL/Interop.h"				//Always include this before any PSSL headers
+#include "../Assets/Shaders/PSSL/ShaderConstants.psslh"
+#include "../Assets/Shaders/PSSL/TechObject.psslh"
 
 namespace NCL {
 	namespace Rendering {

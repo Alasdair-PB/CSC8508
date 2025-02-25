@@ -50,7 +50,6 @@ namespace NCL::CSC8508
 
 		vector<GamePacket*> WriteDeltaFullPacket(bool deltaFrame);
 		bool ReadDeltaFullPacket(INetworkPacket& p);
-
 		void UpdateStateHistory(int minID);
 
 	protected:

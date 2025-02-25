@@ -44,7 +44,7 @@ void GameClient::UpdateClient()
 		if (event.type == ENET_EVENT_TYPE_CONNECT) 
 			std::cout << "Connected to server!" << std::endl;
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE) {
-			std::cout << "Client: Packet received..." << std::endl;
+			//std::cout << "Client: Packet received..." << std::endl;
 			GamePacket* packet = (GamePacket*)event.packet->data;
 			ProcessPacket(packet);
 		}

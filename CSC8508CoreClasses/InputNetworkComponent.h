@@ -65,8 +65,7 @@ namespace NCL::CSC8508
 	public:
 		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, bool clientOwned) :
 			InputComponent(gameObject, controller), 
-			INetworkComponent(objId, ownId, componId, clientOwned)
-		{}
+			INetworkComponent(objId, ownId, componId, clientOwned) {}
 
 		~InputNetworkComponent() = default;
 

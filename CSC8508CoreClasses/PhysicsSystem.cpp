@@ -18,7 +18,7 @@ using namespace CSC8508;
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	applyGravity	= false;
-	useBroadPhase	= false;	
+	useBroadPhase	= true;
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
 	SetGravity(Vector3(0.0f, -9.8f, 0.0f));
@@ -277,14 +277,17 @@ void PhysicsSystem::BroadPhase() {
 }
 
 void PhysicsSystem::NarrowPhase() {
+	int collisionTestCount = 0;
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = broadphaseCollisions.begin(); i != broadphaseCollisions.end(); ++i) {
 		CollisionDetection::CollisionInfo info = *i;
+		collisionTestCount++;
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = numCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
 			allCollisions.insert(info); // insert into our main set
 		}
 	}
+	std::cout << "Number of collisions tested: " << collisionTestCount << '\n';
 }
 
 void PhysicsSystem::IntegrateAccel(float dt)

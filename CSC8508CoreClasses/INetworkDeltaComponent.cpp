@@ -9,10 +9,7 @@ using namespace CSC8508;
 
 INetworkDeltaComponent::INetworkDeltaComponent(int objId, int ownId, int componentId, bool clientOwned, INetworkState* state)
 	: INetworkComponent(objId, ownId, componentId, clientOwned),
-	deltaErrors(0), fullErrors(0),
-	lastFullState(state)
-{
-}
+	deltaErrors(0), fullErrors(0), lastFullState(state) {}
 
 vector<GamePacket*> INetworkDeltaComponent::WriteDeltaFullPacket(bool deltaFrame){
 	if (deltaFrame) {
@@ -26,9 +23,9 @@ vector<GamePacket*> INetworkDeltaComponent::WriteDeltaFullPacket(bool deltaFrame
 bool INetworkDeltaComponent::ReadDeltaFullPacket(INetworkPacket& p)
 {
 	if (p.type == Delta_State)
-		return ReadDeltaPacketState((IDeltaNetworkPacket&)p);
+		return ReadDeltaPacket((IDeltaNetworkPacket&)p);
 	if (p.type == Full_State)
-		return ReadFullPacketState((IFullNetworkPacket&)p);
+		return ReadFullPacket((IFullNetworkPacket&)p);
 	return false;
 }
 
@@ -41,27 +38,24 @@ bool INetworkDeltaComponent::ReadDeltaPacketState(IDeltaNetworkPacket& p)
 }
 
 
-bool INetworkDeltaComponent::ReadFullPacketState(IFullNetworkPacket& p)
-{
-	if (p.fullState.stateID < lastFullState->stateID) {
-		std::cout << "Bad State: " << p.fullState.stateID << " :: " << lastFullState->stateID << std::endl;
+bool INetworkDeltaComponent::ReadFullPacketState(IFullNetworkPacket& p) {
+	if (p.fullState.stateID < lastFullState->stateID) 
 		return false;
-	}
-	std::cout << "Good State: " << p.fullState.stateID << " :: " << lastFullState->stateID << std::endl;
 	return ReadFullPacket(p);
 }
 
 void INetworkDeltaComponent::UpdateStateHistory(int minID) {
 	for (auto i = stateHistory.begin(); i < stateHistory.end();) {
-		if ((*i)->stateID < minID)
+		if ((*i)->stateID < minID) {
+			delete* i;
 			i = stateHistory.erase(i);
+		}
 		else
 			++i;
 	}
 }
 
 bool INetworkDeltaComponent::GetNetworkState(int stateID, INetworkState* state) {
-
 	if (!state)
 		return false;
 

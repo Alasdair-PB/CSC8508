@@ -103,8 +103,7 @@ void GameServer::UpdateServer() {
 		}		
 		else if (type == ENetEventType::ENET_EVENT_TYPE_RECEIVE) 
 		{
-			std::cout << "Sever: client Packet received..." << std::endl;
-
+			//std::cout << "Sever: client Packet received..." << std::endl;
 			GamePacket* packet = (GamePacket*)event.packet->data;
 			ProcessPacket(packet, peer);
 		}		

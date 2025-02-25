@@ -11,6 +11,7 @@
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
 #endif
+#include "SaveManager.h"
 #include "PhysicsSystem.h"
 #include "Legacy/PlayerGameObject.h"
 #include "BoundsComponent.h"

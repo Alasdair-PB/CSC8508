@@ -14,6 +14,71 @@
 using namespace NCL;
 using namespace CSC8508;
 
+struct SerializedPointer{
+	std::string filePointer;
+	template <typename T>
+	void Convert(T* pointer) {
+
+	}
+};
+
+class ISerializable {
+public: 
+	virtual std::string Save(std::string folderPath) { return ""; }
+	virtual void Load(std::string folderPath, std::string name) {}
+};
+
+
+class SaveObject: public ISerializable {
+public:
+
+	struct MySaveStruct {
+		MySaveStruct() :x(0) {}
+		int x;
+		vector<std::string> filePointers;
+	};
+
+	SaveObject(int id, int x): x(x), id(id){}
+
+	void AddParent(ISerializable* object) { objects.push_back(object); }
+
+	void Load(std::string folderPath, std::string name) override {
+		//MySaveStruct loadedSaveData = SaveManager::LoadMyData<MySaveStruct>(name);
+		//for (std::string object : loadedSaveData.filePointers)
+		//	SaveManager::LoadMyData<MySaveStruct>(name);
+		//std::cout << loadedSaveData.x << std::endl;
+	}
+
+	std::string Save(std::string folderPath) override
+	{
+		std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";		
+		MySaveStruct saveInfo;
+		for (ISerializable* object : objects)
+			saveInfo.filePointers.push_back(object->Save(folderPath));
+		SaveManager::GameData saveData = SaveManager::CreateSaveDataAsset<MySaveStruct>(saveInfo);
+		SaveManager::SaveGameData(fileName, saveData);
+		return fileName;
+	}	
+	
+protected:
+	int id;
+	int x;
+	vector<ISerializable*> objects;
+
+};
+
+// Defaults to "game_data.gdmt" for test
+void TestSave() {
+	//SaveObject* objA = new SaveObject(1, 7);
+	///SaveObject* objB = new SaveObject(2, 64);
+	//objA->AddParent(objB);
+	//std::string fileName = objA->Save("");
+	//objA->Load("", fileName);
+
+	SaveManager::SaveGameData("game_data.gdmt", SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>("game_data.gdmt")[0] << std::endl;
+}
+
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
 {
 	world = new GameWorld();
@@ -46,7 +111,10 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	physics->UseGravity(true);
 	world->UpdateWorld(0.1f);
 	physics->Update(0.1f);
+
+	TestSave();
 }
+
 
 void TutorialGame::SetPause(bool state) {
 	inPause = state;

@@ -121,7 +121,6 @@ namespace NCL::CSC8508 {
 			return nullptr;
 		}
 
-
 		void AddChild(GameObject* child);
 		GameObject* TryGetParent();
 		void SetParent(GameObject* parent);
@@ -130,13 +129,10 @@ namespace NCL::CSC8508 {
 		bool HasTag(Tags::Tag tag);
 		template <typename T> bool HasComponent(T type);
 
-
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
 		void SetTag(Tags::Tag newTag) {  tag = newTag;}
 		Tags::Tag GetTag() const { return tag;}
-
-
 
 	protected:
 		virtual void OnAwake() {}
@@ -157,7 +153,7 @@ namespace NCL::CSC8508 {
 		int	worldID;
 
 		Layers::LayerID	layerID;
-		Tags::Tag	tag; // Change to vector
+		Tags::Tag tag; // Change to vector
 	};
 }
 

@@ -15,7 +15,7 @@ enum class RoomType {
     Boss,
     Normal
 };
-
+int maindun;
 // 房间类定义
 class Room {
 public:

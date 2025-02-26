@@ -26,6 +26,9 @@
 
 #include "RenderObject.h"
 
+#include "Room.h"
+#include "dungeon.h"
+
 
 using namespace NCL;
 using namespace CSC8508;
@@ -319,4 +322,5 @@ int main(int argc, char** argv)
 		UpdateWindow(w, g);
 	}
 	Window::DestroyGameWindow();
+	
 }

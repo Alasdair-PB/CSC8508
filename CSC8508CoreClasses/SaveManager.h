@@ -23,11 +23,61 @@ namespace NCL::CSC8508 {
             GameData() : typeID(typeid(void)), dataSize(0) {}
         };
 
-        template <typename T, typename = void>
-        struct is_container : std::false_type {};
+        template <typename T, typename = void> struct is_container : std::false_type {};
+
+        template <typename T> struct is_container<T, std::void_t<
+            typename T::value_type, decltype(std::declval<T>().size()), decltype(std::declval<T>().data())>> : std::true_type {};
 
         template <typename T>
-        struct is_container<T, std::void_t<typename T::value_type, decltype(std::declval<T>().size()), decltype(std::declval<T>().data())>> : std::true_type {};
+        static void SerializeContainer(const T& container, std::vector<uint8_t>& data, uint8_t*& dataPtr, uint32_t containerSize) {
+            std::memcpy(dataPtr, container.data(), containerSize * sizeof(typename T::value_type));
+            dataPtr += containerSize * sizeof(typename T::value_type);
+        }
+
+        static void SerializeContainer(const std::vector<std::string>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
+            for (const auto& str : container) {
+                uint32_t strLength = str.size();
+                std::memcpy(dataPtr, &strLength, sizeof(strLength));
+                dataPtr += sizeof(strLength);
+                std::memcpy(dataPtr, str.data(), strLength);
+                dataPtr += strLength;
+            }
+        }
+
+        template <typename T, typename... Members>
+        static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
+            GameData item;
+            item.typeID = std::type_index(typeid(T));
+            item.dataSize = 0;
+
+            ([&] {
+                const auto& container = value.*members;
+                item.dataSize += sizeof(uint32_t); 
+                if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
+                    for (const auto& str : container) {
+                        item.dataSize += sizeof(uint32_t);
+                        item.dataSize += str.size();
+                    }
+                }
+                else {
+                    item.dataSize += container.size() * sizeof(typename std::decay_t<decltype(container)>::value_type);
+                }
+                }(), ...);
+
+            item.data.resize(item.dataSize);
+            uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
+
+            ([&] {
+                const auto& container = value.*members;
+                uint32_t containerSize = container.size();
+                std::memcpy(dataPtr, &containerSize, sizeof(containerSize));
+                dataPtr += sizeof(containerSize);
+
+                SerializeContainer(container, item.data, dataPtr, containerSize);
+                }(), ...);
+
+            return item;
+        }
 
         template <typename T>
         static GameData CreateSaveDataAsset(const T& value) {
@@ -39,14 +89,6 @@ namespace NCL::CSC8508 {
                 uint32_t containerSize = value.size();
                 std::memcpy(item.data.data(), &containerSize, sizeof(containerSize));
                 std::memcpy(item.data.data() + sizeof(containerSize), value.data(), containerSize * sizeof(typename T::value_type));
-            }
-            else if constexpr (std::is_class_v<T>) {
-                // Rework paramters to declare members names
-                item.dataSize = sizeof(uint32_t) + value.vec.size() * sizeof(typename T::vec::value_type);
-                item.data.resize(item.dataSize);
-                uint32_t containerSize = value.vec.size();
-                std::memcpy(item.data.data(), &containerSize, sizeof(containerSize));
-                std::memcpy(item.data.data() + sizeof(containerSize), value.vec.data(), containerSize * sizeof(typename T::vec::value_type));
             }
             else {
                 item.dataSize = sizeof(value);
@@ -104,57 +146,60 @@ namespace NCL::CSC8508 {
             return true;
         }
 
-        static bool LoadCustomFormat(const std::string& filename, std::vector<GameData>& entries) {
-            std::ifstream file(filename, std::ios::binary);
-            if (!file) {
-                std::cerr << "Error: Could not open file " << filename << std::endl;
-                return false;
+        template <typename T, typename... Members>
+        static T LoadMyData(const std::string& filename, Members T::*... members) {
+            GameData loadedData;
+            if (!LoadGameData(filename, loadedData)) throw std::runtime_error("Failed to load game data");
+            if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");
+
+            T loadedStruct;
+            size_t offset = 0;
+
+            if constexpr (sizeof...(members) == 0) {
+                if constexpr (std::is_trivially_copyable_v<T>)
+                    std::memcpy(&loadedStruct, loadedData.data.data() + offset, sizeof(T));
+                else
+                    static_assert(sizeof(T) == 0, "Unsupported type for deserialization");
             }
-            uint32_t magic;
-            uint16_t version;
-            uint32_t count;
-            file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
-            file.read(reinterpret_cast<char*>(&version), sizeof(version));
-            file.read(reinterpret_cast<char*>(&count), sizeof(count));
+            else {
+                ([&] {
+                    auto& container = loadedStruct.*members;
+                    uint32_t containerSize;
+                    std::memcpy(&containerSize, loadedData.data.data() + offset, sizeof(containerSize));
+                    offset += sizeof(containerSize);
+                    container.resize(containerSize);
 
-            if (magic != 0x47444D54) {
-                std::cerr << "Error: Invalid file format!" << std::endl;
-                return false;
+                    if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
+                        for (auto& str : container) {
+                            uint32_t strLength;
+                            std::memcpy(&strLength, loadedData.data.data() + offset, sizeof(strLength));
+                            offset += sizeof(strLength);
+
+                            str.resize(strLength);
+                            std::memcpy(str.data(), loadedData.data.data() + offset, strLength);
+                            offset += strLength;
+                        }
+                    }
+                    else {
+                        std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type));
+                        offset += containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type);
+                    }
+                    }(), ...);
             }
-
-            entries.clear();
-            for (uint32_t i = 0; i < count; i++) {
-                GameData entry;
-                file.read(reinterpret_cast<char*>(&entry.typeID), sizeof(entry.typeID));
-                file.read(reinterpret_cast<char*>(&entry.dataSize), sizeof(entry.dataSize));
-                entry.data.resize(entry.dataSize);
-                file.read(entry.data.data(), entry.dataSize);
-
-                entries.push_back(entry);
-            }
-            uint32_t checksum;
-            file.read(reinterpret_cast<char*>(&checksum), sizeof(checksum));
-
-            if (checksum != (magic ^ version ^ count)) 
-                std::cerr << "Warning: Checksum mismatch. File may be corrupted!" << std::endl;
-            file.close();
-            return true;
+            return loadedStruct;
         }
 
         template <typename T>
         static T LoadMyData(const std::string& filename) {
             GameData loadedData;
-            if (!LoadGameData(filename, loadedData)) 
-                throw std::runtime_error("Failed to load game data");
-            if (loadedData.typeID != std::type_index(typeid(T))) 
-                throw std::runtime_error("Type mismatch in game data");
+            if (!LoadGameData(filename, loadedData)) throw std::runtime_error("Failed to load game data");
+            if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");
 
             if constexpr (std::is_trivially_copyable_v<T>) {
                 T loadedType;
                 std::memcpy(&loadedType, loadedData.data.data(), sizeof(T));
                 return loadedType;
-            }
-            else if constexpr (is_container<T>::value) {
+            } else if constexpr (is_container<T>::value) {
                 uint32_t size;
                 std::memcpy(&size, loadedData.data.data(), sizeof(size));
 
@@ -162,67 +207,8 @@ namespace NCL::CSC8508 {
                 container.resize(size);
                 std::memcpy(container.data(), loadedData.data.data() + sizeof(size), size * sizeof(typename T::value_type));
                 return container;
-            }
-            else if constexpr (std::is_class_v<T>) {
-                T loadedStruct;
-                size_t offset = 0;
-
-                std::memcpy(&loadedStruct, loadedData.data.data() + offset, sizeof(T) - sizeof(typename T::vec));
-                offset += sizeof(T) - sizeof(typename T::vec);
-                uint32_t vectorSize;
-                std::memcpy(&vectorSize, loadedData.data.data() + offset, sizeof(vectorSize));
-                offset += sizeof(vectorSize);
-                loadedStruct.vec.resize(vectorSize);
-                std::memcpy(loadedStruct.vec.data(), loadedData.data.data() + offset, vectorSize * sizeof(typename T::vec::value_type));
-                return loadedStruct;
-            }
-            else 
+            } else 
                 static_assert(sizeof(T) == -1, "Unsupported type for deserialization");
-        }
-
-        template <typename T>
-        struct HasPointerMember {
-            template <typename U, typename = void>
-            struct check_pointer_members : std::false_type {};
-            template <typename U>
-            struct check_pointer_members<U, std::enable_if_t<
-                std::is_pointer<typename std::remove_reference<decltype(U::x)>::type>::value
-                >> : std::true_type {};
-            static constexpr bool value = check_pointer_members<T>::value;
-        };
-
-        template <typename T>
-        static void LoadData() {
-            std::vector<GameData> loadedData;
-            if (LoadCustomFormat("game_data.gdmt", loadedData)) {
-                for (const auto& entry : loadedData) {
-                    if (entry.typeID == std::type_index(typeid(T))) {
-                        T loadedType;
-                        std::memcpy(&loadedType, entry.data.data(), sizeof(loadedType));
-                        std::cout << "Loaded type value: " << loadedType << std::endl;
-                    }
-                }
-            }
-        }        
-        
-        template <typename... Types>
-        static std::tuple<Types...> LoadAllData() {
-            std::vector<GameData> loadedData;
-            std::tuple<Types...> loadedTypes;
-            if (LoadCustomFormat("game_data.gdmt", loadedData)) {
-                int index = 0;
-                (..., (std::get<Types>(loadedTypes) = [&]() {
-                    for (const auto& entry : loadedData) {
-                        if (entry.typeID == std::type_index(typeid(Types))) {
-                            Types loadedType;
-                            std::memcpy(&loadedType, entry.data.data(), sizeof(loadedType));
-                            return loadedType;
-                        }
-                    }
-                    return Types();
-                    }()));
-            }
-            return loadedTypes;
         }
 
     private:

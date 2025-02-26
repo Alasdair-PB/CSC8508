@@ -4,49 +4,10 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-#include<Room.h>
+
 #include <algorithm>
 
-bool Dungeon::checkOverlap(Room* a, Room* b) {
-    return !(a->x + a->width < b->x || b->x + b->width < a->x ||
-        a->y + a->height < b->y || b->y + b->height < a->y);
-}
 
-void Dungeon::generateRooms(int roomCount, int minSize, int maxSize) {
-    for (int i = 0; i < roomCount; ++i) {
-        int w = minSize + std::rand() % (maxSize - minSize + 1);
-        int h = minSize + std::rand() % (maxSize - minSize + 1);
-        int x = std::rand() % (gridWidth - w);
-        int y = std::rand() % (gridHeight - h);
-
-        Room* newRoom = new Room(x, y, w, h);
-        bool overlap = false;
-        for (auto room : rooms) {
-            if (checkOverlap(newRoom, room)) {
-                overlap = true;
-                break;
-            }
-        }
-        if (!overlap) {
-            rooms.push_back(newRoom);
-        }
-        else {
-            delete newRoom; // 如果重叠则丢弃该房间
-        }
-    }
-}
-
-void Dungeon::connectRooms() {
-    // 可以按照房间中心点排序，然后依次连接
-    for (size_t i = 1; i < rooms.size(); ++i) {
-        Room* roomA = rooms[i - 1];
-        Room* roomB = rooms[i];
-        // 将 roomA 与 roomB 连接，比如将 roomB 加入 roomA 的邻接列表
-        roomA->neighbors.push_back(roomB);
-        roomB->neighbors.push_back(roomA);
-        // 此处可以添加走廊绘制的逻辑，例如记录走廊在网格中的占用单元
-    }
-}
 // 主函数：运行地下城生成示例
 // ----------------------------
 int creatroom() {

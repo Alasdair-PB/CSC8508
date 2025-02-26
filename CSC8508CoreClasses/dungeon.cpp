@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-
+#include<Room.h>
 #include <algorithm>
 
 bool Dungeon::checkOverlap(Room* a, Room* b) {

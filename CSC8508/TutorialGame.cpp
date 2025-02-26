@@ -43,19 +43,26 @@ public:
 	void AddParent(ISerializable* object) { objects.push_back(object); }
 
 	void Load(std::string folderPath, std::string name) override {
-		//MySaveStruct loadedSaveData = SaveManager::LoadMyData<MySaveStruct>(name);
-		//for (std::string object : loadedSaveData.filePointers)
-		//	SaveManager::LoadMyData<MySaveStruct>(name);
-		//std::cout << loadedSaveData.x << std::endl;
+		MySaveStruct loadedSaveData = SaveManager::LoadMyData<MySaveStruct>(name, &MySaveStruct::filePointers);
+		for (int i = 0; i < loadedSaveData.filePointers.size(); i++) {
+			std::cout << loadedSaveData.x << std::endl;
+			std::cout << loadedSaveData.filePointers[i] << std::endl;
+
+			if (i >= objects.size()) break;
+			objects[i]->Load(folderPath, loadedSaveData.filePointers[i]);
+		}
+		std::cout << loadedSaveData.x << std::endl;
 	}
 
 	std::string Save(std::string folderPath) override
 	{
 		std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";		
 		MySaveStruct saveInfo;
+
+		saveInfo.x = x;
 		for (ISerializable* object : objects)
 			saveInfo.filePointers.push_back(object->Save(folderPath));
-		SaveManager::GameData saveData = SaveManager::CreateSaveDataAsset<MySaveStruct>(saveInfo);
+		SaveManager::GameData saveData = SaveManager::CreateSaveDataAsset(saveInfo, &MySaveStruct::filePointers);
 		SaveManager::SaveGameData(fileName, saveData);
 		return fileName;
 	}	
@@ -69,14 +76,17 @@ protected:
 
 // Defaults to "game_data.gdmt" for test
 void TestSave() {
-	//SaveObject* objA = new SaveObject(1, 7);
-	///SaveObject* objB = new SaveObject(2, 64);
-	//objA->AddParent(objB);
-	//std::string fileName = objA->Save("");
-	//objA->Load("", fileName);
+	SaveObject* objA = new SaveObject(1, 7);
+	SaveObject* objB = new SaveObject(2, 64);
+	objA->AddParent(objB);
+	std::string fileName = objA->Save("");
+	objA->Load("", fileName);
 
 	SaveManager::SaveGameData("game_data.gdmt", SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>("game_data.gdmt")[0] << std::endl;
+
+	SaveManager::SaveGameData("game_data_int.gdmt", SaveManager::CreateSaveDataAsset<int>(45));
+	std::cout << SaveManager::LoadMyData<int>("game_data_int.gdmt") << std::endl;
 }
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 

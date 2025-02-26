@@ -28,7 +28,6 @@ void GameClient::ReceivePacket(int type, GamePacket* payload, int source)
 		SetClientId* recievedPacket = (SetClientId*)payload;
 		peerID = recievedPacket->clientPeerId;
 		AcknowledgePacket* ackPacket = new AcknowledgePacket(peerID);
-		//std::cout << "Sending ackowledge package" << std::endl;
 		SendPacket(*ackPacket);
 		delete ackPacket;
 	}
@@ -44,7 +43,6 @@ void GameClient::UpdateClient()
 		if (event.type == ENET_EVENT_TYPE_CONNECT) 
 			std::cout << "Connected to server!" << std::endl;
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE) {
-			//std::cout << "Client: Packet received..." << std::endl;
 			GamePacket* packet = (GamePacket*)event.packet->data;
 			ProcessPacket(packet);
 		}
@@ -52,7 +50,6 @@ void GameClient::UpdateClient()
 	}
 }
 
-// Modify for different channel when not local?
 void GameClient::SendPacket(GamePacket&  payload) 
 {
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);

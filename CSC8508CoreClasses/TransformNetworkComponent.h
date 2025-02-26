@@ -107,7 +107,6 @@ namespace NCL::CSC8508
 			fp->fullState.orientation = myObject.GetTransform().GetOrientation();
 			fp->fullState.stateID = lastFullState->stateID;
 
-			//std::cout << "Writing Full Packet:" << componentID << ", incremented to: " << lastFullState->stateID << std::endl;
 			SetPacketOwnership(fp);
 			packets.push_back(fp);
 			return packets;
@@ -152,11 +151,7 @@ namespace NCL::CSC8508
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override {
 			FullPacket p = ((FullPacket&) ifp);		
 
-			if (p.fullState.stateID < lastFullState->stateID) {
-				//std::cout << "Bad State: " << p.fullState.stateID << " :: " << lastFullState->stateID << std::endl;
-				return false;
-			}
-			//std::cout << "Good State: " << p.fullState.stateID << " :: " << lastFullState->stateID << std::endl;
+			if (p.fullState.stateID < lastFullState->stateID) return false;
 
 			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;

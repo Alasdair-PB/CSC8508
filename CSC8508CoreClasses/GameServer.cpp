@@ -97,13 +97,11 @@ void GameServer::UpdateServer() {
 
 			if (it != playerPeers.end()) 
 				playerPeers.erase(it);
-
 			std::cout << "player disconnected" << std::endl;
 
 		}		
 		else if (type == ENetEventType::ENET_EVENT_TYPE_RECEIVE) 
 		{
-			//std::cout << "Sever: client Packet received..." << std::endl;
 			GamePacket* packet = (GamePacket*)event.packet->data;
 			ProcessPacket(packet, peer);
 		}		

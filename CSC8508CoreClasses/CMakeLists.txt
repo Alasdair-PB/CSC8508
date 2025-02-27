@@ -216,6 +216,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
+include_directories("../ImGui/")
 
 
 if(MSVC)

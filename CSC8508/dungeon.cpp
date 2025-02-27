@@ -1,4 +1,3 @@
-#include "C:/Users/12022/source/repos/CSC8508/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx"
 #include "dungeon.h"
 #include <iostream>
 #include <vector>
@@ -7,6 +6,7 @@
 
 #include <algorithm>
 
+using namespace NCL::CSC8508::DungeonGen;
 
 // 主函数：运行地下城生成示例
 // ----------------------------

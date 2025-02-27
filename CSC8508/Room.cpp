@@ -1,12 +1,12 @@
-#include "C:/Users/12022/source/repos/CSC8508/CSC8508CoreClasses/CMakeFiles/CSC8508CoreClasses.dir/Debug/cmake_pch.hxx"
 #include "Room.h"
 #include "dungeon.h"
 #include "GameObject.h"
-#include "Player.h"
+
+using namespace NCL::CSC8508::DungeonGen;
 
 // 主函数：运行地下城生成示例
 // ----------------------------
-int maindun() {
+int Room::maindun() {
     // 设置地下城总体网格尺寸
     const int dungeonWidth = 100;
     const int dungeonHeight = 100;

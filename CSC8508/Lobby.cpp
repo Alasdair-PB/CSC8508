@@ -201,16 +201,7 @@ void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data) {
     }
 }
 
-void OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data)
-{
-    // Check if the search completed successfully
-    if (Data->ResultCode == EOS_EResult::EOS_Success) {
-        std::cout << "[OnFindLobbiesComplete] Lobby found." << std::endl;
-    }
-    else {
-        std::cerr << "[OnFindLobbiesComplete] Search failed with error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
-    }
-}
+EOS_HLobbySearch LobbySearchHandle = nullptr;
 
 void CreateLobbySearch() {
     std::cout << "[CreateLobbySearch] Attempting to create a lobby search..." << std::endl;
@@ -238,14 +229,14 @@ void CreateLobbySearch() {
     SearchOptions.MaxResults = 10;  // Max number of lobbies to return
 
     // Create the lobby search handle
-    EOS_HLobbySearch LobbySearchHandle = nullptr;
+    
     EOS_EResult Result = EOS_Lobby_CreateLobbySearch(LobbyHandle, &SearchOptions, &LobbySearchHandle);
 
     if (Result == EOS_EResult::EOS_Success) {
         std::cout << "[CreateLobbySearch] Lobby search created successfully." << std::endl;
 
         // Search for the specific lobby ID
-        const char* TargetLobbyId = "ed5008ea1af545d382bcd33ec7ba0b76";  // The given lobby ID
+        const char* TargetLobbyId = "0f58e7c1e041495a967283569e557928";  // The given lobby ID
 
         // Create and set up the SetLobbyIdOptions structure
         EOS_LobbySearch_SetLobbyIdOptions SetLobbyIdOptions = {};
@@ -269,5 +260,46 @@ void CreateLobbySearch() {
     }
 }
 
+void OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data) {
+    if (Data->ResultCode == EOS_EResult::EOS_Success) {
+        std::cerr << "[OnFindLobbiesComplete] Lobby search Success.";
 
+        EOS_HLobbyDetails LobbyDetailsHandle = nullptr;
 
+        EOS_LobbySearch_CopySearchResultByIndexOptions CopyOptions = {};
+        CopyOptions.ApiVersion = EOS_LOBBYSEARCH_COPYSEARCHRESULTBYINDEX_API_LATEST;
+        CopyOptions.LobbyIndex = 0;
+
+        EOS_EResult Result = EOS_LobbySearch_CopySearchResultByIndex(LobbySearchHandle, &CopyOptions, &LobbyDetailsHandle);
+
+        if (Result == EOS_EResult::EOS_Success) {
+            std::cerr << "[LobbyData] Lobby Details Retrieved\n";
+
+            // Now retrieve the lobby details
+            EOS_LobbyDetails_Info* LobbyInfo = nullptr;
+            EOS_LobbyDetails_CopyInfoOptions InfoOptions = {};
+            InfoOptions.ApiVersion = EOS_LOBBYDETAILS_COPYINFO_API_LATEST;
+
+            EOS_EResult InfoResult = EOS_LobbyDetails_CopyInfo(LobbyDetailsHandle, &InfoOptions, &LobbyInfo);
+
+            if (InfoResult == EOS_EResult::EOS_Success && LobbyInfo) {
+                std::cerr << "[LobbyInfo] Lobby ID: " << LobbyInfo->LobbyId << "\n";
+                std::cerr << "[LobbyInfo] Max Players: " << LobbyInfo->MaxMembers << "\n";
+                std::cerr << "[LobbyInfo] Owner ID: " << LobbyInfo->LobbyOwnerUserId << "\n";
+
+                // Free the memory allocated for the lobby info structure
+                EOS_LobbyDetails_Info_Release(LobbyInfo);
+            }
+            else {
+                std::cerr << "[ERROR] Failed to retrieve lobby info. Error: " << EOS_EResult_ToString(InfoResult) << std::endl;
+            }
+        }
+        else
+        {
+            std::cerr << "[LobbyData] Failed to fetch lobby data. Error: " << EOS_EResult_ToString(Result) << std::endl;
+        }
+    }
+    else {
+        std::cerr << "[OnFindLobbiesComplete] Lobby search failed. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
+    }
+}

@@ -108,7 +108,13 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 
 
 void GameWorld::UpdateWorld(float dt){
-	ComponentManager::OperateOnBufferContentsDynamicType<IComponent>(
+
+	ComponentManager::OperateOnAllIComponentBufferOperators(
+		[&](IComponent* c) {
+			if (c->IsEnabled())
+				c->InvokeEarlyUpdate(dt);
+		});
+	ComponentManager::OperateOnAllIComponentBufferOperators(
 		[&](IComponent* c) {
 			if (c->IsEnabled()) 
 				c->InvokeUpdate(dt);

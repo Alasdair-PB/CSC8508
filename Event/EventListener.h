@@ -5,9 +5,10 @@
 #ifndef EVENTLISTENER_H
 #define EVENTLISTENER_H
 
-template <typename E>
-class EventListener
-{
+#include "Event.h"
+
+template <EventType E>
+class EventListener {
 public:
     virtual ~EventListener() = default;
 

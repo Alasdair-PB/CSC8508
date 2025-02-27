@@ -1,4 +1,6 @@
 #pragma once
+#include "Event.h"
+
 //#include "./enet/enet.h"
 struct _ENetHost;
 struct _ENetPeer;
@@ -6,18 +8,16 @@ struct _ENetEvent;
 
 enum BasicNetworkMessages {
 	None,
-	Hello,
 	Message,
-	String_Message,
-	Delta_State,	//1 byte per channel since the last state
-	Full_State,		//Full transform etc
-	Received_State, //received from a client, informs that its received packet n
+	Spawn_Object,
+	Delta_State,	
+	Full_State,		
+	Received_State,
 	Player_Connected,
 	Player_Disconnected,
-	Acknowledge_State,
+	Component_Event,
 	Shutdown
 };
-
 
 struct GamePacket {
 	short size;
@@ -37,6 +37,14 @@ struct GamePacket {
 	}
 };
 
+struct SetClientId : public GamePacket {
+	int clientPeerId;
+
+	SetClientId() {
+		size = sizeof(SetClientId) - sizeof(GamePacket);
+		type = Player_Connected;
+	}
+};
 
 struct AcknowledgePacket : public GamePacket {
 	int stateID;
@@ -52,6 +60,13 @@ struct AcknowledgePacket : public GamePacket {
 	}
 };
 
+class ClientConnectedEvent : Event {
+public:
+	ClientConnectedEvent(int clientId) { this->clientId = clientId; }
+	int GetClientId() { return clientId;  }
+protected:
+	int clientId;
+};
 
 class PacketReceiver {
 public:
@@ -70,10 +85,16 @@ public:
 	void RegisterPacketHandler(int msgID, PacketReceiver* receiver) {
 		packetHandlers.insert(std::make_pair(msgID, receiver));
 	}
+
+	void SetPeerId(int newId) { peerID = newId; }
+	int GetPeerId() { return peerID; }
+
+
 protected:
 	NetworkBase();
 	~NetworkBase();
 
+	int peerID = -1;
 	bool ProcessPacket(GamePacket* p, int peerID = -1);
 
 	typedef std::multimap<int, PacketReceiver*>::const_iterator PacketHandlerIterator;

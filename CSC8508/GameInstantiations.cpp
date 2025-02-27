@@ -1,23 +1,21 @@
 #include "TutorialGame.h"
-#include "GameWorld.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-#include "TextureLoader.h"
-#include "Legacy/EnemyGameObject.h"
 
-#include "Legacy/Kitten.h"
+#include "INetworkComponent.h"
+#include "InputNetworkComponent.h"
+#include "TransformNetworkComponent.h"
 
-#include "PositionConstraint.h"
-#include "OrientationConstraint.h"
-#include "Legacy/StateGameObject.h"
 
 using namespace NCL;
 using namespace CSC8508;
+
 
 GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dimensions)
 {
 	navMesh = new NavigationMesh("smalltest.navmesh");
 	GameObject* navMeshObject = new GameObject();
+
 	for (size_t i = 0; i < navigationMesh->GetSubMeshCount(); ++i)
 	{
 		if (navigationMesh->GetSubMesh(i)->count != 36)
@@ -48,16 +46,35 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 	return navMeshObject;
 }
 
-GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
+float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
+
+GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
 	float meshSize = 1.0f;
 	float inverseMass = 0.5f;
 
 	players = new PlayerGameObject();
-	CapsuleVolume* volume = new CapsuleVolume(2.5f, 0.5f);
+	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 
 	PhysicsComponent* phys = players->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = players->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
+	int componentIdCount = 0;
+
+	if (spawnData)
+	{
+		int unqiueId = CantorPairing(spawnData->objId, componentIdCount);
+		componentIdCount++;
+		InputNetworkComponent* input = players->AddComponent<InputNetworkComponent>(
+			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+
+		unqiueId = CantorPairing(spawnData->objId, componentIdCount);
+		componentIdCount++;
+		TransformNetworkComponent* networkTransform = players->AddComponent<TransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+	}
+	else {
+		InputComponent* input = players->AddComponent<InputComponent>(&controller);
+	}
 
 	players->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
 	players->SetLayerID(Layers::LayerID::Player);
@@ -73,7 +90,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	bounds->AddToIgnoredLayers(Layers::Enemy);
 
 	players->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
-	players->SetController(controller);
 
 	world->AddGameObject(players);
 	return players;

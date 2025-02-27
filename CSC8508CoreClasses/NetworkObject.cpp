@@ -3,28 +3,25 @@
 using namespace NCL;
 using namespace CSC8508;
 
-
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
+NetworkObject::NetworkObject(GameObject& o, int objId, int ownId) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;
-	networkID   = id;
+	objectID = objId;
+	ownerID = ownId;
 }
 
-NetworkObject::~NetworkObject()	{
-}
+NetworkObject::~NetworkObject()	{}
 
 bool NetworkObject::WritePacket(GamePacket** p, bool deltaFrame, int stateID) {
-	if (deltaFrame) {
-		if (!WriteDeltaPacket(p, stateID)) 
-			return WriteFullPacket(p);
-	}
+	if (deltaFrame) 
+		return WriteDeltaPacket(p, stateID) ? true : WriteFullPacket(p);
 	return WriteFullPacket(p);
 }
 
 bool NetworkObject::WriteFullPacket(GamePacket** p) {
 	FullPacket* fp = new FullPacket();
 
-	fp->objectID = networkID;
+	fp->objectID = objectID;
 	fp->fullState.position = object.GetTransform().GetPosition();
 	fp->fullState.orientation = object.GetTransform().GetOrientation();
 	fp->fullState.stateID = lastFullState.stateID++;
@@ -35,12 +32,12 @@ bool NetworkObject::WriteFullPacket(GamePacket** p) {
 bool NetworkObject::WriteDeltaPacket(GamePacket** p, int stateID) {
 	DeltaPacket* dp = new DeltaPacket();
 	NetworkState state;
-	if (!GetNetworkState(stateID, state)) {
-		return false; // can't delta!
-	}
+
+	if (!GetNetworkState(stateID, state)) 
+		return false;
 
 	dp->fullID = stateID;
-	dp->objectID = networkID;
+	dp->objectID = objectID;
 
 	Vector3 currentPos = object.GetTransform().GetPosition();
 	Quaternion currentOrientation = object.GetTransform().GetOrientation();
@@ -69,9 +66,14 @@ bool NetworkObject::ReadPacket(GamePacket& p) {
 }
 
 bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
+
+	std::cout << p.objectID << std::endl;
+
+	if (p.objectID != objectID)
+		return false;
+
 	if (p.fullID != lastFullState.stateID) 
 		return false; 
-
 	UpdateStateHistory(p.fullID);
 
 	Vector3 fullPos = lastFullState.position;
@@ -93,6 +95,11 @@ bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
 
 bool NetworkObject::ReadFullPacket(FullPacket& p) 
 {
+	std::cout << p.objectID << std::endl;
+
+	if (p.objectID != objectID)
+		return false;
+
 	if (p.fullState.stateID < lastFullState.stateID) 
 		return false; 
 

@@ -3,6 +3,7 @@
 #include "Constraint.h"
 #include "CollisionDetection.h"
 #include "Camera.h"
+#include "ComponentManager.h"
 
 
 using namespace NCL;
@@ -46,9 +47,15 @@ void GameWorld::AddGameObject(GameObject* o) {
 	if (bounds)
 		boundsComponents.emplace_back(bounds);
 
-	if (phys)
+	if (phys) 
 		physicsComponents.emplace_back(phys);
 
+	auto newComponents = o->GetAllComponents();
+
+	for (IComponent* component : newComponents) {
+		this->components.push_back(component);
+		component->InvokeOnAwake();
+	}
 	o->InvokeOnAwake();
 }
 
@@ -68,6 +75,14 @@ void GameWorld::GetPhysicsIterators(
 	last = physicsComponents.end();
 }
 
+void GameWorld::GetINetIterators(
+	INetIterator& first,
+	INetIterator& last) const {
+
+	first = networkComponents.begin();
+	last = networkComponents.end();
+}
+
 void GameWorld::GetBoundsIterators(
 	BoundsIterator& first,
 	BoundsIterator& last) const {
@@ -84,11 +99,6 @@ void GameWorld::GetObjectIterators(
 	last	= gameObjects.end();
 }
 
-void GameWorld::OperateOnPhysicsContents(PhysicsComponentFunc f) {
-	for (PhysicsComponent* g : physicsComponents) {
-		f(g);
-	}
-}
 
 void GameWorld::OperateOnContents(GameObjectFunc f) {
 	for (GameObject* g : gameObjects) {
@@ -96,7 +106,13 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 	}
 }
 
+
 void GameWorld::UpdateWorld(float dt){
+	ComponentManager::OperateOnBufferContentsDynamicType<IComponent>(
+		[&](IComponent* c) {
+			if (c->IsEnabled()) 
+				c->InvokeUpdate(dt);
+		});
 	OperateOnContents(
 		[&](GameObject* o) {
 			if (o->IsEnabled()) {

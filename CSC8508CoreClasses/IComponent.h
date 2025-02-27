@@ -6,12 +6,11 @@
 #define ICOMPONENT_H
 
 #include "Transform.h"
+#include "GameObject.h"
+#include <unordered_set>
 
 namespace NCL::CSC8508 
 {
-
-	class GameObject;
-
 	class IComponent
 	{
 	public:
@@ -73,6 +72,15 @@ namespace NCL::CSC8508
 		*/
 		virtual const char* GetType() const {
 			return typeid(*this).name();
+		}
+
+		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const {
+			static std::unordered_set<std::type_index> types = { std::type_index(typeid(IComponent)) };
+			return types;
+		}
+
+		bool IsDerived(const std::type_info& typeInfo) const {
+			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
 
 	protected:

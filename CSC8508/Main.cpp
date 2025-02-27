@@ -216,79 +216,6 @@ void TestBehaviourTree()
 
 #pragma endregion
 
-#pragma region Networking
-
-struct StringPacket : public GamePacket {
-	char stringData[256];
-
-	StringPacket(const std::string& message) {
-		type = BasicNetworkMessages::String_Message;
-		size = (short)message.length();
-
-		memcpy(stringData, message.data(), size);
-	};
-
-	std::string const GetStringFromData() {
-		std::string realString(stringData);
-		realString.resize(size);
-		return realString;
-	}
-};
-
-
-class TestPacketReceiver : public PacketReceiver {
-public:
-	TestPacketReceiver(std::string name) {
-		this->name = name;
-	}
-
-	void ReceivePacket(int type, GamePacket* payload, int source) 
-	{
-		if (type == String_Message) 
-		{
-			StringPacket* realPacket = (StringPacket*)payload;
-			std::string msg = realPacket->GetStringFromData();
-			std::cout << name << " received message: " << msg << std::endl;
-		}
-	}
-protected:
-	std::string name;
-};
-
-void TestNetworking() 
-{
-	NetworkBase::Initialise();
-
-	TestPacketReceiver serverReceiver("Server");
-	TestPacketReceiver clientReceiver("Client");
-
-	int port = NetworkBase::GetDefaultPort();
-
-	GameServer* server = new GameServer(port, 1);
-	GameClient* client = new GameClient();
-
-	server->RegisterPacketHandler(String_Message, &serverReceiver);
-	client->RegisterPacketHandler(String_Message, &clientReceiver);
-
-	bool canConnect = client->Connect(127, 0, 0, 1, port);
-
-	for (int i = 0; i < 100; ++i) 
-	{
-		GamePacket packet =  (StringPacket("Server says hello! " + std::to_string(i)));
-		StringPacket packetB = StringPacket("Client says hello! " + std::to_string(i));
-
-		server->SendGlobalPacket(packet);
-		client->SendPacket(packetB);
-
-		server->UpdateServer();
-		client->UpdateClient();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	NetworkBase::Destroy();
-}
-#pragma  endregion
-
 
 void UpdateWindow(Window* w, NetworkedGame* g)
 {
@@ -307,12 +234,12 @@ int main(int argc, char** argv)
 	Window* w = Window::CreateGameWindow(initInfo);
 	NetworkedGame* g = new NetworkedGame();
 
-	if (!w->HasInitialised()) 
+	if (!w->HasInitialised())
 		return -1;
-		
+
 	w->ShowOSPointer(true);
 	w->LockMouseToWindow(true);
-	w->GetTimer().GetTimeDeltaSeconds(); 
+	w->GetTimer().GetTimeDeltaSeconds();
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{

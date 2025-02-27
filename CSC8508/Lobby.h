@@ -11,9 +11,10 @@
 extern EOS_HPlatform PlatformHandle;
 extern EOS_ProductUserId LocalUserId;
 
-void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data);
-void OnAuthLoginComplete(const EOS_Auth_LoginCallbackInfo* Data);
-void LoginAnonymous();
-void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data);
-void CreateLobby();
 void StartEOS();
+void LoginAnonymous();
+void OnAuthLoginComplete(const EOS_Auth_LoginCallbackInfo* Data);
+void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data);
+void CreateLobby();
+void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data);
+void CreateLobbySearch();

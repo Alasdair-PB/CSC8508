@@ -6,6 +6,59 @@
 EOS_HPlatform PlatformHandle = nullptr;
 EOS_ProductUserId LocalUserId = nullptr;
 
+void StartEOS() {
+    std::cout << "[StartEOS] Initializing EOS SDK..." << std::endl;
+
+    EOS_InitializeOptions InitOptions = {};
+    InitOptions.ApiVersion = EOS_INITIALIZE_API_LATEST;
+    InitOptions.ProductName = "Uni Group Project";
+    InitOptions.ProductVersion = "1.0";
+
+    EOS_EResult InitResult = EOS_Initialize(&InitOptions);
+    if (InitResult != EOS_EResult::EOS_Success) {
+        std::cerr << "[ERROR] Failed to initialize EOS SDK: " << EOS_EResult_ToString(InitResult) << std::endl;
+        return;
+    }
+
+    EOS_Platform_Options PlatformOptions = {};
+    PlatformOptions.ApiVersion = EOS_PLATFORM_OPTIONS_API_LATEST;
+    PlatformOptions.ProductId = "944c0fd27c634870ab2559503cfc2f03";
+    PlatformOptions.SandboxId = "a1aba763c9a34a298e3386c3bcd724f4";
+    PlatformOptions.DeploymentId = "44dcc0582fd84895a9f9663ad079c38c";
+    PlatformOptions.ClientCredentials.ClientId = "xyza7891EdqWCp9ClnPHdgcPnqtVxvLJ";
+    PlatformOptions.ClientCredentials.ClientSecret = "/FFpHHh7MxXXRmlxEk8oAr0vXy+tuQcvXNeLBp/7X4o";
+
+    PlatformHandle = EOS_Platform_Create(&PlatformOptions);
+    if (!PlatformHandle) {
+        std::cerr << "[ERROR] Failed to create EOS Platform." << std::endl;
+        return;
+    }
+
+    std::cout << "[StartEOS] EOS Platform initialized successfully." << std::endl;
+    LoginAnonymous();
+
+    while (true) {
+        EOS_Platform_Tick(PlatformHandle);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
+void LoginAnonymous() {
+    std::cout << "[LoginAnonymous] Starting anonymous login..." << std::endl;
+
+    EOS_HAuth AuthHandle = EOS_Platform_GetAuthInterface(PlatformHandle);
+
+    EOS_Auth_Credentials Credentials = {};
+    Credentials.ApiVersion = EOS_AUTH_CREDENTIALS_API_LATEST;
+    Credentials.Type = EOS_ELoginCredentialType::EOS_LCT_PersistentAuth;
+
+    EOS_Auth_LoginOptions LoginOptions = {};
+    LoginOptions.ApiVersion = EOS_AUTH_LOGIN_API_LATEST;
+    LoginOptions.Credentials = &Credentials;
+
+    EOS_Auth_Login(AuthHandle, &LoginOptions, nullptr, OnAuthLoginComplete);
+}
+
 void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data) {
     std::cout << "[OnConnectLoginComplete] Callback received." << std::endl;
 
@@ -36,6 +89,7 @@ void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data) {
 
         if (LocalUserId) {
             CreateLobby();
+            CreateLobbySearch();
         }
         else {
             std::cerr << "[ERROR] LocalUserId is not valid. Cannot create a lobby." << std::endl;
@@ -45,8 +99,6 @@ void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data) {
         std::cerr << "[ERROR] EOS Connect Login Failed: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
     }
 }
-
-
 
 void OnAuthLoginComplete(const EOS_Auth_LoginCallbackInfo* Data) {
     std::cout << "[OnAuthLoginComplete] Callback received." << std::endl;
@@ -88,38 +140,6 @@ void OnAuthLoginComplete(const EOS_Auth_LoginCallbackInfo* Data) {
     }
 }
 
-void LoginAnonymous() {
-    std::cout << "[LoginAnonymous] Starting anonymous login..." << std::endl;
-
-    EOS_HAuth AuthHandle = EOS_Platform_GetAuthInterface(PlatformHandle);
-
-    EOS_Auth_Credentials Credentials = {};
-    Credentials.ApiVersion = EOS_AUTH_CREDENTIALS_API_LATEST;
-    Credentials.Type = EOS_ELoginCredentialType::EOS_LCT_PersistentAuth;
-
-    EOS_Auth_LoginOptions LoginOptions = {};
-    LoginOptions.ApiVersion = EOS_AUTH_LOGIN_API_LATEST;
-    LoginOptions.Credentials = &Credentials;
-
-    EOS_Auth_Login(AuthHandle, &LoginOptions, nullptr, OnAuthLoginComplete);
-}
-
-
-void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data) {
-    std::cout << "[OnLobbyCreated] Callback received." << std::endl;
-
-    if (Data->ResultCode == EOS_EResult::EOS_Success) {
-        std::cout << "[OnLobbyCreated] Lobby created successfully! Lobby ID: " << Data->LobbyId << std::endl;
-    }
-    else {
-        std::cerr << "[ERROR] Failed to create lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
-
-        if (Data->ResultCode == EOS_EResult::EOS_InvalidRequest) {
-            std::cerr << "[DEBUG] Check if LocalUserId, PlatformHandle, and BucketId are valid." << std::endl;
-        }
-    }
-}
-
 void CreateLobby() {
     std::cout << "[CreateLobby] Attempting to create a lobby..." << std::endl;
 
@@ -149,7 +169,7 @@ void CreateLobby() {
     Options.ApiVersion = EOS_LOBBY_CREATELOBBY_API_LATEST;
     Options.LocalUserId = LocalUserId;
     Options.MaxLobbyMembers = 4;
-    Options.PermissionLevel = EOS_ELobbyPermissionLevel::EOS_LPL_PUBLICADVERTISED;
+    Options.PermissionLevel = EOS_ELobbyPermissionLevel::EOS_LPL_PUBLICADVERTISED; // Public lobby
     Options.BucketId = "game_bucket";
     Options.bPresenceEnabled = EOS_TRUE;
     Options.bAllowInvites = EOS_TRUE;
@@ -166,39 +186,88 @@ void CreateLobby() {
     EOS_Lobby_CreateLobby(LobbyHandle, &Options, nullptr, OnLobbyCreated);
 }
 
-void StartEOS() {
-    std::cout << "[StartEOS] Initializing EOS SDK..." << std::endl;
+void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data) {
+    std::cout << "[OnLobbyCreated] Callback received." << std::endl;
 
-    EOS_InitializeOptions InitOptions = {};
-    InitOptions.ApiVersion = EOS_INITIALIZE_API_LATEST;
-    InitOptions.ProductName = "Uni Group Project";
-    InitOptions.ProductVersion = "1.0";
-
-    EOS_EResult InitResult = EOS_Initialize(&InitOptions);
-    if (InitResult != EOS_EResult::EOS_Success) {
-        std::cerr << "[ERROR] Failed to initialize EOS SDK: " << EOS_EResult_ToString(InitResult) << std::endl;
-        return;
+    if (Data->ResultCode == EOS_EResult::EOS_Success) {
+        std::cout << "[OnLobbyCreated] Lobby created successfully! Lobby ID: " << Data->LobbyId << std::endl;
     }
+    else {
+        std::cerr << "[ERROR] Failed to create lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
 
-    EOS_Platform_Options PlatformOptions = {};
-    PlatformOptions.ApiVersion = EOS_PLATFORM_OPTIONS_API_LATEST;
-    PlatformOptions.ProductId = "944c0fd27c634870ab2559503cfc2f03";
-    PlatformOptions.SandboxId = "a1aba763c9a34a298e3386c3bcd724f4";
-    PlatformOptions.DeploymentId = "44dcc0582fd84895a9f9663ad079c38c";
-    PlatformOptions.ClientCredentials.ClientId = "xyza7891EdqWCp9ClnPHdgcPnqtVxvLJ";
-    PlatformOptions.ClientCredentials.ClientSecret = "/FFpHHh7MxXXRmlxEk8oAr0vXy+tuQcvXNeLBp/7X4o";
-
-    PlatformHandle = EOS_Platform_Create(&PlatformOptions);
-    if (!PlatformHandle) {
-        std::cerr << "[ERROR] Failed to create EOS Platform." << std::endl;
-        return;
-    }
-
-    std::cout << "[StartEOS] EOS Platform initialized successfully." << std::endl;
-    LoginAnonymous();
-
-    while (true) {
-        EOS_Platform_Tick(PlatformHandle);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (Data->ResultCode == EOS_EResult::EOS_InvalidRequest) {
+            std::cerr << "[DEBUG] Check if LocalUserId, PlatformHandle, and BucketId are valid." << std::endl;
+        }
     }
 }
+
+void OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data)
+{
+    // Check if the search completed successfully
+    if (Data->ResultCode == EOS_EResult::EOS_Success) {
+        std::cout << "[OnFindLobbiesComplete] Lobby found." << std::endl;
+    }
+    else {
+        std::cerr << "[OnFindLobbiesComplete] Search failed with error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
+    }
+}
+
+void CreateLobbySearch() {
+    std::cout << "[CreateLobbySearch] Attempting to create a lobby search..." << std::endl;
+
+    if (!LocalUserId) {
+        std::cerr << "[ERROR] LocalUserId is NULL. Authentication must be complete before creating a lobby search." << std::endl;
+        return;
+    }
+
+    if (!PlatformHandle) {
+        std::cerr << "[ERROR] PlatformHandle is NULL. Ensure the EOS platform is initialized." << std::endl;
+        return;
+    }
+
+    EOS_HLobby LobbyHandle = EOS_Platform_GetLobbyInterface(PlatformHandle);
+
+    if (!LobbyHandle) {
+        std::cerr << "[ERROR] LobbyHandle is NULL. Lobby interface might not be initialized." << std::endl;
+        return;
+    }
+
+    // Initialize the lobby search options
+    EOS_Lobby_CreateLobbySearchOptions SearchOptions = {};
+    SearchOptions.ApiVersion = EOS_LOBBY_CREATELOBBYSEARCH_API_LATEST;
+    SearchOptions.MaxResults = 10;  // Max number of lobbies to return
+
+    // Create the lobby search handle
+    EOS_HLobbySearch LobbySearchHandle = nullptr;
+    EOS_EResult Result = EOS_Lobby_CreateLobbySearch(LobbyHandle, &SearchOptions, &LobbySearchHandle);
+
+    if (Result == EOS_EResult::EOS_Success) {
+        std::cout << "[CreateLobbySearch] Lobby search created successfully." << std::endl;
+
+        // Search for the specific lobby ID
+        const char* TargetLobbyId = "ed5008ea1af545d382bcd33ec7ba0b76";  // The given lobby ID
+
+        // Create and set up the SetLobbyIdOptions structure
+        EOS_LobbySearch_SetLobbyIdOptions SetLobbyIdOptions = {};
+        SetLobbyIdOptions.ApiVersion = EOS_LOBBYSEARCH_SETLOBBYID_API_LATEST;
+        SetLobbyIdOptions.LobbyId = TargetLobbyId;  // Set the specific lobby ID
+
+        // Set the lobby ID to search by
+        EOS_LobbySearch_SetLobbyId(LobbySearchHandle, &SetLobbyIdOptions);
+        std::cout << "[CreateLobbySearch] Searching for the lobby with ID: " << TargetLobbyId << std::endl;
+
+        // Set up the FindOptions with LocalUserId
+        EOS_LobbySearch_FindOptions FindOptions = {};
+        FindOptions.ApiVersion = EOS_LOBBYSEARCH_FIND_API_LATEST;
+        FindOptions.LocalUserId = LocalUserId;  // Use LocalUserId for the search
+
+        // Call EOS_LobbySearch_Find to execute the search
+        EOS_LobbySearch_Find(LobbySearchHandle, &FindOptions, nullptr, OnFindLobbiesComplete);
+    }
+    else {
+        std::cerr << "[ERROR] Failed to create lobby search. Error: " << EOS_EResult_ToString(Result) << std::endl;
+    }
+}
+
+
+

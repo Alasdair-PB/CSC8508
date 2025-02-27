@@ -48,7 +48,7 @@ namespace NCL::CSC8508 {
         static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
             GameData item;
             item.typeID = std::type_index(typeid(T));
-            item.dataSize = 0;
+            item.dataSize = 0; // sizeof(value);
 
             ([&] {
                 const auto& container = value.*members;
@@ -66,6 +66,9 @@ namespace NCL::CSC8508 {
 
             item.data.resize(item.dataSize);
             uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
+
+            //std::memcpy(dataPtr, &value, sizeof(value));
+           // dataPtr += sizeof(value);
 
             ([&] {
                 const auto& container = value.*members;
@@ -146,6 +149,26 @@ namespace NCL::CSC8508 {
             return true;
         }
 
+        template <typename T>
+        static T LoadMember(GameData loadedData) {
+            T container;
+            if constexpr (std::is_trivially_copyable_v<T>) {
+                std::memcpy(&container, loadedData.data.data(), sizeof(T));
+                return container;
+            }
+            else if constexpr (is_container<T>::value) {
+                uint32_t size;
+                std::memcpy(&size, loadedData.data.data(), sizeof(size));
+                container.resize(size);
+                std::memcpy(container.data(), loadedData.data.data() + sizeof(size), size * sizeof(typename T::value_type));
+                return container;
+            }
+            else {
+                static_assert(sizeof(T) == -1, "Unsupported type for deserialization");
+                return container;
+            }
+        }
+
         template <typename T, typename... Members>
         static T LoadMyData(const std::string& filename, Members T::*... members) {
             GameData loadedData;
@@ -153,15 +176,12 @@ namespace NCL::CSC8508 {
             if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");
 
             T loadedStruct;
-            size_t offset = 0;
 
-            if constexpr (sizeof...(members) == 0) {
-                if constexpr (std::is_trivially_copyable_v<T>)
-                    std::memcpy(&loadedStruct, loadedData.data.data() + offset, sizeof(T));
-                else
-                    static_assert(sizeof(T) == 0, "Unsupported type for deserialization");
-            }
+            if constexpr (sizeof...(members) == 0) 
+                return LoadMember<T>(loadedData);
             else {
+                size_t offset = 0;
+                //std::memcpy(&loadedStruct, loadedData.data.data(), sizeof(T));
                 ([&] {
                     auto& container = loadedStruct.*members;
                     uint32_t containerSize;
@@ -169,6 +189,7 @@ namespace NCL::CSC8508 {
                     offset += sizeof(containerSize);
                     container.resize(containerSize);
 
+                    // Below should be function
                     if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
                         for (auto& str : container) {
                             uint32_t strLength;
@@ -187,28 +208,6 @@ namespace NCL::CSC8508 {
                     }(), ...);
             }
             return loadedStruct;
-        }
-
-        template <typename T>
-        static T LoadMyData(const std::string& filename) {
-            GameData loadedData;
-            if (!LoadGameData(filename, loadedData)) throw std::runtime_error("Failed to load game data");
-            if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");
-
-            if constexpr (std::is_trivially_copyable_v<T>) {
-                T loadedType;
-                std::memcpy(&loadedType, loadedData.data.data(), sizeof(T));
-                return loadedType;
-            } else if constexpr (is_container<T>::value) {
-                uint32_t size;
-                std::memcpy(&size, loadedData.data.data(), sizeof(size));
-
-                T container;
-                container.resize(size);
-                std::memcpy(container.data(), loadedData.data.data() + sizeof(size), size * sizeof(typename T::value_type));
-                return container;
-            } else 
-                static_assert(sizeof(T) == -1, "Unsupported type for deserialization");
         }
 
     private:

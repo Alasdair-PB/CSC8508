@@ -18,3 +18,4 @@ void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data);
 void CreateLobby();
 void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data);
 void CreateLobbySearch();
+void OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data);

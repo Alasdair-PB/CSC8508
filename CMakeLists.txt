@@ -90,6 +90,25 @@ endif()
 # Include FMOD headers globally
 include_directories("${FMOD_DIR}/inc")
 
+######################################
+# OPUS
+######################################
+
+# Set Opus Install Path
+set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
+
+# Include Opus headers
+include_directories("${OPUS_INSTALL_PATH}/include")
+
+# Link Opus libraries
+find_library(OPUS_LIBRARY NAMES opus PATHS "${OPUS_INSTALL_PATH}/lib")
+
+if(NOT OPUS_LIBRARY)
+    message(FATAL_ERROR "Opus library not found in ${OPUS_INSTALL_PATH}/lib")
+endif()
+
+
+
 
 
 ################################################################################
@@ -110,6 +129,8 @@ endif()
 target_link_libraries(AudioEngine PRIVATE "${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
 target_link_libraries(CSC8508 PRIVATE AudioEngine)
 target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
+
+target_link_libraries(AudioEngine PRIVATE ${OPUS_LIBRARY})
 
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT CSC8508)

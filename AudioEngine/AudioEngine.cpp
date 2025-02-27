@@ -5,6 +5,7 @@
 #include "AudioEngine.h"
 #include <fmod.hpp>
 #include <iostream>
+#include <opus/opus.h>
 
 AudioEngine::AudioEngine() : audioSystem(nullptr) {
     FMOD::System_Create(&audioSystem);

@@ -44,7 +44,7 @@ public:
 	void AddParent(ISerializable* object) { objects.push_back(object); }
 
 	void Load(std::string folderPath, std::string name) override {
-		MySaveStruct loadedSaveData = SaveManager::LoadMyData<MySaveStruct>(name, &MySaveStruct::filePointers);
+		MySaveStruct loadedSaveData = SaveManager::LoadMyData<MySaveStruct>(name, &MySaveStruct::x, &MySaveStruct::filePointers);
 		for (int i = 0; i < loadedSaveData.filePointers.size(); i++) {
 			std::cout << loadedSaveData.filePointers[i] << std::endl;
 			if (i >= objects.size()) break;
@@ -60,7 +60,7 @@ public:
 
 		for (ISerializable* object : objects)
 			saveInfo.filePointers.push_back(object->Save(folderPath));
-		SaveManager::GameData saveData = SaveManager::CreateSaveDataAsset(saveInfo, &MySaveStruct::filePointers);
+		SaveManager::GameData saveData = SaveManager::CreateSaveDataAsset(saveInfo, &MySaveStruct::x, &MySaveStruct::filePointers);
 		SaveManager::SaveGameData(fileName, saveData);
 		return fileName;
 	}	
@@ -71,13 +71,11 @@ protected:
 	vector<ISerializable*> objects;
 };
 
-
 struct MyX {
 	MyX() : x(0) {}
 	MyX(int x) :x(x) {}
 	int x;
 };
-
 
 // Defaults to "game_data.gdmt" for test
 void TestSave() {
@@ -92,7 +90,6 @@ void TestSave() {
 
 	SaveManager::SaveGameData("game_data_int.gdmt", SaveManager::CreateSaveDataAsset<int>(45));
 	std::cout << SaveManager::LoadMyData<int>("game_data_int.gdmt") << std::endl;
-
 
 	SaveManager::SaveGameData("game_data_x.gdmt", SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
 	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.gdmt").x << std::endl;

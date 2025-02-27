@@ -48,35 +48,44 @@ namespace NCL::CSC8508 {
         static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
             GameData item;
             item.typeID = std::type_index(typeid(T));
-            item.dataSize = 0; // sizeof(value);
+            item.dataSize = 0;
 
             ([&] {
                 const auto& container = value.*members;
-                item.dataSize += sizeof(uint32_t); 
-                if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
-                    for (const auto& str : container) {
-                        item.dataSize += sizeof(uint32_t);
-                        item.dataSize += str.size();
-                    }
-                }
+
+                if constexpr (std::is_trivially_copyable_v<typename std::decay_t<decltype(container)>>) 
+                    item.dataSize += sizeof(container);
                 else {
-                    item.dataSize += container.size() * sizeof(typename std::decay_t<decltype(container)>::value_type);
+                    item.dataSize += sizeof(uint32_t);
+                    if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
+                        for (const auto& str : container) {
+                            item.dataSize += sizeof(uint32_t);
+                            item.dataSize += str.size();
+                        }
+                    }
+                    else {
+                        item.dataSize += container.size() * sizeof(typename std::decay_t<decltype(container)>::value_type);
+                    }
                 }
                 }(), ...);
 
             item.data.resize(item.dataSize);
             uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
 
-            //std::memcpy(dataPtr, &value, sizeof(value));
-           // dataPtr += sizeof(value);
-
             ([&] {
                 const auto& container = value.*members;
-                uint32_t containerSize = container.size();
-                std::memcpy(dataPtr, &containerSize, sizeof(containerSize));
-                dataPtr += sizeof(containerSize);
 
-                SerializeContainer(container, item.data, dataPtr, containerSize);
+                if constexpr (std::is_trivially_copyable_v<typename std::decay_t<decltype(container)>>) {
+                    std::memcpy(dataPtr, &container, sizeof(container));
+                    dataPtr += sizeof(container);
+                }
+                else {
+                    uint32_t containerSize = container.size();
+                    std::memcpy(dataPtr, &containerSize, sizeof(containerSize));
+                    dataPtr += sizeof(containerSize);
+
+                    SerializeContainer(container, item.data, dataPtr, containerSize);
+                }
                 }(), ...);
 
             return item;
@@ -181,29 +190,35 @@ namespace NCL::CSC8508 {
                 return LoadMember<T>(loadedData);
             else {
                 size_t offset = 0;
-                //std::memcpy(&loadedStruct, loadedData.data.data(), sizeof(T));
                 ([&] {
                     auto& container = loadedStruct.*members;
-                    uint32_t containerSize;
-                    std::memcpy(&containerSize, loadedData.data.data() + offset, sizeof(containerSize));
-                    offset += sizeof(containerSize);
-                    container.resize(containerSize);
 
-                    // Below should be function
-                    if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
-                        for (auto& str : container) {
-                            uint32_t strLength;
-                            std::memcpy(&strLength, loadedData.data.data() + offset, sizeof(strLength));
-                            offset += sizeof(strLength);
-
-                            str.resize(strLength);
-                            std::memcpy(str.data(), loadedData.data.data() + offset, strLength);
-                            offset += strLength;
-                        }
+                    if constexpr (std::is_trivially_copyable_v<typename std::decay_t<decltype(container)>>) {
+                        std::memcpy(&container, loadedData.data.data() + offset, sizeof(container));
+                        offset += sizeof(container);
+                        return container;
                     }
-                    else {
-                        std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type));
-                        offset += containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type);
+                    else {                    
+                        uint32_t containerSize;
+                        std::memcpy(&containerSize, loadedData.data.data() + offset, sizeof(containerSize));
+                        offset += sizeof(containerSize);
+                        container.resize(containerSize);
+
+                        if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
+                            for (auto& str : container) {
+                                uint32_t strLength;
+                                std::memcpy(&strLength, loadedData.data.data() + offset, sizeof(strLength));
+                                offset += sizeof(strLength);
+
+                                str.resize(strLength);
+                                std::memcpy(str.data(), loadedData.data.data() + offset, strLength);
+                                offset += strLength;
+                            }
+                        }
+                        else {
+                            std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type));
+                            offset += containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type);
+                        }
                     }
                     }(), ...);
             }

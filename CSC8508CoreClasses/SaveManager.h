@@ -63,9 +63,8 @@ namespace NCL::CSC8508 {
                             item.dataSize += str.size();
                         }
                     }
-                    else {
+                    else
                         item.dataSize += container.size() * sizeof(typename std::decay_t<decltype(container)>::value_type);
-                    }
                 }
                 }(), ...);
 

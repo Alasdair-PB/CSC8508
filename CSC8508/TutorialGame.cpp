@@ -10,33 +10,117 @@
 #include "OrientationConstraint.h"
 #include "Legacy/StateGameObject.h"
 
+#include "array"
 
 using namespace NCL;
 using namespace CSC8508;
 
-struct SerializedPointer{
-	std::string filePointer;
-	template <typename T>
-	void Convert(T* pointer) {
+namespace namespaceX {  
+	struct ISerializedField {
+		virtual ~ISerializedField() = default;
+	};
 
-	}
-};
+	template <typename T>
+	struct Serialized : public ISerializedField {
+		T value;
+		constexpr Serialized(T v) : value(v) {}
+	};
+
+	template <typename Derived>
+	struct ISerializedData {	
+		#define serialized_var(type, name, value) \
+			Serialized<type> name{value}; \
+			ISerializedField* get_##name() { return &name; } \
+			inline static bool name##_registered = (Parent::addSerializedField(&MySaveStruct::get_##name), true);
+		using FieldGetter = ISerializedField * (Derived::*)();
+		static inline std::vector<FieldGetter> serializedFields;
+
+		static void addSerializedField(FieldGetter field_ptr) {
+			serializedFields.push_back(field_ptr);
+		}
+
+		static auto GetSerializedFields() {
+			return serializedFields;
+		}
+	};
+
+	struct MySaveStruct : ISerializedData<MySaveStruct> {
+		using Parent = ISerializedData<MySaveStruct>;
+		serialized_var(int, x, 0);
+		serialized_var(std::vector<std::string>, filePointers, {});
+
+		MySaveStruct() {}
+		static void printSerializedFields() {
+			auto fields = GetSerializedFields();
+		}
+	};
+}
+
+
 
 class ISerializable {
-public: 
+public: 			
 	virtual std::string Save(std::string folderPath) { return ""; }
 	virtual void Load(std::string folderPath, std::string name) {}
-};
 
+/*
+	template <typename Derived>
+	struct ISerializedData {
+		static inline std::tuple<> serializedFields; 
+
+		static void addSerializedField(int* field_ptr) {
+			serializedFields.push_back(field_ptr);
+		}
+
+		// Retrieve serialized fields as a tuple
+		static auto GetSerializedFields() {
+			return serializedFields;
+		}
+	};
+
+#define serialized_var(type, name, value) \
+        type name{value}; \
+        type* get_##name() { return &name; } \
+        inline static bool name##_registered = (Parent::addSerializedField(&MySaveStruct::get_##name), true); \
+        type& name##_direct = name.get();  */
+};
 
 class SaveObject: public ISerializable {
 public:
+/*
+	struct MySaveStruct : ISerializedData<MySaveStruct> {
+		using Parent = ISerializedData<MySaveStruct>;
 
+		serialized_var(int, x, 0);
+		serialized_var(std::vector<std::string>, filePointers, {});
+
+		MySaveStruct() {}
+
+		MySaveStruct(int x) : x(x) {}
+
+		static void printSerializedFields() {
+			auto fields = GetSerializedFields();
+			std::apply([](auto&&... args) {
+				((std::cout << args->get() << std::endl), ...);
+				}, fields);
+		}
+	};*/
+	
 	struct MySaveStruct {
-		MySaveStruct() : x(0){}
-		MySaveStruct(int x) :x(x) {}
+		#define SERIALIZED_FIELD(field) std::make_tuple(#field, &MySaveStruct::field)
+
+		MySaveStruct() : x(0) {}
+		MySaveStruct(int x) : x(x) {}
+
 		int x;
-		vector<std::string> filePointers;
+		std::vector<std::string> filePointers;
+
+		static auto GetSerializedFields() {
+			return std::make_tuple(
+				SERIALIZED_FIELD(x),
+				SERIALIZED_FIELD(filePointers)
+			);
+		}
 	};
 
 	SaveObject(int id, int x): x(x), id(id){}
@@ -44,7 +128,13 @@ public:
 	void AddParent(ISerializable* object) { objects.push_back(object); }
 
 	void Load(std::string folderPath, std::string name) override {
-		MySaveStruct loadedSaveData = SaveManager::LoadMyData<MySaveStruct>(name, &MySaveStruct::x, &MySaveStruct::filePointers);
+
+		auto fields = MySaveStruct::GetSerializedFields();
+		MySaveStruct loadedSaveData = std::apply(
+			[&](auto&&... args) { return SaveManager::LoadMyData<MySaveStruct>(name, std::get<1>(args)...); },
+			fields
+		);
+
 		for (int i = 0; i < loadedSaveData.filePointers.size(); i++) {
 			std::cout << loadedSaveData.filePointers[i] << std::endl;
 			if (i >= objects.size()) break;
@@ -56,7 +146,7 @@ public:
 	std::string Save(std::string folderPath) override
 	{
 		std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";
-		MySaveStruct saveInfo(10);
+		MySaveStruct saveInfo(x);
 
 		for (ISerializable* object : objects)
 			saveInfo.filePointers.push_back(object->Save(folderPath));

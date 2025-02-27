@@ -33,7 +33,8 @@ class SaveObject: public ISerializable {
 public:
 
 	struct MySaveStruct {
-		MySaveStruct() :x(0) {}
+		MySaveStruct() : x(0){}
+		MySaveStruct(int x) :x(x) {}
 		int x;
 		vector<std::string> filePointers;
 	};
@@ -45,9 +46,7 @@ public:
 	void Load(std::string folderPath, std::string name) override {
 		MySaveStruct loadedSaveData = SaveManager::LoadMyData<MySaveStruct>(name, &MySaveStruct::filePointers);
 		for (int i = 0; i < loadedSaveData.filePointers.size(); i++) {
-			std::cout << loadedSaveData.x << std::endl;
 			std::cout << loadedSaveData.filePointers[i] << std::endl;
-
 			if (i >= objects.size()) break;
 			objects[i]->Load(folderPath, loadedSaveData.filePointers[i]);
 		}
@@ -56,10 +55,9 @@ public:
 
 	std::string Save(std::string folderPath) override
 	{
-		std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";		
-		MySaveStruct saveInfo;
+		std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";
+		MySaveStruct saveInfo(10);
 
-		saveInfo.x = x;
 		for (ISerializable* object : objects)
 			saveInfo.filePointers.push_back(object->Save(folderPath));
 		SaveManager::GameData saveData = SaveManager::CreateSaveDataAsset(saveInfo, &MySaveStruct::filePointers);
@@ -71,8 +69,15 @@ protected:
 	int id;
 	int x;
 	vector<ISerializable*> objects;
-
 };
+
+
+struct MyX {
+	MyX() : x(0) {}
+	MyX(int x) :x(x) {}
+	int x;
+};
+
 
 // Defaults to "game_data.gdmt" for test
 void TestSave() {
@@ -87,6 +92,10 @@ void TestSave() {
 
 	SaveManager::SaveGameData("game_data_int.gdmt", SaveManager::CreateSaveDataAsset<int>(45));
 	std::cout << SaveManager::LoadMyData<int>("game_data_int.gdmt") << std::endl;
+
+
+	SaveManager::SaveGameData("game_data_x.gdmt", SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
+	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.gdmt").x << std::endl;
 }
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 

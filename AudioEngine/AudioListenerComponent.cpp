@@ -6,6 +6,7 @@
 #include <fmod.hpp>
 #include <iostream>
 #include <cmath>
+#include <opus/opus.h>
 
 using namespace NCL;
 using namespace CSC8508;

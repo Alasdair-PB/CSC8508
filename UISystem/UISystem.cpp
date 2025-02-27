@@ -1,7 +1,7 @@
 #include "UISystem.h"
-#include "../ImGui/imgui_impl_win32.h"
-#include "../ImGui/imgui_impl_opengl3.h"
-#include "../ImGui/imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui.h"
 #include <filesystem>
 
 using namespace NCL;

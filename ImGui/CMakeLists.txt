@@ -6,5 +6,3 @@ ${Headers}
 ${Sources})
 
 include_directories(../NCLCoreClasses/)
-
-target_link_libraries(Event NCLCoreClasses)

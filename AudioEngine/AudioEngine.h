@@ -18,7 +18,7 @@
 enum class ChannelGroupType {
 	SFX,
 	MUSIC,
-	VOICE,
+	CHAT,
 	MASTER
 };
 

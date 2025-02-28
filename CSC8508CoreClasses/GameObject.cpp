@@ -24,6 +24,20 @@ GameObject::~GameObject()	{
 	delete renderObject;
 }
 
+struct GameObject::GameObjDataStruct : public ISerializedData {
+	GameObjDataStruct() : isEnabled(1) {}
+	GameObjDataStruct(bool isEnabled) : isEnabled(isEnabled) {}
+
+	bool isEnabled;
+	std::vector<std::string> componentPointers;
+
+	static auto GetSerializedFields() {
+		return std::make_tuple(
+			SERIALIZED_FIELD(GameObjDataStruct, isEnabled),
+			SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
+		);
+	}
+};
 
 void GameObject::Load(std::string folderPath, std::string name) {
 

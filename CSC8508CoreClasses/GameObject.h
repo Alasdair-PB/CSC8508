@@ -20,7 +20,6 @@ namespace NCL::CSC8508 {
 		enum LayerID { Default, Ignore_RayCast, UI, Player, Enemy, Ignore_Collisions };
 	}
 	class IComponent;
-
 	class NetworkObject;
 	class RenderObject;
 	class PhysicsObject;
@@ -112,21 +111,7 @@ namespace NCL::CSC8508 {
 			return nullptr;
 		}
 
-		struct GameObjDataStruct : public ISerializable {
-			GameObjDataStruct() : isEnabled(1) {}
-			GameObjDataStruct(bool isEnabled) : isEnabled(isEnabled) {}
-
-			bool isEnabled;
-			std::vector<std::string> componentPointers;
-
-			static auto GetSerializedFields() {
-				return std::make_tuple(
-					SERIALIZED_FIELD(GameObjDataStruct, isEnabled),
-					SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
-				);
-			}
-		};
-
+		struct GameObjDataStruct; 
 		void Load(std::string folderPath, std::string name) override;
 		std::string Save(std::string folderPath) override;
 

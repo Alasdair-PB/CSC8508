@@ -5,6 +5,7 @@
 #include "OGLMesh.h"
 
 #include "GameWorld.h"
+#include "UISystem.h"
 
 namespace NCL {
 	namespace CSC8508 {
@@ -18,6 +19,8 @@ namespace NCL {
 			Mesh*		LoadMesh(const std::string& name);
 			Texture*	LoadTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
+
+			void SetUISystem(UISystem* ui) { uiSystem = ui;}
 
 		protected:
 			void NewRenderLines();
@@ -40,7 +43,6 @@ namespace NCL {
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
-
 			vector<const RenderObject*> activeObjects;
 
 			OGLShader*  debugShader;
@@ -75,6 +77,8 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
+
+			UISystem* uiSystem;
 		};
 	}
 }

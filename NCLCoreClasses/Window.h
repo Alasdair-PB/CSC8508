@@ -11,6 +11,12 @@ https://research.ncl.ac.uk/game/
 #include "Mouse.h"
 
 #include "Vector.h"
+#include <windows.h>
+#include <io.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string>
+#include <functional>
 
 namespace NCL {
 	class GameTimer;
@@ -82,6 +88,7 @@ namespace NCL {
 		static const Keyboard*	 GetKeyboard() { return keyboard; }
 		static const Mouse*		 GetMouse() { return mouse; }
 		static const GameTimer&	 GetTimer() { return timer; }
+		static const HWND        GetHandle() { return handle; }
 
 		static Window*	const GetWindow() { return window; }
 
@@ -111,5 +118,6 @@ namespace NCL {
 		static Mouse*		mouse;
 
 		static GameTimer	timer;
+		static HWND         handle;
 	};
 }

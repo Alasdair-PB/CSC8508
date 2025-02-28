@@ -43,6 +43,8 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	physics->UseGravity(true);
 	world->UpdateWorld(0.1f);
 	physics->Update(0.1f);
+	uiSystem = new UISystem(Window::GetHandle());
+	renderer->SetUISystem(uiSystem);
 }
 
 void TutorialGame::SetPause(bool state) {
@@ -83,6 +85,8 @@ TutorialGame::~TutorialGame()
 
 	delete navigationMesh;
 	delete navMesh;
+  
+	delete uiSystem;
 }
 
 void TutorialGame::UpdateObjectSelectMode(float dt) {
@@ -138,8 +142,9 @@ void TutorialGame::UpdateGame(float dt)
 	if (OnEndGame(dt))
 		return; 
 
+	DrawUIElements();
 	mainMenu->Update(dt);
-	renderer->Render();
+	renderer->Render();	
 	Debug::UpdateRenderables(dt);
 
 	if (inPause)
@@ -355,6 +360,19 @@ void TutorialGame::MoveSelectedObject() {
 			}
 		}
 	}
+}
+
+void TutorialGame::DrawUIElements() {
+	framerateDelay += 1;
+
+	uiSystem->StartFrame();
+
+	/*uiSystem->DrawDemo();*/
+	if (framerateDelay > 10) {
+		latestFramerate = Window::GetTimer().GetTimeDeltaSeconds();
+		framerateDelay = 0;
+	}
+	uiSystem->DisplayFramerate(latestFramerate);
 }
 
 

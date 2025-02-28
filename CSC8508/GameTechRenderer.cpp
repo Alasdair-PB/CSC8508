@@ -4,6 +4,11 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
+
+#include <windows.h>
+#include <GL/GL.h>
+#include <tchar.h>
+
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8508;
@@ -12,7 +17,7 @@ using namespace CSC8508;
 
 Matrix4 biasMatrix = Matrix::Translation(Vector3(0.5f, 0.5f, 0.5f)) * Matrix::Scale(Vector3(0.5f, 0.5f, 0.5f));
 
-GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world)	{
+GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world)      {
 	glEnable(GL_DEPTH_TEST);
 
 	debugShader  = new OGLShader("debug.vert", "debug.frag");
@@ -71,7 +76,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 
 	SetDebugStringBufferSizes(10000);
-	SetDebugLineBufferSizes(1000);
+	SetDebugLineBufferSizes(1000); 
 }
 
 GameTechRenderer::~GameTechRenderer()	{
@@ -134,6 +139,8 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderLines();
 	NewRenderTextures();
 	NewRenderText();
+	uiSystem->EndFrame();
+
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

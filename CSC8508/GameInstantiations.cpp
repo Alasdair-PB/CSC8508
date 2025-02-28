@@ -5,6 +5,7 @@
 #include "INetworkComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
+#include "CameraComponent.h"
 
 
 using namespace NCL;
@@ -48,51 +49,55 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
+int GetUniqueId(int objectId, int& componentCount) {
+	int unqiueId = CantorPairing(objectId, componentCount);
+	componentCount++;
+	return unqiueId;
+}
+
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
 	float meshSize = 1.0f;
 	float inverseMass = 0.5f;
 
-	players = new PlayerGameObject();
+	GameObject* player = new PlayerGameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 
-	PhysicsComponent* phys = players->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = players->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
+	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	int componentIdCount = 0;
 
 	if (spawnData)
 	{
-		int unqiueId = CantorPairing(spawnData->objId, componentIdCount);
-		componentIdCount++;
-		InputNetworkComponent* input = players->AddComponent<InputNetworkComponent>(
-			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
+		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
+			&controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
-		unqiueId = CantorPairing(spawnData->objId, componentIdCount);
-		componentIdCount++;
-		TransformNetworkComponent* networkTransform = players->AddComponent<TransformNetworkComponent>(
-			spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+
+		if (spawnData->clientOwned) 
+			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 	}
 	else {
-		InputComponent* input = players->AddComponent<InputComponent>(&controller);
+		InputComponent* input = player->AddComponent<InputComponent>(&controller);
+		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 	}
 
-	players->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
-	players->SetLayerID(Layers::LayerID::Player);
-	players->SetTag(Tags::Player);
+	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
+	player->SetLayerID(Layers::LayerID::Player);
+	player->SetTag(Tags::Player);
 
-	players->SetRenderObject(new RenderObject(&players->GetTransform(), capsuleMesh, nullptr, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&players->GetTransform(), bounds->GetBoundingVolume()));
+	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, nullptr, basicShader));
+	player->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
+
+	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform(), bounds->GetBoundingVolume()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
-	players->SetEndGame([&](bool hasWon) {EndGame(hasWon); });
 
-	bounds->AddToIgnoredLayers(Layers::Enemy);
-
-	players->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
-
-	world->AddGameObject(players);
-	return players;
+	world->AddGameObject(player);
+	return player;
 }
 
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)

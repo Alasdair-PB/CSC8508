@@ -123,12 +123,9 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	inSelectionMode = false;
 
 	world->GetMainCamera().SetController(controller);
-	world->GetMainCamera().SetGetPlayer([&]() -> Vector3 { return GetPlayerPos(); });
 
 	controller.MapAxis(0, "Sidestep");
-	controller.MapAxis(1, "UpDown");
 	controller.MapAxis(2, "Forward");
-
 	controller.MapAxis(3, "XLook");
 	controller.MapAxis(4, "YLook");
 
@@ -148,9 +145,6 @@ void TutorialGame::SetPause(bool state) {
 
 void TutorialGame::EndGame(bool hasWon) {
 	inPause = true;
-	endGame = true;
-	this->hasWon = hasWon;
-	Debug::Print(hasWon ? "Victory" : "Game Over", Vector2(5, 85));
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -183,19 +177,6 @@ TutorialGame::~TutorialGame()
 
 	delete navigationMesh;
 	delete navMesh;
-
-	delete players;
-}
-
-Vector3 TutorialGame::GetPlayerPos() {
-	return players == nullptr ? Vector3(0,0,0) : players->GetTransform().GetPosition();
-}
-
-void TutorialGame::UpdateCamera(float dt) {
-
-	if (!inSelectionMode)
-		world->GetMainCamera().UpdateCamera(dt);
-
 }
 
 void TutorialGame::UpdateObjectSelectMode(float dt) {
@@ -226,12 +207,12 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 }
 
 bool TutorialGame::OnEndGame(float dt) {
-	if (endGame) {
+	/*if (endGame) {
 		renderer->Render();
 		renderer->Update(dt);
 		Debug::UpdateRenderables(dt);
 		return true;
-	}
+	}*/
 
 	return false;
 }
@@ -249,7 +230,7 @@ void TutorialGame::UpdateDrawScreen(float dt) {
 void TutorialGame::UpdateGame(float dt) 
 {
 	if (OnEndGame(dt))
-		return;
+		return; 
 
 	mainMenu->Update(dt);
 	renderer->Render();
@@ -263,9 +244,7 @@ void TutorialGame::UpdateGame(float dt)
 
 	Window::GetWindow()->ShowOSPointer(true);
 	//Window::GetWindow()->LockMouseToWindow(true);
-
 	physics->Update(dt);
-	UpdateCamera(dt);
 }
 
 void TutorialGame::LockedObjectMovement() 

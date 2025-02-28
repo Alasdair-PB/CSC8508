@@ -44,19 +44,13 @@ namespace NCL {
 
 			void SetPause(bool state);
 			void InitWorld();
-			void BridgeConstraintTest();
 			void InitGameExamples();
 
 			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
-			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void UpdateCamera(float dt);
 			void UpdateObjectSelectMode(float dt);
 			bool SelectObject();
 			void MoveSelectedObject();
 			void LockedObjectMovement();
-
-
-
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
@@ -67,8 +61,6 @@ namespace NCL {
 
 			void EndGame(bool hasWon);
 
-			Vector3 GetPlayerPos();
-			void SphereCastWorld();
 			void UpdateScore(float points);
 
 			bool RayCastNavWorld(Ray& r, float rayDistance);
@@ -95,10 +87,7 @@ namespace NCL {
 			bool inPause = false;
 			bool inSelectionMode;
 
-			bool endGame = false;
-			bool hasWon = false;
-
-			float		forceMagnitude;
+			float forceMagnitude;
 			float time = 0;
 			int score = 0;
 
@@ -135,7 +124,6 @@ namespace NCL {
 			};
 
 			GameObject* objClosest = nullptr;
-			PlayerGameObject* players = nullptr;
 		};
 	}
 }

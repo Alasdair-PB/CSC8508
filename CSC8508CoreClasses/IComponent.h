@@ -7,12 +7,12 @@
 
 #include "Transform.h"
 #include "GameObject.h"
-#include "ISerializable.h"
+//#include "ISerializable.h"
 #include <unordered_set>
 
 namespace NCL::CSC8508 
 {
-	class IComponent : public ISerializable
+	class IComponent //: public ISerializable
 	{
 	public:
 
@@ -83,8 +83,8 @@ namespace NCL::CSC8508
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
 
-		void Load(std::string folderPath, std::string name) override; 
-		std::string Save(std::string folderPath) override;
+		//void Load(std::string folderPath, std::string name) override; 
+		//std::string Save(std::string folderPath) override;
 		struct ComponentDataStruct;
 
 	protected:

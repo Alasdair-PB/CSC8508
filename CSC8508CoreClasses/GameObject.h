@@ -6,7 +6,7 @@
 #include "Transform.h"
 #include "ComponentManager.h"
 #include <vector>
-#include "ISerializable.h"
+//#include "ISerializable.h"
 
 using std::vector;
 
@@ -25,7 +25,8 @@ namespace NCL::CSC8508 {
 	class PhysicsObject;
 	class BoundsComponent;
 
-	class GameObject: ISerializable	{
+	class GameObject //: ISerializable	{
+	{
 	public:
 		GameObject(bool isStatic = false);
 		~GameObject();
@@ -112,8 +113,8 @@ namespace NCL::CSC8508 {
 		}
 
 		struct GameObjDataStruct; 
-		void Load(std::string folderPath, std::string name) override;
-		std::string Save(std::string folderPath) override;
+		//void Load(std::string folderPath, std::string name) override;
+		//std::string Save(std::string folderPath) override;
 
 
 		void AddChild(GameObject* child);

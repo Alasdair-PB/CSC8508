@@ -20,7 +20,7 @@ void IComponent::SetEnabled(bool enabled) {
 
 
 
-struct IComponent::ComponentDataStruct : public ISerializedData {
+/*struct IComponent::ComponentDataStruct : public ISerializedData {
 	ComponentDataStruct() : enabled(1) {}
 	ComponentDataStruct(bool enabled) : enabled(enabled) {}
 
@@ -47,4 +47,4 @@ void IComponent::Load(std::string folderPath, std::string name){
 
 	ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(folderPath, name);
 	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
-}
+}*/

@@ -7,8 +7,6 @@
 #include <typeindex>
 #include <type_traits>
 #include <iostream>
-
-
 using std::vector;
 
 namespace NCL::CSC8508 {

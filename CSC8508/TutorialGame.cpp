@@ -15,100 +15,61 @@
 using namespace NCL;
 using namespace CSC8508;
 
-namespace namespaceX {  
-	struct ISerializedField {
-		virtual ~ISerializedField() = default;
-	};
-
-	template <typename T>
-	struct Serialized : public ISerializedField {
-		T value;
-		constexpr Serialized(T v) : value(v) {}
-	};
-
-	template <typename Derived>
-	struct ISerializedData {	
-		#define serialized_var(type, name, value) \
-			Serialized<type> name{value}; \
-			ISerializedField* get_##name() { return &name; } \
-			inline static bool name##_registered = (Parent::addSerializedField(&MySaveStruct::get_##name), true);
-		using FieldGetter = ISerializedField * (Derived::*)();
-		static inline std::vector<FieldGetter> serializedFields;
-
-		static void addSerializedField(FieldGetter field_ptr) {
-			serializedFields.push_back(field_ptr);
-		}
-
-		static auto GetSerializedFields() {
-			return serializedFields;
-		}
-	};
-
-	struct MySaveStruct : ISerializedData<MySaveStruct> {
-		using Parent = ISerializedData<MySaveStruct>;
-		serialized_var(int, x, 0);
-		serialized_var(std::vector<std::string>, filePointers, {});
-
-		MySaveStruct() {}
-		static void printSerializedFields() {
-			auto fields = GetSerializedFields();
-		}
-	};
-}
-
-
-
 class ISerializable {
-public: 			
+public:
 	virtual std::string Save(std::string folderPath) { return ""; }
 	virtual void Load(std::string folderPath, std::string name) {}
 
-/*
-	template <typename Derived>
-	struct ISerializedData {
-		static inline std::tuple<> serializedFields; 
+	#define ERROR_GET_SERIALIZED_FIELDS(T) \
+		"Error: GetSerializedFields not implemented in class " #T
 
-		static void addSerializedField(int* field_ptr) {
-			serializedFields.push_back(field_ptr);
+	struct ISerializedData {
+	public:
+		#define SERIALIZED_FIELD(Derived, field) std::make_tuple(#field, &Derived::field)
+		//#define ERROR_GET_SERIALIZED_FIELDS(T) \
+			"Error: GetSerializedFields not implemented in class " #T
+
+		template <typename T, typename = void>
+		struct HasGetSerializedFields : std::false_type {};
+
+		template <typename T>
+		struct HasGetSerializedFields<T, std::void_t<decltype(T::GetSerializedFields())>> : std::true_type {};
+
+		template<typename T>
+		static T LoadISerializable(std::string folderPath, std::string name) {
+			T serializedData;
+			if constexpr (HasGetSerializedFields<T>::value) {
+				auto fields = T::GetSerializedFields();
+				serializedData = std::apply(
+					[&](auto&&... args) { return SaveManager::LoadMyData<T>(name, std::get<1>(args)...); },
+					fields
+				);
+			}
+			else 
+				static_assert(HasGetSerializedFields<T>::value, ERROR_GET_SERIALIZED_FIELDS(T));
+			return serializedData;
 		}
 
-		// Retrieve serialized fields as a tuple
-		static auto GetSerializedFields() {
-			return serializedFields;
+		template<typename T>
+		static SaveManager::GameData CreateGameData(T saveInfo) {
+			SaveManager::GameData saveData;
+			if constexpr (HasGetSerializedFields<T>::value) {
+				auto fields = T::GetSerializedFields();
+				saveData = std::apply(
+					[&](auto&&... args) { return SaveManager::CreateSaveDataAsset(saveInfo, std::get<1>(args)...); },
+					fields
+				);
+			}
+			else 
+				static_assert(HasGetSerializedFields<T>::value, ERROR_GET_SERIALIZED_FIELDS(T));
+			return saveData;
 		}
 	};
-
-#define serialized_var(type, name, value) \
-        type name{value}; \
-        type* get_##name() { return &name; } \
-        inline static bool name##_registered = (Parent::addSerializedField(&MySaveStruct::get_##name), true); \
-        type& name##_direct = name.get();  */
 };
 
-class SaveObject: public ISerializable {
+class SaveObject : public ISerializable {
 public:
-/*
-	struct MySaveStruct : ISerializedData<MySaveStruct> {
-		using Parent = ISerializedData<MySaveStruct>;
-
-		serialized_var(int, x, 0);
-		serialized_var(std::vector<std::string>, filePointers, {});
-
-		MySaveStruct() {}
-
-		MySaveStruct(int x) : x(x) {}
-
-		static void printSerializedFields() {
-			auto fields = GetSerializedFields();
-			std::apply([](auto&&... args) {
-				((std::cout << args->get() << std::endl), ...);
-				}, fields);
-		}
-	};*/
-	
-	struct MySaveStruct {
-		#define SERIALIZED_FIELD(field) std::make_tuple(#field, &MySaveStruct::field)
-
+	struct MySaveStruct : public ISerializable {
 		MySaveStruct() : x(0) {}
 		MySaveStruct(int x) : x(x) {}
 
@@ -117,8 +78,8 @@ public:
 
 		static auto GetSerializedFields() {
 			return std::make_tuple(
-				SERIALIZED_FIELD(x),
-				SERIALIZED_FIELD(filePointers)
+				SERIALIZED_FIELD(MySaveStruct, x),
+				SERIALIZED_FIELD(MySaveStruct, filePointers)
 			);
 		}
 	};
@@ -129,12 +90,7 @@ public:
 
 	void Load(std::string folderPath, std::string name) override {
 
-		auto fields = MySaveStruct::GetSerializedFields();
-		MySaveStruct loadedSaveData = std::apply(
-			[&](auto&&... args) { return SaveManager::LoadMyData<MySaveStruct>(name, std::get<1>(args)...); },
-			fields
-		);
-
+		MySaveStruct loadedSaveData = ISerializedData::LoadISerializable<MySaveStruct>(folderPath, name);
 		for (int i = 0; i < loadedSaveData.filePointers.size(); i++) {
 			std::cout << loadedSaveData.filePointers[i] << std::endl;
 			if (i >= objects.size()) break;
@@ -150,7 +106,8 @@ public:
 
 		for (ISerializable* object : objects)
 			saveInfo.filePointers.push_back(object->Save(folderPath));
-		SaveManager::GameData saveData = SaveManager::CreateSaveDataAsset(saveInfo, &MySaveStruct::x, &MySaveStruct::filePointers);
+
+		SaveManager::GameData saveData = ISerializedData::CreateGameData<MySaveStruct>(saveInfo);
 		SaveManager::SaveGameData(fileName, saveData);
 		return fileName;
 	}	

@@ -16,7 +16,7 @@ AudioEngine::AudioEngine() : audioSystem(nullptr) {
 
 	musicGroup = CreateChannelGroups(ChannelGroupType::MUSIC, "Music");
 	sfxGroup = CreateChannelGroups(ChannelGroupType::SFX, "SFX");
-	voiceGroup = CreateChannelGroups(ChannelGroupType::VOICE, "Voice");
+	voiceGroup = CreateChannelGroups(ChannelGroupType::CHAT, "Voice");
 
 	masterGroup->addGroup(musicGroup);
 	masterGroup->addGroup(sfxGroup);

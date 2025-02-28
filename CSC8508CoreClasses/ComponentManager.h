@@ -85,12 +85,12 @@ namespace NCL::CSC8508 {
         using Action = std::function<void(std::function<void(T*)> func)>;
 
         static void OperateOnAllIComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkComponentBufferOperators)
+            for (Action<IComponent>* myAction : IComponentBufferOperators) 
                 (*myAction)(func);
         }
 
         static void OperateOnAllINetworkComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkComponentBufferOperators)
+            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) 
                 (*myAction)(func);
         }
 
@@ -128,12 +128,14 @@ namespace NCL::CSC8508 {
             componentCount<T>++;
             allComponents[typeid(T)].push_back(component);
 
+            AddOperatorBuffer<T, IComponent>(IComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkComponent>(INetworkComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
 
             return component;
         }
-        static void Clear()
+
+        static void CleanUp()
         {
             for (auto& [type, componentsList] : allComponents) {
                 for (auto* comp : componentsList)
@@ -156,6 +158,7 @@ namespace NCL::CSC8508 {
 
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static std::vector<Action<IComponent>*> INetworkComponentBufferOperators;
+        inline static std::vector<Action<IComponent>*> IComponentBufferOperators;
         inline static std::vector<Action<IComponent>*> INetworkDeltaComponentBufferOperators;
 
     };

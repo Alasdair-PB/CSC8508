@@ -9,6 +9,8 @@
 #include <type_traits>
 #include <iostream>
 #include <vector>
+#include "ISerializable.h"
+
 #include <memory>
 using std::vector;
 
@@ -17,7 +19,7 @@ namespace NCL::CSC8508 {
     class IComponent;
     class INetworkComponent;
     class INetworkDeltaComponent;
-
+    class ISerializable;
     class PhysicsComponent;
 
     class ComponentManager final {
@@ -83,21 +85,18 @@ namespace NCL::CSC8508 {
         using Action = std::function<void(std::function<void(T*)> func)>;
 
         static void OperateOnAllIComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) {
+            for (Action<IComponent>* myAction : INetworkComponentBufferOperators)
                 (*myAction)(func);
-            }
         }
 
         static void OperateOnAllINetworkComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkComponentBufferOperators) {
+            for (Action<IComponent>* myAction : INetworkComponentBufferOperators)
                 (*myAction)(func);
-            }
         }
 
         static void OperateOnAllINetworkDeltaComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : INetworkDeltaComponentBufferOperators) {
+            for (Action<IComponent>* myAction : INetworkDeltaComponentBufferOperators)
                 (*myAction)(func);
-            }
         }
 
         template <typename T, typename T2> requires std::is_base_of_v<IComponent, T>

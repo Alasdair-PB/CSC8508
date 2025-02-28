@@ -7,11 +7,13 @@
 
 #include "Transform.h"
 #include "GameObject.h"
+#include "ISerializable.h"
+
 #include <unordered_set>
 
 namespace NCL::CSC8508 
 {
-	class IComponent
+	class IComponent : public ISerializable
 	{
 	public:
 
@@ -82,6 +84,37 @@ namespace NCL::CSC8508
 		bool IsDerived(const std::type_info& typeInfo) const {
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
+
+
+		struct ComponentDataStruct : public ISerializable {
+			ComponentDataStruct() : enabled(1) {}
+			ComponentDataStruct(bool enabled) : enabled(enabled) {}
+
+			bool enabled;
+
+			static auto GetSerializedFields() {
+				return std::make_tuple(
+					SERIALIZED_FIELD(ComponentDataStruct, enabled)
+				);
+			}
+		};
+
+		void Load(std::string folderPath, std::string name) override {
+
+			ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(folderPath, name);
+			std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
+		}
+
+		std::string Save(std::string folderPath) override
+		{
+			int id = 6;
+			std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";
+			ComponentDataStruct saveInfo(enabled);
+			SaveManager::GameData saveData = ISerializedData::CreateGameData<ComponentDataStruct>(saveInfo);
+			SaveManager::SaveGameData(fileName, saveData);
+			return fileName;
+		}
+
 
 	protected:
 		virtual void OnAwake() {}

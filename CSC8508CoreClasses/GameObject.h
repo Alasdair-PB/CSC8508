@@ -6,6 +6,7 @@
 #include "Transform.h"
 #include "ComponentManager.h"
 #include <vector>
+#include "ISerializable.h"
 
 using std::vector;
 
@@ -25,18 +26,16 @@ namespace NCL::CSC8508 {
 	class PhysicsObject;
 	class BoundsComponent;
 
-	class GameObject	{
+	class GameObject: ISerializable	{
 	public:
 		GameObject(bool isStatic = false);
 		~GameObject();
 
 		bool IsEnabled() const { return isEnabled;}
 		bool SetEnabled(bool isEnabled) { this->isEnabled = isEnabled;  }
-
 		bool IsStatic() const { return isStatic;}
 
 		Transform& GetTransform() {return transform;}
-
 
 		/**
 		 * Function invoked after the object and components have been instantiated.
@@ -120,6 +119,25 @@ namespace NCL::CSC8508 {
 			}
 			return nullptr;
 		}
+
+		struct GameObjDataStruct : public ISerializable {
+			GameObjDataStruct() : isEnabled(1) {}
+			GameObjDataStruct(bool isEnabled) : isEnabled(isEnabled) {}
+
+			bool isEnabled;
+			std::vector<std::string> componentPointers;
+
+			static auto GetSerializedFields() {
+				return std::make_tuple(
+					SERIALIZED_FIELD(GameObjDataStruct, isEnabled),
+					SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
+				);
+			}
+		};
+
+		void Load(std::string folderPath, std::string name) override;
+		std::string Save(std::string folderPath) override;
+
 
 		void AddChild(GameObject* child);
 		GameObject* TryGetParent();

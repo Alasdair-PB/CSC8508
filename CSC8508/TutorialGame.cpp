@@ -9,7 +9,7 @@
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
 #include "Legacy/StateGameObject.h"
-#include "array"
+#include "SaveManager.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -33,8 +33,8 @@ void TestSaveGameObject() {
 	GameObject* myObjectToSave = new GameObject();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
 
-	std::string fileName = myObjectToSave->Save("");
-	myObjectToSave->Load("", fileName);
+	//std::string fileName = myObjectToSave->Save("");
+	//myObjectToSave->Load("", fileName);
 }
 
 // Defaults to "game_data.gdmt" for test

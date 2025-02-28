@@ -6,9 +6,13 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#ifdef _SCE_TARGET_OS_PROSPERO //Change to PS5
+#ifndef USE_PS5 //Change to PS5
 #include <sys/ioctl.h>
 #include <netdb.h>
+#else
+#include <arpa/inet.h> 
+#include <netinet/in.h>
+#include <net.h>
 #endif
 
 /* #define HAS_FCNTL 1  PS5 
@@ -25,10 +29,10 @@
 #define SOMAXCONN 128
 #endif
 #ifndef HAS_FCNTL
-#define HAS_FCNTL 1
+//#define HAS_FCNTL 1
 #endif
-#define HAS_INET_NTOP 1 
-#define HAS_INET_PTON 1
+//#define HAS_INET_NTOP 1 
+//#define HAS_INET_PTON 1
 #ifndef HAS_GETADDRINFO
 // #define HAS_GETADDRINFO 1
 #endif

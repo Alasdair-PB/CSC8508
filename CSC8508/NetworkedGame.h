@@ -14,6 +14,8 @@ namespace NCL {
 			NetworkedGame();
 			~NetworkedGame();
 
+			NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer);
+
 			void StartAsServer();
 			void StartAsClient(char a, char b, char c, char d);
 

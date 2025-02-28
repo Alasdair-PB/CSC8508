@@ -1,5 +1,5 @@
 #include "PS5Window.h"
-#include "../CSC8508/TutorialGame.h"
+#include "../CSC8508/NetworkedGame.h"
 #include "../CSC8508CoreClasses/PhysicsSystem.h"
 #include "../CSC8508CoreClasses/GameWorld.h"
 #include "../CSC8508/GameTechRendererInterface.h"
@@ -22,7 +22,6 @@ int main() {
 	std::unique_ptr<GameTechVulkanRenderer> renderer = std::make_unique<GameTechVulkanRenderer>(*world);
 #elif USEAGC
 	std::unique_ptr<GameTechAGCRenderer> renderer = std::make_unique<GameTechAGCRenderer>(*world);
-
 	PS5Controller* c = window->GetController();
 #else 
 	GameTechRenderer* renderer = new GameTechRenderer(*world);
@@ -52,14 +51,14 @@ int main() {
 	c->MapButton(0, "Up");
 	c->MapButton(2, "Down");
 
-	std::unique_ptr<TutorialGame> g = std::make_unique<TutorialGame>();
+	std::unique_ptr<TutorialGame> g = std::make_unique<TutorialGame>(world.get(), renderer.get());
 
 	while (window->UpdateWindow()) {
 		float dt = window->GetTimer().GetTimeDeltaSeconds();
 		g->UpdateGame(dt);
 		renderer->Update(dt);
 		renderer->Render();
-		Debug::UpdateRenderables(dt);
+		//Debug::UpdateRenderables(dt);
 	}
 
 	return 0;

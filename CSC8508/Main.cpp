@@ -25,7 +25,7 @@
 #include "BehaviourAction.h"
 
 #include "RenderObject.h"
-
+#include "GameTechRenderer.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -290,11 +290,14 @@ void TestNetworking()
 #pragma  endregion
 
 
-void UpdateWindow(Window* w, NetworkedGame* g)
+void UpdateWindow(Window* w, NetworkedGame* g, GameTechRenderer* r)
 {
 	float dt = w->GetTimer().GetTimeDeltaSeconds();
 	w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
 	g->UpdateGame(dt);
+	r->Update(dt);
+	r->Render();
+	Debug::UpdateRenderables(dt);
 }
 
 int main(int argc, char** argv) 
@@ -305,7 +308,10 @@ int main(int argc, char** argv)
 	initInfo.windowTitle = "CSC8508 Game technology!";
 
 	Window* w = Window::CreateGameWindow(initInfo);
-	NetworkedGame* g = new NetworkedGame();
+	
+	std::unique_ptr<GameWorld>	world = std::make_unique<GameWorld>();
+	std::unique_ptr<GameTechRenderer> renderer = std::make_unique<GameTechRenderer>(*(world.get()));
+	NetworkedGame* g = new NetworkedGame(world.get(), renderer.get());
 
 	if (!w->HasInitialised()) 
 		return -1;
@@ -316,7 +322,9 @@ int main(int argc, char** argv)
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{
-		UpdateWindow(w, g);
+		float dt = w->GetTimer().GetTimeDeltaSeconds();
+		world->UpdateWorld(dt);
+		UpdateWindow(w, g, renderer.get());
 	}
 	Window::DestroyGameWindow();
 }

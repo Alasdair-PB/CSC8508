@@ -42,13 +42,14 @@ namespace NCL::Rendering {
 
 		virtual bool SetVerticalSync(VerticalSyncState s);
 
+		void Render() { RendererBase::Render(); };
+		void Update(float dt) { RendererBase::Update(dt); };
+
 	protected:			
 		void BeginFrame()	override;
 		void RenderFrame()	override;
 		void EndFrame()		override;
 		void SwapBuffers()  override;
-
-		void Render() { RendererBase::Render(); };
 
 		void UseShader(const OGLShader& s);
 		void BindTextureToShader(const OGLTexture& t, const std::string& uniform, int texUnit) const;

@@ -37,6 +37,9 @@ namespace NCL {
 			virtual Texture*	LoadTexture(const std::string& name)			override;
 			virtual Shader*		LoadShader(const std::string& vertex, const std::string& fragment)	override;
 
+			void Render() override { NCL::PS5::AGCRenderer::Render(); }
+			void Update(float dt) override { NCL::PS5::AGCRenderer::Update(dt); }
+
 		protected:
 			void RenderFrame()	override;
 			void UpdateObjectList();

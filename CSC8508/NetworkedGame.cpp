@@ -23,7 +23,8 @@ void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { SpawnPlayer(); }
 
 
-NetworkedGame::NetworkedGame()	{
+NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
+: TutorialGame(gameWorld, renderer) {
 	thisServer = nullptr;
 	thisClient = nullptr;
 
@@ -76,6 +77,7 @@ void NetworkedGame::UpdateGame(float dt)
 
 		timeToNextPacket += 1.0f / 20.0f; //20hz server/client update
 	}
+	mainMenu->Update(dt);
 	TutorialGame::UpdateGame(dt);
 }
 

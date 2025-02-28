@@ -3,10 +3,6 @@
 //
 
 #include "GameObject.h"
-#include "CollisionDetection.h"
-#include "PhysicsObject.h"
-#include "RenderObject.h"
-#include "NetworkObject.h"
 
 using namespace NCL::CSC8508;
 
@@ -24,7 +20,7 @@ GameObject::~GameObject()	{
 	delete renderObject;
 }
 
-/*struct GameObject::GameObjDataStruct : public ISerializedData {
+struct GameObject::GameObjDataStruct : public ISerializedData {
 	GameObjDataStruct() : isEnabled(1) {}
 	GameObjDataStruct(bool isEnabled) : isEnabled(isEnabled) {}
 
@@ -63,4 +59,3 @@ std::string GameObject::Save(std::string folderPath)
 	SaveManager::SaveGameData(fileName, saveData);
 	return fileName;
 }
-*/

@@ -9,63 +9,12 @@
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
 #include "Legacy/StateGameObject.h"
+#include "ISerializable.h"
 
 #include "array"
 
 using namespace NCL;
 using namespace CSC8508;
-
-class ISerializable {
-public:
-	virtual std::string Save(std::string folderPath) { return ""; }
-	virtual void Load(std::string folderPath, std::string name) {}
-
-	#define ERROR_GET_SERIALIZED_FIELDS(T) \
-		"Error: GetSerializedFields not implemented in class " #T
-
-	struct ISerializedData {
-	public:
-		#define SERIALIZED_FIELD(Derived, field) std::make_tuple(#field, &Derived::field)
-		//#define ERROR_GET_SERIALIZED_FIELDS(T) \
-			"Error: GetSerializedFields not implemented in class " #T
-
-		template <typename T, typename = void>
-		struct HasGetSerializedFields : std::false_type {};
-
-		template <typename T>
-		struct HasGetSerializedFields<T, std::void_t<decltype(T::GetSerializedFields())>> : std::true_type {};
-
-		template<typename T>
-		static T LoadISerializable(std::string folderPath, std::string name) {
-			T serializedData;
-			if constexpr (HasGetSerializedFields<T>::value) {
-				auto fields = T::GetSerializedFields();
-				serializedData = std::apply(
-					[&](auto&&... args) { return SaveManager::LoadMyData<T>(name, std::get<1>(args)...); },
-					fields
-				);
-			}
-			else 
-				static_assert(HasGetSerializedFields<T>::value, ERROR_GET_SERIALIZED_FIELDS(T));
-			return serializedData;
-		}
-
-		template<typename T>
-		static SaveManager::GameData CreateGameData(T saveInfo) {
-			SaveManager::GameData saveData;
-			if constexpr (HasGetSerializedFields<T>::value) {
-				auto fields = T::GetSerializedFields();
-				saveData = std::apply(
-					[&](auto&&... args) { return SaveManager::CreateSaveDataAsset(saveInfo, std::get<1>(args)...); },
-					fields
-				);
-			}
-			else 
-				static_assert(HasGetSerializedFields<T>::value, ERROR_GET_SERIALIZED_FIELDS(T));
-			return saveData;
-		}
-	};
-};
 
 class SaveObject : public ISerializable {
 public:
@@ -124,22 +73,36 @@ struct MyX {
 	int x;
 };
 
-// Defaults to "game_data.gdmt" for test
-void TestSave() {
+void TestSaveByType() {
+	SaveManager::SaveGameData("game_data.gdmt", SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>("game_data.gdmt")[0] << std::endl;
+	SaveManager::SaveGameData("game_data_int.gdmt", SaveManager::CreateSaveDataAsset<int>(45));
+	std::cout << SaveManager::LoadMyData<int>("game_data_int.gdmt") << std::endl;
+	SaveManager::SaveGameData("game_data_x.gdmt", SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
+	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.gdmt").x << std::endl;
+}
+
+void TestSaveObject() {
 	SaveObject* objA = new SaveObject(1, 7);
 	SaveObject* objB = new SaveObject(2, 64);
 	objA->AddParent(objB);
 	std::string fileName = objA->Save("");
 	objA->Load("", fileName);
+}
 
-	SaveManager::SaveGameData("game_data.gdmt", SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	std::cout << SaveManager::LoadMyData<std::vector<int>>("game_data.gdmt")[0] << std::endl;
+void TestSaveGameObject() {
+	GameObject* myObjectToSave = new GameObject();
+	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
 
-	SaveManager::SaveGameData("game_data_int.gdmt", SaveManager::CreateSaveDataAsset<int>(45));
-	std::cout << SaveManager::LoadMyData<int>("game_data_int.gdmt") << std::endl;
+	std::string fileName = myObjectToSave->Save("");
+	myObjectToSave->Load("", fileName);
+}
 
-	SaveManager::SaveGameData("game_data_x.gdmt", SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
-	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.gdmt").x << std::endl;
+// Defaults to "game_data.gdmt" for test
+void TestSave() {
+	TestSaveObject();
+	TestSaveByType();
+	TestSaveGameObject();
 }
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 

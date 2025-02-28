@@ -52,26 +52,24 @@ namespace NCL::CSC8508
 		
 		~TransformNetworkComponent() = default;
 
-		void OnAwake() override { 
-			lastFullState = new TransformNetworkState();
-		}
 		void Update(float deltaTime) override {}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
 			static std::unordered_set<std::type_index> types = {
-				std::type_index(typeid(IComponent)),				
+				std::type_index(typeid(IComponent)),
 				std::type_index(typeid(INetworkComponent)),
 				std::type_index(typeid(INetworkDeltaComponent))
 			};
 			return types;
 		}
 
-		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame, int stateID) override 
+		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override 
 		{ 
 			vector<GamePacket*> packets;
 
 			DeltaPacket* dp = new DeltaPacket();
 			TransformNetworkState state;
+			int stateID = lastFullState->stateID;
 
 			if (!GetNetworkState(stateID, &state))
 				return packets;
@@ -102,12 +100,14 @@ namespace NCL::CSC8508
 			vector<GamePacket*> packets;
 			FullPacket* fp = new FullPacket();
 
+			// Packets can be written for non-owners in case of server, but in these cases we want to use the recieved fullState
+			if (clientOwned) lastFullState->stateID++; 
+
 			fp->fullState.position = myObject.GetTransform().GetPosition();
 			fp->fullState.orientation = myObject.GetTransform().GetOrientation();
-			fp->fullState.stateID = lastFullState->stateID++;
+			fp->fullState.stateID = lastFullState->stateID;
 
 			SetPacketOwnership(fp);
-
 			packets.push_back(fp);
 			return packets;
 		}
@@ -121,8 +121,12 @@ namespace NCL::CSC8508
 		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override 
 		{
 			DeltaPacket p = ((DeltaPacket&)idp);
-			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);
 
+			if (p.fullID != lastFullState->stateID)
+				return false;
+			UpdateStateHistory(p.fullID);
+
+			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);
 			Vector3 fullPos = lastTransformFullState->position;
 			Quaternion fullOrientation = lastTransformFullState->orientation;
 
@@ -143,30 +147,26 @@ namespace NCL::CSC8508
 			return true;
 		}
 
-		bool ReadFullPacket(IFullNetworkPacket& ifp) override
-		{
-			FullPacket p = ((FullPacket&) ifp);
-			if (p.fullState.stateID < lastFullState->stateID)
-				return false;
+			
+		bool ReadFullPacket(IFullNetworkPacket& ifp) override {
+			FullPacket p = ((FullPacket&) ifp);		
 
-			std::cout << p.fullState.position.y << std::endl;
+			if (p.fullState.stateID < lastFullState->stateID) return false;
 
 			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;
 			((TransformNetworkState*)lastFullState)->stateID = p.fullState.stateID;
-
-			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);
-
-			if (!lastTransformFullState)
-				return false;
-
+			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);				
+			
+			if (!lastTransformFullState) return false;
 			myObject.GetTransform().SetPosition(lastTransformFullState->position);
 			myObject.GetTransform().SetOrientation(lastTransformFullState->orientation);
 
-			stateHistory.emplace_back(lastFullState);
+			TransformNetworkState* transformStateHistory = new TransformNetworkState();
+			*transformStateHistory = *lastTransformFullState;
+			stateHistory.emplace_back(transformStateHistory);
 			return true;
 		}
-
 		bool ReadEventPacket(INetworkPacket& p) override { return true;}
 	};
 }

@@ -49,6 +49,10 @@ namespace NCL {
 			void BroadcastOwnedObjects(bool deltaFrame);
 
 			bool SendToAllClients(GamePacket* dataPacket);
+
+			void ReceiveComponentEventPacket(int type, GamePacket* payload);
+			void ReceiveFullDeltaStatePacket(int type, GamePacket* payload);
+			void ReceiveSpawnPacket(int type, GamePacket* payload);
 			bool SendToAllOtherClients(GamePacket* dataPacket, int ownerId);
 
 			GameServer* thisServer;

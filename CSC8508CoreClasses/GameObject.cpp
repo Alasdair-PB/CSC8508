@@ -16,12 +16,10 @@ GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic)	{
 	layerID = Layers::LayerID::Default;
 	tag = Tags::Tag::Default;
 	renderObject	= nullptr;
-	networkObject	= nullptr;
 	components = vector<IComponent*>();
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
 }
 
 GameObject::~GameObject()	{
 	delete renderObject;
-	delete networkObject;
 }

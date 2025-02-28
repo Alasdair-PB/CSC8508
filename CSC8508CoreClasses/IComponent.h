@@ -36,7 +36,7 @@ namespace NCL::CSC8508
 		 * Function invoked each frame after Update.
 		 * @param deltaTime Time since last frame
 		 */
-		void InvokeLateUpdate(float deltaTime) { LateUpdate(deltaTime); }
+		void InvokeEarlyUpdate(float deltaTime) { EarlyUpdate(deltaTime); }
 
 		/**
 		 * Function invoked when the component is enabled.
@@ -86,7 +86,7 @@ namespace NCL::CSC8508
 	protected:
 		virtual void OnAwake() {}
 		virtual void Update(float deltaTime) {}
-		virtual void LateUpdate(float deltaTime) {}
+		virtual void EarlyUpdate(float deltaTime) {}
 		virtual void OnEnable() {}
 		virtual void OnDisable() {}
 

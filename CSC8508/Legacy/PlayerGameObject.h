@@ -54,20 +54,16 @@ namespace NCL {
                 if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr)
                     return;
 
+                if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
+                    return;
+
                 Vector3 dir;
-                yaw -= inputComponent->GetNamedAxis("XLook");
-
-                if (yaw < 0)
-                    yaw += 360.0f;
-                if (yaw > 360.0f)
-                    yaw -= 360.0f;
-
-                Matrix3 yawRotation = Matrix::RotationMatrix3x3(yaw, Vector3(0, 1, 0));
+                Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
 
                 dir += yawRotation * Vector3(0, 0, -inputComponent->GetNamedAxis("Forward"));
                 dir += yawRotation * Vector3(inputComponent->GetNamedAxis("Sidestep"), 0, 0);
 
-                Matrix3 offsetRotation = Matrix::RotationMatrix3x3(-55.0f, Vector3(0, 1, 0));
+                Matrix3 offsetRotation = Matrix::RotationMatrix3x3(0.0f, Vector3(0, 1, 0));
                 dir = offsetRotation * dir;
 
                 physicsObj->AddForce(dir * speed);
@@ -94,7 +90,6 @@ namespace NCL {
  
         protected:
             float speed = 10.0f;
-            float	yaw = 0;
             EndGame endGame;
             IncreaseScore increaseScore;
 

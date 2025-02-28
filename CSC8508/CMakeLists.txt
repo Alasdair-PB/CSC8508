@@ -187,20 +187,18 @@ include_directories("../NCLCoreClasses/")
 include_directories("../CSC8508CoreClasses/")
 include_directories("../OpenGLRendering/")
 
-
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8508CoreClasses)
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC enet)
 
 if(PS5)
 	#include_directories("../PS5Core/")
 	#target_link_libraries(${PROJECT_NAME} LINK_PUBLIC PS5Core)
 	#include_directories("../PS5Starter/")
 	#target_link_libraries(${PROJECT_NAME} LINK_PUBLIC PS5Starter)
-# else() PS5
-#=target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
-#include_directories("../OpenGLRendering/")
+else() 
+include_directories("../OpenGLRendering/")
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC enet)
 endif()
 
 if(USE_VULKAN)

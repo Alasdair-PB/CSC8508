@@ -12,22 +12,24 @@
 #include "GameTechRenderer.h"
 
 #ifdef USE_PS5
-//#include "../PS5Starter/GameTechAGCRenderer.h"
-//#include "../PS5Core/PS5Window.h"
+#include "../PS5Starter/GameTechAGCRenderer.h"
+#include "../PS5Core/PS5Window.h"
+#include "../PS5Core/PS5Controller.h"
 #endif // USE_PS5
 
 using namespace NCL;
 using namespace CSC8508;
 
-TutorialGame::TutorialGame() 
+TutorialGame::TutorialGame(GameWorld* inWorld, GameTechRendererInterface* inRenderer)
+	: world(inWorld),
+	renderer(inRenderer)
 {
-	world = new GameWorld();
-
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
-	renderer = new GameTechAGCRenderer(*world);
+	world->GetMainCamera().SetController(*w->GetController());
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
+	world->GetMainCamera().SetController(*controller);
 #ifdef USEVULKAN
 	renderer = new GameTechVulkanRenderer(*world);
 	renderer->Init();
@@ -42,15 +44,7 @@ TutorialGame::TutorialGame()
 	useGravity		= false;
 	inSelectionMode = false;
 
-	world->GetMainCamera().SetController(*controller);
 	world->GetMainCamera().SetGetPlayer([&]() -> Vector3 { return GetPlayerPos(); });
-
-	controller->MapAxis(0, "Sidestep");
-	controller->MapAxis(1, "UpDown");
-	controller->MapAxis(2, "Forward");
-
-	controller->MapAxis(3, "XLook");
-	controller->MapAxis(4, "YLook");
 
 	InitialiseAssets();	
 	
@@ -144,9 +138,9 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 
 bool TutorialGame::OnEndGame(float dt) {
 	if (endGame) {
-		renderer->Render();
-		renderer->Update(dt);
-		Debug::UpdateRenderables(dt);
+		//renderer->Render();
+		//renderer->Update(dt);
+		//Debug::UpdateRenderables(dt);
 		return true;
 	}
 
@@ -168,9 +162,8 @@ void TutorialGame::UpdateGame(float dt)
 	if (OnEndGame(dt))
 		return;
 
-	mainMenu->Update(dt);
-	renderer->Render();
-	renderer->Update(dt);
+	//renderer->Render();
+	//renderer->Update(dt);
 	Debug::UpdateRenderables(dt);
 
 	if (inPause)

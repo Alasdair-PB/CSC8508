@@ -82,3 +82,4 @@ Testing/
 enet-master/
 *.zip
 /build_windows
+/Assets

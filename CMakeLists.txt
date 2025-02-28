@@ -52,6 +52,10 @@ set(COMPILE_ASSET_ROOT "${CMAKE_SOURCE_DIR}/Assets/" CACHE STRING "")
 set(DEBUG_ASSET_ROOT "${CMAKE_SOURCE_DIR}/Assets/" CACHE STRING "")
 set(RELEASE_ASSET_ROOT "${CMAKE_SOURCE_DIR}/Assets/" CACHE STRING "")
 
+message(STATUS "Compile Asset Root: ${COMPILE_ASSET_ROOT}")
+message(STATUS "Debug Asset Root: ${DEBUG_ASSET_ROOT}")
+message(STATUS "Release Asset Root: ${RELEASE_ASSET_ROOT}")
+
 add_compile_definitions(ASSETROOTLOCATION="${DEBUG_ASSET_ROOT}") 
 
 if(MSVC) 
@@ -75,9 +79,9 @@ else()
 	add_subdirectory(OpenGLRendering)
 endif()
 
+
 if(MSVC)
 if(PS5)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT PS5Starter)
-endif() 
-    
+endif()   
 endif()

@@ -19,7 +19,8 @@ namespace NCL {
 	namespace CSC8508 {
 		class TutorialGame		{
 		public:
-			TutorialGame();
+			TutorialGame() {};
+			TutorialGame(GameWorld* gameWorld, GameTechRendererInterface* renderer);
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);

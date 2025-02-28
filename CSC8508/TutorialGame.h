@@ -13,6 +13,8 @@
 #include "Legacy/PlayerGameObject.h"
 #include "BoundsComponent.h"
 #include <vector>
+#include "SaveManager.h"
+
 using std::vector;
 
 namespace NCL {

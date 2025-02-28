@@ -3,13 +3,12 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "TextureLoader.h"
-#include "Legacy/EnemyGameObject.h"
-#include "Legacy/Kitten.h"
+
+#include "GameObject.h"
+#include "TransformNetworkComponent.h"
 
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
-#include "Legacy/StateGameObject.h"
-#include "SaveManager.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -31,7 +30,10 @@ void TestSaveByType() {
 
 void TestSaveGameObject() {
 	GameObject* myObjectToSave = new GameObject();
+	//PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
+
+	delete myObjectToSave;
 
 	//std::string fileName = myObjectToSave->Save("");
 	//myObjectToSave->Load("", fileName);

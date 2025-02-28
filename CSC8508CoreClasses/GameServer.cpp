@@ -1,6 +1,7 @@
 #include "GameServer.h"
-#include "GameWorld.h"
+#include "EventManager.h"
 #include "./enet/enet.h"
+
 using namespace NCL;
 using namespace CSC8508;
 
@@ -26,6 +27,9 @@ bool GameServer::Initialise() {
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
 	address.port = port;
+
+	peerID = nextPlayerIndex;
+	nextPlayerIndex++;
 
 	netHandle = enet_host_create(&address, clientMax, 1, 0, 0);
 
@@ -55,11 +59,10 @@ void GameServer::ReceivePacket(int type, GamePacket* payload, int source)
 	if (payload->type == Received_State) 
 	{
 		AcknowledgePacket* ackPacket = (AcknowledgePacket*) payload;
-		playerStates[source] = ackPacket->stateID;
-		std::cout << "packet recieved" << std::endl;
+		ClientConnectedEvent event = ClientConnectedEvent(ackPacket->GetStateID());
+		EventManager::Call(&event);
 	}
 }
-
 
 void GameServer::UpdateServer() {
 
@@ -73,17 +76,20 @@ void GameServer::UpdateServer() {
 		ENetPeer* p = event.peer;
 		int peer = p->incomingPeerID;
 
-		std::cout << "Updating event: " << type << std::endl;
-
 		if (type == ENET_EVENT_TYPE_CONNECT) 
-		{		
-			// Does not handle disconnects correctly- disconnected players may break playerID setup
+		{					
+			nextPlayerIndex++;
+			int playerID = nextPlayerIndex;			
 
-			int playerID = playerPeers.size();
 			playerPeers[playerID] = p;
 			playerStates[playerID] = 0;
 
+			SetClientId* newPacket = new SetClientId();
+			newPacket->clientPeerId = playerID;
+			SendPacketToPeer(newPacket, playerID);
 			std::cout << "player connected" << std::endl;
+			delete newPacket;
+
 		}
 		else if (type == ENET_EVENT_TYPE_DISCONNECT) 
 		{
@@ -91,7 +97,6 @@ void GameServer::UpdateServer() {
 
 			if (it != playerPeers.end()) 
 				playerPeers.erase(it);
-
 			std::cout << "player disconnected" << std::endl;
 
 		}		
@@ -101,13 +106,7 @@ void GameServer::UpdateServer() {
 			ProcessPacket(packet, peer);
 		}		
 		enet_packet_destroy(event.packet);
-
 	}
-}
-
-void GameServer::SetGameWorld(GameWorld &g) 
-{
-	gameWorld = &g;
 }
 
 bool GameServer::SendPacketToPeer(GamePacket* packet, int playerID) 

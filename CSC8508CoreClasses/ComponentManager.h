@@ -9,8 +9,6 @@
 #include <type_traits>
 #include <iostream>
 #include <vector>
-#include "ISerializable.h"
-
 #include <memory>
 using std::vector;
 
@@ -19,8 +17,6 @@ namespace NCL::CSC8508 {
     class IComponent;
     class INetworkComponent;
     class INetworkDeltaComponent;
-    class ISerializable;
-    class PhysicsComponent;
 
     class ComponentManager final {
     public:

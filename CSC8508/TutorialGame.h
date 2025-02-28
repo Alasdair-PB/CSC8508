@@ -4,20 +4,16 @@
 #include "Legacy/MainMenu.h"
 #include "Math.h"
 #include "Legacy/UpdateObject.h"
-
-
 #pragma once
 #include "GameTechRenderer.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
 #endif
-#include "SaveManager.h"
 #include "PhysicsSystem.h"
 #include "Legacy/PlayerGameObject.h"
 #include "BoundsComponent.h"
 #include <vector>
 using std::vector;
-
 
 namespace NCL {
 	namespace CSC8508 {
@@ -28,7 +24,6 @@ namespace NCL {
 			int ownId;
 			bool clientOwned;
 		};
-
 
 		class TutorialGame		{
 		public:

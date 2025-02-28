@@ -9,63 +9,10 @@
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
 #include "Legacy/StateGameObject.h"
-#include "ISerializable.h"
-
 #include "array"
 
 using namespace NCL;
 using namespace CSC8508;
-
-class SaveObject : public ISerializable {
-public:
-	struct MySaveStruct : public ISerializable {
-		MySaveStruct() : x(0) {}
-		MySaveStruct(int x) : x(x) {}
-
-		int x;
-		std::vector<std::string> filePointers;
-
-		static auto GetSerializedFields() {
-			return std::make_tuple(
-				SERIALIZED_FIELD(MySaveStruct, x),
-				SERIALIZED_FIELD(MySaveStruct, filePointers)
-			);
-		}
-	};
-
-	SaveObject(int id, int x): x(x), id(id){}
-
-	void AddParent(ISerializable* object) { objects.push_back(object); }
-
-	void Load(std::string folderPath, std::string name) override {
-
-		MySaveStruct loadedSaveData = ISerializedData::LoadISerializable<MySaveStruct>(folderPath, name);
-		for (int i = 0; i < loadedSaveData.filePointers.size(); i++) {
-			std::cout << loadedSaveData.filePointers[i] << std::endl;
-			if (i >= objects.size()) break;
-			objects[i]->Load(folderPath, loadedSaveData.filePointers[i]);
-		}
-		std::cout << loadedSaveData.x << std::endl;
-	}
-
-	std::string Save(std::string folderPath) override
-	{
-		std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";
-		MySaveStruct saveInfo(x);
-
-		for (ISerializable* object : objects)
-			saveInfo.filePointers.push_back(object->Save(folderPath));
-
-		SaveManager::GameData saveData = ISerializedData::CreateGameData<MySaveStruct>(saveInfo);
-		SaveManager::SaveGameData(fileName, saveData);
-		return fileName;
-	}	
-	
-protected:
-	int id;
-	int x;
-	vector<ISerializable*> objects;
-};
 
 struct MyX {
 	MyX() : x(0) {}
@@ -82,14 +29,6 @@ void TestSaveByType() {
 	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.gdmt").x << std::endl;
 }
 
-void TestSaveObject() {
-	SaveObject* objA = new SaveObject(1, 7);
-	SaveObject* objB = new SaveObject(2, 64);
-	objA->AddParent(objB);
-	std::string fileName = objA->Save("");
-	objA->Load("", fileName);
-}
-
 void TestSaveGameObject() {
 	GameObject* myObjectToSave = new GameObject();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
@@ -100,7 +39,6 @@ void TestSaveGameObject() {
 
 // Defaults to "game_data.gdmt" for test
 void TestSave() {
-	TestSaveObject();
 	TestSaveByType();
 	TestSaveGameObject();
 }

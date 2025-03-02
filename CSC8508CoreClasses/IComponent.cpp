@@ -31,18 +31,15 @@ struct IComponent::ComponentDataStruct : public ISerializedData {
 	}
 };
 
-std::string IComponent::Save(std::string folderPath)
+size_t IComponent::Save(std::string assetPath, size_t allocationStart)
 {
-	int id = 47632;
-	std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";
 	ComponentDataStruct saveInfo(enabled);
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<ComponentDataStruct>(saveInfo);
-	SaveManager::SaveGameData(fileName, saveData);
-	return fileName;
+	return SaveManager::SaveGameData(assetPath, saveData, allocationStart);
 }
 
-void IComponent::Load(std::string folderPath, std::string name){
+void IComponent::Load(std::string assetPath, size_t allocationStart){
 
-	ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(folderPath, name);
+	ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(assetPath, allocationStart);
 	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
 }

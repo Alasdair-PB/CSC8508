@@ -10,8 +10,8 @@ namespace NCL::CSC8508 {
 
 	class ISerializable {
 	public:
-		virtual std::string Save(std::string folderPath) { return ""; }
-		virtual void Load(std::string folderPath, std::string name) {}
+		virtual size_t Save(std::string assetPath, size_t allocationStart) { return 0; }
+		virtual void Load(std::string assetPath, size_t allocationStart) {}
 
 		struct ISerializedData {
 		public:
@@ -26,12 +26,12 @@ namespace NCL::CSC8508 {
 			struct HasGetSerializedFields<T, std::void_t<decltype(T::GetSerializedFields())>> : std::true_type {};
 
 			template<typename T>
-			static T LoadISerializable(std::string folderPath, std::string name) {
+			static T LoadISerializable(std::string assetPath, size_t allocationStart) {
 				T serializedData;
 				if constexpr (HasGetSerializedFields<T>::value) {
 					auto fields = T::GetSerializedFields();
 					serializedData = std::apply(
-						[&](auto&&... args) { return SaveManager::LoadMyData<T>(name, std::get<1>(args)...); },
+						[&](auto&&... args) { return SaveManager::LoadMyData<T>(assetPath, allocationStart, std::get<1>(args)...); },
 						fields
 					);
 				}

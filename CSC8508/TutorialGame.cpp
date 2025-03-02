@@ -30,13 +30,9 @@ void TestSaveByType() {
 
 void TestSaveGameObject() {
 	GameObject* myObjectToSave = new GameObject();
-	//PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-
-	delete myObjectToSave;
-
-	//std::string fileName = myObjectToSave->Save("");
-	//myObjectToSave->Load("", fileName);
+	std::string fileName = myObjectToSave->Save("");
+	myObjectToSave->Load("", fileName);
 }
 
 // Defaults to "game_data.gdmt" for test

@@ -18,9 +18,7 @@ void IComponent::SetEnabled(bool enabled) {
 	this->enabled = enabled;
 }
 
-
-
-/*struct IComponent::ComponentDataStruct : public ISerializedData {
+struct IComponent::ComponentDataStruct : public ISerializedData {
 	ComponentDataStruct() : enabled(1) {}
 	ComponentDataStruct(bool enabled) : enabled(enabled) {}
 
@@ -35,7 +33,7 @@ void IComponent::SetEnabled(bool enabled) {
 
 std::string IComponent::Save(std::string folderPath)
 {
-	int id = 6;
+	int id = 47632;
 	std::string fileName = "game_data%" + std::to_string(id) + ".gdmt";
 	ComponentDataStruct saveInfo(enabled);
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<ComponentDataStruct>(saveInfo);
@@ -47,4 +45,4 @@ void IComponent::Load(std::string folderPath, std::string name){
 
 	ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(folderPath, name);
 	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
-}*/
+}

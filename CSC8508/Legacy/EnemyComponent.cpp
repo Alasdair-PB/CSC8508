@@ -1,11 +1,11 @@
-#include "EnemyGameObject.h"
+#include "EnemyComponent.h"
 
 
 using namespace NCL;
 using namespace CSC8508;
 
 
-EnemyGameObject::EnemyGameObject(NavigationMesh* navMesh) 
+EnemyComponent::EnemyComponent(GameObject& gameObject, NavigationMesh* navMesh) : IComponent(gameObject)
 {
     playerVisible = false;
     sequence = new BehaviourSequence("Path Sequence");
@@ -17,14 +17,14 @@ EnemyGameObject::EnemyGameObject(NavigationMesh* navMesh)
     sequence->Reset();
 }
 
-EnemyGameObject::~EnemyGameObject() {
+EnemyComponent::~EnemyComponent() {
     delete sequence;
 }
 
-bool EnemyGameObject::CanSeePlayer()
+bool EnemyComponent::CanSeePlayer()
 {
     Vector3 playerPos = getPlayerPos();
-    Vector3 enemyPos = this->GetTransform().GetPosition();
+    Vector3 enemyPos = GetGameObject().GetTransform().GetPosition();
 
     enemyPos.y += yOffSet;
     playerPos.y += yOffSet;

@@ -20,22 +20,21 @@ struct MyX {
 };
 
 void TestSaveByType() {
-	SaveManager::SaveGameData("game_data.gdmt", SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	std::cout << SaveManager::LoadMyData<std::vector<int>>("game_data.gdmt")[0] << std::endl;
-	SaveManager::SaveGameData("game_data_int.gdmt", SaveManager::CreateSaveDataAsset<int>(45));
-	std::cout << SaveManager::LoadMyData<int>("game_data_int.gdmt") << std::endl;
-	SaveManager::SaveGameData("game_data_x.gdmt", SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
-	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.gdmt").x << std::endl;
+	SaveManager::SaveGameData("game_data.gdmt", SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}), 0);
+	std::cout << SaveManager::LoadMyData<std::vector<int>>("game_data.gdmt", 0)[0] << std::endl;
+	SaveManager::SaveGameData("game_data_int.gdmt", SaveManager::CreateSaveDataAsset<int>(45), 0);
+	std::cout << SaveManager::LoadMyData<int>("game_data_int.gdmt", 0) << std::endl;
+	SaveManager::SaveGameData("game_data_x.gdmt", SaveManager::CreateSaveDataAsset<MyX>(MyX(2)), 0);
+	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.gdmt", 0).x << std::endl;
 }
 
 void TestSaveGameObject() {
 	GameObject* myObjectToSave = new GameObject();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-	std::string fileName = myObjectToSave->Save("");
-	myObjectToSave->Load("", fileName);
+	int id = myObjectToSave->Save("MyGameObject.gdmt", 0);
+	myObjectToSave->Load("MyGameObject.gdmt", id);
 }
 
-// Defaults to "game_data.gdmt" for test
 void TestSave() {
 	TestSaveByType();
 	TestSaveGameObject();

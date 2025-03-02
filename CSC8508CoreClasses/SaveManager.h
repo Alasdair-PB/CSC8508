@@ -32,6 +32,13 @@ namespace NCL::CSC8508 {
             dataPtr += containerSize * sizeof(typename T::value_type);
         }
 
+        static void SerializeContainer(const std::vector<size_t>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
+            for (const auto& value : container) {
+                std::memcpy(dataPtr, &value, sizeof(value));
+                dataPtr += sizeof(value);
+            }
+        }
+
         static void SerializeContainer(const std::vector<std::string>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
             for (const auto& str : container) {
                 uint32_t strLength = str.size();
@@ -107,8 +114,11 @@ namespace NCL::CSC8508 {
             return item;
         }
 
-        static void SaveGameData(const std::string& filename, GameData gameData) {
-            std::ofstream file(filename, std::ios::binary);
+        static size_t SaveGameData(const std::string& assetPath, GameData gameData, size_t start) {
+            std::ofstream file(assetPath, std::ios::binary | std::ios::app);
+
+            file.seekp(start, std::ios::beg);
+
             uint32_t magic = 0x47444D54;
             uint16_t version = 1;
 
@@ -117,18 +127,25 @@ namespace NCL::CSC8508 {
             file.write(reinterpret_cast<const char*>(&gameData.typeID), sizeof(gameData.typeID));
             file.write(reinterpret_cast<const char*>(&gameData.dataSize), sizeof(gameData.dataSize));
             file.write(gameData.data.data(), gameData.dataSize);
- 
+
             uint32_t checksum = magic ^ version;
             file.write(reinterpret_cast<char*>(&checksum), sizeof(checksum));
+
+            uint32_t endMarker = 0x454E4453;
+            file.write(reinterpret_cast<char*>(&endMarker), sizeof(endMarker));
+
+            size_t end = file.tellp();
             file.close();
+            return end;
         }
 
-        static bool LoadGameData(const std::string& filename, GameData& gameData) {
-            std::ifstream file(filename, std::ios::binary);
+        static bool LoadGameData(const std::string& assetPath, GameData& gameData, size_t start) {
+            std::ifstream file(assetPath, std::ios::binary);
             if (!file) {
-                std::cerr << "Error: Could not open file " << filename << std::endl;
+                std::cerr << "Error: Could not open file " << assetPath << std::endl;
                 return false;
             }
+            file.seekg(start, std::ios::beg);
 
             uint32_t magic;
             uint16_t version;
@@ -148,7 +165,14 @@ namespace NCL::CSC8508 {
             file.read(gameData.data.data(), gameData.dataSize);
             file.read(reinterpret_cast<char*>(&checksum), sizeof(checksum));
 
-            if (checksum != (magic ^ version)) 
+            uint32_t endMarker;
+            file.read(reinterpret_cast<char*>(&endMarker), sizeof(endMarker));
+            if (endMarker != 0x454E4453) {
+                std::cerr << "Error: Missing end marker. File may be corrupted!" << std::endl;
+                return false;
+            }
+
+            if (checksum != (magic ^ version))
                 std::cerr << "Warning: Checksum mismatch. File may be corrupted!" << std::endl;
 
             file.close();
@@ -176,9 +200,9 @@ namespace NCL::CSC8508 {
         }
 
         template <typename T, typename... Members>
-        static T LoadMyData(const std::string& filename, Members T::*... members) {
+        static T LoadMyData(const std::string& assetPath, const size_t allocationStart, Members T::*... members) {
             GameData loadedData;
-            if (!LoadGameData(filename, loadedData)) throw std::runtime_error("Failed to load game data");
+            if (!LoadGameData(assetPath, loadedData, allocationStart)) throw std::runtime_error("Failed to load game data");
             if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");
 
             T loadedStruct;

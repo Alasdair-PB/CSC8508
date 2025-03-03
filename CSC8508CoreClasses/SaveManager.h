@@ -114,12 +114,15 @@ namespace NCL::CSC8508 {
             return item;
         }
 
+        const static uint32_t fileExtension = 0x70666162; // pfab
+        const static uint32_t endConst = 0x454E4453; // Ends
+
         static size_t SaveGameData(const std::string& assetPath, GameData gameData, size_t start) {
             std::ofstream file(assetPath, std::ios::binary | std::ios::app);
 
             file.seekp(start, std::ios::beg);
 
-            uint32_t magic = 0x47444D54;
+            uint32_t magic = fileExtension;
             uint16_t version = 1;
 
             file.write(reinterpret_cast<char*>(&magic), sizeof(magic));
@@ -131,7 +134,7 @@ namespace NCL::CSC8508 {
             uint32_t checksum = magic ^ version;
             file.write(reinterpret_cast<char*>(&checksum), sizeof(checksum));
 
-            uint32_t endMarker = 0x454E4453;
+            uint32_t endMarker = endConst;
             file.write(reinterpret_cast<char*>(&endMarker), sizeof(endMarker));
 
             size_t end = file.tellp();
@@ -152,7 +155,7 @@ namespace NCL::CSC8508 {
             file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
             file.read(reinterpret_cast<char*>(&version), sizeof(version));
 
-            if (magic != 0x47444D54) {
+            if (magic != fileExtension) {
                 std::cerr << "Error: Invalid file format!" << std::endl;
                 return false;
             }
@@ -167,7 +170,7 @@ namespace NCL::CSC8508 {
 
             uint32_t endMarker;
             file.read(reinterpret_cast<char*>(&endMarker), sizeof(endMarker));
-            if (endMarker != 0x454E4453) {
+            if (endMarker != endConst) {
                 std::cerr << "Error: Missing end marker. File may be corrupted!" << std::endl;
                 return false;
             }

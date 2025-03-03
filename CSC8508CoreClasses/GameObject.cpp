@@ -36,7 +36,6 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 };
 
 void GameObject::Load(std::string assetPath, size_t allocationStart) {
-
 	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
 		std::cout << loadedSaveData.componentPointers[i] << std::endl;
@@ -46,14 +45,24 @@ void GameObject::Load(std::string assetPath, size_t allocationStart) {
 	std::cout << loadedSaveData.isEnabled << std::endl;
 }
 
-size_t GameObject::Save(std::string assetPath, size_t allocationStart)
+size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 {
+	bool clearMemory = false;
+	if (allocationStart == nullptr) {
+		allocationStart = new size_t(0);
+		clearMemory = true;
+	}
+
 	GameObjDataStruct saveInfo(isEnabled);
 	for (IComponent* component : components) {
-		saveInfo.componentPointers.push_back(allocationStart);
-		allocationStart = component->Save(assetPath, allocationStart);
+		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);		
+		saveInfo.componentPointers.push_back(*allocationStart);
+		*allocationStart = nextMemoryLocation;
 	}
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<GameObjDataStruct>(saveInfo);
-	SaveManager::SaveGameData(assetPath, saveData, allocationStart);
-	return allocationStart;
+	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart);
+
+	if (clearMemory)
+		delete allocationStart;
+	return nextMemoryLocation;
 }

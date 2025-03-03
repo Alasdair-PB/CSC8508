@@ -113,8 +113,8 @@ namespace NCL::CSC8508 {
 		}
 
 		struct GameObjDataStruct; 
-		void Load(std::string assetPath, size_t allocationStart) override;
-		size_t Save(std::string assetPath, size_t allocationStart) override;
+		void Load(std::string assetPath, size_t allocationStart = 0) override;
+		size_t Save(std::string assetPath, size_t* = nullptr) override;
 
 		void AddChild(GameObject* child);
 		GameObject* TryGetParent();

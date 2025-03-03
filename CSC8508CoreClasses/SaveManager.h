@@ -49,6 +49,14 @@ namespace NCL::CSC8508 {
             }
         }
 
+        /// <summary>
+        /// Creates gameData that allows data Types to saved and reinterpreted by the SaveManager
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="...Members"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="...members"></param>
+        /// <returns></returns>
         template <typename T, typename... Members>
         static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
             GameData item;
@@ -95,6 +103,7 @@ namespace NCL::CSC8508 {
             return item;
         }
 
+        // To be reworked into function above
         template <typename T>
         static GameData CreateSaveDataAsset(const T& value) {
             GameData item;
@@ -114,11 +123,59 @@ namespace NCL::CSC8508 {
             return item;
         }
 
-        const static uint32_t fileExtension = 0x70666162; // pfab
-        const static uint32_t endConst = 0x454E4453; // Ends
+        const static uint32_t fileExtension = 0x70666162; // "pfab"
+        const static uint32_t endConst = 0x454E4453; // "ends"
+        const static uint32_t initConst = 0x696E6974; // "init"
 
-        static size_t SaveGameData(const std::string& assetPath, GameData gameData, size_t start) {
+        /// <summary>
+        /// Initialises the table of contents to find the starting object in a file
+        /// </summary>
+        /// <param name="file">The file data is being saved to</param>
+        static void InitializeTOC(std::ofstream& file) {
+            size_t initObject;
+            file.seekp(0, std::ios::beg);
+            file.write(reinterpret_cast<char*>(&initObject), sizeof(initObject));
+        }
+
+        static void SetTOCOffsets(const std::string& assetPath, size_t start) {
+            std::fstream file(assetPath, std::ios::in | std::ios::out | std::ios::binary);
+            if (!file) {
+                std::cerr << "Error: Could not open file " << assetPath << std::endl;
+                return;
+            }
+            file.seekp(0, std::ios::beg);
+            file.write(reinterpret_cast<char*>(&start), sizeof(start));
+            file.close();
+        }
+
+        static size_t ReadTOC(std::ifstream& file, size_t start) {
+            file.seekg(0, std::ios::beg);
+            size_t initObject;
+            file.read(reinterpret_cast<char*>(&initObject), sizeof(initObject));
+            return initObject;
+        }
+        enum FileType {Prefab, Scene};
+
+        /// <summary>
+        /// Saves gameData as a .pfab file
+        /// </summary>
+        /// <param name="assetPath">The file to save this data to</param>
+        /// <param name="gameData">The gameData to save</param>
+        /// <param name="start">The position in memory to save this data</param>
+        /// <param name="fileType">The fileType format. Scenes use a different file extension and have a larger maxObject count
+        /// <returns>The next memory position free after this data</returns>
+        
+        static size_t SaveGameData(const std::string& assetPath, GameData gameData, size_t* memoryLocation = nullptr, bool isRootObject = true, FileType fileType = FileType::Prefab) {
             std::ofstream file(assetPath, std::ios::binary | std::ios::app);
+            size_t start = (memoryLocation == nullptr) ? 0 : *memoryLocation;
+
+            if (start == 0) {
+                InitializeTOC(file);
+                start = file.tellp();  
+
+                if (memoryLocation != nullptr)
+                    *memoryLocation = start;
+            }
 
             file.seekp(start, std::ios::beg);
 
@@ -132,23 +189,40 @@ namespace NCL::CSC8508 {
             file.write(gameData.data.data(), gameData.dataSize);
 
             uint32_t checksum = magic ^ version;
-            file.write(reinterpret_cast<char*>(&checksum), sizeof(checksum));
-
             uint32_t endMarker = endConst;
+            file.write(reinterpret_cast<char*>(&checksum), sizeof(checksum));
             file.write(reinterpret_cast<char*>(&endMarker), sizeof(endMarker));
 
             size_t end = file.tellp();
+
+            if (isRootObject)
+                SetTOCOffsets(assetPath, start);    
+
+
             file.close();
             return end;
         }
 
-        static bool LoadGameData(const std::string& assetPath, GameData& gameData, size_t start) {
+        /// <summary>
+        /// Loads a .pfab file type and interprets the file into a GameData object
+        /// </summary>
+        /// <param name="assetPath">The file to load for this .fab data</param>
+        /// <param name="gameData"The GameData that recieves the loaded data as it's GameData derived type</param>
+        /// <param name="start">The memory location of Gamedata in the .pfab file</param>
+        /// <returns>If the load was successful</returns>
+        static bool LoadGameData(const std::string& assetPath, GameData& gameData, size_t start = 0, FileType fileType = FileType::Prefab) {
             std::ifstream file(assetPath, std::ios::binary);
             if (!file) {
                 std::cerr << "Error: Could not open file " << assetPath << std::endl;
                 return false;
             }
-            file.seekg(start, std::ios::beg);
+
+            if (start == 0) {
+                size_t tocStart = ReadTOC(file, start);
+                file.seekg(tocStart, std::ios::beg);
+            }
+            else 
+                file.seekg(start, std::ios::beg);
 
             uint32_t magic;
             uint16_t version;
@@ -203,7 +277,7 @@ namespace NCL::CSC8508 {
         }
 
         template <typename T, typename... Members>
-        static T LoadMyData(const std::string& assetPath, const size_t allocationStart, Members T::*... members) {
+        static T LoadMyData(const std::string& assetPath, const size_t allocationStart = 0, Members T::*... members) {
             GameData loadedData;
             if (!LoadGameData(assetPath, loadedData, allocationStart)) throw std::runtime_error("Failed to load game data");
             if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");

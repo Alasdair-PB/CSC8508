@@ -19,20 +19,32 @@ struct MyX {
 	int x;
 };
 
+const static std::string folderPath = "../../Assets/Pfabs/";
+
+std::string GetAssetPath(std::string pfabName) {
+	return folderPath + pfabName;
+}
+
 void TestSaveByType() {
-	SaveManager::SaveGameData("game_data.pfab", SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}), 0);
-	std::cout << SaveManager::LoadMyData<std::vector<int>>("game_data.pfab", 0)[0] << std::endl;
-	SaveManager::SaveGameData("game_data_int.pfab", SaveManager::CreateSaveDataAsset<int>(45), 0);
-	std::cout << SaveManager::LoadMyData<int>("game_data_int.pfab", 0) << std::endl;
-	SaveManager::SaveGameData("game_data_x.pfab", SaveManager::CreateSaveDataAsset<MyX>(MyX(2)), 0);
-	std::cout << SaveManager::LoadMyData<MyX>("game_data_x.pfab", 0).x << std::endl;
+	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
+	std::string intPath = GetAssetPath("int_data.pfab");
+	std::string structPath = GetAssetPath("struct_data.pfab");
+
+	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
+	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
+	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
+	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
+	std::cout << SaveManager::LoadMyData<MyX>(structPath).x << std::endl;
 }
 
 void TestSaveGameObject() {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+
 	GameObject* myObjectToSave = new GameObject();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-	int id = myObjectToSave->Save("MyGameObject.pfab", 0);
-	myObjectToSave->Load("MyGameObject.pfab", id);
+	myObjectToSave->Save(gameObjectPath);
+	myObjectToSave->Load(gameObjectPath);
 }
 
 void TestSave() {

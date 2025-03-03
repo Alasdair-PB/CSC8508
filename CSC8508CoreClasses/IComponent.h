@@ -84,7 +84,7 @@ namespace NCL::CSC8508
 		}
 
 		void Load(std::string assetPath, size_t allocationStart) override;
-		size_t Save(std::string assetPath, size_t allocationStart) override;
+		size_t Save(std::string assetPath, size_t* allocationStart) override;
 		struct ComponentDataStruct;
 
 	protected:

@@ -10,6 +10,7 @@ using namespace CSC8508;
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <cstdlib>
 
 
 void UpdateWindow(Window* w, NetworkedGame* g)
@@ -21,11 +22,20 @@ void UpdateWindow(Window* w, NetworkedGame* g)
 
 int main(int argc, char** argv) 
 {
+	int wWidth	= 1920;
+	int wHeight = 1200;
+	if (argc == 3) {
+		std::cout << "AHK Launch" << "\n";
+		wWidth = std::atoi(argv[1]);
+		wHeight = std::atoi(argv[2]);
+	}
+	else {
+		std::cout << "Normal Launch" << "\n";
+	}
+
 	WindowInitialisation initInfo;
-	initInfo.width		= 1920; //Main Window Size
-	initInfo.height		= 1200; //Main Window Size
-	//initInfo.width	= 960;  //For Quad Window test
-	//initInfo.height	= 600;  //For Quad Window test
+	initInfo.width		= wWidth;
+	initInfo.height		= wHeight; 
 	initInfo.windowTitle = "CSC8508 Game technology!";
 
 	Window* w = Window::CreateGameWindow(initInfo);

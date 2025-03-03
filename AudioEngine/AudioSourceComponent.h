@@ -2,6 +2,9 @@
 // Contributors: Max Bolton
 //
 
+#ifndef AUDIOSOURCECOMPONENT_H
+#define AUDIOSOURCECOMPONENT_H
+
 #ifndef ASSETROOTLOCATION
 #define ASSETROOTLOCATION "../Assets/"
 #endif
@@ -147,7 +150,7 @@ public:
 		Vector3 pos = transform->GetPosition();
 		fPosition = VecToFMOD(pos);
 
-		PhysicsComponent* physComp = GetGameObject().TryGetComponent<PhysicsComponent>();
+		/*PhysicsComponent* physComp = GetGameObject().TryGetComponent<PhysicsComponent>();
 
 		if (physComp) {
 			Vector3 vel = physComp->GetPhysicsObject()->GetLinearVelocity();
@@ -155,7 +158,7 @@ public:
 		}
 		else if(debug) {
 			std::cout << "No Physics Component found for AudioSourceComponentComponent!" << std::endl;
-		}
+		}*/
 
 
 
@@ -185,3 +188,5 @@ private:
 
 	float fVolume;
 };
+
+#endif // AUDIOSOURCECOMPONENT_H

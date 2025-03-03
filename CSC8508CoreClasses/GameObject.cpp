@@ -25,7 +25,7 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	GameObjDataStruct(bool isEnabled) : isEnabled(isEnabled) {}
 
 	bool isEnabled;
-	std::vector<size_t> componentPointers;
+	std::vector<std::pair<size_t, size_t>> componentPointers;
 
 	static auto GetSerializedFields() {
 		return std::make_tuple(
@@ -38,9 +38,11 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 void GameObject::Load(std::string assetPath, size_t allocationStart) {
 	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
-		std::cout << loadedSaveData.componentPointers[i] << std::endl;
+		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
+		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
+
 		if (i >= components.size()) break;
-		components[i]->Load(assetPath, loadedSaveData.componentPointers[i]);
+		components[i]->Load(assetPath, loadedSaveData.componentPointers[i].first);
 	}
 	std::cout << loadedSaveData.isEnabled << std::endl;
 }
@@ -56,7 +58,7 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 	GameObjDataStruct saveInfo(isEnabled);
 	for (IComponent* component : components) {
 		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);		
-		saveInfo.componentPointers.push_back(*allocationStart);
+		saveInfo.componentPointers.push_back(std::make_pair(*allocationStart, typeid(*component).hash_code()));
 		*allocationStart = nextMemoryLocation;
 	}
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<GameObjDataStruct>(saveInfo);

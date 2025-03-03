@@ -89,7 +89,10 @@ namespace NCL::CSC8508 {
 
 		int	GetWorldID() const {
 			return worldID;
-		}	
+		}
+
+
+
 
 		vector<IComponent*> GetAllComponents() const { return components; }
 
@@ -105,9 +108,8 @@ namespace NCL::CSC8508 {
 			requires std::is_base_of_v<IComponent, T>
 		T* TryGetComponent() {
 			for (IComponent* component : components) {
-				if (T* casted = dynamic_cast<T*>(component)) {
+				if (T* casted = dynamic_cast<T*>(component))
 					return casted;
-				}
 			}
 			return nullptr;
 		}
@@ -128,6 +130,37 @@ namespace NCL::CSC8508 {
 		Layers::LayerID GetLayerID() const {return layerID; }
 		void SetTag(Tags::Tag newTag) {  tag = newTag;}
 		Tags::Tag GetTag() const { return tag;}
+
+		/*
+		template <typename T> requires std::is_base_of_v<IComponent, T>
+		using Action = std::function<void(std::function<void(T*)> func)>;
+		inline static std::unordered_map<size_t, Action<IComponent>*> addComponent;
+
+
+		template <typename T>
+		static void RegisterAddComponent() {
+			new Action(
+				[](std::function<void(IComponent*)> func) {
+					AddComponent<T>(
+						[&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+					);
+				}
+			));
+		}
+
+		template <typename T>
+		static AddToComponentDictionary()
+		{
+			func(component);
+			(*addComponent<T>)(func);
+		}
+
+		static T AddComponentOfTypeName(size_t hash) {
+			switch () {
+
+			}
+		}*/
+
 
 	protected:
 		virtual void OnAwake() {}

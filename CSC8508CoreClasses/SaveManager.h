@@ -39,6 +39,15 @@ namespace NCL::CSC8508 {
             }
         }
 
+        static void SerializeContainer(const std::vector<std::pair<size_t, std::size_t>>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
+            for (const auto& value : container) {
+                std::memcpy(dataPtr, &value.first, sizeof(value.first));
+                dataPtr += sizeof(value.first);
+                std::memcpy(dataPtr, &value.second, sizeof(value.second));
+                dataPtr += sizeof(value.second);
+            }
+        }
+
         static void SerializeContainer(const std::vector<std::string>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
             for (const auto& str : container) {
                 uint32_t strLength = str.size();
@@ -311,6 +320,21 @@ namespace NCL::CSC8508 {
                                 str.resize(strLength);
                                 std::memcpy(str.data(), loadedData.data.data() + offset, strLength);
                                 offset += strLength;
+                            }
+                        }
+                        else if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::pair<size_t, std::type_info>>) {
+                            for (auto& p : container) {
+                                std::memcpy(&p.first, loadedData.data.data() + offset, sizeof(p.first));
+                                offset += sizeof(p.first);
+
+                                uint32_t typeNameLength;
+                                std::memcpy(&typeNameLength, loadedData.data.data() + offset, sizeof(typeNameLength));
+                                offset += sizeof(typeNameLength);
+
+                                std::string typeName(typeNameLength, '\0');
+                                std::memcpy(typeName.data(), loadedData.data.data() + offset, typeNameLength);
+                                offset += typeNameLength;
+                                p.second = typeid(typeName);
                             }
                         }
                         else {

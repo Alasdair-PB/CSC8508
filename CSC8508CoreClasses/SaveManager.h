@@ -175,12 +175,19 @@ namespace NCL::CSC8508 {
         /// <returns>The next memory position free after this data</returns>
         
         static size_t SaveGameData(const std::string& assetPath, GameData gameData, size_t* memoryLocation = nullptr, bool isRootObject = true, FileType fileType = FileType::Prefab) {
-            std::ofstream file(assetPath, std::ios::binary | std::ios::app);
             size_t start = (memoryLocation == nullptr) ? 0 : *memoryLocation;
+            std::ios::openmode mode = std::ios::binary |
+                ((start == 0) ? std::ios::trunc : std::ios::app);
+            std::ofstream file(assetPath, mode);
+
+            if (!file) {
+                std::cerr << "Error: Could not open file " << assetPath << std::endl;
+                return 0;
+            }
 
             if (start == 0) {
                 InitializeTOC(file);
-                start = file.tellp();  
+                start = file.tellp();
 
                 if (memoryLocation != nullptr)
                     *memoryLocation = start;
@@ -225,11 +232,8 @@ namespace NCL::CSC8508 {
                 std::cerr << "Error: Could not open file " << assetPath << std::endl;
                 return false;
             }
-
-            if (start == 0) {
-                size_t tocStart = ReadTOC(file, start);
-                file.seekg(tocStart, std::ios::beg);
-            }
+            if (start == 0) 
+                file.seekg(ReadTOC(file, start), std::ios::beg);
             else 
                 file.seekg(start, std::ios::beg);
 

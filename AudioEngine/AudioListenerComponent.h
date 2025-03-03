@@ -49,6 +49,8 @@ public:
 
 	void SetPlayerOrientation();
 
+
+	#pragma region FMOD Recording
 	/**
 	* Start Microphone recording of selected input device
 	*/
@@ -81,6 +83,8 @@ public:
 	FMOD::Sound* getMicInput() {
 		return micInput;
 	}
+
+	#pragma endregion
 
 	#pragma region Opus Tools
 
@@ -120,6 +124,11 @@ public:
 			std::cout << "Opus Encoder Error: " + std::to_string(error) << std::endl;
 			return nullptr;
 		}
+
+		opus_encoder_ctl(encoder, OPUS_SET_BITRATE(64000)); // Adjust bitrate for clarity
+		opus_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_BANDWIDTH_FULLBAND));
+		opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(10)); // Max quality
+
 		return encoder;
 	}
 
@@ -155,6 +164,12 @@ public:
 		if (lock->ptr1 && lock->len1 > 0) {
 			short* pcmShorts = static_cast<short*>(lock->ptr1);
 			pcmData.assign(pcmShorts, pcmShorts + (lock->len1 / sizeof(short)));
+
+			std::cout << "[PCM Extraction] 5 sample values: ";
+			for (int i = 0; i < 5; i++) {
+				std::cout << pcmData[i] << " ";
+			}
+			std::cout << std::endl;
 		}
 		else {
 			std::cout << "PCM Extract Failure, ptr1 == NULL or len1 is 0" << std::endl;
@@ -164,13 +179,19 @@ public:
 		if (lock->ptr2 && lock->len2 > 0) {
 			short* pcmShorts = static_cast<short*>(lock->ptr2);
 			pcmData.insert(pcmData.end(), pcmShorts, pcmShorts + (lock->len2 / sizeof(short)));
+			std::cout << "PCM Extracted Second Chunk" << std::endl;
 		}
 		else if (lock->ptr2 == nullptr) {
-			std::cout << "PCM Extract Note, ptr2 is NULL (no wrap-around in PCM buffer)";
+			//std::cout << "PCM Extract Note, ptr2 is NULL (no wrap-around in PCM buffer)";
+		}
+
+		if (!pcmData.empty()) {
+			auto minMax = std::minmax_element(pcmData.begin(), pcmData.end());
+			std::cout << "[PCM DEBUG] Min sample: " << *minMax.first << " | Max Sample: " << *minMax.second << std::endl;
 		}
 
 
-		std::cout << "Extracted PCM Samples: " << pcmData.size() << std::endl;
+		std::cout << "Total extracted PCM Samples: " << pcmData.size() << std::endl;
 		return pcmData;
 
 	}
@@ -186,6 +207,10 @@ public:
 		std::vector<unsigned char> tempBuffer(4096);
 		int frameSize = 960;
 
+		if (pcmData.size() < frameSize) {
+			std::cerr << "[Opus Encoding] PCM Data is less than frame size! size: " << pcmData.size() << std::endl;
+			return opusData;
+		}
 
 		for (size_t i = 0; i < pcmData.size(); i += frameSize) {
 			
@@ -196,9 +221,10 @@ public:
 
 			if (encodedBytes > 0) {
 				opusData.insert(opusData.end(), tempBuffer.begin(), tempBuffer.begin() + encodedBytes);
+				std::cout << "[Opus Encoding] Frame " << (i/frameSize) << " | Encoded bytes: " << encodedBytes << " | First Byte: " << (int)tempBuffer[0] << std::endl;
 			}
 			else {
-				std::cout << "Opus Encoding Error: " + encodedBytes << std::endl;
+				std::cout << "[Opus Encoding] Error: " + encodedBytes << std::endl;
 				break;
 			}
 
@@ -218,75 +244,103 @@ public:
 	std::vector<std::vector<unsigned char>> StreamEncodeMic() {
 		std::vector<std::vector<unsigned char>> encodedPackets;
 
-		unsigned int recordPos = 0, lastPos = 0;
+
+		static unsigned int lastPos = 0;  // Static to persist between calls
+		unsigned int recordPos = 0;
 		unsigned int frameSize = 960;
 
+		fSystem->getRecordPosition(inputDeviceIndex, &recordPos);
+		std::cout << "[DEBUG] Mic Record Position | Current: " << recordPos << " | Last: " << lastPos << std::endl;
 
-		while (IsRecording()) {
-			fSystem->getRecordPosition(inputDeviceIndex, &recordPos);
+		unsigned int availableSamples = (recordPos != lastPos) ? (recordPos - lastPos) : frameSize;
 
-			if (recordPos != lastPos) {
-				PCMBufferLock lock = LockSound(micInput, lastPos, frameSize * sizeof(short));
 
-				if (lock.len1 > 0) {
-					std::vector<short> pcmData = ExtractPCMData(&lock);
-					encodedPackets.push_back(std::vector<unsigned char>(EncodeOpusFrame(pcmData)));
-					
-				}
-				UnlockSound(micInput, &lock);
-				lastPos = recordPos; // update last position
-			}
+		PCMBufferLock lock = LockSound(micInput, lastPos, availableSamples * sizeof(short));
+		if (lock.len1 > 0) {
+			std::vector<short> pcmData = ExtractPCMData(&lock);
+			encodedPackets.push_back(EncodeOpusFrame(pcmData));
 		}
+		UnlockSound(micInput, &lock);
+
+		// Start from beginning of buffer
+		lastPos = recordPos;
+
 		return encodedPackets;
 	}
+
+
 
 
 	/**
 	* Decodes a single Opus packet into PCM samples.
 	*/
 	FMOD::Sound* DecodeOpusFrame(std::vector<unsigned char>& opusData) {
+		std::cout << "[Debug] Decoding Opus Frame | " << opusData.size() << std::endl;
 		OpusDecoder* decoder = OpenDecoder();
-
 		std::vector<short> pcmData(960);
+
 		int decodedSamples = opus_decode(decoder, opusData.data(), opusData.size(), pcmData.data(), pcmData.size(), 0);
 
 		if (decodedSamples < 0) {
-			std::cout << "Opus Decoding Error: " + decodedSamples << std::endl;
+			std::cerr << "[ERROR] Opus Decoding Failed! Error Code: " << decodedSamples << std::endl;
+			CloseDecoder(decoder);
 			return nullptr;
 		}
 
-		pcmData.resize(decodedSamples);
+		if (decodedSamples < 960) {
+			std::cerr << "[WARNING] Decoded frame is smaller than expected! Size: " << decodedSamples << std::endl;
+		}
 
+		pcmData.resize(decodedSamples);
 		CloseDecoder(decoder);
 
 		return PCMToFSound(pcmData);
 	}
 
 
+
 	/**
 	* Continuously decodes Opus frames into PCM and plays them back.
 	*/
 	void StreamDecodePlayback(std::vector<std::vector<unsigned char>>& encodedPackets) {
+		std::cout << "[DEBUG] StreamDecodePlayback | Packets: " << encodedPackets.size() << std::endl;
+
+		if (encodedPackets.empty()) {
+			std::cerr << "[ERROR] No Encoded Data to Decode!" << std::endl;
+			return;
+		}
+
 		OpusDecoder* decoder = OpenDecoder();
-		if (!decoder) return;
+		if (!decoder) {
+			std::cerr << "[ERROR] Failed to Open Opus Decoder!" << std::endl;
+			return;
+		}
 
 		std::queue<std::vector<short>> pcmQueue;
 
 		for (auto& packet : encodedPackets) {
-			std::vector<short> pcmBuffer(960);
-			int decodedSamples = opus_decode(decoder, packet.data(), packet.size(), pcmBuffer.data(), pcmBuffer.size(), 0);
+			std::cout << "[DEBUG] Calling DecodeOpusFrame()" << std::endl;
 
-			if (decodedSamples > 0) {
-				pcmQueue.push(pcmBuffer);
-				PlayPCMBuffer(pcmQueue);
+			FMOD::Sound* sound = DecodeOpusFrame(packet);
+			if (sound) {
+				std::cout << "[DEBUG] Successfully decoded and created FMOD sound!" << std::endl;
+				fSystem->playSound(sound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), false, &tempChannel);
+
+				// Prevent PCM queue from growing too large (causing slow playback)
+				if (pcmQueue.size() > 5) {
+					std::cout << "[WARNING] PCM Queue too large, discarding old frames!" << std::endl;
+					pcmQueue.pop();
+				}
 			}
-
-
+			else {
+				std::cerr << "[ERROR] DecodeOpusFrame() failed!" << std::endl;
+			}
 		}
 
 		CloseDecoder(decoder);
-
 	}
+
+
 
 
 	/**
@@ -297,13 +351,24 @@ public:
 			std::vector<short> pcmData = pcmQueue.front();
 			pcmQueue.pop();
 
+			std::cout << "[DEBUG] Playing PCM | Samples: " << pcmData.size()
+				<< " | First Sample: " << pcmData[0] << std::endl;
+
 			FMOD::Sound* sound = PCMToFSound(pcmData);
 			if (sound) {
+				std::cout << "[DEBUG] Playing New PCM Buffer..." << std::endl;
 				fSystem->playSound(sound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), false, &tempChannel);
-			}
 
+				// Ensure FMOD processes playback immediately
+				fSystem->update();
+			}
+			else {
+				std::cerr << "[ERROR] PCMToFSound Failed!" << std::endl;
+			}
 		}
 	}
+
+
 
 
 	/**
@@ -325,15 +390,16 @@ public:
 			&exinfo,
 			&sound
 		);
-
 		if (result != FMOD_OK) {
-			std::cout << "Failed to create sound from PCM data. Fmod Error: " << result <<  std::endl;
+			std::cerr << "[ERROR] PCMToFSound Failed! FMOD Error: " << FMOD_ErrorString(result) << std::endl;
 			return nullptr;
 		}
+
 
 		return sound;
 
 	}
+
 
 	#pragma endregion
 
@@ -356,7 +422,12 @@ public:
 		std::vector<std::vector<unsigned char>> encodedPackets;
 		if (IsRecording()) encodedPackets = StreamEncodeMic();
 
-		if (!encodedPackets.empty()) StreamDecodePlayback(encodedPackets);
+		if (!encodedPackets.empty()) {
+			StreamDecodePlayback(encodedPackets);
+		}
+		else {
+			std::cout << "No encoded packets to decode!" << std::endl;
+		}
 	}
 	#pragma endregion
 
@@ -372,6 +443,7 @@ public:
 	* @return std::map<int, std::string> 
 	*/
 	std::map<int, std::string> GetInputDeviceList() {
+		UpdateInputList();
 		return inputDeviceList;
 	}
 
@@ -392,6 +464,7 @@ public:
 	*/
 
 	std::map<int, std::string> GetOutputDeviceList() {
+		UpdateOutputList();
 		return outputDeviceList;
 	}
 
@@ -419,6 +492,10 @@ public:
 	*/
 	void SetOutputDeviceIndex(int index) {
 		outputDeviceIndex = index;
+	}
+
+	void OnAwake() override {
+
 	}
 
 private:

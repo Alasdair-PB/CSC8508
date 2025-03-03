@@ -87,6 +87,11 @@ void AudioListenerComponent::ToggleRecording() {
 bool AudioListenerComponent::IsRecording() {
 	bool isRecording;
 	FMOD_RESULT result = fSystem->isRecording(0, &isRecording);
+	if (result != FMOD_OK) {
+		std::cerr << "Error: " << FMOD_ErrorString(result) << std::endl;
+		return false;
+	}
+
 	return isRecording;
 }
 

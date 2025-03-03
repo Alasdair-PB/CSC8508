@@ -10,7 +10,7 @@ namespace NCL::CSC8508 {
 
 	class ISerializable {
 	public:
-		virtual size_t Save(std::string assetPath, size_t allocationStart) { return 0; }
+		virtual size_t Save(std::string assetPath, size_t* allocationStart) { return 0; }
 		virtual void Load(std::string assetPath, size_t allocationStart) {}
 
 		struct ISerializedData {

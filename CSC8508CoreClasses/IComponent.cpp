@@ -31,11 +31,11 @@ struct IComponent::ComponentDataStruct : public ISerializedData {
 	}
 };
 
-size_t IComponent::Save(std::string assetPath, size_t allocationStart)
+size_t IComponent::Save(std::string assetPath, size_t* allocationStart)
 {
 	ComponentDataStruct saveInfo(enabled);
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<ComponentDataStruct>(saveInfo);
-	return SaveManager::SaveGameData(assetPath, saveData, allocationStart);
+	return SaveManager::SaveGameData(assetPath, saveData, allocationStart, false);
 }
 
 void IComponent::Load(std::string assetPath, size_t allocationStart){

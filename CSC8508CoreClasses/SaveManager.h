@@ -15,10 +15,10 @@ namespace NCL::CSC8508 {
     public:
 
         struct GameData {
-            std::type_index typeID;
+            std::size_t typeHash;
             uint32_t dataSize;
             std::vector<char> data;
-            GameData() : typeID(typeid(void)), dataSize(0) {}
+            GameData() : typeHash(std::hash<std::string>{}(typeid(void).name())), dataSize(0) {}
         };
 
         template <typename T, typename = void> struct is_container : std::false_type {};
@@ -69,7 +69,7 @@ namespace NCL::CSC8508 {
         template <typename T, typename... Members>
         static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
             GameData item;
-            item.typeID = std::type_index(typeid(T));
+            item.typeHash = std::hash<std::string>{}(typeid(T).name());
             item.dataSize = 0;
 
             ([&] {
@@ -116,7 +116,7 @@ namespace NCL::CSC8508 {
         template <typename T>
         static GameData CreateSaveDataAsset(const T& value) {
             GameData item;
-            item.typeID = std::type_index(typeid(T));
+            item.typeHash = std::hash<std::string>{}(typeid(T).name());
             if constexpr (is_container<T>::value) {
                 item.dataSize = sizeof(uint32_t) + value.size() * sizeof(typename T::value_type);
                 item.data.resize(item.dataSize);
@@ -199,7 +199,7 @@ namespace NCL::CSC8508 {
 
             file.write(reinterpret_cast<char*>(&magic), sizeof(magic));
             file.write(reinterpret_cast<char*>(&version), sizeof(version));
-            file.write(reinterpret_cast<const char*>(&gameData.typeID), sizeof(gameData.typeID));
+            file.write(reinterpret_cast<const char*>(&gameData.typeHash), sizeof(gameData.typeHash));
             file.write(reinterpret_cast<const char*>(&gameData.dataSize), sizeof(gameData.dataSize));
             file.write(gameData.data.data(), gameData.dataSize);
 
@@ -244,7 +244,7 @@ namespace NCL::CSC8508 {
                 return false;
             }
 
-            file.read(reinterpret_cast<char*>(&gameData.typeID), sizeof(gameData.typeID));
+            file.read(reinterpret_cast<char*>(&gameData.typeHash), sizeof(gameData.typeHash));
             file.read(reinterpret_cast<char*>(&gameData.dataSize), sizeof(gameData.dataSize));
 
             uint32_t checksum;
@@ -290,7 +290,7 @@ namespace NCL::CSC8508 {
         static T LoadMyData(const std::string& assetPath, const size_t allocationStart = 0, Members T::*... members) {
             GameData loadedData;
             if (!LoadGameData(assetPath, loadedData, allocationStart)) throw std::runtime_error("Failed to load game data");
-            if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");
+            if (loadedData.typeHash != std::hash<std::string>{}(typeid(T).name())) throw std::runtime_error("Type mismatch in game data");
             T loadedStruct;
 
             if constexpr (sizeof...(members) == 0) 

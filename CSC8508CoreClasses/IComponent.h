@@ -83,8 +83,8 @@ namespace NCL::CSC8508
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
 
-		void Load(std::string assetPath, size_t allocationStart) override;
-		size_t Save(std::string assetPath, size_t* allocationStart) override;
+		virtual void Load(std::string assetPath, size_t allocationStart) override;
+		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
 		struct ComponentDataStruct;
 
 	protected:

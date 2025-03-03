@@ -112,11 +112,11 @@ namespace NCL::CSC8508 {
             return item;
         }
 
-        // To be reworked into function above
         template <typename T>
         static GameData CreateSaveDataAsset(const T& value) {
             GameData item;
             item.typeHash = std::hash<std::string>{}(typeid(T).name());
+
             if constexpr (is_container<T>::value) {
                 item.dataSize = sizeof(uint32_t) + value.size() * sizeof(typename T::value_type);
                 item.data.resize(item.dataSize);

@@ -43,7 +43,7 @@ void TestSaveGameObject() {
 	GameObject* myObjectToSave = new GameObject();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
 
-	myObjectToSave->Save(gameObjectPath);
+	//myObjectToSave->Save(gameObjectPath);
 	myObjectToSave->Load(gameObjectPath);
 }
 

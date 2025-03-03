@@ -91,9 +91,6 @@ namespace NCL::CSC8508 {
 			return worldID;
 		}
 
-
-
-
 		vector<IComponent*> GetAllComponents() const { return components; }
 
 		template <typename T, typename... Args>

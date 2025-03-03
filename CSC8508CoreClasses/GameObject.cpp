@@ -11,7 +11,7 @@ GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nu
 	isEnabled = true;
 	layerID = Layers::LayerID::Default;
 	tag = Tags::Tag::Default;
-	renderObject	= nullptr;
+	renderObject = nullptr;
 	components = vector<IComponent*>();
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
 }

@@ -176,8 +176,7 @@ namespace NCL::CSC8508 {
         
         static size_t SaveGameData(const std::string& assetPath, GameData gameData, size_t* memoryLocation = nullptr, bool isRootObject = true, FileType fileType = FileType::Prefab) {
             size_t start = (memoryLocation == nullptr) ? 0 : *memoryLocation;
-            std::ios::openmode mode = std::ios::binary |
-                ((start == 0) ? std::ios::trunc : std::ios::app);
+            std::ios::openmode mode = std::ios::binary | ((start == 0) ? std::ios::trunc : std::ios::app);
             std::ofstream file(assetPath, mode);
 
             if (!file) {
@@ -213,8 +212,6 @@ namespace NCL::CSC8508 {
 
             if (isRootObject)
                 SetTOCOffsets(assetPath, start);    
-
-
             file.close();
             return end;
         }
@@ -294,7 +291,6 @@ namespace NCL::CSC8508 {
             GameData loadedData;
             if (!LoadGameData(assetPath, loadedData, allocationStart)) throw std::runtime_error("Failed to load game data");
             if (loadedData.typeID != std::type_index(typeid(T))) throw std::runtime_error("Type mismatch in game data");
-
             T loadedStruct;
 
             if constexpr (sizeof...(members) == 0) 

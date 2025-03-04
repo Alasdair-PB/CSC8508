@@ -44,6 +44,63 @@ void GameWorld::ClearAndErase() {
 	Clear();
 }
 
+struct  GameWorld::WorldSaveData : ISerializedData {
+	WorldSaveData() : nearPlane(1) {}
+	WorldSaveData(float isEnabled) : nearPlane(isEnabled) {}
+
+	float nearPlane;
+	float farPlane;
+	float pitch;
+	float yaw;
+	Vector3 position;
+	std::vector<std::pair<size_t, size_t>> gameObjectPointers;
+
+	static auto GetSerializedFields() {
+		return std::make_tuple(
+			SERIALIZED_FIELD(WorldSaveData, nearPlane),
+			SERIALIZED_FIELD(WorldSaveData, gameObjectPointers)
+		);
+	}
+};
+
+
+void GameWorld::Load(std::string assetPath, size_t allocationStart) {
+	WorldSaveData loadedSaveData = ISerializedData::LoadISerializable<WorldSaveData>(assetPath, allocationStart);
+	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
+		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
+		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
+
+		if (i >= components.size()) break;
+		components[i]->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
+	}
+	std::cout << loadedSaveData.nearPlane << std::endl;
+}
+
+size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
+{
+	bool clearMemory = false;
+	if (allocationStart == nullptr) {
+		allocationStart = new size_t(0);
+		clearMemory = true;
+	}
+
+	// For tomorrow check why hash_code is used here when type hash has been changed elsewhere
+	WorldSaveData saveInfo(1);
+	for (IComponent* component : components) {
+		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);
+		saveInfo.gameObjectPointers.push_back(std::make_pair(*allocationStart, typeid(*component).hash_code()));
+		*allocationStart = nextMemoryLocation;
+	}
+	SaveManager::GameData saveData = ISerializedData::CreateGameData<WorldSaveData>(saveInfo);
+	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart);
+
+	if (clearMemory)
+		delete allocationStart;
+	return nextMemoryLocation;
+}
+
+
+
 void GameWorld::AddGameObject(GameObject* o) {
 	gameObjects.emplace_back(o);
 	o->SetWorldID(worldIDCounter++);
@@ -81,14 +138,6 @@ void GameWorld::GetPhysicsIterators(
 
 	first = physicsComponents.begin();
 	last = physicsComponents.end();
-}
-
-void GameWorld::GetINetIterators(
-	INetIterator& first,
-	INetIterator& last) const {
-
-	first = networkComponents.begin();
-	last = networkComponents.end();
 }
 
 void GameWorld::GetBoundsIterators(

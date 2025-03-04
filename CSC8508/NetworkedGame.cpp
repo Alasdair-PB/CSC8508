@@ -50,7 +50,7 @@ NetworkedGame::NetworkedGame()	{
 	thisServer = nullptr;
 	thisClient = nullptr;
 
-	mainMenu = new MainMenu([&](bool state) -> void { this->SetPause(state); },
+	mainMenu = new MainMenu([&](bool state) -> void {world->SetPausedWorld(state); },
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
 		[&]() -> void { this->StartOfflineCallBack();});

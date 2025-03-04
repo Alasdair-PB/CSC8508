@@ -55,7 +55,6 @@ void TestSave() {
 	TestSaveGameObject();
 }
 
-
 void DreamFrameWork() {
 	// Create new game World
 	// Load Controller Map from save data
@@ -77,10 +76,7 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 #endif
 	physics = new PhysicsSystem(*world);
 
-	forceMagnitude	= 10.0f;
-	useGravity		= false;
 	inSelectionMode = false;
-
 	world->GetMainCamera().SetController(controller);
 
 	controller.MapAxis(0, "Sidestep");
@@ -91,22 +87,10 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	InitialiseAssets();	
 	
 	physics->UseGravity(true);
-	world->UpdateWorld(0.1f);
-	physics->Update(0.1f);
-
 	uiSystem = new UISystem(Window::GetHandle());
 	renderer->SetUISystem(uiSystem);
 
 	TestSave();
-}
-
-
-void TutorialGame::SetPause(bool state) {
-	inPause = state;
-}
-
-void TutorialGame::EndGame(bool hasWon) {
-	inPause = true;
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -160,45 +144,15 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 	SelectObject();
 }
 
-bool TutorialGame::OnEndGame(float dt) {
-	/*if (endGame) {
-		renderer->Render();
-		renderer->Update(dt);
-		Debug::UpdateRenderables(dt);
-		return true;
-	}*/
-
-	return false;
-}
-
-void TutorialGame::UpdateScore(float score) {
-	this->score += score;
-}
-
-void TutorialGame::UpdateDrawScreen(float dt) {
-	time += dt;
-	Debug::Print("Score: " + std::to_string(score), Vector2(70, 20));
-	Debug::Print("Time: " + std::to_string(time), Vector2(70, 10));
-}
-
 void TutorialGame::UpdateGame(float dt) 
 {
-	if (OnEndGame(dt))
-		return; 
-
 	DrawUIElements();
 	mainMenu->Update(dt);
 	renderer->Render();	
 	Debug::UpdateRenderables(dt);
 
-	if (inPause)
-		return;
-
-	UpdateDrawScreen(dt);
 	world->UpdateWorld(dt);
-
 	Window::GetWindow()->ShowOSPointer(true);
-	//Window::GetWindow()->LockMouseToWindow(true);
 	physics->Update(dt);
 }
 
@@ -216,67 +170,6 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 	AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-}
-
-std::vector<Vector3> TutorialGame::GetVertices(Mesh* navigationMesh, int i)
-{
-	const SubMesh* subMesh = navigationMesh->GetSubMesh(i);
-	const std::vector<unsigned int>& indices = navigationMesh->GetIndexData();
-	const std::vector<Vector3>& positionData = navigationMesh->GetPositionData();
-	std::vector<Vector3> vertices;
-
-	for (size_t j = subMesh->start; j < subMesh->start + subMesh->count; j += 3) {
-		unsigned int idx0 = indices[j];
-		unsigned int idx1 = indices[j + 1];
-		unsigned int idx2 = indices[j + 2];
-
-		vertices.push_back(positionData[idx0]);
-		vertices.push_back(positionData[idx1]);
-		vertices.push_back(positionData[idx2]);
-	}
-	return vertices;
-}
-
-const bool DebugCubeTransforms = false;
-
-void  TutorialGame::CalculateCubeTransformations(const std::vector<Vector3>& vertices, Vector3& position, Vector3& scale, Quaternion& rotation)
-{
-	Vector3 minBound(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-	Vector3 maxBound(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-
-	for (const auto& vertex : vertices) {
-		minBound = Vector::Min(minBound, vertex);
-		maxBound = Vector::Max(maxBound, vertex);
-	}
-
-	position = (minBound + maxBound) * 0.5f;
-	Vector3 extent = maxBound - minBound;
-
-	Vector3 a, b, c;
-	a = vertices[1] - vertices[2];
-	b = vertices[4] - vertices[5];
-	c = vertices[8] - vertices[9];
-
-	if (DebugCubeTransforms) {
-		Debug::DrawLine(vertices[1], vertices[2], Vector4(1, 0, 0, 1));
-		Debug::DrawLine(vertices[4], vertices[5], Vector4(0, 0, 1, 1));
-		Debug::DrawLine(vertices[8], vertices[9], Vector4(0, 1, 0, 1));
-	}
-
-	extent = Vector3(Vector::Length(a),Vector::Length(b),Vector::Length(c));
-
-	Vector3 localX = Vector::Normalise(a); 
-	Vector3 localY = Vector::Normalise(b); 
-	Vector3 localZ = -Vector::Normalise(c); 
-
-	Matrix3 rotationMatrix = Matrix3();
-
-	rotationMatrix.SetColumn(2, Vector4(localZ, 0));
-	rotationMatrix.SetColumn(1, Vector4(localY, 0));
-	rotationMatrix.SetColumn(0, Vector4(-localX, 0));
-
-	rotation = Quaternion(rotationMatrix);
-	scale = extent * 0.5f;
 }
 
 bool TutorialGame::SelectObject() {
@@ -315,14 +208,9 @@ void TutorialGame::DrawUIElements() {
 	framerateDelay += 1;
 
 	uiSystem->StartFrame();
-
-	/*uiSystem->DrawDemo();*/
 	if (framerateDelay > 10) {
 		latestFramerate = Window::GetTimer().GetTimeDeltaSeconds();
 		framerateDelay = 0;
 	}
 	uiSystem->DisplayFramerate(latestFramerate);
 }
-
-
-

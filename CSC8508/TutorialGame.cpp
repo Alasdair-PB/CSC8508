@@ -62,7 +62,6 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 #else 
 	renderer = new GameTechRenderer(*world);
 #endif
-
 	physics = new PhysicsSystem(*world);
 
 	forceMagnitude	= 10.0f;
@@ -98,13 +97,12 @@ void TutorialGame::EndGame(bool hasWon) {
 }
 
 void TutorialGame::InitialiseAssets() {
-	cubeMesh	= renderer->LoadMesh("cube.msh");
+	cubeMesh = renderer->LoadMesh("cube.msh");
 	navigationMesh = renderer->LoadMesh("NavMeshObject.msh");
 	capsuleMesh = renderer->LoadMesh("capsule.msh");
 	sphereMesh = renderer->LoadMesh("sphere.msh");
 
-
-	basicTex	= renderer->LoadTexture("checkerboard.png");
+	basicTex = renderer->LoadTexture("checkerboard.png");
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
 	InitCamera();
@@ -153,9 +151,7 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 			objClosest->GetRenderObject()->SetColour(Vector4(1, 0, 1, 1));
 		}
 	}
-
 	SelectObject();
-	MoveSelectedObject();
 }
 
 bool TutorialGame::OnEndGame(float dt) {
@@ -200,29 +196,6 @@ void TutorialGame::UpdateGame(float dt)
 	physics->Update(dt);
 }
 
-void TutorialGame::LockedObjectMovement() 
-{
-	Matrix4 view = world->GetMainCamera().BuildViewMatrix();
-	Matrix4 camWorld = Matrix::Inverse(view);
-	Vector3 rightAxis = Vector3(camWorld.GetColumn(0)); 
-	Vector3 fwdAxis = Vector::Cross(Vector3(0, 1, 0), rightAxis);
-
-	fwdAxis.y = 0.0f;
-	fwdAxis = Vector::Normalise(fwdAxis);
-
-	auto phys = selectionObject->GetPhysicsComponent();
-
-	if(!phys)
-		return;
-
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::UP)) 
-		phys->GetPhysicsObject()->AddForce(fwdAxis);
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::DOWN)) 
-		phys->GetPhysicsObject()->AddForce(-fwdAxis);
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::NEXT)) 
-		phys->GetPhysicsObject()->AddForce(Vector3(0,-10,0));
-}
-
 void TutorialGame::InitCamera() {
 	world->GetMainCamera().SetNearPlane(0.1f);
 	world->GetMainCamera().SetFarPlane(500.0f);
@@ -236,7 +209,7 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-	InitGameExamples();
+	AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
 }
 
 std::vector<Vector3> TutorialGame::GetVertices(Mesh* navigationMesh, int i)
@@ -257,31 +230,6 @@ std::vector<Vector3> TutorialGame::GetVertices(Mesh* navigationMesh, int i)
 	}
 	return vertices;
 }
-
-
-bool TutorialGame::RayCastNavWorld(Ray& r, float rayLength)
-{
-
-	Vector3 intersection = Vector3(0, 0, 0);
-	Vector3 dir = Vector::Normalise(r.GetDirection());
-	Vector3 pos = r.GetPosition();
-
-	for (size_t i = 0; i < navigationMesh->GetSubMeshCount(); ++i) {
-		const SubMesh* subMesh = navigationMesh->GetSubMesh(i);
-
-		for (size_t j = subMesh->start; j < subMesh->start + subMesh->count; ++j) {
-			Vector3 a, b, c;
-			if (!navigationMesh->GetTriangle(j, a, b, c))
-				continue;
-
-			float t, u, v;
-			if (RayIntersectsTriangle(pos, dir, a, b, c, t, u, v) && t <= rayLength) 
-				return true;
-		}
-	}
-	return false;
-}
-
 
 const bool DebugCubeTransforms = false;
 
@@ -325,22 +273,6 @@ void  TutorialGame::CalculateCubeTransformations(const std::vector<Vector3>& ver
 	scale = extent * 0.5f;
 }
 
-
-void TutorialGame::InitGameExamples() 
-{	
-	AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-}
-
-void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
-	for (int x = 0; x < numCols; ++x) {
-		for (int z = 0; z < numRows; ++z) {
-			Vector3 position = Vector3(x * colSpacing, 100.0f, z * rowSpacing);
-			AddSphereToWorld(position, radius, 1.0f);
-		}
-	}
-	AddFloorToWorld(Vector3(0, -2, 0));
-}
-
 bool TutorialGame::SelectObject() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
 		inSelectionMode = !inSelectionMode;
@@ -369,39 +301,8 @@ bool TutorialGame::SelectObject() {
 			else 
 				return false;
 		}
-		if (Window::GetKeyboard()->KeyPressed(NCL::KeyCodes::L)) {
-			if (selectionObject) {
-				if (lockedObject == selectionObject) 
-					lockedObject = nullptr;
-				else 
-					lockedObject = selectionObject;
-			}
-		}
 	}
-
 	return false;
-}
-
-void TutorialGame::MoveSelectedObject() {
-	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
-
-	if (!selectionObject) 
-		return;
-
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::Right)) 
-	{
-		Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
-		RayCollision closestCollision;
-
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
-
-				auto phys = selectionObject->GetPhysicsComponent();
-				if (phys)
-					phys->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-			}
-		}
-	}
 }
 
 void TutorialGame::DrawUIElements() {

@@ -36,17 +36,13 @@ namespace NCL {
 
 		protected:
 			void InitialiseAssets();
-
 			void InitCamera();
 
 			void SetPause(bool state);
 			void InitWorld();
-			void InitGameExamples();
 
-			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
 			void UpdateObjectSelectMode(float dt);
 			bool SelectObject();
-			void MoveSelectedObject();
 			void LockedObjectMovement();
       
 			void DrawUIElements();
@@ -61,8 +57,6 @@ namespace NCL {
 			void EndGame(bool hasWon);
 
 			void UpdateScore(float points);
-
-			bool RayCastNavWorld(Ray& r, float rayDistance);
 			void UpdateDrawScreen(float dt);
 			bool OnEndGame(float dt);
 

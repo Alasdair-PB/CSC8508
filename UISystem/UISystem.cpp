@@ -61,12 +61,17 @@ void UISystem::DisplayFramerate(float dt) {
 }
 
 void UISystem::AudioSliders() {
-	ImGui::Begin("Audio Slider");
-	enum AudioOptions { AudioOption1, AudioOption2, AudioOption3, AudioOptionCount };
-	static int option = AudioOption1;
-	const char* optionNames[AudioOptionCount] = { "Option1", "Option2", "Option3" };
-	const char* optionName = (option >= 0 && option < AudioOptionCount) ? optionNames[option] : "Unknown";
-	ImGui::SliderInt("Audio Options", &option, 0, AudioOptionCount - 1, optionName);
+	ImGui::SetNextWindowPos(ImVec2(800, 300));
+	ImGui::SetNextWindowSize(ImVec2(500, 125));
+	ImGui::Begin("Audio Sliders");
+	ImGui::SliderInt("Master Volume", &masterVolume, 0, 100);
+	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::MASTER, masterVolume);
+	ImGui::SliderInt("Music Volume", &musicVolume, 0, 100);
+	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::MUSIC, musicVolume);
+	ImGui::SliderInt("SFX Volume", &sfxVolume, 0, 100);
+	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::SFX, sfxVolume);
+	ImGui::SliderInt("Voice Volume", &voiceVolume, 0, 100);
+	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::CHAT, voiceVolume);
 	ImGui::End();
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
+#include "../AudioEngine/AudioEngine.h"
 
 namespace NCL {
 	namespace CSC8508 {
@@ -23,7 +24,11 @@ namespace NCL {
 		protected:
 			HWND uiWindow;
 			bool showDemo = true;
-			int sliderVal = 0;
+
+			int masterVolume = 100;
+			int musicVolume = 100;
+			int sfxVolume = 100;
+			int voiceVolume = 100;
 		};
 	}
 }

@@ -7,6 +7,8 @@
 
 
 #include <fmod.hpp>
+#include <map>
+
 
 /**
 * Type of Channel Group

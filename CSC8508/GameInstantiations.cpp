@@ -6,6 +6,7 @@
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
 #include "MeshManager.h"
+#include "MaterialManager.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -16,7 +17,8 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 	GameObject* navMeshObject = new GameObject();
 	Mesh* navigationMesh = MeshManager::GetMesh("navMesh");
 	Mesh* cubeMesh = MeshManager::GetMesh("cube");
-
+	Texture* basicTex = MaterialManager::GetTexture("basic");
+	Shader* basicShader = MaterialManager::GetShader("basic");
 
 	for (size_t i = 0; i < navigationMesh->GetSubMeshCount(); ++i)
 	{
@@ -63,6 +65,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	GameObject* player = new GameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 	Mesh* capsuleMesh = MeshManager::GetMesh("capsule");
+	Shader* basicShader = MaterialManager::GetShader("basic");
 
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
@@ -109,6 +112,8 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	Vector3 floorSize = Vector3(200, 2, 200);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	Mesh* cubeMesh = MeshManager::GetMesh("cube");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
+	Shader* basicShader = MaterialManager::GetShader("basic");
 
 
 	PhysicsComponent* phys = floor->AddComponent<PhysicsComponent>();
@@ -132,6 +137,9 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
 	Mesh* sphereMesh = MeshManager::GetMesh("sphere");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
+	Shader* basicShader = MaterialManager::GetShader("basic");
+
 
 	PhysicsComponent* phys = sphere->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = sphere->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
@@ -154,6 +162,8 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	GameObject* cube = new GameObject();
 	OBBVolume* volume = new OBBVolume(dimensions);
 	Mesh* cubeMesh = MeshManager::GetMesh("cube");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
+	Shader* basicShader = MaterialManager::GetShader("basic");
 
 	PhysicsComponent* phys = cube->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = cube->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);

@@ -85,11 +85,7 @@ namespace NCL {
 			NavigationPath outPath;
 			NavigationMesh* navMesh = nullptr;
 
-			Texture*	basicTex	= nullptr;
-			Shader*		basicShader = nullptr;
-
 			MainMenu* mainMenu = nullptr;
-
 			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset = Vector3(0, 14, 20);
 

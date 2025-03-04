@@ -9,6 +9,7 @@
 
 #include "PositionConstraint.h"
 #include "MeshManager.h"
+#include "MaterialManager.h"
 
 #include "OrientationConstraint.h"
 
@@ -114,9 +115,8 @@ void TutorialGame::InitialiseAssets() {
 	MeshManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MeshManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
 	MeshManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
-
-	basicTex = renderer->LoadTexture("checkerboard.png");
-	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
+	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
+	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 
 	InitCamera();
 	InitWorld();
@@ -124,15 +124,14 @@ void TutorialGame::InitialiseAssets() {
 
 TutorialGame::~TutorialGame()	
 {
-
-	delete basicTex;
-	delete basicShader;
+	MeshManager::CleanUp();
+	MaterialManager::CleanUp();
+	ComponentManager::CleanUp();
 
 	delete physics;
 	delete renderer;
 	delete world;
 	delete navMesh;
-  
 	delete uiSystem;
 }
 

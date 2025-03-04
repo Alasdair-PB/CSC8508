@@ -1,7 +1,6 @@
 #ifndef MESHMANAGER_H
 #define MESHMANAGER_H
 
-#include <vector>
 #include "Mesh.h"
 #include "RenderObject.h"
 #include <unordered_map>

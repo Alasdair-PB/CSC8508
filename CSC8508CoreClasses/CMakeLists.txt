@@ -90,6 +90,7 @@ set(Header_Files
     "GameWorld.h"
     "RenderObject.h"
     "MeshManager.h"
+    "MaterialManager.h"
     "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})

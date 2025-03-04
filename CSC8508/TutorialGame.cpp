@@ -52,6 +52,14 @@ void TestSave() {
 	TestSaveGameObject();
 }
 
+
+void DreamFrameWork() {
+	// Load Controller Map from save data
+	// Load Camera and init from save data
+	// Load Physics Settings from save data
+	// Load scene
+}
+
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
 {
 	world = new GameWorld();

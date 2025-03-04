@@ -1,28 +1,22 @@
 #ifndef MESHMANAGER_H
 #define MESHMANAGER_H
 
-#include <typeindex>
-#include <unordered_map>
-#include <unordered_set>
-#include <new>    
-#include <utility>
-#include <type_traits>
-#include <iostream>
 #include <vector>
-#include <memory>
-using std::vector;
+#include "Mesh.h"
+#include "RenderObject.h"
 
-namespace NCL::CSC8508 {
+namespace NCL {
+    namespace CSC8508 {
+        using std::vector;
+        class MeshManager final {
+        public:
 
-    class MeshManager final {
-    public:
 
-    
-
-    private:
-        MeshManager() = default;
-
-    };
+        private:
+            MeshManager() = default;
+            vector<Mesh*> allMeshes;
+        };
+    }
 }
 
 #endif // MESHMANAGER_H

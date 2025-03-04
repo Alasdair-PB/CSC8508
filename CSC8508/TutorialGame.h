@@ -82,16 +82,11 @@ namespace NCL {
 			int score = 0;
 
 			BoundsComponent* selectionObject = nullptr;
-			Mesh* navigationMesh = nullptr;
 			NavigationPath outPath;
 			NavigationMesh* navMesh = nullptr;
 
 			Texture*	basicTex	= nullptr;
 			Shader*		basicShader = nullptr;
-
-			Mesh*	capsuleMesh = nullptr;
-			Mesh*	cubeMesh	= nullptr;
-			Mesh*	sphereMesh	= nullptr;
 
 			MainMenu* mainMenu = nullptr;
 

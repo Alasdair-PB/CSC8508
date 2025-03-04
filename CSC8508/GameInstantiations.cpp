@@ -5,6 +5,7 @@
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
+#include "MeshManager.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -13,6 +14,9 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 {
 	navMesh = new NavigationMesh("smalltest.navmesh");
 	GameObject* navMeshObject = new GameObject();
+	Mesh* navigationMesh = MeshManager::GetMesh("navMesh");
+	Mesh* cubeMesh = MeshManager::GetMesh("cube");
+
 
 	for (size_t i = 0; i < navigationMesh->GetSubMeshCount(); ++i)
 	{
@@ -58,6 +62,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	GameObject* player = new GameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
+	Mesh* capsuleMesh = MeshManager::GetMesh("capsule");
 
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
@@ -103,6 +108,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	GameObject* floor = new GameObject();
 	Vector3 floorSize = Vector3(200, 2, 200);
 	AABBVolume* volume = new AABBVolume(floorSize);
+	Mesh* cubeMesh = MeshManager::GetMesh("cube");
 
 
 	PhysicsComponent* phys = floor->AddComponent<PhysicsComponent>();
@@ -125,6 +131,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	GameObject* sphere = new GameObject();
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
+	Mesh* sphereMesh = MeshManager::GetMesh("sphere");
 
 	PhysicsComponent* phys = sphere->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = sphere->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
@@ -146,6 +153,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
 	GameObject* cube = new GameObject();
 	OBBVolume* volume = new OBBVolume(dimensions);
+	Mesh* cubeMesh = MeshManager::GetMesh("cube");
 
 	PhysicsComponent* phys = cube->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = cube->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);

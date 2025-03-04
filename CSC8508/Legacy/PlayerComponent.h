@@ -1,10 +1,9 @@
 #pragma once
 #include "PhysicsObject.h"
+#include "GameObject.h"
 #include "InputComponent.h"
 
 #include "Ray.h"
-#include "Kitten.h"
-#include "CollectMe.h"
 #include "EventListener.h"
 
 #include "Window.h"
@@ -14,11 +13,11 @@ namespace NCL {
     namespace CSC8508 {
 
         class OnJumpEvent : public Event {};
-        class PlayerGameObject : public GameObject, public EventListener<OnJumpEvent> {
+        class PlayerComponent : public IComponent, public EventListener<OnJumpEvent> {
         public:
 
-            PlayerGameObject();
-            ~PlayerGameObject();
+            PlayerComponent(GameObject& gameObject);
+            ~PlayerComponent();
 
             typedef std::function<void(bool hasWon)> EndGame;
             typedef std::function<void(float points)> IncreaseScore;
@@ -38,8 +37,8 @@ namespace NCL {
             */
             void OnAwake() override
             {
-                physicsComponent = this->TryGetComponent<PhysicsComponent>();
-                inputComponent = this->TryGetComponent<InputComponent>();
+                physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
+                inputComponent = GetGameObject().TryGetComponent<InputComponent>();
 
                 if (physicsComponent)
                     physicsObj = physicsComponent->GetPhysicsObject();
@@ -68,24 +67,6 @@ namespace NCL {
 
                 physicsObj->AddForce(dir * speed);
                 physicsObj->RotateTowardsVelocity();
-            }
-
-            void OnCollisionBegin(BoundsComponent* otherBounds) override {
-                GameObject& otherObject = otherBounds->GetGameObject();
-
-                if (otherObject.GetTag() == Tags::Enemy)
-                    endGame(false);
-                else if (otherObject.GetTag() == Tags::Collect)
-                {
-                    CollectMe& collect = static_cast<CollectMe&>(otherObject);
-                    if (!collect.IsCollected())
-                    {
-                        increaseScore(collect.GetPoints());
-                        collect.SetCollected(true);
-                        collect.GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
-
-                    }
-                }
             }
  
         protected:

@@ -1,6 +1,3 @@
-#include <chrono>
-#include <thread>
-#include <sstream>
 
 #include "Window.h"
 #include "Debug.h"
@@ -8,20 +5,12 @@
 #include "TutorialGame.h"
 #include "NetworkedGame.h"
 
-#include "PushdownMachine.h"
-
-#include "PushdownState.h"
-
-#include "BehaviourNode.h"
-#include "BehaviourSelector.h"
-#include "BehaviourSequence.h"
-#include "BehaviourAction.h"
-
-#include "RenderObject.h"
-
-
 using namespace NCL;
 using namespace CSC8508;
+
+#include <chrono>
+#include <thread>
+#include <sstream>
 
 
 void UpdateWindow(Window* w, NetworkedGame* g)

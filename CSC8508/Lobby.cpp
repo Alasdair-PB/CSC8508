@@ -88,8 +88,9 @@ void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data) {
         }
 
         if (LocalUserId) {
+            //LeaveLobby();
             CreateLobby();
-            CreateLobbySearch();
+            //CreateLobbySearch();
         }
         else {
             std::cerr << "[ERROR] LocalUserId is not valid. Cannot create a lobby." << std::endl;
@@ -99,6 +100,8 @@ void OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data) {
         std::cerr << "[ERROR] EOS Connect Login Failed: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
     }
 }
+
+EOS_HLobby LobbyHandle = {};
 
 void OnAuthLoginComplete(const EOS_Auth_LoginCallbackInfo* Data) {
     std::cout << "[OnAuthLoginComplete] Callback received." << std::endl;
@@ -158,7 +161,7 @@ void CreateLobby() {
         return;
     }
 
-    EOS_HLobby LobbyHandle = EOS_Platform_GetLobbyInterface(PlatformHandle);
+    LobbyHandle = EOS_Platform_GetLobbyInterface(PlatformHandle);
 
     if (!LobbyHandle) {
         std::cerr << "[ERROR] LobbyHandle is NULL. Lobby interface might not be initialized." << std::endl;
@@ -179,6 +182,7 @@ void CreateLobby() {
     Options.AllowedPlatformIds = nullptr;
     Options.bCrossplayOptOut = EOS_FALSE;
 
+
     std::cout << "[CreateLobby] LocalUserId: " << LocalUserId << std::endl;
     std::cout << "[CreateLobby] PlatformHandle: " << PlatformHandle << std::endl;
     std::cout << "[CreateLobby] LobbyHandle: " << LobbyHandle << std::endl;
@@ -190,7 +194,7 @@ void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data) {
     std::cout << "[OnLobbyCreated] Callback received." << std::endl;
 
     if (Data->ResultCode == EOS_EResult::EOS_Success) {
-        std::cout << "[OnLobbyCreated] Lobby created successfully! Lobby ID: " << Data->LobbyId << std::endl;
+        std::cout << "[OnLobbyCreated] Lobby created successfully! Lobby ID: " << Data->LobbyId << ". You are now the owner!" << std::endl;
     }
     else {
         std::cerr << "[ERROR] Failed to create lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
@@ -236,7 +240,7 @@ void CreateLobbySearch() {
         std::cout << "[CreateLobbySearch] Lobby search created successfully." << std::endl;
 
         // Search for the specific lobby ID
-        const char* TargetLobbyId = "0f58e7c1e041495a967283569e557928";  // The given lobby ID
+        const char* TargetLobbyId = "a42c25af66e642de991a0a89bb0f54c8";  // The given lobby ID
 
         // Create and set up the SetLobbyIdOptions structure
         EOS_LobbySearch_SetLobbyIdOptions SetLobbyIdOptions = {};
@@ -260,11 +264,13 @@ void CreateLobbySearch() {
     }
 }
 
+EOS_HLobbyDetails LobbyDetailsHandle;
+
 void OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data) {
     if (Data->ResultCode == EOS_EResult::EOS_Success) {
         std::cerr << "[OnFindLobbiesComplete] Lobby search Success.";
 
-        EOS_HLobbyDetails LobbyDetailsHandle = nullptr;
+        LobbyDetailsHandle = nullptr;
 
         EOS_LobbySearch_CopySearchResultByIndexOptions CopyOptions = {};
         CopyOptions.ApiVersion = EOS_LOBBYSEARCH_COPYSEARCHRESULTBYINDEX_API_LATEST;
@@ -287,6 +293,9 @@ void OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data) {
                 std::cerr << "[LobbyInfo] Max Players: " << LobbyInfo->MaxMembers << "\n";
                 std::cerr << "[LobbyInfo] Owner ID: " << LobbyInfo->LobbyOwnerUserId << "\n";
 
+                LeaveLobby();
+                //JoinLobby();
+
                 // Free the memory allocated for the lobby info structure
                 EOS_LobbyDetails_Info_Release(LobbyInfo);
             }
@@ -301,5 +310,73 @@ void OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data) {
     }
     else {
         std::cerr << "[OnFindLobbiesComplete] Lobby search failed. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
+    }
+}
+
+// Function to join a lobby using a given LobbyDetailsHandle
+void JoinLobby() {
+    if (LobbyDetailsHandle == nullptr) {
+        std::cerr << "[ERROR] Invalid LobbyDetailsHandle before JoinLobby()\n";
+        return;
+    }
+
+    if (LocalUserId == nullptr) {
+        std::cerr << "[ERROR] LocalUserId is null, cannot join lobby\n";
+        return;
+    }
+
+    LobbyHandle = EOS_Platform_GetLobbyInterface(PlatformHandle);
+
+    EOS_Lobby_JoinLobbyOptions JoinOptions = {};
+    JoinOptions.ApiVersion = EOS_LOBBY_JOINLOBBY_API_LATEST;
+    JoinOptions.LobbyDetailsHandle = LobbyDetailsHandle;
+    JoinOptions.LocalUserId = LocalUserId;  // Ensure LocalUserId is correctly set
+    JoinOptions.LocalRTCOptions = NULL;
+    JoinOptions.bPresenceEnabled = EOS_TRUE;  // Enable presence if needed
+    JoinOptions.bCrossplayOptOut = EOS_FALSE;
+    JoinOptions.RTCRoomJoinActionType = EOS_ELobbyRTCRoomJoinActionType::EOS_LRRJAT_AutomaticJoin;
+
+    EOS_Lobby_JoinLobby(LobbyHandle, &JoinOptions, nullptr, OnJoinLobbyComplete);
+}
+
+// Callback function for when joining a lobby completes
+void OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data) {
+    if (Data->ResultCode == EOS_EResult::EOS_Success) {
+    }
+    else {
+        std::cerr << "[ERROR] Failed to join lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
+    }
+}
+
+// Callback after updating the lobby
+void OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Data) {
+    if (Data->ResultCode == EOS_EResult::EOS_Success) {
+        std::cout << "[OnLobbyUpdated] Successfully updated lobby attributes.\n";
+    }
+    else {
+        std::cerr << "[ERROR] Failed to update lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
+    }
+}
+
+// Function to leave a lobby using a given LobbyId
+void LeaveLobby() {
+
+    LobbyHandle = EOS_Platform_GetLobbyInterface(PlatformHandle);
+
+    EOS_Lobby_LeaveLobbyOptions LeaveOptions = {};
+    LeaveOptions.ApiVersion = EOS_LOBBY_LEAVELOBBY_API_LATEST;
+    LeaveOptions.LocalUserId = LocalUserId; // Ensure LocalUserId is correctly set
+    LeaveOptions.LobbyId = "8b04b581a080487c98ee5ee27338e65b"; //Change this
+
+    EOS_Lobby_LeaveLobby(LobbyHandle, &LeaveOptions, nullptr, OnLeaveLobbyComplete);
+}
+
+// Callback function for when leaving a lobby completes
+void OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackInfo* Data) {
+    if (Data->ResultCode == EOS_EResult::EOS_Success) {
+        std::cerr << "[OnLeaveLobbyComplete] Successfully left lobby: " << Data->LobbyId << "\n";
+    }
+    else {
+        std::cerr << "[ERROR] Failed to leave lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
     }
 }

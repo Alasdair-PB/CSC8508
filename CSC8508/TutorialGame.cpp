@@ -3,16 +3,54 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "TextureLoader.h"
-#include "Legacy/EnemyGameObject.h"
-#include "Legacy/Kitten.h"
+
+#include "GameObject.h"
+#include "TransformNetworkComponent.h"
 
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
-#include "Legacy/StateGameObject.h"
-
 
 using namespace NCL;
 using namespace CSC8508;
+
+struct MyX {
+	MyX() : x(0) {}
+	MyX(int x) :x(x) {}
+	int x;
+};
+
+const static std::string folderPath = "../../Assets/Pfabs/";
+
+std::string GetAssetPath(std::string pfabName) {
+	return folderPath + pfabName;
+}
+
+void TestSaveByType() {
+	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
+	std::string intPath = GetAssetPath("int_data.pfab");
+	std::string structPath = GetAssetPath("struct_data.pfab");
+
+	//SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
+	//SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
+	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
+	//SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
+	std::cout << SaveManager::LoadMyData<MyX>(structPath).x << std::endl;
+}
+
+void TestSaveGameObject() {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* myObjectToSave = new GameObject();
+	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
+
+	//myObjectToSave->Save(gameObjectPath);
+	myObjectToSave->Load(gameObjectPath);
+}
+
+void TestSave() {
+	TestSaveByType();
+	TestSaveGameObject();
+}
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
 {
@@ -43,7 +81,10 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	physics->UseGravity(true);
 	world->UpdateWorld(0.1f);
 	physics->Update(0.1f);
+
+	TestSave();
 }
+
 
 void TutorialGame::SetPause(bool state) {
 	inPause = state;

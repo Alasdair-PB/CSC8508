@@ -43,8 +43,6 @@ namespace NCL {
 
 			void UpdateObjectSelectMode(float dt);
 			bool SelectObject();
-			void LockedObjectMovement();
-      
 			void DrawUIElements();
       
 			GameObject* AddFloorToWorld(const Vector3& position);
@@ -73,7 +71,6 @@ namespace NCL {
 #endif
 			PhysicsSystem*		physics;
 			GameWorld*			world;
-
 			KeyboardMouseController controller;
 
 			bool useGravity;
@@ -85,7 +82,6 @@ namespace NCL {
 			int score = 0;
 
 			BoundsComponent* selectionObject = nullptr;
-
 			Mesh* navigationMesh = nullptr;
 			NavigationPath outPath;
 			NavigationMesh* navMesh = nullptr;
@@ -100,21 +96,11 @@ namespace NCL {
 			MainMenu* mainMenu = nullptr;
 
 			BoundsComponent* lockedObject	= nullptr;
-			Vector3 lockedOffset		= Vector3(0, 14, 20);
+			Vector3 lockedOffset = Vector3(0, 14, 20);
 
 			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
 			}
-
-
-			std::vector<Vector4> colors = {
-				Vector4(1.0f, 0.0f, 0.0f, 1.0f), // Red
-				Vector4(0.0f, 1.0f, 0.0f, 1.0f), // Green
-				Vector4(0.0f, 0.0f, 1.0f, 1.0f), // Blue
-				Vector4(1.0f, 1.0f, 0.0f, 1.0f), // Yellow
-				Vector4(1.0f, 0.0f, 1.0f, 1.0f), // Magenta
-				Vector4(0.0f, 1.0f, 1.0f, 1.0f)  // Cyan
-			};
 
 			GameObject* objClosest = nullptr;
       

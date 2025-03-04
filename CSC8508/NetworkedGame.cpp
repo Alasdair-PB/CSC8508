@@ -27,7 +27,6 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
-
 struct SpawnPacket : public GamePacket {
 
 	short ownerId;

@@ -29,7 +29,6 @@ namespace NCL {
 			void SpawnPlayerClient(int ownerId, int objectId, Prefab prefab);
 			void SpawnPlayerServer(int ownerId, Prefab prefab);
 
-
 			void StartLevel();
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
 
@@ -57,13 +56,12 @@ namespace NCL {
 
 			GameServer* thisServer;
 			GameClient* thisClient;
+
 			float timeToNextPacket;
 			int packetsToSnapshot;
-
 			int nextObjectId;
 
 			vector<GameObject*> ownedObjects;
-
 			GameObject* GetPlayerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 			std::vector<int> playerStates;
 

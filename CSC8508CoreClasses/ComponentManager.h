@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+
 using std::vector;
 
 namespace NCL::CSC8508 {

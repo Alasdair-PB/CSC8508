@@ -10,7 +10,15 @@ namespace NCL {
         using std::vector;
         class MeshManager final {
         public:
+            void PushMesh(Mesh* mesh, size_t id) {
+                allMeshes.push_back(mesh);
+            }
 
+            void CleanUp() {
+                for (auto mesh : allMeshes)
+                    delete mesh;
+                allMeshes.clear();
+            }
 
         private:
             MeshManager() = default;

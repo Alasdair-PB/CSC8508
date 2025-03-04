@@ -19,8 +19,6 @@
 
 #include "RenderObject.h"
 
-#include "Room.h"
-#include "dungeon.h"
 
 using namespace NCL;
 using namespace CSC8508;

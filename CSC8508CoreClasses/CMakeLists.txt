@@ -86,9 +86,7 @@ source_group("Physics" FILES ${Physics})
 
 set(Header_Files
     "Debug.h"
-    "SaveManager.h"
     "GameObject.h"
-    "ISerializable.h"
     "GameWorld.h"
     "RenderObject.h"
     "MeshManager.h"
@@ -236,7 +234,7 @@ include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
 include_directories("../ImGui/")
-
+include_directories("../SerializedSave/")
 
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")

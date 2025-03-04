@@ -16,9 +16,9 @@ namespace NCL::CSC8508 {
 
     class IComponent;
     class INetworkComponent;
-    class INetworkDeltaComponent;
 
     class PhysicsComponent;
+    class INetworkDeltaComponent;
 
     class ComponentManager final {
     public:

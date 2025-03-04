@@ -1,16 +1,13 @@
 #include "TutorialGame.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-
 #include "INetworkComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
 
-
 using namespace NCL;
 using namespace CSC8508;
-
 
 GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dimensions)
 {
@@ -59,9 +56,10 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	float meshSize = 1.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* player = new PlayerGameObject();
+	GameObject* player = new GameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 
+	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 

@@ -8,6 +8,8 @@
 #include "TransformNetworkComponent.h"
 
 #include "PositionConstraint.h"
+#include "MeshManager.h"
+
 #include "OrientationConstraint.h"
 
 using namespace NCL;
@@ -107,10 +109,11 @@ void TutorialGame::EndGame(bool hasWon) {
 }
 
 void TutorialGame::InitialiseAssets() {
-	cubeMesh = renderer->LoadMesh("cube.msh");
-	navigationMesh = renderer->LoadMesh("NavMeshObject.msh");
-	capsuleMesh = renderer->LoadMesh("capsule.msh");
-	sphereMesh = renderer->LoadMesh("sphere.msh");
+
+	MeshManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
+	MeshManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
+	MeshManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
+	MeshManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
 
 	basicTex = renderer->LoadTexture("checkerboard.png");
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
@@ -121,10 +124,6 @@ void TutorialGame::InitialiseAssets() {
 
 TutorialGame::~TutorialGame()	
 {
-	delete cubeMesh;	
-	delete capsuleMesh;
-	delete sphereMesh;
-
 
 	delete basicTex;
 	delete basicShader;
@@ -132,8 +131,6 @@ TutorialGame::~TutorialGame()
 	delete physics;
 	delete renderer;
 	delete world;
-
-	delete navigationMesh;
 	delete navMesh;
   
 	delete uiSystem;

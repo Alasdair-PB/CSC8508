@@ -4,25 +4,31 @@
 #include <vector>
 #include "Mesh.h"
 #include "RenderObject.h"
+#include <unordered_map>
 
 namespace NCL {
     namespace CSC8508 {
         using std::vector;
         class MeshManager final {
         public:
-            void PushMesh(Mesh* mesh, size_t id) {
-                allMeshes.push_back(mesh);
+            static void PushMesh(std::string name, Mesh* mesh) {
+                allMeshes[name] = mesh;
             }
 
-            void CleanUp() {
+            static Mesh* GetMesh(std::string name) {
+                return allMeshes[name];
+            }
+
+            static void CleanUp() {
                 for (auto mesh : allMeshes)
-                    delete mesh;
+                    delete mesh.second;
                 allMeshes.clear();
             }
 
         private:
             MeshManager() = default;
-            vector<Mesh*> allMeshes;
+            inline static std::unordered_map<std::string, Mesh*> allMeshes;
+
         };
     }
 }

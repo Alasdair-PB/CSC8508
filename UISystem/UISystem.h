@@ -17,10 +17,13 @@ namespace NCL {
 
 			void DrawDemo();
 			void DisplayFramerate(float dt);
+			void AudioSliders();
+			int MainMenu();
 
 		protected:
 			HWND uiWindow;
 			bool showDemo = true;
+			int sliderVal = 0;
 		};
 	}
 }

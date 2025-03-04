@@ -1,3 +1,4 @@
+
 #include "Window.h"
 #include "Debug.h"
 
@@ -51,4 +52,5 @@ int main(int argc, char** argv)
 		UpdateWindow(w, g);
 	}
 	Window::DestroyGameWindow();
+	
 }

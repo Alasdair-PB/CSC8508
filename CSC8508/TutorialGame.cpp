@@ -142,7 +142,14 @@ void TutorialGame::UpdateGame(float dt)
 	if (OnEndGame(dt))
 		return; 
 
-	DrawUIElements();
+	uiSystem->StartFrame();
+	/*uiSystem->DrawDemo();*/
+	DrawFramerate();
+	if (displayMenu == true) {
+		DrawMainMenu();
+	}
+	uiSystem->AudioSliders();
+
 	mainMenu->Update(dt);
 	renderer->Render();	
 	Debug::UpdateRenderables(dt);
@@ -362,12 +369,9 @@ void TutorialGame::MoveSelectedObject() {
 	}
 }
 
-void TutorialGame::DrawUIElements() {
+void TutorialGame::DrawFramerate() {
 	framerateDelay += 1;
 
-	uiSystem->StartFrame();
-
-	/*uiSystem->DrawDemo();*/
 	if (framerateDelay > 10) {
 		latestFramerate = Window::GetTimer().GetTimeDeltaSeconds();
 		framerateDelay = 0;
@@ -375,5 +379,12 @@ void TutorialGame::DrawUIElements() {
 	uiSystem->DisplayFramerate(latestFramerate);
 }
 
+void TutorialGame::DrawMainMenu() {
+	menuOption = uiSystem->MainMenu();
+	if (menuOption != 0) {
+		displayMenu = false;
+		mainMenu->SetOption(menuOption);
+	}
+}
 
 

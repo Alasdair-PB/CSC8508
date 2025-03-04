@@ -14,9 +14,14 @@ namespace NCL {
                 std::vector<Room*> rooms;
                 int gridWidth, gridHeight;
 
+                /// <summary>
+                /// initializes a random seed for dungeon
+                /// </summary>
+                /// <param name="width"></param>
+                /// <param name="height"></param>
                 Dungeon(int width, int height)
                     : gridWidth(width), gridHeight(height) {
-                    std::srand(static_cast<unsigned>(std::time(nullptr))); /*initialize random seed*//*初始化随机种子*/
+                    std::srand(static_cast<unsigned>(std::time(nullptr)));
                 }
 
                 ~Dungeon() {
@@ -24,11 +29,17 @@ namespace NCL {
                         delete room;
                 }
 
-                // 生成房间，参数：房间数量、最小尺寸、最大尺寸
-                /* Generate rooms, parameters: room count, minimum size, maximum size */
+                /// <summary>
+                /// Generate rooms, parameters: room count, minimum size, maximum size
+                /// If it is the first room, it can be set as the starting room
+                /// If there is an overlap in rooms, delete the room
+                /// </summary>
+                /// <param name="roomCount"></param>
+                /// <param name="minSize"></param>
+                /// <param name="maxSize"></param>
                 void generateRooms(int roomCount, int minSize, int maxSize) {
-                    int attempts = 0; // 尝试次数计数，避免死循环
-                    /* Try to generate rooms until the desired count is reached or too many attempts are made */
+                    int attempts = 0;
+
                     while (rooms.size() < static_cast<size_t>(roomCount) && attempts < roomCount * 5) {
                         int w = minSize + std::rand() % (maxSize - minSize + 1);
                         int h = minSize + std::rand() % (maxSize - minSize + 1);
@@ -37,8 +48,6 @@ namespace NCL {
 
                         Room* newRoom = new Room(x, y, w, h);
 
-                        // 如果是第一个房间，可以设为起始房间
-                        /* If it is the first room, it can be set as the starting room */
                         if (rooms.empty()) {
                             newRoom->type = RoomType::Start;
                         }
@@ -54,50 +63,47 @@ namespace NCL {
                             rooms.push_back(newRoom);
                         }
                         else {
-                            delete newRoom; // 重叠则删除房间
-                            /* If there is an overlap, delete the room */
+                            delete newRoom;
                         }
                         attempts++;
                     }
                 }
 
-                // 检查两个房间是否重叠
-                /* Check if two rooms overlap */
+                /// <summary>
+                /// Check if room a and room b have overlap (with a small margin)
+                /// </summary>
+                /// <param name="a"></param>
+                /// <param name="b"></param>
+                /// <returns></returns>
                 bool checkOverlap(Room* a, Room* b) {
-                    // 检测 a 与 b 是否有重叠（留有一定边距也可以）
-                    /* Check if a and b have overlap (with a small margin) */
                     return !(a->x + a->width <= b->x || b->x + b->width <= a->x ||
                         a->y + a->height <= b->y || b->y + b->height <= a->y);
                 }
 
-                // 简单连接房间：按照房间中心点顺序依次连接
-                /* Simple connection of rooms: connect rooms in order of center point */
+                /// <summary>
+                /// Simple connection of rooms: connect rooms in order of center point
+                /// Sort rooms by center point x coordinate (or distance for MST)
+                /// Connects each room to the next room in order
+                /// Add them to each other's neighbor list
+                /// Calls a function to creat corridor between rooms and record path in corridor map
+                /// </summary>
                 void connectRooms() {
                     if (rooms.empty()) return;
 
-                    // 对房间按照中心点 x 坐标排序（也可以根据距离进行 MST 最小生成树）
-                    /* Sort rooms by center point x coordinate (or distance for MST) */
                     std::sort(rooms.begin(), rooms.end(), [](Room* a, Room* b) {
                         return a->center().first < b->center().first;
                         });
 
-                    // 按顺序连接每个房间与下一个房间
-                    /* Connect each room to the next room in order */
                     for (size_t i = 1; i < rooms.size(); ++i) {
                         Room* roomA = rooms[i - 1];
                         Room* roomB = rooms[i];
 
-                        // 将它们互相加入邻接列表
-                        /* Add them to each other's neighbor list */
                         roomA->neighbors.push_back(roomB);
                         roomB->neighbors.push_back(roomA);
 
-                        // 这里可以调用生成走廊的函数，将两房间中心相连的路径记录下来
-                        /* Here, you can call a function to generate a corridor between the two rooms, and record the path in the corridor map */
                         createCorridor(roomA, roomB);
                     }
                 }
-
 
                 void createCorridor(Room* a, Room* b) {
                     auto [ax, ay] = a->center();
@@ -106,7 +112,6 @@ namespace NCL {
                         << bx << ", " << by << ")" << std::endl;
 
                 }
-
 
                 void printDungeon() {
                     std::cout << "Dungeon Info:" << std::endl;
@@ -137,15 +142,18 @@ namespace NCL {
                 }
             };
 
+            /// <summary>
+            /// collider: Box, Sphere, Capsule
+            /// tags: e.g. "Room", "Corridor", "Door"
+            /// </summary>
             struct Prefab {
-                std::string name;        // 预设名称
-                std::string modelPath;   // 3D 模型路径
-                std::string collider;    // 碰撞体类型 (Box, Sphere, Capsule)
-                bool isWalkable;         // 是否可行走（false 表示障碍物）
-                float width, height, depth; // 大小
-                std::vector<std::string> tags; // 额外的标记 (e.g. "Room", "Corridor", "Door")
+                std::string name; 
+                std::string modelPath;
+                std::string collider; 
+                bool isWalkable;         
+                float width, height, depth; 
+                std::vector<std::string> tags; 
 
-                // 构造函数
                 Prefab(std::string _name, std::string _model, std::string _collider,
                     bool _walkable, float w, float h, float d, std::vector<std::string> _tags)
                     : name(_name), modelPath(_model), collider(_collider), isWalkable(_walkable),
@@ -155,20 +163,24 @@ namespace NCL {
 
             class PrefabManager {
             private:
-                std::vector<Prefab> prefabs; // 存储所有预设
+                std::vector<Prefab> prefabs;
 
             public:
-
-                // 从文件加载 Prefab（假设用 JSON）
+                /// <summary>
+                /// Loads prefab from a JSON configuration file
+                /// </summary>
                 void loadPrefabs() {
-                    // 假设你有一个 JSON 解析库
                     prefabs.push_back(Prefab("SmallRoom", "models/small_room.obj", "Box", true, 5, 3, 5, { "Room" }));
                     prefabs.push_back(Prefab("Corridor", "models/corridor.obj", "Box", true, 3, 3, 10, { "Corridor" }));
                     prefabs.push_back(Prefab("Door", "models/door.obj", "Box", true, 1, 2, 0.1, { "Door" }));
                     prefabs.push_back(Prefab("Table", "models/table.obj", "Box", false, 2, 1, 2, { "Furniture" }));
                 }
 
-                // 按类型随机选择一个 Prefab
+                /// <summary>
+                /// Sets room type as a Prefab
+                /// </summary>
+                /// <param name="tag"></param>
+                /// <returns>Filtered Rooms</returns>
                 Prefab* getRandomPrefabByTag(const std::string& tag) {
                     std::vector<Prefab*> filtered;
                     for (auto& p : prefabs) {

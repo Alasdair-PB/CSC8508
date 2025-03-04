@@ -30,11 +30,11 @@ void TestSaveByType() {
 	std::string intPath = GetAssetPath("int_data.pfab");
 	std::string structPath = GetAssetPath("struct_data.pfab");
 
-	//SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
-	//SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
+	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
 	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
-	//SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
+	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
 	std::cout << SaveManager::LoadMyData<MyX>(structPath).x << std::endl;
 }
 
@@ -43,7 +43,7 @@ void TestSaveGameObject() {
 	GameObject* myObjectToSave = new GameObject();
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
 
-	//myObjectToSave->Save(gameObjectPath);
+	myObjectToSave->Save(gameObjectPath);
 	myObjectToSave->Load(gameObjectPath);
 }
 
@@ -54,10 +54,12 @@ void TestSave() {
 
 
 void DreamFrameWork() {
+	// Create new game World
 	// Load Controller Map from save data
 	// Load Camera and init from save data
 	// Load Physics Settings from save data
-	// Load scene
+	// Load scene from save data
+	// Set UI either from components or by direct call
 }
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 

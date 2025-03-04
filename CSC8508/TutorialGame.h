@@ -27,18 +27,15 @@ namespace NCL {
 			bool clientOwned;
 		};
 
-		class TutorialGame		{
+		class TutorialGame {
 		public:
 			TutorialGame();
 			~TutorialGame();
-
 			virtual void UpdateGame(float dt);
 
 		protected:
 			void InitialiseAssets();
 			void InitCamera();
-
-			void SetPause(bool state);
 			void InitWorld();
 
 			void UpdateObjectSelectMode(float dt);
@@ -52,12 +49,6 @@ namespace NCL {
 			GameObject* AddNavMeshToWorld(const Vector3& position, Vector3 dimensions);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 
-			void EndGame(bool hasWon);
-
-			void UpdateScore(float points);
-			void UpdateDrawScreen(float dt);
-			bool OnEndGame(float dt);
-
 			void  CalculateCubeTransformations(const std::vector<Vector3>& vertices, Vector3& position, Vector3& scale, Quaternion& rotation);
 			std::vector<Vector3>  GetVertices(Mesh* navigationMesh, int i);
 
@@ -69,17 +60,11 @@ namespace NCL {
 #else
 			GameTechRenderer* renderer;
 #endif
-			PhysicsSystem*		physics;
-			GameWorld*			world;
+			PhysicsSystem* physics;
+			GameWorld* world;
 			KeyboardMouseController controller;
 
-			bool useGravity;
-			bool inPause = false;
 			bool inSelectionMode;
-
-			float forceMagnitude;
-			float time = 0;
-			int score = 0;
 
 			BoundsComponent* selectionObject = nullptr;
 			NavigationPath outPath;
@@ -94,8 +79,8 @@ namespace NCL {
 			}
 
 			GameObject* objClosest = nullptr;
-      
 			UISystem* uiSystem;
+
 			float framerateDelay = 0;
 			float latestFramerate;
 		};

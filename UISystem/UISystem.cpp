@@ -11,7 +11,7 @@ UISystem::UISystem(HWND handle) : uiWindow(handle) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsCustom1();
+	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_InitForOpenGL(handle);
 	ImGui_ImplOpenGL3_Init();
 	audioEngine = &AudioEngine::Instance();
@@ -52,7 +52,6 @@ void UISystem::DrawDemo() {
 }
 
 void UISystem::DisplayFramerate(float dt) {
-	ImGui::StyleColorsDark();
 	ImGui::SetNextWindowPos(ImVec2(50, 50));
 	ImGui::SetNextWindowSize(ImVec2(120, 50));
 	bool open = true;
@@ -94,7 +93,6 @@ void UISystem::AudioSliders() {
 }
 
 int UISystem::MainMenu() {
-	ImGui::StyleColorsDark();
 	ImGui::SetNextWindowPos(ImVec2(80, 480));
 	ImGui::SetNextWindowSize(ImVec2(600, 500));
 	bool open = true;

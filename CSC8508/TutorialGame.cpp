@@ -190,7 +190,10 @@ void TutorialGame::UpdateGame(float dt)
 	if (displayMenu == true) {
 		DrawMainMenu();
 	}
-	uiSystem->AudioSliders();
+
+	if (inPause) {
+		uiSystem->AudioSliders();
+	}
 
 	mainMenu->Update(dt);
 	renderer->Render();	

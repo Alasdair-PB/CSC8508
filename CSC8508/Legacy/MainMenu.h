@@ -33,6 +33,8 @@ namespace NCL {
 			void Update(float dt);
 			bool CheckUpdateGame();
 
+			void SetOption(int option) { menuOption = option; }
+
 			SetPauseGame setPause;
 			StartClient startClient;
 			StartServer startServer;
@@ -52,6 +54,9 @@ namespace NCL {
 			PushdownState::PushdownResult IntroScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult GameScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult PauseScreenOnUpdate(float dt, PushdownState** newState);
+
+			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt };
+			int menuOption = 0;
 		};
 	}
 }

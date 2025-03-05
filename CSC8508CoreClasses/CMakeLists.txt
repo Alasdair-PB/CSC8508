@@ -28,6 +28,8 @@ set(AI_State_Machine
     "StateMachine.cpp"
     "StateMachine.h"
     "StateTransition.h"
+    "IState.h"
+    "IStateTransition.h"
 )
 source_group("AI\\State Machine" FILES ${AI_State_Machine})
 
@@ -122,6 +124,8 @@ set(Components
     "BoundsComponent.h"
     "PhysicsComponent.cpp"
     "BoundsComponent.cpp"
+    "StateComponent.cpp"
+    "StateComponent.h"
 )
 source_group("Components" FILES ${Components})
 

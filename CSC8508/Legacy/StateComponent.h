@@ -6,16 +6,16 @@
 namespace NCL {
     namespace CSC8508 {
         class StateMachine;
-        class StateGameObject : public GameObject  {
+        class StateComponent : public IComponent  {
         public:
-            StateGameObject();
-            ~StateGameObject();
+            StateComponent(GameObject& gameObject);
+            ~StateComponent();
 
             virtual void Update(float dt);
 
             void OnAwake() override
             {
-                physics = this->TryGetComponent<PhysicsComponent>();
+                physics = GetGameObject().TryGetComponent<PhysicsComponent>();
             }
 
         protected:

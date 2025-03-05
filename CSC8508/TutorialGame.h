@@ -3,9 +3,6 @@
 #include "NavigationMesh.h"
 #include "Legacy/MainMenu.h"
 #include "Math.h"
-#include "Legacy/UpdateObject.h"
-
-
 #pragma once
 #include "GameTechRenderer.h"
 #include "UISystem.h"
@@ -13,11 +10,12 @@
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
-#include "Legacy/PlayerGameObject.h"
+#include "Legacy/PlayerComponent.h"
 #include "BoundsComponent.h"
 #include <vector>
-using std::vector;
+#include "SaveManager.h"
 
+using std::vector;
 
 namespace NCL {
 	namespace CSC8508 {
@@ -28,7 +26,6 @@ namespace NCL {
 			int ownId;
 			bool clientOwned;
 		};
-
 
 		class TutorialGame		{
 		public:

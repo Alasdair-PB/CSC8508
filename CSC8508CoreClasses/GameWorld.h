@@ -83,9 +83,9 @@ namespace NCL {
 
 			struct WorldSaveData;
 
-			size_t Save(std::string assetPath, size_t* allocationStart);
-			void  Load(std::string assetPath, size_t allocationStart);
-
+			size_t Save(std::string assetPath, size_t* allocationStart = 0);
+			void  Load(std::string assetPath, size_t allocationStart = 0);
+			void LoadCameraInfo(float nearPlane, float farPlane, float pitch, float yaw, Vector3 position);
 
 		protected:
 			std::vector<PhysicsComponent*> physicsComponents;

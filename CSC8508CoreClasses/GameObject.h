@@ -133,7 +133,6 @@ namespace NCL::CSC8508 {
 		using Action = std::function<void(std::function<void(T*)> func)>;
 		inline static std::unordered_map<size_t, Action<IComponent>*> addComponent;
 
-
 		template <typename T>
 		static void RegisterAddComponent() {
 			new Action(

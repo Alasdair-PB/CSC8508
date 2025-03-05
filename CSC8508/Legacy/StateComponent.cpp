@@ -1,4 +1,4 @@
-#include "StateGameObject.h"
+#include "StateComponent.h"
 #include "StateTransition.h"
 #include "StateMachine.h"
 #include "State.h"
@@ -7,7 +7,7 @@
 using namespace NCL;
 using namespace CSC8508;
 
-StateGameObject::StateGameObject() 
+StateComponent::StateComponent(GameObject& gameObject) : IComponent(gameObject)
 {
 
     counter = 0.0f;
@@ -34,20 +34,20 @@ StateGameObject::StateGameObject()
 }
 
 
-StateGameObject::~StateGameObject() {
+StateComponent::~StateComponent() {
 	delete stateMachine;
 }
 
-void StateGameObject::Update(float dt) {
+void StateComponent::Update(float dt) {
     stateMachine -> Update(dt);
 }
 
-void StateGameObject::MoveLeft(float dt) {
+void StateComponent::MoveLeft(float dt) {
     physics->GetPhysicsObject()->AddForce({ -100, 0, 0 });
     counter += dt;
 }
 
-void StateGameObject::MoveRight(float dt) {
+void StateComponent::MoveRight(float dt) {
     physics->GetPhysicsObject()->AddForce({ 100, 0, 0 });
     counter -= dt;
 }

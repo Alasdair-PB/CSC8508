@@ -7,18 +7,18 @@
 
 #include "Transform.h"
 #include "GameObject.h"
+//#include "ISerializable.h"
 #include <unordered_set>
 
 namespace NCL::CSC8508 
 {
-	class IComponent
+	class IComponent : public ISerializable
 	{
 	public:
 
 		IComponent(GameObject& gameObject) : gameObject(gameObject), enabled(true) {}
 
 		virtual ~IComponent() = default;
-
 
 		/**
 		 * Function invoked after the object and components have been instantiated.
@@ -82,6 +82,10 @@ namespace NCL::CSC8508
 		bool IsDerived(const std::type_info& typeInfo) const {
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
+
+		virtual void Load(std::string assetPath, size_t allocationStart) override;
+		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+		struct ComponentDataStruct;
 
 	protected:
 		virtual void OnAwake() {}

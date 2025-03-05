@@ -4,7 +4,15 @@
 #include "CollisionDetection.h"
 #include "Camera.h"
 #include "ComponentManager.h"
+#include "PhysicsComponent.h"
+#include "TransformNetworkComponent.h"
 
+#include "Transform.h"
+#include "IComponent.h"
+#include "NetworkBase.h"
+#include "Event.h"
+#include "EventManager.h"
+#include "INetworkComponent.h"
 
 using namespace NCL;
 using namespace NCL::CSC8508;

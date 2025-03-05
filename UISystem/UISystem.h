@@ -25,10 +25,12 @@ namespace NCL {
 			HWND uiWindow;
 			bool showDemo = true;
 
-			int masterVolume = 100;
-			int musicVolume = 100;
-			int sfxVolume = 100;
-			int voiceVolume = 100;
+			float masterVolume = 100;
+			float musicVolume = 100;
+			float sfxVolume = 100;
+			float voiceVolume = 100;
+
+			AudioEngine* audioEngine;
 		};
 	}
 }

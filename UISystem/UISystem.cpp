@@ -14,6 +14,7 @@ UISystem::UISystem(HWND handle) : uiWindow(handle) {
 	ImGui::StyleColorsCustom1();
 	ImGui_ImplWin32_InitForOpenGL(handle);
 	ImGui_ImplOpenGL3_Init();
+	audioEngine = &AudioEngine::Instance();
 }
 
 UISystem::~UISystem() {
@@ -64,14 +65,31 @@ void UISystem::AudioSliders() {
 	ImGui::SetNextWindowPos(ImVec2(800, 300));
 	ImGui::SetNextWindowSize(ImVec2(500, 125));
 	ImGui::Begin("Audio Sliders");
-	ImGui::SliderInt("Master Volume", &masterVolume, 0, 100);
-	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::MASTER, masterVolume);
-	ImGui::SliderInt("Music Volume", &musicVolume, 0, 100);
-	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::MUSIC, musicVolume);
-	ImGui::SliderInt("SFX Volume", &sfxVolume, 0, 100);
-	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::SFX, sfxVolume);
-	ImGui::SliderInt("Voice Volume", &voiceVolume, 0, 100);
-	AudioEngine::Instance().SetChannelVolume(ChannelGroupType::CHAT, voiceVolume);
+	
+	masterVolume = audioEngine->GetChannelVolume(ChannelGroupType::MASTER);
+	masterVolume = masterVolume * 100;
+	ImGui::SliderFloat("Master Volume", &masterVolume, 0, 100, "%.0f");
+	masterVolume = masterVolume / 100;
+	audioEngine->SetChannelVolume(ChannelGroupType::MASTER, masterVolume);
+
+	musicVolume = audioEngine->GetChannelVolume(ChannelGroupType::MUSIC);
+	musicVolume = musicVolume * 100;
+	ImGui::SliderFloat("Music Volume", &musicVolume, 0, 100, "%.0f");
+	musicVolume = musicVolume / 100;
+	audioEngine->SetChannelVolume(ChannelGroupType::MUSIC, musicVolume);
+
+	sfxVolume = audioEngine->GetChannelVolume(ChannelGroupType::SFX);
+	sfxVolume = sfxVolume * 100;
+	ImGui::SliderFloat("SFX Volume", &sfxVolume, 0, 100, "%.0f");
+	sfxVolume = sfxVolume / 100;
+	audioEngine->SetChannelVolume(ChannelGroupType::SFX, sfxVolume);
+
+	voiceVolume = audioEngine->GetChannelVolume(ChannelGroupType::CHAT);
+	voiceVolume = voiceVolume * 100;
+	ImGui::SliderFloat("Voice Volume", &voiceVolume, 0, 100, "%.0f");
+	voiceVolume = voiceVolume / 100;
+	audioEngine->SetChannelVolume(ChannelGroupType::CHAT, voiceVolume);
+
 	ImGui::End();
 }
 

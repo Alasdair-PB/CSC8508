@@ -22,11 +22,12 @@ struct MyX {
 	int x;
 };
 
-const static std::string folderPath = "../../Assets/Pfabs/";
+const static std::string folderPath = "../../Assets/Pfabs/"; 
 
 std::string GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
 }
+
 
 void TestSaveByType() {
 	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
@@ -102,7 +103,7 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 
-	InitCamera();
+	lockedObject = nullptr;
 	InitWorld();
 }
 
@@ -134,9 +135,8 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 
 		if (hit)
 		{
-			if (objClosest) {
+			if (objClosest)
 				objClosest->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-			}
 			objClosest = (GameObject*)closestCollision.node;
 			objClosest->GetRenderObject()->SetColour(Vector4(1, 0, 1, 1));
 		}
@@ -156,32 +156,24 @@ void TutorialGame::UpdateGame(float dt)
 	physics->Update(dt);
 }
 
-void TutorialGame::InitCamera() {
-	world->GetMainCamera().SetNearPlane(0.1f);
-	world->GetMainCamera().SetFarPlane(500.0f);
-	world->GetMainCamera().SetPitch(-15.0f);
-	world->GetMainCamera().SetYaw(315.0f);
-	world->GetMainCamera().SetPosition(Vector3(-60, 40, 60));
-	lockedObject = nullptr;
-}
-
 void TutorialGame::InitWorld() 
 {
 	world->ClearAndErase();
 	physics->Clear();
 	AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+
+	std::string assetPath = GetAssetPath("myScene.pfab");
+	world->Save(assetPath);
+	world->Load(assetPath);
 }
 
 bool TutorialGame::SelectObject() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q))
 		inSelectionMode = !inSelectionMode;
-	}
 	if (inSelectionMode) {
-
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::Left)) {
 
 			RenderObject* ro = selectionObject->GetGameObject().GetRenderObject();
-
 			if (selectionObject)
 			{
 				ro->SetColour(Vector4(1, 1, 1, 1));
@@ -189,7 +181,6 @@ bool TutorialGame::SelectObject() {
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
-
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) 
 			{

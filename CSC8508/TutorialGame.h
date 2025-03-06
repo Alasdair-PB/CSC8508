@@ -1,3 +1,4 @@
+#pragma once
 #include "../NCLCoreClasses/KeyboardMouseController.h"
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
@@ -6,7 +7,7 @@
 #include "Legacy/UpdateObject.h"
 
 
-#pragma once
+
 // #include "GameTechRenderer.h"
 #include "GameTechRendererInterface.h"
 #ifdef USEVULKAN

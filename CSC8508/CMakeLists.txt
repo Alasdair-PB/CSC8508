@@ -331,6 +331,7 @@ if(PS5)
 		NCLCoreClasses
 		PS5Core
 		GLTFLoader
+		enet
 	)
 
 	add_dependencies(${PROJECT_NAME}
@@ -349,6 +350,14 @@ if(PS5)
 	
 	PRIVATE ScePad_stub_weak
 	PRIVATE SceUserService_stub_weak
+	
+	PRIVATE SceNpUtility_stub_weak
+	PRIVATE SceCommonDialog_stub_weak
+	PRIVATE SceNetCtlApDialog_stub_weak
+	PRIVATE SceNetCtlAp_stub_weak
+	PRIVATE SceNetCtl_stub_weak
+	PRIVATE SceNet_stub_weak
+	PRIVATE ScePosix_stub_weak
 	)
 	include_directories(${COMPILE_ASSET_ROOT}) 
 else() 

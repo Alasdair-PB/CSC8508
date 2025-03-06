@@ -1,14 +1,16 @@
 set(PROJECT_NAME CSC8508)
 
-file(GLOB Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-source_group("Header Files" FILES ${Header_Files})
-
-file(GLOB Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-source_group("Source Files" FILES ${Source_Files})
-
+file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB Legacy_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Legacy/*")
+
+list(REMOVE_ITEM Source_Files ${Legacy_Files})
+list(REMOVE_ITEM Header_Files ${Legacy_Files})
+
+source_group("Header Files" FILES ${Header_Files})
+source_group("Source Files" FILES ${Source_Files})
 source_group("Legacy" FILES ${Legacy_Files})
-	
+
 if(USE_VULKAN)
 	file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
 	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
@@ -336,6 +338,10 @@ if(PS5)
 		NCLCoreClasses
 		PS5Core
 		GLTFLoader
+		Event
+		AudioEngine
+		ImGui
+		UISystem
 		enet
 	)
 
@@ -370,17 +376,16 @@ else()
 		NCLCoreClasses
 		OpenGLRendering
 		CSC8508CoreClasses
+		Event
+		AudioEngine
+		ImGui
+		UISystem
 		enet
 	)
 	target_link_libraries(${PROJECT_NAME} 
 		PUBLIC ${PROJECT_DEPENDENCIES}
 	)
 endif()
-
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Event)
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC AudioEngine)
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC ImGui)
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC UISystem)
 
 # Handle `fmod.dll` copying here instead of `AudioEngine`
 add_custom_command(TARGET CSC8508 POST_BUILD

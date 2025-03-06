@@ -1,10 +1,10 @@
-#pragma once
 #include "../NCLCoreClasses/KeyboardMouseController.h"
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
 #include "Legacy/MainMenu.h"
 #include "Math.h"
-#include "GameTechRendererInterface.h"
+#pragma once
+#include "GameTechRenderer.h"
 #include "UISystem.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
@@ -29,8 +29,7 @@ namespace NCL {
 
 		class TutorialGame		{
 		public:
-			TutorialGame() {};
-			TutorialGame(GameWorld* gameWorld, GameTechRendererInterface* renderer);
+			TutorialGame();
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
@@ -73,15 +72,16 @@ namespace NCL {
 
 			MainMenu* GetMainMenu() { return mainMenu; }
 
-			GameTechRendererInterface* renderer;
+
 #ifdef USEVULKAN
-#endif			
-#ifdef USE_PS5
+			GameTechVulkanRenderer*	renderer;
+#else
+			GameTechRenderer* renderer;
 #endif
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
-			Controller* controller;
+			KeyboardMouseController controller;
 
 			bool useGravity;
 			bool inPause = false;
@@ -91,7 +91,7 @@ namespace NCL {
 			float time = 0;
 			int score = 0;
 
-			GameObject* selectionObject = nullptr;
+			BoundsComponent* selectionObject = nullptr;
 
 			Mesh* navigationMesh = nullptr;
 			NavigationPath outPath;
@@ -106,9 +106,10 @@ namespace NCL {
 
 			MainMenu* mainMenu = nullptr;
 
-			GameObject* lockedObject	= nullptr;
+			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset		= Vector3(0, 14, 20);
-			void LockCameraToObject(GameObject* o) {
+
+			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
 			}
 

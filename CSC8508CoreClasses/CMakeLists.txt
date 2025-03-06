@@ -144,7 +144,6 @@ set(ALL_FILES
     ${Components}
     ${ComponentSystems}
     ${NetworkComponents}
-    ${enet_Files}
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
@@ -189,8 +188,13 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     <unordered_set>
 	<set>
     <vector>
+	<stack>
 	<unordered_map>
     <map> 
+	<list>
+	<thread>
+    <atomic>
+	<functional>
 	<stack> 
 	
     "../NCLCoreClasses/Vector.h"
@@ -214,9 +218,9 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "ws2_32.lib"
     "Event"
 )
-#if(NOT PS5)
+
 add_subdirectory(enet)
-#endif()
+
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")

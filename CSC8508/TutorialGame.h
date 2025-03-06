@@ -14,6 +14,8 @@
 #include "BoundsComponent.h"
 #include <vector>
 #include "SaveManager.h"
+#include "ComponentAssemblyDefiner.h"
+
 
 using std::vector;
 
@@ -36,6 +38,7 @@ namespace NCL {
 		protected:
 			void InitialiseAssets();
 			void InitWorld();
+			void InitialiseGame();
 
 			void UpdateObjectSelectMode(float dt);
 			bool SelectObject();
@@ -51,7 +54,7 @@ namespace NCL {
 			std::vector<Vector3>  GetVertices(Mesh* navigationMesh, int i);
 
 			MainMenu* GetMainMenu() { return mainMenu; }
-
+			ComponentAssemblyDefiner* componentAssembly;
 
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;

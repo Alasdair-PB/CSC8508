@@ -10,7 +10,6 @@
 #include "PositionConstraint.h"
 #include "MeshManager.h"
 #include "MaterialManager.h"
-
 #include "OrientationConstraint.h"
 
 using namespace NCL;
@@ -27,7 +26,6 @@ const static std::string folderPath = "../../Assets/Pfabs/";
 std::string GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
 }
-
 
 void TestSaveByType() {
 	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
@@ -56,13 +54,30 @@ void TestSave() {
 	TestSaveGameObject();
 }
 
-void DreamFrameWork() {
-	// Create new game World
-	// Load Controller Map from save data
-	// Load Camera and init from save data
-	// Load Physics Settings from save data
-	// Load scene from save data
-	// Set UI either from components or by direct call
+void LoadControllerMappings(Controller& controller)
+{
+	controller.MapAxis(0, "Sidestep");
+	controller.MapAxis(2, "Forward");
+	controller.MapAxis(3, "XLook");
+	controller.MapAxis(4, "YLook");
+}
+
+void TutorialGame::InitialiseGame() {
+
+	componentAssembly = new ComponentAssemblyDefiner();
+	componentAssembly->InitializeMap();
+
+	world->GetMainCamera().SetController(controller);
+	LoadControllerMappings(controller);
+
+	InitialiseAssets();
+
+	physics->UseGravity(true);
+	uiSystem = new UISystem(Window::GetHandle());
+	renderer->SetUISystem(uiSystem);
+	inSelectionMode = false;
+
+	TestSave();
 }
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
@@ -77,21 +92,7 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 #endif
 	physics = new PhysicsSystem(*world);
 
-	inSelectionMode = false;
-	world->GetMainCamera().SetController(controller);
-
-	controller.MapAxis(0, "Sidestep");
-	controller.MapAxis(2, "Forward");
-	controller.MapAxis(3, "XLook");
-	controller.MapAxis(4, "YLook");
-
-	InitialiseAssets();	
-	
-	physics->UseGravity(true);
-	uiSystem = new UISystem(Window::GetHandle());
-	renderer->SetUISystem(uiSystem);
-
-	TestSave();
+	InitialiseGame();
 }
 
 void TutorialGame::InitialiseAssets() {

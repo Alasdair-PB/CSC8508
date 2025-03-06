@@ -114,7 +114,6 @@ namespace NCL::CSC8508 {
             }
         }
 
-
         template <typename T, typename... Args> requires std::is_base_of_v<IComponent, T>
         static T* AddComponent(Args&&... args) {
             if (componentCount<T> >= MAX_COMPONENTS<T>) {

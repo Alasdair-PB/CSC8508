@@ -6,6 +6,7 @@
 #include "Transform.h"
 #include "ComponentManager.h"
 #include <vector>
+#include "ISerializable.h"
 
 using std::vector;
 
@@ -19,24 +20,22 @@ namespace NCL::CSC8508 {
 		enum LayerID { Default, Ignore_RayCast, UI, Player, Enemy, Ignore_Collisions };
 	}
 	class IComponent;
-
 	class NetworkObject;
 	class RenderObject;
 	class PhysicsObject;
 	class BoundsComponent;
 
-	class GameObject	{
+	class GameObject : ISerializable	{
+	
 	public:
 		GameObject(bool isStatic = false);
 		~GameObject();
 
 		bool IsEnabled() const { return isEnabled;}
 		bool SetEnabled(bool isEnabled) { this->isEnabled = isEnabled;  }
-
 		bool IsStatic() const { return isStatic;}
 
 		Transform& GetTransform() {return transform;}
-
 
 		/**
 		 * Function invoked after the object and components have been instantiated.
@@ -90,7 +89,7 @@ namespace NCL::CSC8508 {
 
 		int	GetWorldID() const {
 			return worldID;
-		}	
+		}
 
 		vector<IComponent*> GetAllComponents() const { return components; }
 
@@ -106,13 +105,15 @@ namespace NCL::CSC8508 {
 			requires std::is_base_of_v<IComponent, T>
 		T* TryGetComponent() {
 			for (IComponent* component : components) {
-				if (T* casted = dynamic_cast<T*>(component)) {
+				if (T* casted = dynamic_cast<T*>(component))
 					return casted;
-				}
 			}
 			return nullptr;
 		}
 
+		struct GameObjDataStruct; 
+		void Load(std::string assetPath, size_t allocationStart = 0) override;
+		size_t Save(std::string assetPath, size_t* = nullptr) override;
 
 		void AddChild(GameObject* child);
 		GameObject* TryGetParent();
@@ -122,12 +123,40 @@ namespace NCL::CSC8508 {
 		bool HasTag(Tags::Tag tag);
 		template <typename T> bool HasComponent(T type);
 
-
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
 		void SetTag(Tags::Tag newTag) {  tag = newTag;}
 		Tags::Tag GetTag() const { return tag;}
 
+		/*
+		template <typename T> requires std::is_base_of_v<IComponent, T>
+		using Action = std::function<void(std::function<void(T*)> func)>;
+		inline static std::unordered_map<size_t, Action<IComponent>*> addComponent;
+
+
+		template <typename T>
+		static void RegisterAddComponent() {
+			new Action(
+				[](std::function<void(IComponent*)> func) {
+					AddComponent<T>(
+						[&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+					);
+				}
+			));
+		}
+
+		template <typename T>
+		static AddToComponentDictionary()
+		{
+			func(component);
+			(*addComponent<T>)(func);
+		}
+
+		static T AddComponentOfTypeName(size_t hash) {
+			switch () {
+
+			}
+		}*/
 
 
 	protected:
@@ -148,7 +177,7 @@ namespace NCL::CSC8508 {
 		int	worldID;
 
 		Layers::LayerID	layerID;
-		Tags::Tag	tag; // Change to vector
+		Tags::Tag tag; // Change to vector
 	};
 }
 

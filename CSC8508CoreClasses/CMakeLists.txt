@@ -86,7 +86,9 @@ source_group("Physics" FILES ${Physics})
 
 set(Header_Files
     "Debug.h"
+    "SaveManager.h"
     "GameObject.h"
+    "ISerializable.h"
     "GameWorld.h"
     "RenderObject.h"
     "Transform.h"
@@ -232,6 +234,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
+include_directories("../ImGui/")
 
 
 if(MSVC)

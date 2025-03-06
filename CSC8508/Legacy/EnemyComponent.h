@@ -14,19 +14,18 @@
 #include "CollisionDetection.h"
 
 #include "GameWorld.h"
-#include "UpdateObject.h"
 
 
 namespace NCL {
     namespace CSC8508 {
-        class EnemyGameObject : public GameObject {
+        class EnemyComponent: public IComponent {
         public:    
 
             typedef std::function<bool(Ray& r, float rayDistance)> RaycastToWorld; 
             typedef std::function<Vector3()> GetPlayerPos;
 
-            EnemyGameObject(NavigationMesh* navMesh);
-            ~EnemyGameObject();
+            EnemyComponent(GameObject& gameObject, NavigationMesh* navMesh);
+            ~EnemyComponent();
 
             void SetRay(RaycastToWorld rayHit){ this->rayHit = rayHit; }
             void SetGetPlayer(GetPlayerPos getPlayerPos) { this->getPlayerPos = getPlayerPos; }
@@ -37,8 +36,8 @@ namespace NCL {
           */
             void OnAwake() override
             {
-                navMeshComponent = this->TryGetComponent<NavMeshComponent>();
-                physicsComponent = this->TryGetComponent<PhysicsComponent>();
+                navMeshComponent = GetGameObject().TryGetComponent<NavMeshComponent>();
+                physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
 
             }
 
@@ -87,7 +86,7 @@ namespace NCL {
             BehaviourAction* patrol = new BehaviourAction("Patrol",
                 [&](float dt, BehaviourState state) -> BehaviourState
                 {
-                    Vector3 pos = this->transform.GetPosition();
+                    Vector3 pos = GetGameObject().GetTransform().GetPosition();
                     Vector3 playerPos = getPlayerPos();
 
                     if (state == Initialise)
@@ -122,7 +121,7 @@ namespace NCL {
             BehaviourAction* chase = new BehaviourAction("Chase",
                 [&](float dt, BehaviourState state) -> BehaviourState
                 {
-                    Vector3 pos = this->transform.GetPosition();
+                    Vector3 pos = GetGameObject().GetTransform().GetPosition();
                     Vector3 playerPos = getPlayerPos();
 
                     if (state == Initialise) {

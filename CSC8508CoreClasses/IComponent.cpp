@@ -3,7 +3,6 @@
 //
 
 #include "IComponent.h"
-#include "GameObject.h"
 
 using namespace NCL::CSC8508;
 
@@ -17,4 +16,32 @@ bool IComponent::IsEnabled() const {
 
 void IComponent::SetEnabled(bool enabled) {
 	this->enabled = enabled;
+}
+
+struct IComponent::ComponentDataStruct : public ISerializedData {
+	ComponentDataStruct() : enabled(1) {}
+	ComponentDataStruct(bool enabled) : enabled(enabled) {}
+
+	bool enabled;
+	//vector<size_t> constructorArguments; 
+
+	static auto GetSerializedFields() {
+		return std::make_tuple(
+			SERIALIZED_FIELD(ComponentDataStruct, enabled)
+			//, SERIALIZED_FIELD(ComponentDataStruct, constructorArguments)
+		);
+	}
+};
+
+size_t IComponent::Save(std::string assetPath, size_t* allocationStart)
+{
+	ComponentDataStruct saveInfo(enabled);
+	SaveManager::GameData saveData = ISerializedData::CreateGameData<ComponentDataStruct>(saveInfo);
+	return SaveManager::SaveGameData(assetPath, saveData, allocationStart, false);
+}
+
+void IComponent::Load(std::string assetPath, size_t allocationStart){
+
+	ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(assetPath, allocationStart);
+	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
 }

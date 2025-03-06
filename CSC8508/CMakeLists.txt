@@ -274,13 +274,18 @@ if(PS5)
     PUBLIC ${CMAKE_SOURCE_DIR}/NCLCoreClasses
 	PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
 	PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
+	PUBLIC ${CMAKE_SOURCE_DIR}/Event
+    PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
+	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
 	)
-	#include_directories("../OpenGLRendering/")
 else()
 	target_include_directories (${PROJECT_NAME} 
 	PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
     PUBLIC ${CMAKE_SOURCE_DIR}/NCLCoreClasses
 	PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
+	PUBLIC ${CMAKE_SOURCE_DIR}/Event
+    PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
+	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
 	)
 endif()
 
@@ -371,6 +376,18 @@ else()
 		PUBLIC ${PROJECT_DEPENDENCIES}
 	)
 endif()
+
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Event)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC AudioEngine)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC ImGui)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC UISystem)
+
+# Handle `fmod.dll` copying here instead of `AudioEngine`
+add_custom_command(TARGET CSC8508 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${FMOD_DIR}/lib/x64/fmod.dll"
+    "$<TARGET_FILE_DIR:CSC8508>"
+)
 
 if(USE_VULKAN)
     include_directories("../VulkanRendering/")

@@ -48,7 +48,6 @@ set(Collision_Detection
     "CapsuleVolume.cpp"
     "CollisionDetection.h"
     "CollisionDetection.cpp"
-     "CollisionVolume.h"
     "OBBVolume.h"
     "QuadTree.h"
     "QuadTree.cpp"
@@ -73,7 +72,7 @@ source_group("Networking" FILES ${Networking})
 
 set(Physics
     "constraint.h"  
-     "constraint.h"  
+    "constraint.h"  
     "PositionConstraint.cpp"
     "PositionConstraint.h"
     "OrientationConstraint.cpp"
@@ -87,7 +86,9 @@ source_group("Physics" FILES ${Physics})
 
 set(Header_Files
     "Debug.h"
+    "SaveManager.h"
     "GameObject.h"
+    "ISerializable.h"
     "GameWorld.h"
     "RenderObject.h"
     "Transform.h"
@@ -103,31 +104,32 @@ set(Source_Files
 )
 source_group("Source Files" FILES ${Source_Files})
 
-#[[
-set(enet_Files
-    "./enet/callbacks.h"
-    "./enet/callbacks.c"
-    "./enet/list.h"
-    "./enet/list.c"
-    "./enet/protocol.h"
-    "./enet/protocol.c"
-    "./enet/win32.h"
-    "./enet/win32.c"
-	"./enet/unix.h"
-    "./enet/unix.c"
-
-    "./enet/enet.h"
-    "./enet/time.h"
-    "./enet/types.h"
-    "./enet/utility.h"
-
-    "./enet/compress.c"
-    "./enet/host.c"
-    "./enet/packet.c"
-    "./enet/peer.c"
+set(ComponentSystems
+    "IComponent.h"
+    "INetworkComponent.h"
+    "INetworkDeltaComponent.h"
+    "ComponentManager.h"
+    "IComponent.cpp"
+    "INetworkComponent.cpp"    
+    "INetworkDeltaComponent.cpp"
 )
-source_group("eNet" FILES ${enet_Files})
-]]
+source_group("ComponentSystems" FILES ${ComponentSystems})
+
+set(Components
+    "InputComponent.h"
+    "CameraComponent.h"
+    "PhysicsComponent.h"
+    "BoundsComponent.h"
+    "PhysicsComponent.cpp"
+    "BoundsComponent.cpp"
+)
+source_group("Components" FILES ${Components})
+
+set(NetworkComponents
+    "InputNetworkComponent.h"
+    "TransformNetworkComponent.h"
+)
+source_group("NetworkComponents" FILES ${NetworkComponents})
 
 set(ALL_FILES
     ${Header_Files}
@@ -139,7 +141,10 @@ set(ALL_FILES
     ${Collision_Detection}
     ${Networking}
     ${Physics}
-    # ${enet_Files}   PS5?
+    ${Components}
+    ${ComponentSystems}
+    ${NetworkComponents}
+    ${enet_Files}
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
@@ -193,6 +198,7 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
 	"../NCLCoreClasses/GameTimer.h"
+
 )
 
 ################################################################################
@@ -206,13 +212,19 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "NCLCoreClasses"
     "ws2_32.lib"
+    "Event"
 )
 #if(NOT PS5)
 add_subdirectory(enet)
 #endif()
 include_directories("../NCLCoreClasses/")
 include_directories("./")
+include_directories("../Event/")
+include_directories("../ImGui/")
+
 
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")
-endif()
+endif()    
+
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Event)

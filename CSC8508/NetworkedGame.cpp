@@ -1,9 +1,18 @@
+//
+// Original author: Rich Davison
+// Contributors: Alasdair
+//
+
 #include "NetworkedGame.h"
 #include "NetworkPlayer.h"
 #include "NetworkObject.h"
 #include "GameServer.h"
 #include "GameClient.h"
 #include "RenderObject.h"
+#include "INetworkComponent.h"
+#include "INetworkDeltaComponent.h"
+#include "ComponentManager.h"
+#include "EventManager.h"
 
 #define COLLISION_MSG 30
 
@@ -17,27 +26,44 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
+
+struct SpawnPacket : public GamePacket {
+
+	short ownerId;
+	short objectId;
+	// add a prefab reference in the future
+
+	SpawnPacket() {
+		type = Spawn_Object;
+		size = sizeof(SpawnPacket) - sizeof(GamePacket);
+	}
+};
+
 void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
-void NetworkedGame::StartOfflineCallBack() { SpawnPlayer(); }
+void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 
 
-NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
-: TutorialGame(gameWorld, renderer) {
+/*NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
+: TutorialGame(gameWorld, renderer) {*/
+
+NetworkedGame::NetworkedGame()	{
+	EventManager::RegisterListener<NetworkEvent>(this);
+	EventManager::RegisterListener<ClientConnectedEvent>(this);
+
 	thisServer = nullptr;
 	thisClient = nullptr;
 
 	mainMenu = new MainMenu([&](bool state) -> void { this->SetPause(state); },
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
-		[&]() -> void { this->StartOfflineCallBack(); });
+		[&]() -> void { this->StartOfflineCallBack();});
 
 	NetworkBase::Initialise();
 	timeToNextPacket  = 0.0f;
 	packetsToSnapshot = 0;
 	playerStates = std::vector<int>();
 }
-
 
 NetworkedGame::~NetworkedGame()	{
 	delete thisServer;
@@ -48,7 +74,13 @@ void NetworkedGame::StartAsServer()
 {
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 	thisServer->RegisterPacketHandler(Received_State, this);
-	StartLevel();
+	thisServer->RegisterPacketHandler(Spawn_Object, this);
+	thisServer->RegisterPacketHandler(Component_Event, this);
+
+	thisServer->RegisterPacketHandler(Delta_State, this);
+	thisServer->RegisterPacketHandler(Full_State, this);
+
+	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) 
@@ -58,179 +90,234 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 
 	thisClient->RegisterPacketHandler(Delta_State, this);
 	thisClient->RegisterPacketHandler(Full_State, this);
+	thisClient->RegisterPacketHandler(Component_Event, this);
 
 	thisClient->RegisterPacketHandler(Player_Connected, this);
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 
-	StartLevel();
+	thisClient->RegisterPacketHandler(Spawn_Object, this);
 }
 
+void NetworkedGame::OnEvent(ClientConnectedEvent* e) 
+{
+	int id = e->GetClientId();
+	SendSpawnPacketsOnClientConnect(id);	
+	SpawnPlayerServer(id, Prefab::Player);
+}
+
+void NetworkedGame::OnEvent(NetworkEvent* e)
+{
+	auto dataPacket = e->eventData;
+	if (thisServer) 
+		SendToAllClients(dataPacket);
+	else 
+		thisClient->SendPacket(*dataPacket);
+}
+
+//20hz server/client update
 void NetworkedGame::UpdateGame(float dt) 
 {
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
-		if (thisServer) 
-			UpdateAsServer(dt);
-		else if (thisClient) 
-			UpdateAsClient(dt);
-
-		timeToNextPacket += 1.0f / 20.0f; //20hz server/client update
+		UpdatePackets(dt);
+		timeToNextPacket += 1.0f / 20.0f; 
 	}
-	mainMenu->Update(dt);
+
+	if (thisServer) 
+		thisServer->UpdateServer();
+	else if (thisClient) 
+		thisClient->UpdateClient();
 	TutorialGame::UpdateGame(dt);
 }
 
-void NetworkedGame::UpdateAsServer(float dt)
+void NetworkedGame::UpdatePackets(float dt)
 {
 	packetsToSnapshot--;
 	if (packetsToSnapshot < 0) 
 	{
-		BroadcastSnapshot(false);
-		packetsToSnapshot = 5;
-	}
-	else {
-		BroadcastSnapshot(true);
-	}
-
-	thisServer->UpdateServer();
-}
-
-void NetworkedGame::UpdateAsClient(float dt) 
-{
-
-	packetsToSnapshot--;
-	if (packetsToSnapshot < 0)
-	{
 		BroadcastOwnedObjects(false);
 		packetsToSnapshot = 5;
 	}
-	else {
-		ClientPacket newPacket;
-		newPacket.score = score;
-		newPacket.lastID = 0;
-		thisClient->SendPacket(newPacket);
+	else 
 		BroadcastOwnedObjects(true);
-	}
-	thisClient->UpdateClient();
 }
 
-
-void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) {
-
-	std::vector<GameObject*>::const_iterator first, last;
-	world->GetObjectIterators(first, last);
-
-	for (auto i = first; i != last; ++i)
-	{
-		NetworkObject* o = (*i)->GetNetworkObject();
-
-		if (!o)
-			continue;
-
-		if (o->GetNetworkID() == 0) // id of server for now hard coded
-			continue;
-
-		GamePacket* newPacket = new GamePacket();
-		newPacket->type = Full_State;
-
-		if (o->WritePacket(&newPacket, deltaFrame, 0)) //lastAcknowledgedState
-			thisClient->SendPacket(*newPacket);
-		delete newPacket;
-	}
-}
-
-
-void NetworkedGame::BroadcastSnapshot(bool deltaFrame) 
+bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
 {
+	if (!thisServer) return false;
 	for (const auto& player : thisServer->playerPeers)
-	{	
+	{
 		int playerID = player.first;
-		//int lastAcknowledgedState = playerStates[playerID];
-		std::vector<GameObject*>::const_iterator first, last;
-		world->GetObjectIterators(first, last);
-
-		for (auto i = first; i != last; ++i) 
-		{
-			NetworkObject* o = (*i)->GetNetworkObject();
-
-			if (!o) 
-				continue;
-
-			GamePacket* newPacket = new GamePacket();
-			newPacket->type = Full_State;
-
-			if (o->WritePacket(&newPacket, deltaFrame, 0)) //lastAcknowledgedState
-			{
-				thisServer->SendPacketToPeer(newPacket, playerID);
-				std::cout << "sending packet to peer" << std::endl;
-			}				
-			delete newPacket;
-		}
-
-		ClientPacket* scorePacket = new ClientPacket();
-		scorePacket->score = score;
-		scorePacket->lastID = 0;
-		thisServer->SendPacketToPeer(scorePacket, playerID);
-		delete scorePacket;
+		thisServer->SendPacketToPeer(dataPacket, playerID);
 	}
+	return true;
 }
 
-void NetworkedGame::UpdateMinimumState() 
+bool NetworkedGame::SendToAllOtherClients(GamePacket* dataPacket, int ownerId)
 {
-	int minID = INT_MAX;
-	int maxID = 0; 
-
-	for (auto i : stateIDs) {
-		minID = std::min(minID, i.second);
-		maxID = std::max(maxID, i.second);
+	if (!thisServer) return false;
+	for (const auto& player : thisServer->playerPeers)
+	{
+		int playerID = player.first;
+		if (playerID != ownerId)
+			thisServer->SendPacketToPeer(dataPacket, playerID);
 	}
+	return true;
+}
 
+void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame) 
+{
+	ComponentManager::OperateOnAllINetworkDeltaComponentBufferOperators(
+		[&](IComponent* ic) 
+		{
+			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
+			if (!c) return;
+			if ((thisClient && c->IsOwner()) || thisServer) {
+				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
+				for (GamePacket* packet : packets)
+				{
+					if (thisClient)
+						thisClient->SendPacket(*packet);
+					else if (thisServer)
+						SendToAllOtherClients(packet, c->GetOwnerID());
+					delete packet;
+				}
+				packets.clear();
+			}
+		});
+}
+
+GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) 
+	{ return TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50), spawnPacket);}
+
+void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, Prefab prefab)
+{
+	// Will be prefab reference in the future	
+	bool clientOwned = ownerId == thisClient->GetPeerId();
+	NetworkSpawnData data = NetworkSpawnData();
+
+	data.clientOwned = clientOwned;
+	data.objId = objectId;
+	data.ownId = ownerId;
+	auto object = GetPlayerPrefab(&data);
+
+	if (clientOwned)
+		ownedObjects.emplace_back(object);
+}
+
+void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
+{
+	// Will be prefab reference in the future
+	bool serverOwned = ownerId == thisServer->GetPeerId();
+	NetworkSpawnData data = NetworkSpawnData();
+
+	data.clientOwned = serverOwned;
+	data.objId = nextObjectId;
+	data.ownId = ownerId;
+	auto object = GetPlayerPrefab(&data);
+
+	if (serverOwned)
+		ownedObjects.emplace_back(object);
+
+	SpawnPacket* newPacket = new SpawnPacket();
+	newPacket->ownerId = ownerId;
+	newPacket->objectId = nextObjectId;
+
+	SendToAllClients(newPacket);
+
+	delete newPacket;
+	nextObjectId++;
+}
+
+bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId) {
+	if (!object)
+		return false;
+
+	for (auto component : object->GetAllComponents()) {
+		if (component->IsDerived(typeid(INetworkComponent))) 
+		{
+			INetworkComponent* networkComponent = dynamic_cast<INetworkComponent*>(component);
+			if (!networkComponent)
+				std::cout << "NetworkComponent is not derived type" << std::endl;
+			objectId = networkComponent->GetObjectID();
+			ownerId = networkComponent->GetOwnerID();
+			return true;
+		}
+	}
+	return false;
+}
+
+void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
+{
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	world->GetObjectIterators(first, last);
 
-	for (auto i = first; i != last; ++i) 
+	int ownerId;
+	int objectId;
+	for (auto i = first; i != last; ++i)
 	{
-		NetworkObject* o = (*i)->GetNetworkObject();
-		if (!o) 
-			continue;
-
-		o->UpdateStateHistory(minID); 
+		if (HasNetworkComponent(*i, objectId, ownerId))
+		{
+			SpawnPacket* newPacket = new SpawnPacket();
+			newPacket->ownerId = ownerId;
+			newPacket->objectId = objectId;
+			thisServer->SendPacketToPeer(newPacket, clientId);
+			delete newPacket;
+		}
 	}
 }
 
-void NetworkedGame::SpawnPlayer() 
-{
-	auto play = TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
-	NetworkObject* player = new NetworkObject(*play, 0); 
-	play->SetNetworkObject(player);
-	world->AddGameObject(play);
+void NetworkedGame::StartLevel() {}
+
+void NetworkedGame::ReceiveFullDeltaStatePacket(int type, GamePacket* payload) {
+	if (type == Full_State || type == Delta_State) {
+		INetworkPacket* p = (INetworkPacket*)payload;
+		ComponentManager::OperateOnAllINetworkDeltaComponentBufferOperators(
+			[&](IComponent* ic) {
+				INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
+				if (p->componentID == (c->GetComponentID()))
+				{
+					c->ReadDeltaFullPacket(*p);
+					if (thisServer)
+						SendToAllOtherClients(payload, p->ownerID);
+				}
+			});
+	}
 }
 
-void NetworkedGame::StartLevel() 
-{
-	//for (const auto& player : serverPlayers)
-	//{
-		SpawnPlayer();
-	//}
+void NetworkedGame::ReceiveComponentEventPacket(int type, GamePacket* payload) {
+	if (type == Component_Event) {
+		INetworkPacket* p = (INetworkPacket*)payload;
+		ComponentManager::OperateOnAllINetworkComponentBufferOperators(
+			[&](IComponent* ic) {
+				INetworkComponent* c = dynamic_cast<INetworkComponent*>(ic);
+				if (p->componentID == (c->GetComponentID()))
+				{
+					c->ReadEventPacket(*p);
+					if (thisServer)
+						SendToAllOtherClients(payload, p->ownerID);
+				}
+			});
+	}
+}
+
+void NetworkedGame::ReceiveSpawnPacket(int type, GamePacket* payload) {
+	if (type == Spawn_Object) {
+		if (thisClient) {
+			SpawnPacket* ackPacket = (SpawnPacket*)payload;
+			SpawnPlayerClient(ackPacket->ownerId, ackPacket->objectId, Prefab::Player);
+		}
+	}
 }
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
-	std::vector<GameObject*>::const_iterator first, last;
-	world->GetObjectIterators(first, last);
-	for (auto i = first; i != last; ++i)
-	{
-		NetworkObject* o = (*i)->GetNetworkObject();
-		if (!o)
-			continue;
-		o->ReadPacket(*payload);
-	}
-
-	if (thisClient) 
-		thisClient->ReceivePacket(type, payload, source);
-	else if (thisServer) 
-		thisServer->ReceivePacket(type, payload, source);
+	ReceiveFullDeltaStatePacket(type, payload);
+	ReceiveComponentEventPacket(type, payload);
+	ReceiveSpawnPacket(type, payload);
+	if (thisClient) thisClient->ReceivePacket(type, payload, source);
+	else if (thisServer) thisServer->ReceivePacket(type, payload, source);
 }
 
 void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
@@ -244,5 +331,6 @@ void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
 
 		newPacket.playerID = b->GetPlayerNum();
 		thisClient->SendPacket(newPacket);
+
 	}
 }

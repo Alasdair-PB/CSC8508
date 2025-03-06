@@ -7,10 +7,21 @@
 #include "ComponentManager.h"
 #include <vector>
 #include "../SerializedSave/ISerializable.h"
+#include "EventManager.h"
 
 using std::vector;
 
 namespace NCL::CSC8508 {
+
+	class AddComponentEvent : Event {
+	public:
+		AddComponentEvent(GameObject& gameObject, size_t entry) : gameObject(gameObject), entry(entry) {}
+		GameObject& GetGameObject() { return gameObject; }
+		size_t GetEntry() { return entry; }
+	protected:
+		GameObject& gameObject;
+		size_t entry; 
+	};
 
 	namespace Tags {
 		enum Tag { Default, Player, Enemy, Kitten, CursorCast, Ground, Collect };
@@ -22,10 +33,9 @@ namespace NCL::CSC8508 {
 	class IComponent;
 	class NetworkObject;
 	class RenderObject;
-	class PhysicsObject;
 	class BoundsComponent;
 
-	class GameObject : ISerializable	{
+	class GameObject : ISerializable {
 	
 	public:
 		GameObject(bool isStatic = false);
@@ -127,36 +137,6 @@ namespace NCL::CSC8508 {
 		Layers::LayerID GetLayerID() const {return layerID; }
 		void SetTag(Tags::Tag newTag) {  tag = newTag;}
 		Tags::Tag GetTag() const { return tag;}
-
-		/*
-		template <typename T> requires std::is_base_of_v<IComponent, T>
-		using Action = std::function<void(std::function<void(T*)> func)>;
-		inline static std::unordered_map<size_t, Action<IComponent>*> addComponent;
-
-		template <typename T>
-		static void RegisterAddComponent() {
-			new Action(
-				[](std::function<void(IComponent*)> func) {
-					AddComponent<T>(
-						[&func](T* derived) { func(static_cast<IComponent*>(derived)); }
-					);
-				}
-			));
-		}
-
-		template <typename T>
-		static AddToComponentDictionary()
-		{
-			func(component);
-			(*addComponent<T>)(func);
-		}
-
-		static T AddComponentOfTypeName(size_t hash) {
-			switch () {
-
-			}
-		}*/
-
 
 	protected:
 		virtual void OnAwake() {}

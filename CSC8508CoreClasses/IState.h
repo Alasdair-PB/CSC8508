@@ -12,6 +12,8 @@ namespace NCL {
 			virtual void Update(float dt, GameObject& gameObject) {
 				
 			}
+
+			virtual bool IsComplete(float dt, GameObject& gameObject) { return true; }
 		protected:
 
 		};

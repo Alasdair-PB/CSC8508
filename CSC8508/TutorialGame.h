@@ -3,20 +3,19 @@
 #include "NavigationMesh.h"
 #include "Legacy/MainMenu.h"
 #include "Math.h"
-#include "Legacy/UpdateObject.h"
-
-
 #pragma once
 #include "GameTechRenderer.h"
+#include "UISystem.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
-#include "Legacy/PlayerGameObject.h"
+#include "Legacy/PlayerComponent.h"
 #include "BoundsComponent.h"
 #include <vector>
-using std::vector;
+#include "SaveManager.h"
 
+using std::vector;
 
 namespace NCL {
 	namespace CSC8508 {
@@ -27,7 +26,6 @@ namespace NCL {
 			int ownId;
 			bool clientOwned;
 		};
-
 
 		class TutorialGame		{
 		public:
@@ -50,6 +48,9 @@ namespace NCL {
 			bool SelectObject();
 			void MoveSelectedObject();
 			void LockedObjectMovement();
+
+			void DrawFramerate();
+			void DrawMainMenu();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
@@ -123,6 +124,12 @@ namespace NCL {
 			};
 
 			GameObject* objClosest = nullptr;
+      
+			UISystem* uiSystem;
+			float framerateDelay = 0;
+			float latestFramerate;
+			bool displayMenu = true;
+			int menuOption = 0;
 		};
 	}
 }

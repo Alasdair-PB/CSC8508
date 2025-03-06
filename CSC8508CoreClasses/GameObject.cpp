@@ -1,54 +1,70 @@
+//
+// Contributors: Alasdair
+//
+#include "IComponent.h"
 #include "GameObject.h"
-#include "CollisionDetection.h"
-#include "PhysicsObject.h"
-#include "RenderObject.h"
-#include "NetworkObject.h"
 
 using namespace NCL::CSC8508;
 
-GameObject::GameObject(const std::string& objectName)	{
-	name			= objectName;
-	worldID			= -1;
-	isActive		= true;
+GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nullptr) {
+	worldID = -1;
+	isEnabled = true;
 	layerID = Layers::LayerID::Default;
 	tag = Tags::Tag::Default;
-	boundingVolume	= nullptr;
-	physicsObject	= nullptr;
-	renderObject	= nullptr;
-	networkObject	= nullptr;
+	renderObject = nullptr;
+	components = vector<IComponent*>();
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
 }
 
-GameObject::~GameObject()	{
-	delete boundingVolume;
-	delete physicsObject;
+GameObject::~GameObject() {
 	delete renderObject;
-	delete networkObject;
 }
 
-bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
-	if (!boundingVolume) {
-		return false;
+struct GameObject::GameObjDataStruct : public ISerializedData {
+	GameObjDataStruct() : isEnabled(1) {}
+	GameObjDataStruct(bool isEnabled) : isEnabled(isEnabled) {}
+
+	bool isEnabled;
+	std::vector<std::pair<size_t, size_t>> componentPointers;
+
+	static auto GetSerializedFields() {
+		return std::make_tuple(
+			SERIALIZED_FIELD(GameObjDataStruct, isEnabled),
+			SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
+		);
 	}
-	outSize = broadphaseAABB;
-	return true;
+};
+
+void GameObject::Load(std::string assetPath, size_t allocationStart) {
+	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
+	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
+		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
+		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
+
+		if (i >= components.size()) break;
+		components[i]->Load(assetPath, loadedSaveData.componentPointers[i].first);
+	}
+	std::cout << loadedSaveData.isEnabled << std::endl;
 }
 
-void GameObject::UpdateBroadphaseAABB() {
-	if (!boundingVolume) {
-		return;
+size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
+{
+	bool clearMemory = false;
+	if (allocationStart == nullptr) {
+		allocationStart = new size_t(0);
+		clearMemory = true;
 	}
-	if (boundingVolume->type == VolumeType::AABB) {
-		broadphaseAABB = ((AABBVolume&)*boundingVolume).GetHalfDimensions();
+
+	GameObjDataStruct saveInfo(isEnabled);
+	for (IComponent* component : components) {
+		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);		
+		saveInfo.componentPointers.push_back(std::make_pair(*allocationStart, typeid(*component).hash_code()));
+		*allocationStart = nextMemoryLocation;
 	}
-	else if (boundingVolume->type == VolumeType::Sphere) {
-		float r = ((SphereVolume&)*boundingVolume).GetRadius();
-		broadphaseAABB = Vector3(r, r, r);
-	}
-	else if (boundingVolume->type == VolumeType::OBB) {
-		Matrix3 mat = Quaternion::RotationMatrix<Matrix3>(transform.GetOrientation());
-		mat = Matrix::Absolute(mat);
-		Vector3 halfSizes = ((OBBVolume&)*boundingVolume).GetHalfDimensions();
-		broadphaseAABB = mat * halfSizes;
-	}
+	SaveManager::GameData saveData = ISerializedData::CreateGameData<GameObjDataStruct>(saveInfo);
+	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart);
+
+	if (clearMemory)
+		delete allocationStart;
+	return nextMemoryLocation;
 }

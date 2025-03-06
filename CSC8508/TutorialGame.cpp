@@ -3,13 +3,12 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "TextureLoader.h"
-#include "Legacy/EnemyGameObject.h"
-#include "Legacy/Kitten.h"
+
+#include "GameObject.h"
+#include "TransformNetworkComponent.h"
 
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
-#include "Legacy/StateGameObject.h"
-
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -23,9 +22,51 @@
 using namespace NCL;
 using namespace CSC8508;
 
-TutorialGame::TutorialGame(GameWorld* inWorld, GameTechRendererInterface* inRenderer)
+
+/*TutorialGame::TutorialGame(GameWorld* inWorld, GameTechRendererInterface* inRenderer)
 	: world(inWorld),
-	renderer(inRenderer)
+	renderer(inRenderer)*/
+
+struct MyX {
+	MyX() : x(0) {}
+	MyX(int x) :x(x) {}
+	int x;
+};
+
+const static std::string folderPath = "../../Assets/Pfabs/";
+
+std::string GetAssetPath(std::string pfabName) {
+	return folderPath + pfabName;
+}
+
+void TestSaveByType() {
+	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
+	std::string intPath = GetAssetPath("int_data.pfab");
+	std::string structPath = GetAssetPath("struct_data.pfab");
+
+	//SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
+	//SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
+	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
+	//SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
+	std::cout << SaveManager::LoadMyData<MyX>(structPath).x << std::endl;
+}
+
+void TestSaveGameObject() {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* myObjectToSave = new GameObject();
+	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
+
+	//myObjectToSave->Save(gameObjectPath);
+	myObjectToSave->Load(gameObjectPath);
+}
+
+void TestSave() {
+	TestSaveByType();
+	TestSaveGameObject();
+}
+
+TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
 {
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
@@ -33,12 +74,6 @@ TutorialGame::TutorialGame(GameWorld* inWorld, GameTechRendererInterface* inRend
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
 	world->GetMainCamera().SetController(*controller);
-	controller->MapAxis(0, "Sidestep");
-	controller->MapAxis(1, "UpDown");
-	controller->MapAxis(2, "Forward");
-
-	controller->MapAxis(3, "XLook");
-	controller->MapAxis(4, "YLook");
 #ifdef USEVULKAN
 	renderer = new GameTechVulkanRenderer(*world);
 	renderer->Init();
@@ -47,20 +82,32 @@ TutorialGame::TutorialGame(GameWorld* inWorld, GameTechRendererInterface* inRend
 	renderer = new GameTechRenderer(*world);
 #endif
 #endif
+	// To Do: Maybe move to to a different place or make a factory function
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(1, "UpDown");
+	controller->MapAxis(2, "Forward");
+
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
+
 	physics = new PhysicsSystem(*world);
 
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
 
-	world->GetMainCamera().SetGetPlayer([&]() -> Vector3 { return GetPlayerPos(); });
-
 	InitialiseAssets();	
 	
 	physics->UseGravity(true);
 	world->UpdateWorld(0.1f);
 	physics->Update(0.1f);
+
+	uiSystem = new UISystem(Window::GetHandle());
+	renderer->SetUISystem(uiSystem);
+
+	TestSave();
 }
+
 
 void TutorialGame::SetPause(bool state) {
 	inPause = state;
@@ -68,9 +115,6 @@ void TutorialGame::SetPause(bool state) {
 
 void TutorialGame::EndGame(bool hasWon) {
 	inPause = true;
-	endGame = true;
-	this->hasWon = hasWon;
-	Debug::Print(hasWon ? "Victory" : "Game Over", Vector2(5, 85));
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -103,19 +147,8 @@ TutorialGame::~TutorialGame()
 
 	delete navigationMesh;
 	delete navMesh;
-
-	delete players;
-}
-
-Vector3 TutorialGame::GetPlayerPos() {
-	return players == nullptr ? Vector3(0,0,0) : players->GetTransform().GetPosition();
-}
-
-void TutorialGame::UpdateCamera(float dt) {
-
-	if (!inSelectionMode)
-		world->GetMainCamera().UpdateCamera(dt);
-
+  
+	delete uiSystem;
 }
 
 void TutorialGame::UpdateObjectSelectMode(float dt) {
@@ -146,12 +179,12 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 }
 
 bool TutorialGame::OnEndGame(float dt) {
-	if (endGame) {
+	/*if (endGame) {
 		renderer->Render();
 		renderer->Update(dt);
 		Debug::UpdateRenderables(dt);
 		return true;
-	}
+	}*/
 
 	return false;
 }
@@ -169,11 +202,26 @@ void TutorialGame::UpdateDrawScreen(float dt) {
 void TutorialGame::UpdateGame(float dt) 
 {
 	if (OnEndGame(dt))
-		return;
+		return; 
+
+	uiSystem->StartFrame();
+	/*uiSystem->DrawDemo();*/
+	DrawFramerate();
+	if (displayMenu == true) {
+		DrawMainMenu();
+	}
+
+	if (inPause) {
+		uiSystem->AudioSliders();
+	}
 
 	//renderer->Render();
 	//renderer->Update(dt);
 	//Debug::UpdateRenderables(dt);
+
+	mainMenu->Update(dt);
+	renderer->Render();	
+	Debug::UpdateRenderables(dt);
 
 	if (inPause)
 		return;
@@ -185,11 +233,9 @@ void TutorialGame::UpdateGame(float dt)
 	}
 
 	Window::GetWindow()->ShowOSPointer(true);
-	Window::GetWindow()->LockMouseToWindow(true);
-	world->UpdateWorld(dt);
+	//Window::GetWindow()->LockMouseToWindow(true);
 
 	physics->Update(dt);
-	UpdateCamera(dt);
 }
 
 void TutorialGame::LockedObjectMovement() 
@@ -383,5 +429,22 @@ void TutorialGame::MoveSelectedObject() {
 	}
 }
 
+void TutorialGame::DrawFramerate() {
+	framerateDelay += 1;
+
+	if (framerateDelay > 10) {
+		latestFramerate = Window::GetTimer().GetTimeDeltaSeconds();
+		framerateDelay = 0;
+	}
+	uiSystem->DisplayFramerate(latestFramerate);
+}
+
+void TutorialGame::DrawMainMenu() {
+	menuOption = uiSystem->MainMenu();
+	if (menuOption != 0) {
+		displayMenu = false;
+		mainMenu->SetOption(menuOption);
+	}
+}
 
 

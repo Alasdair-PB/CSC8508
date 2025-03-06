@@ -1,6 +1,12 @@
+//
+// Contributors: Alasdair
+//
+
 #pragma once
 #include "Transform.h"
-#include "CollisionVolume.h"
+#include "ComponentManager.h"
+#include <vector>
+#include "ISerializable.h"
 
 using std::vector;
 
@@ -13,71 +19,69 @@ namespace NCL::CSC8508 {
 	namespace Layers {
 		enum LayerID { Default, Ignore_RayCast, UI, Player, Enemy, Ignore_Collisions };
 	}
-
+	class IComponent;
 	class NetworkObject;
 	class RenderObject;
 	class PhysicsObject;
+	class BoundsComponent;
 
-	class GameObject	{
+	class GameObject : ISerializable	{
+	
 	public:
-		GameObject(const std::string& name = "");
+		GameObject(bool isStatic = false);
 		~GameObject();
 
-		void SetBoundingVolume(CollisionVolume* vol) {
-			boundingVolume = vol;
-		}
+		bool IsEnabled() const { return isEnabled;}
+		bool SetEnabled(bool isEnabled) { this->isEnabled = isEnabled;  }
+		bool IsStatic() const { return isStatic;}
 
-		const CollisionVolume* GetBoundingVolume() const {
-			return boundingVolume;
-		}
+		Transform& GetTransform() {return transform;}
 
-		bool IsActive() const {
-			return isActive;
-		}
+		/**
+		 * Function invoked after the object and components have been instantiated.
+		 * @param deltaTime Time since last frame
+		 */
+		void InvokeOnAwake() { OnAwake(); }
 
-		Transform& GetTransform() {
-			return transform;
-		}
+		/**
+		 * Function invoked each frame.
+		 * @param deltaTime Time since last frame
+		 */
+		void InvokeUpdate(float deltaTime) { Update(deltaTime); }
+
+		/**
+		 * Function invoked each frame after Update.
+		 * @param deltaTime Time since last frame
+		 */
+		void InvokeEarlyUpdate(float deltaTime) { EarlyUpdate(deltaTime); }
+
+
+		/**
+		 * Function invoked when the component is enabled.
+		 */
+		void InvokeOnEnable() { OnEnable(); }
+
+		/**
+		 * Function invoked when the component is disabled.
+		 */
+		void InvokeOnDisable() { OnDisable(); }
+
 
 		RenderObject* GetRenderObject() const {
 			return renderObject;
-		}
-
-		PhysicsObject* GetPhysicsObject() const {
-			return physicsObject;
-		}
-
-		NetworkObject* GetNetworkObject() const {
-			return networkObject;
 		}
 
 		void SetRenderObject(RenderObject* newObject) {
 			renderObject = newObject;
 		}
 
-		void SetNetworkObject(NetworkObject* newObject) {
-			networkObject = newObject;
-		}
-
-		void SetPhysicsObject(PhysicsObject* newObject) {
-			physicsObject = newObject;
-		}
-
-		const std::string& GetName() const {
-			return name;
-		}
-
-		virtual void OnCollisionBegin(GameObject* otherObject) {
+		virtual void OnCollisionBegin(BoundsComponent* otherObject) {
 			//std::cout << "OnCollisionBegin event occured!\n";
 		}
 
-		virtual void OnCollisionEnd(GameObject* otherObject) {
+		virtual void OnCollisionEnd(BoundsComponent* otherObject) {
 			//std::cout << "OnCollisionEnd event occured!\n";
 		}
-
-		bool GetBroadphaseAABB(Vector3&outsize) const;
-
-		void UpdateBroadphaseAABB();
 
 		void SetWorldID(int newID) {
 			worldID = newID;
@@ -85,38 +89,95 @@ namespace NCL::CSC8508 {
 
 		int	GetWorldID() const {
 			return worldID;
-		}	
+		}
+
+		vector<IComponent*> GetAllComponents() const { return components; }
+
+		template <typename T, typename... Args>
+			requires std::is_base_of_v<IComponent, T>
+		T* AddComponent(Args&&... args) {
+			T* component = ComponentManager::AddComponent<T>(*this, std::forward<Args>(args)...);
+			components.push_back(component);
+			return component;
+		}
+
+		template <typename T>
+			requires std::is_base_of_v<IComponent, T>
+		T* TryGetComponent() {
+			for (IComponent* component : components) {
+				if (T* casted = dynamic_cast<T*>(component))
+					return casted;
+			}
+			return nullptr;
+		}
+
+		struct GameObjDataStruct; 
+		void Load(std::string assetPath, size_t allocationStart = 0) override;
+		size_t Save(std::string assetPath, size_t* = nullptr) override;
+
+		void AddChild(GameObject* child);
+		GameObject* TryGetParent();
+		void SetParent(GameObject* parent);
+		bool HasParent();
+		void UpdateComponents();
+		bool HasTag(Tags::Tag tag);
+		template <typename T> bool HasComponent(T type);
 
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
 		void SetTag(Tags::Tag newTag) {  tag = newTag;}
 		Tags::Tag GetTag() const { return tag;}
 
-		void AddToIgnoredLayers(Layers::LayerID layerID) { ignoreLayers.push_back(layerID); }
-		const std::vector<Layers::LayerID>& GetIgnoredLayers() const { return ignoreLayers; }
+		/*
+		template <typename T> requires std::is_base_of_v<IComponent, T>
+		using Action = std::function<void(std::function<void(T*)> func)>;
+		inline static std::unordered_map<size_t, Action<IComponent>*> addComponent;
 
-		float GetRestitution() { return restitution; }
-		void SetRestitution(float newRestitution) { restitution = newRestitution;}
+
+		template <typename T>
+		static void RegisterAddComponent() {
+			new Action(
+				[](std::function<void(IComponent*)> func) {
+					AddComponent<T>(
+						[&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+					);
+				}
+			));
+		}
+
+		template <typename T>
+		static AddToComponentDictionary()
+		{
+			func(component);
+			(*addComponent<T>)(func);
+		}
+
+		static T AddComponentOfTypeName(size_t hash) {
+			switch () {
+
+			}
+		}*/
 
 
 	protected:
-		Transform			transform;
+		virtual void OnAwake() {}
+		virtual void Update(float deltaTime) {}
+		virtual void EarlyUpdate(float deltaTime) {}
+		virtual void OnEnable() {}
+		virtual void OnDisable() {}
 
-		CollisionVolume*	boundingVolume;
-		PhysicsObject*		physicsObject;
-		RenderObject*		renderObject;
-		NetworkObject*		networkObject;
+		Transform transform;
+		RenderObject* renderObject;
+		GameObject* parent;
 
-		bool isActive;
+		vector<IComponent*> components; 
+
+		bool isEnabled;
+		const bool isStatic;
 		int	worldID;
-		float restitution = 0.2f; 
 
 		Layers::LayerID	layerID;
-		Tags::Tag	tag;
-		std::string	name;
-
-		Vector3 broadphaseAABB;
-		vector<Layers::LayerID> ignoreLayers; // Made only for ignoring impluse resolution. Triggers will still activate
+		Tags::Tag tag; // Change to vector
 	};
 }
 

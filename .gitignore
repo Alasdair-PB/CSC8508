@@ -46,7 +46,6 @@ _deps
 *.pch
 
 # Executables
-*.exe
 *.out
 *.app
 

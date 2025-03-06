@@ -30,6 +30,7 @@ set(AI_State_Machine
     "StateTransition.h"
     "IState.h"
     "IStateTransition.h"
+    "WaitState.h"
 )
 source_group("AI\\State Machine" FILES ${AI_State_Machine})
 

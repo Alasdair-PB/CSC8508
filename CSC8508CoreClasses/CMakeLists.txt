@@ -207,9 +207,9 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "NCLCoreClasses"
     "ws2_32.lib"
 )
-if(NOT PS5)
+#if(NOT PS5)
 add_subdirectory(enet)
-endif()
+#endif()
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 

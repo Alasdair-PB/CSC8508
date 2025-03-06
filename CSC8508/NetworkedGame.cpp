@@ -5,7 +5,6 @@
 #include "GameClient.h"
 #include "RenderObject.h"
 
-
 #define COLLISION_MSG 30
 
 struct MessagePacket : public GamePacket {

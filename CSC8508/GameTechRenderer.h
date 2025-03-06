@@ -1,4 +1,5 @@
 #pragma once
+#ifndef USE_PS5
 #include "../OpenGLRendering/OGLRenderer.h"
 #include "../OpenGLRendering/OGLShader.h"
 #include "../OpenGLRendering/OGLTexture.h"
@@ -15,9 +16,9 @@ namespace NCL {
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
 
-			Mesh*		LoadMesh(const std::string& name);
-			Texture*	LoadTexture(const std::string& name);
-			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
+			Mesh* LoadMesh(const std::string& name);
+			Texture* LoadTexture(const std::string& name);
+			Shader* LoadShader(const std::string& vertex, const std::string& fragment);
 
 		protected:
 			void NewRenderLines();
@@ -33,7 +34,7 @@ namespace NCL {
 			void BuildObjectList();
 			void SortObjectList();
 			void RenderShadowMap();
-			void RenderCamera(); 
+			void RenderCamera();
 			void RenderSkybox();
 
 			void LoadSkybox();
@@ -43,14 +44,14 @@ namespace NCL {
 
 			vector<const RenderObject*> activeObjects;
 
-			OGLShader*  debugShader;
-			OGLShader*  skyboxShader;
-			OGLMesh*	skyboxMesh;
-			OGLMesh*	debugTexMesh;
+			OGLShader* debugShader;
+			OGLShader* skyboxShader;
+			OGLMesh* skyboxMesh;
+			OGLMesh* debugTexMesh;
 			GLuint		skyboxTex;
 
 			//shadow mapping things
-			OGLShader*	shadowShader;
+			OGLShader* shadowShader;
 			GLuint		shadowTex;
 			GLuint		shadowFBO;
 			Matrix4     shadowMatrix;
@@ -78,4 +79,6 @@ namespace NCL {
 		};
 	}
 }
+#endif // DEBUG
+
 

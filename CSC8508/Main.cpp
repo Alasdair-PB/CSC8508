@@ -25,14 +25,21 @@
 #include "BehaviourAction.h"
 
 #include "RenderObject.h"
-#include "GameTechRenderer.h"
 
 using namespace NCL;
 using namespace CSC8508;
 
+#ifdef USE_PS5
+#include "./PS5/GameTechAGCRenderer.h"
+#include "PS5Window.h"
+#else
+#include "GameTechRenderer.h"
+#endif // USE_PS5
+
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <functional>
 
 #pragma region TestStateMachine
 
@@ -216,81 +223,8 @@ void TestBehaviourTree()
 
 #pragma endregion
 
-#pragma region Networking
-
-struct StringPacket : public GamePacket {
-	char stringData[256];
-
-	StringPacket(const std::string& message) {
-		type = BasicNetworkMessages::String_Message;
-		size = (short)message.length();
-
-		memcpy(stringData, message.data(), size);
-	};
-
-	std::string const GetStringFromData() {
-		std::string realString(stringData);
-		realString.resize(size);
-		return realString;
-	}
-};
-
-
-class TestPacketReceiver : public PacketReceiver {
-public:
-	TestPacketReceiver(std::string name) {
-		this->name = name;
-	}
-
-	void ReceivePacket(int type, GamePacket* payload, int source) 
-	{
-		if (type == String_Message) 
-		{
-			StringPacket* realPacket = (StringPacket*)payload;
-			std::string msg = realPacket->GetStringFromData();
-			std::cout << name << " received message: " << msg << std::endl;
-		}
-	}
-protected:
-	std::string name;
-};
-
-void TestNetworking() 
-{
-	NetworkBase::Initialise();
-
-	TestPacketReceiver serverReceiver("Server");
-	TestPacketReceiver clientReceiver("Client");
-
-	int port = NetworkBase::GetDefaultPort();
-
-	GameServer* server = new GameServer(port, 1);
-	GameClient* client = new GameClient();
-
-	server->RegisterPacketHandler(String_Message, &serverReceiver);
-	client->RegisterPacketHandler(String_Message, &clientReceiver);
-
-	bool canConnect = client->Connect(127, 0, 0, 1, port);
-
-	for (int i = 0; i < 100; ++i) 
-	{
-		GamePacket packet =  (StringPacket("Server says hello! " + std::to_string(i)));
-		StringPacket packetB = StringPacket("Client says hello! " + std::to_string(i));
-
-		server->SendGlobalPacket(packet);
-		client->SendPacket(packetB);
-
-		server->UpdateServer();
-		client->UpdateClient();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	NetworkBase::Destroy();
-}
-#pragma  endregion
-
-
-void UpdateWindow(Window* w, NetworkedGame* g, GameTechRenderer* r)
+/*
+void UpdateWindow(Window* w, NetworkedGame* g, GameTechAGCRenderer* r)
 {
 	float dt = w->GetTimer().GetTimeDeltaSeconds();
 	w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
@@ -299,22 +233,33 @@ void UpdateWindow(Window* w, NetworkedGame* g, GameTechRenderer* r)
 	r->Render();
 	Debug::UpdateRenderables(dt);
 }
+*/
 
 int main(int argc, char** argv) 
 {
+	std::unique_ptr<GameWorld>	world = std::make_unique<GameWorld>();
+
+#ifdef USE_PS5
+	std::unique_ptr<PS5::PS5Window> w = std::make_unique<PS5::PS5Window>("Hello!", 1920, 1080);
+	std::unique_ptr<GameTechAGCRenderer> renderer = std::make_unique<GameTechAGCRenderer>(*(world.get()));
+#else 
 	WindowInitialisation initInfo;
-	initInfo.width		= 1920;
-	initInfo.height		= 1200;
+	initInfo.width = 1920;
+	initInfo.height = 1200;
 	initInfo.windowTitle = "CSC8508 Game technology!";
 
 	Window* w = Window::CreateGameWindow(initInfo);
-	
-	std::unique_ptr<GameWorld>	world = std::make_unique<GameWorld>();
 	std::unique_ptr<GameTechRenderer> renderer = std::make_unique<GameTechRenderer>(*(world.get()));
+#endif
+
 	NetworkedGame* g = new NetworkedGame(world.get(), renderer.get());
 
+#ifndef USE_PS5
 	if (!w->HasInitialised()) 
 		return -1;
+#endif // !USE_PS5
+
+	
 		
 	w->ShowOSPointer(true);
 	w->LockMouseToWindow(true);
@@ -324,7 +269,11 @@ int main(int argc, char** argv)
 	{
 		float dt = w->GetTimer().GetTimeDeltaSeconds();
 		world->UpdateWorld(dt);
-		UpdateWindow(w, g, renderer.get());
+		w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
+		g->UpdateGame(dt);
+		renderer->Update(dt);
+		renderer->Render();
+		Debug::UpdateRenderables(dt);
 	}
 	Window::DestroyGameWindow();
 }

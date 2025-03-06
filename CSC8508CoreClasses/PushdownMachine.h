@@ -19,8 +19,8 @@ namespace NCL {
 			bool ModifyStack(PushdownState* newState, PushdownState::PushdownResult result);
 
 		protected:
-			PushdownState* activeState;
-			PushdownState* initialState;
+			PushdownState* activeState  = nullptr;
+			PushdownState* initialState = nullptr;
 
 			std::stack<PushdownState*> stateStack;
 		};

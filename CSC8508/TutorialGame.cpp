@@ -49,8 +49,8 @@ void TestSaveByType() {
 void TestSaveGameObject() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	GameObject* myObjectToSave = new GameObject();
-	//PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-	//myObjectToSave->Save(gameObjectPath);
+	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
+	myObjectToSave->Save(gameObjectPath);
 	myObjectToSave->Load(gameObjectPath);
 }
 

@@ -3,8 +3,13 @@
 //
 #include "IComponent.h"
 #include "GameObject.h"
+#include "EventManager.h"
 
 using namespace NCL::CSC8508;
+
+AddComponentEvent::AddComponentEvent(GameObject& gameObject, size_t entry) : gameObject(gameObject), entry(entry) {}
+GameObject& AddComponentEvent::GetGameObject() { return gameObject; }
+size_t AddComponentEvent::GetEntry() { return entry; }
 
 GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nullptr) {
 	worldID = -1;
@@ -35,8 +40,20 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	}
 };
 
-void GameObject::Load(std::string assetPath, size_t allocationStart) {
-	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
+void GameObject::LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath) {
+	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
+		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
+		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
+
+		auto e = AddComponentEvent(*this, loadedSaveData.componentPointers[i].second);
+		EventManager::Call(&e);
+
+		if (i >= components.size()) break;
+		components[i]->Load(assetPath, loadedSaveData.componentPointers[i].first);
+	}
+}
+
+void GameObject::LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath) {
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
 		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
 		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
@@ -44,6 +61,11 @@ void GameObject::Load(std::string assetPath, size_t allocationStart) {
 		if (i >= components.size()) break;
 		components[i]->Load(assetPath, loadedSaveData.componentPointers[i].first);
 	}
+}
+
+void GameObject::Load(std::string assetPath, size_t allocationStart) {
+	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
+	components.size() > 0 ? LoadInto(loadedSaveData, assetPath) : LoadClean(loadedSaveData, assetPath);
 	std::cout << loadedSaveData.isEnabled << std::endl;
 }
 

@@ -1,18 +1,36 @@
 #ifndef DAMAGEABLE_COMPONENT_H
 #define DAMAGEABLE_COMPONENT_H
 
-#include <algorithm>
+#include <algorithm>  
 #include <iostream>
+#include <functional> 
+#include "IComponent.h" 
+#include "Event.h" 
+#include "EventManager.h" 
+#include "GameObject.h" 
 
-class DamageableComponent {
+
+class DeathEvent : public Event {
+private:
+    GameObject& gameObject;
+
+public:
+    DeathEvent(GameObject& obj) : gameObject(obj) {}
+    GameObject& GetGameObject() { return gameObject; }
+};
+
+class DamageableComponent : public IComponent {
 private:
     int health;
     int maxHealth;
+    GameObject& owner; 
 
 public:
-   
-    DamageableComponent(int initialHealth, int initialMaxHealth)
-        : health(std::max(0, initialHealth)), maxHealth(std::max(1, initialMaxHealth)) {
+    
+    DamageableComponent(GameObject& gameObject, int initialHealth, int initialMaxHealth)
+        : IComponent(), owner(gameObject),
+        health(std::max(0, initialHealth)),
+        maxHealth(std::max(1, initialMaxHealth)) {
         health = std::min(health, maxHealth); 
     }
 
@@ -20,6 +38,9 @@ public:
     void DamageComponent(int damage) {
         if (damage > 0) {
             health = std::max(0, health - damage);
+            if (health <= 0) {
+                InvokeDeathEvent();
+            }
         }
     }
 
@@ -44,13 +65,9 @@ public:
     }
 
     
-    void SetHealth(int newHealth) {
-        if (newHealth >= 0) {
-            health = std::min(newHealth, maxHealth);
-        }
-    }
+   
 
-    
+   
     int GetHealth() const {
         return health;
     }
@@ -58,6 +75,13 @@ public:
     
     int GetMaxHealth() const {
         return maxHealth;
+    }
+
+private:
+    
+    void InvokeDeathEvent() {
+        auto event = DeathEvent(owner);
+        EventManager::Call(&event);
     }
 };
 

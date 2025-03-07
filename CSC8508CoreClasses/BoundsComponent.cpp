@@ -46,3 +46,33 @@ void BoundsComponent::UpdateBroadphaseAABB() {
 		broadphaseAABB = mat * halfSizes;*/
 	}
 }
+
+struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
+	BoundsComponentDataStruct() : enabled(true) {}
+	BoundsComponentDataStruct(bool enabled) :
+		enabled(enabled) {
+	}
+	bool enabled;
+	// Create new collider from collider type enum
+	// Bool try get physics component
+	// Radius or vectors for bounds scale
+
+	static auto GetSerializedFields() {
+		return std::make_tuple(
+			SERIALIZED_FIELD(BoundsComponentDataStruct, enabled)
+		);
+	}
+};
+
+size_t BoundsComponent::Save(std::string assetPath, size_t* allocationStart)
+{
+	BoundsComponentDataStruct saveInfo;
+	saveInfo = BoundsComponentDataStruct(IsEnabled());
+	SaveManager::GameData saveData = ISerializedData::CreateGameData<BoundsComponentDataStruct>(saveInfo);
+	return SaveManager::SaveGameData(assetPath, saveData, allocationStart, false);
+}
+
+void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
+	BoundsComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<BoundsComponentDataStruct>(assetPath, allocationStart);
+	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
+}

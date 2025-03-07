@@ -8,7 +8,6 @@
 #include "TransformNetworkComponent.h"
 
 #include "PositionConstraint.h"
-#include "MeshManager.h"
 #include "MaterialManager.h"
 #include "OrientationConstraint.h"
 
@@ -82,7 +81,7 @@ void TutorialGame::InitialiseGame() {
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
-	TestSave();
+	//TestSave();
 }
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
@@ -101,10 +100,10 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 }
 
 void TutorialGame::InitialiseAssets() {
-	MeshManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
-	MeshManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
-	MeshManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MeshManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
+	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
+	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
+	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
+	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 
@@ -114,7 +113,6 @@ void TutorialGame::InitialiseAssets() {
 
 TutorialGame::~TutorialGame()	
 {
-	MeshManager::CleanUp();
 	MaterialManager::CleanUp();
 	ComponentManager::CleanUp();
 
@@ -175,11 +173,11 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-	AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-
-	//std::string assetPath = GetAssetPath("myScene.pfab");
+	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+	//delete x;
+	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//world->Save(assetPath);
-	//world->Load(assetPath);
+	world->Load(assetPath);
 }
 
 bool TutorialGame::SelectObject() {

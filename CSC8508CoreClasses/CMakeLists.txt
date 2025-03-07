@@ -89,7 +89,6 @@ set(Header_Files
     "GameObject.h"
     "GameWorld.h"
     "RenderObject.h"
-    "MeshManager.h"
     "MaterialManager.h"
     "Transform.h"
 )

@@ -4,6 +4,7 @@
 #include "IComponent.h"
 #include "GameObject.h"
 #include "EventManager.h"
+#include "MaterialManager.h"
 #include "RenderObject.h"
 
 using namespace NCL::CSC8508;
@@ -26,26 +27,23 @@ GameObject::~GameObject() {
 	delete renderObject;
 }
 
-struct QuaternionSaveData {
-public:
-	float x;
-	float y;
-	float z;
-	float w;
-	QuaternionSaveData(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
-	QuaternionSaveData() : x(0), y(0), z(0), w(0) {}
-};
-
 struct GameObject::GameObjDataStruct : public ISerializedData {
-	GameObjDataStruct() : isEnabled(true), orientation(QuaternionSaveData()), position(Vector3()), scale(Vector3(1,1,1)), colour(Vector4()) {}
-	GameObjDataStruct(bool isEnabled, QuaternionSaveData orientation, Vector3 position, Vector3 scale, Vector4 colour) :
-		isEnabled(isEnabled), orientation(orientation), position(position), scale(scale), colour(colour){}
+	GameObjDataStruct() : isEnabled(true), orientation(Quaternion()), position(Vector3()), scale(Vector3(1,1,1)), colour(Vector4()),
+		meshPointer(0), texturePointer(0), shaderPointer(0){}
+	GameObjDataStruct(bool isEnabled, Quaternion orientation, Vector3 position, Vector3 scale, 
+		Vector4 colour, size_t meshPointer, size_t texturePointer, size_t shaderPointer) :
+		isEnabled(isEnabled), orientation(orientation), position(position), scale(scale), 
+		colour(colour), texturePointer(texturePointer), meshPointer(meshPointer), shaderPointer(shaderPointer) {}
 
 	bool isEnabled;
-	QuaternionSaveData orientation;
+	Quaternion orientation;
 	Vector3 position;
 	Vector3 scale;
 	Vector4 colour;
+	size_t meshPointer;
+	size_t texturePointer;
+	size_t shaderPointer;
+
 	std::vector<std::pair<size_t, size_t>> componentPointers;
 
 	static auto GetSerializedFields() {
@@ -55,6 +53,9 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 			SERIALIZED_FIELD(GameObjDataStruct, position),
 			SERIALIZED_FIELD(GameObjDataStruct, scale),
 			SERIALIZED_FIELD(GameObjDataStruct, colour),
+			SERIALIZED_FIELD(GameObjDataStruct, meshPointer),
+			SERIALIZED_FIELD(GameObjDataStruct, texturePointer),
+			SERIALIZED_FIELD(GameObjDataStruct, shaderPointer),
 			SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
 		);
 	}
@@ -63,36 +64,42 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 void GameObject::LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath) {
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
 		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
-		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
-
 		AddComponentEvent e = AddComponentEvent(*this, loadedSaveData.componentPointers[i].second);
 		EventManager::Call(&e);
 		if (!e.IsCancelled())
-			components.front()->Load(assetPath, loadedSaveData.componentPointers[i].first);
+			components.back()->Load(assetPath, loadedSaveData.componentPointers[i].first);
+		std::cout << "new component added" << std::endl;
+
 	}
 }
 
 void GameObject::LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath) {
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
 		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
-		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
-
 		if (i >= components.size()) break;
 		components[i]->Load(assetPath, loadedSaveData.componentPointers[i].first);
 	}
 }
 
-void GameObject::Load(std::string assetPath, size_t allocationStart) {
-	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
-	components.size() > 0 ? LoadInto(loadedSaveData, assetPath) : LoadClean(loadedSaveData, assetPath);
-
-
-	Quaternion orientation = Quaternion(loadedSaveData.orientation.x, loadedSaveData.orientation.y, loadedSaveData.orientation.z, loadedSaveData.orientation.w);
-	transform.SetOrientation(orientation);
+void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
+	transform.SetOrientation(loadedSaveData.orientation);
 	transform.SetPosition(loadedSaveData.position);
 	transform.SetScale(loadedSaveData.scale);
 	SetEnabled(loadedSaveData.isEnabled);
+
+	Mesh* cubeMesh = MaterialManager::GetMesh(loadedSaveData.meshPointer);
+	Texture* basicTex = MaterialManager::GetTexture(loadedSaveData.texturePointer);
+	Shader* basicShader = MaterialManager::GetShader(loadedSaveData.shaderPointer);
+
+	renderObject = new RenderObject(&GetTransform(), cubeMesh, basicTex, basicShader);
+	renderObject->SetColour(loadedSaveData.colour);
 	std::cout << loadedSaveData.isEnabled << std::endl;
+}
+
+void GameObject::Load(std::string assetPath, size_t allocationStart) {
+	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
+	components.size() > 0 ? LoadInto(loadedSaveData, assetPath) : LoadClean(loadedSaveData, assetPath);
+	LoadGameObjectInstanceData(loadedSaveData);
 }
 
 size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
@@ -102,12 +109,17 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 		allocationStart = new size_t(0);
 		clearMemory = true;
 	}
+	GameObjDataStruct saveInfo;
 
-	Vector4 colour = renderObject == nullptr ? Vector4(1,1,1,1) : renderObject->GetColour();
-
-	Quaternion ori = transform.GetOrientation();
-	QuaternionSaveData savedOritentation = QuaternionSaveData(ori.x, ori.y, ori.z, ori.w);
-	GameObjDataStruct saveInfo(isEnabled, savedOritentation, transform.GetPosition(), transform.GetScale(), colour);
+	saveInfo = renderObject == nullptr ?
+		
+		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
+			Vector4(), 0, 0, 0) :
+		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
+			renderObject->GetColour(), 
+			MaterialManager::GetMeshPointer(renderObject->GetMesh()),
+			MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture()), 
+			MaterialManager::GetShaderPointer(renderObject->GetShader()));
 
 	for (IComponent* component : components) {
 		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);		

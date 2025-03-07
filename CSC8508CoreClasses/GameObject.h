@@ -192,6 +192,12 @@ namespace NCL::CSC8508 {
 		void LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath);
 
 		/// <summary>
+		/// Loads GameObject specific Data into this GameObject
+		/// </summary>
+		/// <param name="loadedSaveData">The loaded data used to set this GameObject's properties to the loaded data</param>
+		void LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData);
+
+		/// <summary>
 		/// Add a child GameObject to this GameObject
 		/// </summary>
 		/// <param name="child">The new child GameObject</param>

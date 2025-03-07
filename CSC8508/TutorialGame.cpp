@@ -147,9 +147,6 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 
 void TutorialGame::UpdateGame(float dt) 
 {
-	if (OnEndGame(dt))
-		return; 
-
 	uiSystem->StartFrame();
 	/*uiSystem->DrawDemo();*/
 	DrawFramerate();
@@ -157,9 +154,9 @@ void TutorialGame::UpdateGame(float dt)
 		DrawMainMenu();
 	}
 
-	if (inPause) {
-		uiSystem->AudioSliders();
-	}
+	//if (inPause) {
+	//	uiSystem->AudioSliders();
+	//}
 
 	mainMenu->Update(dt);
 	renderer->Render();	
@@ -207,28 +204,6 @@ bool TutorialGame::SelectObject() {
 		}
 	}
 	return false;
-}
-
-void TutorialGame::MoveSelectedObject() {
-	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
-
-	if (!selectionObject) 
-		return;
-
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::Right)) 
-	{
-		Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
-		RayCollision closestCollision;
-
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
-
-				auto phys = selectionObject->GetPhysicsComponent();
-				if (phys)
-					phys->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-			}
-		}
-	}
 }
 
 void TutorialGame::DrawFramerate() {

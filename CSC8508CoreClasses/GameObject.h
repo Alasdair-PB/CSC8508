@@ -25,17 +25,17 @@ namespace NCL::CSC8508 {
 	class PhysicsObject;
 	class BoundsComponent;
 
-	class GameObject : ISerializable	{
-	
+	class GameObject : ISerializable {
+
 	public:
 		GameObject(bool isStatic = false);
 		~GameObject();
 
-		bool IsEnabled() const { return isEnabled;}
-		bool SetEnabled(bool isEnabled) { this->isEnabled = isEnabled;  }
-		bool IsStatic() const { return isStatic;}
+		bool IsEnabled() const { return isEnabled; }
+		bool SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
+		bool IsStatic() const { return isStatic; }
 
-		Transform& GetTransform() {return transform;}
+		Transform& GetTransform() { return transform; }
 
 		/**
 		 * Function invoked after the object and components have been instantiated.
@@ -111,7 +111,7 @@ namespace NCL::CSC8508 {
 			return nullptr;
 		}
 
-		struct GameObjDataStruct; 
+		struct GameObjDataStruct;
 		void Load(std::string assetPath, size_t allocationStart = 0) override;
 		size_t Save(std::string assetPath, size_t* = nullptr) override;
 
@@ -123,10 +123,10 @@ namespace NCL::CSC8508 {
 		bool HasTag(Tags::Tag tag);
 		template <typename T> bool HasComponent(T type);
 
-		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
-		Layers::LayerID GetLayerID() const {return layerID; }
-		void SetTag(Tags::Tag newTag) {  tag = newTag;}
-		Tags::Tag GetTag() const { return tag;}
+		void SetLayerID(Layers::LayerID newID) { layerID = newID; }
+		Layers::LayerID GetLayerID() const { return layerID; }
+		void SetTag(Tags::Tag newTag) { tag = newTag; }
+		Tags::Tag GetTag() const { return tag; }
 
 		/*
 		template <typename T> requires std::is_base_of_v<IComponent, T>
@@ -170,7 +170,7 @@ namespace NCL::CSC8508 {
 		RenderObject* renderObject;
 		GameObject* parent;
 
-		vector<IComponent*> components; 
+		vector<IComponent*> components;
 
 		bool isEnabled;
 		const bool isStatic;

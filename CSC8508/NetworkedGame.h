@@ -4,7 +4,6 @@
 #include "NetworkObject.h"
 #include "EventListener.h"
 
-
 namespace NCL {
 	namespace CSC8508 {
 		class GameServer;
@@ -20,8 +19,6 @@ namespace NCL {
 		public:
 			NetworkedGame();
 			~NetworkedGame();
-
-			NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer);
 
 			void StartAsServer();
 			void StartAsClient(char a, char b, char c, char d);

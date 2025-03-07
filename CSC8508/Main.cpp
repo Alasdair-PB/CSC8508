@@ -1,5 +1,3 @@
-
-#include "Window.h"
 #include "Debug.h"
 
 #include "TutorialGame.h"
@@ -12,6 +10,7 @@ using namespace CSC8508;
 #include "./PS5/GameTechAGCRenderer.h"
 #include "PS5Window.h"
 #else
+#include "Window.h"
 #include "GameTechRenderer.h"
 #endif // USE_PS5
 
@@ -26,8 +25,6 @@ void UpdateWindow(Window* w, NetworkedGame* g)
 	float dt = w->GetTimer().GetTimeDeltaSeconds();
 	w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
 	g->UpdateGame(dt);
-	r->Update(dt);
-	r->Render();
 	Debug::UpdateRenderables(dt);
 }
 
@@ -43,39 +40,42 @@ int main(int argc, char** argv)
 	else {
 		std::cout << "Normal Launch" << "\n";
 	}
-	WindowInitialisation initInfo;
-	initInfo.windowTitle = "CSC8508 Game technology!";
+	
 
 #ifdef USE_PS5
-	std::unique_ptr<PS5::PS5Window> w = std::make_unique<PS5::PS5Window>(initInfo.windowTitle, 1920, 1080);
-	std::unique_ptr<GameTechAGCRenderer> renderer = std::make_unique<GameTechAGCRenderer>(*(world.get()));
+	std::unique_ptr<PS5::PS5Window> w = std::make_unique<PS5::PS5Window>("PS5", 1920, 1080);
+
+	NetworkedGame* g = new NetworkedGame();
+
+	while (w->UpdateWindow()) {
+		float dt = w->GetTimer().GetTimeDeltaSeconds();
+		g->UpdateGame(dt);
+		//Debug::UpdateRenderables(dt);
+	}
 #else 
+	WindowInitialisation initInfo;
+	initInfo.windowTitle = "CSC8508 Game technology!";
 	initInfo.width = wWidth;
 	initInfo.height = wHeight;
 
 	Window* w = Window::CreateGameWindow(initInfo);
-	std::unique_ptr<GameTechRenderer> renderer = std::make_unique<GameTechRenderer>(*(world.get()));
-#endif
-	NetworkedGame* g = new NetworkedGame(world.get(), renderer.get());
-#ifndef USE_PS5
-	if (!w->HasInitialised()) 
-		return -1;
-#endif // !USE_PS5
 
+	if (!w->HasInitialised())
+		return -1;
 	w->ShowOSPointer(true);
 	w->LockMouseToWindow(true);
 	w->GetTimer().GetTimeDeltaSeconds();
 
+	NetworkedGame* g = new NetworkedGame();
+
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{
 		float dt = w->GetTimer().GetTimeDeltaSeconds();
-		world->UpdateWorld(dt);
 		w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
 		g->UpdateGame(dt);
-		renderer->Update(dt);
-		renderer->Render();
 		Debug::UpdateRenderables(dt);
 	}
 	Window::DestroyGameWindow();
+#endif
 	
 }

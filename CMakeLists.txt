@@ -70,9 +70,12 @@ endif()
 # Create Third Party Directory
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/ThirdParty)
 
-
 # Set FMOD path
+if(PS5)
+set(FMOD_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/FMOD PS5/api/core")
+else()
 set(FMOD_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/FMOD/api/core")
+endif()
 
 # Check if FMOD is installed
 if(NOT EXISTS "${FMOD_DIR}")

@@ -7,15 +7,15 @@
 
 
 namespace NCL {
-		class Camera;
-		using Maths::Ray;
+	class Camera;
+	using Maths::Ray;
 	namespace CSC8508 {
 		class GameObject;
 		class PhysicsComponent;
 		class BoundsComponent;
 		class Constraint;
 
-		typedef std::function<void(GameObject*)> GameObjectFunc;		
+		typedef std::function<void(GameObject*)> GameObjectFunc;
 		typedef std::function<void(PhysicsComponent*)> PhysicsComponentFunc;
 		typedef std::function<void(INetworkComponent*)> INetworkComponentFunc;
 		typedef std::function<void(IComponent*)> IComponentFunc;
@@ -29,7 +29,7 @@ namespace NCL {
 
 
 
-		class GameWorld	{
+		class GameWorld {
 		public:
 			GameWorld();
 			~GameWorld();
@@ -43,7 +43,7 @@ namespace NCL {
 			void AddConstraint(Constraint* c);
 			void RemoveConstraint(Constraint* c, bool andDelete = false);
 
-			PerspectiveCamera& GetMainCamera()  {
+			PerspectiveCamera& GetMainCamera() {
 				return mainCamera;
 			}
 			void ShuffleWorldConstraints();
@@ -108,4 +108,3 @@ namespace NCL {
 		};
 	}
 }
-

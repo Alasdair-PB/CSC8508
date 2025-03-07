@@ -17,21 +17,21 @@
 using namespace NCL;
 using namespace NCL::CSC8508;
 
-GameWorld::GameWorld()	{
-	shuffleConstraints	= false;
-	shuffleObjects		= false;
-	worldIDCounter		= 0;
-	worldStateCounter	= 0;
+GameWorld::GameWorld() {
+	shuffleConstraints = false;
+	shuffleObjects = false;
+	worldIDCounter = 0;
+	worldStateCounter = 0;
 }
 
-GameWorld::~GameWorld()	{
+GameWorld::~GameWorld() {
 }
 
 void GameWorld::Clear() {
 	gameObjects.clear();
 	constraints.clear();
-	worldIDCounter		= 0;
-	worldStateCounter	= 0;
+	worldIDCounter = 0;
+	worldStateCounter = 0;
 }
 
 void GameWorld::ClearAndErase() {
@@ -55,7 +55,7 @@ void GameWorld::AddGameObject(GameObject* o) {
 	if (bounds)
 		boundsComponents.emplace_back(bounds);
 
-	if (phys) 
+	if (phys)
 		physicsComponents.emplace_back(phys);
 
 	auto newComponents = o->GetAllComponents();
@@ -103,8 +103,8 @@ void GameWorld::GetObjectIterators(
 	GameObjectIterator& first,
 	GameObjectIterator& last) const {
 
-	first	= gameObjects.begin();
-	last	= gameObjects.end();
+	first = gameObjects.begin();
+	last = gameObjects.end();
 }
 
 
@@ -115,7 +115,7 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 }
 
 
-void GameWorld::UpdateWorld(float dt){
+void GameWorld::UpdateWorld(float dt) {
 
 	ComponentManager::OperateOnAllIComponentBufferOperators(
 		[&](IComponent* c) {
@@ -124,7 +124,7 @@ void GameWorld::UpdateWorld(float dt){
 		});
 	ComponentManager::OperateOnAllIComponentBufferOperators(
 		[&](IComponent* c) {
-			if (c->IsEnabled()) 
+			if (c->IsEnabled())
 				c->InvokeUpdate(dt);
 		});
 	OperateOnContents(
@@ -151,9 +151,9 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	RayCollision collision;
 
 	for (auto& i : boundsComponents) {
-		if (!i->GetBoundingVolume()) 
+		if (!i->GetBoundingVolume())
 			continue;
-		if (i == ignoreThis) 
+		if (i == ignoreThis)
 			continue;
 		bool toContinue = false;
 
@@ -174,8 +174,8 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 
 		RayCollision thisCollision;
 		if (CollisionDetection::RayIntersection(r, *i, thisCollision)) {
-				
-			if (!closestObject) {	
+
+			if (!closestObject) {
 				closestCollision = collision;
 				closestCollision.node = i;
 				return true;
@@ -210,6 +210,6 @@ void GameWorld::RemoveConstraint(Constraint* c, bool andDelete) {
 void GameWorld::GetConstraintIterators(
 	std::vector<Constraint*>::const_iterator& first,
 	std::vector<Constraint*>::const_iterator& last) const {
-	first	= constraints.begin();
-	last	= constraints.end();
+	first = constraints.begin();
+	last = constraints.end();
 }

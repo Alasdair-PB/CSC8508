@@ -1,6 +1,5 @@
 #pragma once
 #include "PushdownState.h"
-#include <stack>
 
 namespace NCL {
 	namespace CSC8508 {
@@ -19,8 +18,8 @@ namespace NCL {
 			bool ModifyStack(PushdownState* newState, PushdownState::PushdownResult result);
 
 		protected:
-			PushdownState* activeState  = nullptr;
-			PushdownState* initialState = nullptr;
+			PushdownState* activeState;
+			PushdownState* initialState;
 
 			std::stack<PushdownState*> stateStack;
 		};

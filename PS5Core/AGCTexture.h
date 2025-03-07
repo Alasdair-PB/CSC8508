@@ -8,7 +8,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 
 #include "Texture.h"
-
 #include <agc.h>
 
 namespace NCL::PS5 {

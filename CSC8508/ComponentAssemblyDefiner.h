@@ -2,7 +2,7 @@
 #define COMPONENTASSEMBLY_H
 #include <unordered_map>
 #include "GameObject.h"
-#include "EventManager.h"
+#include "EventListener.h"
 
 namespace NCL {
     namespace CSC8508 {

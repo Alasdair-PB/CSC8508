@@ -21,12 +21,37 @@ AudioListenerComponent::AudioListenerComponent(GameObject& gameObject, Perspecti
 	// Create sound object for microphone input
 	FMOD_CREATESOUNDEXINFO exinfo = {};
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-	exinfo.numchannels = 1;  // Mono for voice
+	exinfo.numchannels = channels;  // Mono for voice
 	exinfo.format = FMOD_SOUND_FORMAT_PCM16;
-	exinfo.defaultfrequency = 48000;  // Match system sample rate
-	exinfo.length = exinfo.defaultfrequency * sizeof(short) * 5;  // 5 seconds buffer
+	exinfo.defaultfrequency = sampleRate;  // Match system sample rate
+	exinfo.length = (int)(exinfo.defaultfrequency * sizeof(short) * 1);  // 1 seconds buffer
 
-	fSystem->createSound(nullptr, FMOD_OPENUSER | FMOD_3D, &exinfo, &micInput);
+	fSystem->createSound(nullptr, FMOD_OPENUSER, &exinfo, &micInput);
+
+
+	encoder = OpenEncoder();
+	decoder = OpenDecoder();
+
+	// Create sound object for microphone input
+	FMOD_CREATESOUNDEXINFO streamExinfo = {};
+	streamExinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+	streamExinfo.numchannels = channels;  // Mono for voice
+	streamExinfo.format = FMOD_SOUND_FORMAT_PCM16;
+	streamExinfo.defaultfrequency = sampleRate;  // Match system sample rate
+	streamExinfo.length = ringBufferMaxSize * sizeof(short);
+	streamExinfo.pcmreadcallback = PCMReadCallback;
+	streamExinfo.userdata = this;
+
+
+	FMOD_RESULT result = fSystem->createSound(0, FMOD_OPENUSER | FMOD_LOOP_NORMAL, &streamExinfo, &streamSound);
+	if (result != FMOD_OK) {
+		std::cerr << "[ERROR] createSound (stream): " << FMOD_ErrorString(result) << std::endl;
+	}
+	result = fSystem->playSound(streamSound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), false, &streamChannel);
+	if (result != FMOD_OK) {
+		std::cerr << "[ERROR] playSound (stream): " << FMOD_ErrorString(result) << std::endl;
+	}
+
 
 	this->camera = &camera;
 
@@ -36,6 +61,8 @@ AudioListenerComponent::AudioListenerComponent(GameObject& gameObject, Perspecti
 	// Comment out for where you want the up and forward vectors to be updated from for testing
 	//SetCamOrientation();
 	SetPlayerOrientation();
+
+	InitPersistentSound();
 
 }
 
@@ -76,11 +103,11 @@ void AudioListenerComponent::ToggleRecording() {
 	
 	if (IsRecording()) {
 		StopRecording();
-		std::cout << "Recording Stopped" << std::endl;
+		//// std::cout << "Recording Stopped" << std::endl;
 	}
 	else {
 		RecordMic();
-		std::cout << "Recording Started" << std::endl;
+		//// std::cout << "Recording Started" << std::endl;
 	}
 }
 
@@ -88,7 +115,7 @@ bool AudioListenerComponent::IsRecording() {
 	bool isRecording;
 	FMOD_RESULT result = fSystem->isRecording(0, &isRecording);
 	if (result != FMOD_OK) {
-		std::cerr << "Error: " << FMOD_ErrorString(result) << std::endl;
+		// std::cerr << "Error: " << FMOD_ErrorString(result) << std::endl;
 		return false;
 	}
 
@@ -113,7 +140,7 @@ void AudioListenerComponent::UpdateInputList() {
 
 void AudioListenerComponent::PrintInputList() {
 	for (auto& device : inputDeviceList) {
-		std::cout << "Device: " << device.first << " - " << device.second << std::endl;
+		// std::cout << "Device: " << device.first << " - " << device.second << std::endl;
 	}
 }
 
@@ -137,6 +164,19 @@ void AudioListenerComponent::UpdateOutputList() {
 
 void AudioListenerComponent::PrintOutputList() {
 	for (auto& device : outputDeviceList) {
-		std::cout << "Device: " << device.first << " - " << device.second << std::endl;
+		// std::cout << "Device: " << device.first << " - " << device.second << std::endl;
 	}
+}
+
+static FMOD_RESULT F_CALLBACK PCMReadCallback(FMOD_SOUND* sound, void* data, unsigned int datalen) {
+	void* userData = nullptr;
+	FMOD_RESULT result = FMOD_Sound_GetUserData(sound, &userData);
+
+	if (result != FMOD_OK || userData == nullptr) {
+		return FMOD_ERR_INVALID_HANDLE;
+	}
+
+	AudioListenerComponent* instance = static_cast<AudioListenerComponent*>(userData);
+	instance->PopSamples(data, datalen);
+	return FMOD_OK;
 }

@@ -14,6 +14,12 @@
 #include <fmod.hpp>
 #include <fmod_errors.h>
 #include <queue>
+#include <deque>
+#include <algorithm>
+#include <vector>
+#include <cstring>
+#include <iostream>
+#include <mutex>
 
 using namespace NCL;
 using namespace NCL::Maths;
@@ -28,6 +34,7 @@ struct PCMBufferLock {
 	unsigned int len2;
 };
 
+static FMOD_RESULT F_CALLBACK PCMReadCallback(FMOD_SOUND* sound, void* data, unsigned int datalen);
 
 /**
 * Listener class for audio engine
@@ -56,7 +63,6 @@ public:
 	*/
 	void RecordMic() {
 		FMOD_RESULT result = fSystem->recordStart(inputDeviceIndex, micInput, true);
-		std::cout << "Recording Result: " << result << std::endl;
 	}
 
 	/**
@@ -86,293 +92,113 @@ public:
 
 	#pragma endregion
 
-	#pragma region Opus Tools
+	#pragma region Encoding/Decoding Tools
 
-	PCMBufferLock LockSound(FMOD::Sound* sound, unsigned int offset, unsigned int bufferSize) {
+	/**
+	* Locks a section of the FMOD PCM buffer for reading/writing.
+	* FMOD writes to a circular buffer so must lock portions to prevent data corruption.
+	* Lock can contain two pointers if the buffer wraps around.
+	* 1st pointer is the start of the audio, 2nd holds the remainder if the buffer wraps.
+	* @return PCMBufferLock (struct containing buffer info)
+	* @param FMOD::Sound* (sound to lock)
+	* @param unsigned int (lastPos)
+	* @param unsigned int (bufferSize)
+	*
+	PCMBufferLock LockSound(FMOD::Sound* sound, unsigned int lastPos, unsigned int bufferSize) {
 		PCMBufferLock lock = {};
-		unsigned int recordPosition = 0;
-		fSystem->getRecordPosition(inputDeviceIndex, &recordPosition);
 
-		if (recordPosition == offset) {
-			std::cerr << "Cannot lock sound at current record position!" << std::endl;
-			return lock;
-		}
+		unsigned int recordPos = 0;
+		fSystem->getRecordPosition(inputDeviceIndex, &recordPos);
 
-		FMOD_RESULT result = sound->lock(offset, bufferSize, &lock.ptr1, &lock.ptr2, &lock.len1, &lock.len2);
-		
+
+		FMOD_RESULT result = sound->lock(recordPos, bufferSize, &lock.ptr1, &lock.ptr2, &lock.len1, &lock.len2);
+
 		if (result == FMOD_OK) {
-			lock.offset = 0;
+			lock.offset = lastPos;
 			lock.length = lock.len1 + lock.len2;
 		}
 		else {
-			std::cerr << "Failed to lock PCM data, err: " << FMOD_ErrorString(result) << std::endl;
+			std::cout << "[ERROR] LockSound(): result = " << FMOD_ErrorString(result) << std::endl;
+		}
+
+		return lock;
+	}*/
+
+	PCMBufferLock LockSound(FMOD::Sound* sound, unsigned int startOffset, unsigned int buffersize) {
+		PCMBufferLock lock = {};
+		FMOD_RESULT result = sound->lock(startOffset, buffersize, &lock.ptr1, &lock.ptr2, &lock.len1, &lock.len2);
+		if (result == FMOD_OK) {
+			lock.offset = startOffset;
+			lock.length = lock.len1 + lock.len2;
+		}
+		else {
+			std::cerr << "[ERROR] LockSound(): " << FMOD_ErrorString(result) << std::endl;
 		}
 		return lock;
-
 	}
 
+
+	/**
+	* Release the lock so FMOD can continue recording.
+	* @return bool (true if successful)
+	* @param FMOD::Sound* (sound to unlock)
+	* @param PCMBufferLock* (lock to release)
+	*/
 	bool UnlockSound(FMOD::Sound* sound, PCMBufferLock* lock) {
 		FMOD_RESULT result = sound->unlock(lock->ptr1, lock->ptr2, lock->len1, lock->len2);
 		return result == FMOD_OK ? true : false;
 	}
 
+	/**
+	* Configures an Opus encoder to convert RAW PCM data into Opus format.
+	* @return OpusEncoder* (pointer to the encoder)
+	*/
 	OpusEncoder* OpenEncoder() {
 		int error;
 
 		OpusEncoder* encoder = opus_encoder_create(sampleRate, channels, OPUS_APPLICATION_VOIP, &error);
 		if (error != OPUS_OK) {
-			std::cout << "Opus Encoder Error: " + std::to_string(error) << std::endl;
+			// std::cout << "[ERROR] OpenEncoder(): " + std::to_string(error) << std::endl;
 			return nullptr;
 		}
-
-		opus_encoder_ctl(encoder, OPUS_SET_BITRATE(64000)); // Adjust bitrate for clarity
-		opus_encoder_ctl(encoder, OPUS_SET_BANDWIDTH(OPUS_BANDWIDTH_FULLBAND));
-		opus_encoder_ctl(encoder, OPUS_SET_COMPLEXITY(10)); // Max quality
 
 		return encoder;
 	}
 
+	/**
+	* Closes a specified Opus encoder.
+	* @param OpusEncoder* (pointer to the encoder)
+	*/
 	void CloseEncoder(OpusEncoder* encoder) {
 		opus_encoder_destroy(encoder);
 	}
 
+	/**
+	* Configures an Opus decoder to convert Opus data into PCM samples.
+	* @return OpusDecoder* (pointer to the decoder)
+	*/
 	OpusDecoder* OpenDecoder() {
 		int error;
 		OpusDecoder* decoder = opus_decoder_create(sampleRate, channels, &error);
 		if (error != OPUS_OK) {
-			std::cout << "Opus Decoder Error: " + std::to_string(error) << std::endl;
+			// std::cout << "[ERROR] OpenDecoder(): " + std::to_string(error) << std::endl;
 			return nullptr;
 		}
 		return decoder;
 	}
 
+	/**
+	* Closes a specified Opus decoder.
+	* @param OpusDecoder* (pointer to the decoder)
+	*/
 	void CloseDecoder(OpusDecoder* decoder) {
 		opus_decoder_destroy(decoder);
 	}
-	#pragma endregion
-
-
-	#pragma region Encoding/Decoding Pipeline
-	/**
-	* Extracts PCM samples from the locked buffer.
-	*/
-	std::vector<short> ExtractPCMData(PCMBufferLock* lock) {
-		std::vector<short> pcmData;
-
-		// First Chunk
-
-		if (lock->ptr1 && lock->len1 > 0) {
-			short* pcmShorts = static_cast<short*>(lock->ptr1);
-			pcmData.assign(pcmShorts, pcmShorts + (lock->len1 / sizeof(short)));
-
-			std::cout << "[PCM Extraction] 5 sample values: ";
-			for (int i = 0; i < 5; i++) {
-				std::cout << pcmData[i] << " ";
-			}
-			std::cout << std::endl;
-		}
-		else {
-			std::cout << "PCM Extract Failure, ptr1 == NULL or len1 is 0" << std::endl;
-		}
-
-		// Second Chunk (if exists)
-		if (lock->ptr2 && lock->len2 > 0) {
-			short* pcmShorts = static_cast<short*>(lock->ptr2);
-			pcmData.insert(pcmData.end(), pcmShorts, pcmShorts + (lock->len2 / sizeof(short)));
-			std::cout << "PCM Extracted Second Chunk" << std::endl;
-		}
-		else if (lock->ptr2 == nullptr) {
-			//std::cout << "PCM Extract Note, ptr2 is NULL (no wrap-around in PCM buffer)";
-		}
-
-		if (!pcmData.empty()) {
-			auto minMax = std::minmax_element(pcmData.begin(), pcmData.end());
-			std::cout << "[PCM DEBUG] Min sample: " << *minMax.first << " | Max Sample: " << *minMax.second << std::endl;
-		}
-
-
-		std::cout << "Total extracted PCM Samples: " << pcmData.size() << std::endl;
-		return pcmData;
-
-	}
-
-
-	/**
-	* Encodes a single frame of PCM data into Opus.
-	*/
-	std::vector<unsigned char> EncodeOpusFrame(std::vector<short>& pcmData) {
-		OpusEncoder* encoder = OpenEncoder();
-
-		std::vector<unsigned char> opusData;
-		std::vector<unsigned char> tempBuffer(4096);
-		int frameSize = 960;
-
-		if (pcmData.size() < frameSize) {
-			std::cerr << "[Opus Encoding] PCM Data is less than frame size! size: " << pcmData.size() << std::endl;
-			return opusData;
-		}
-
-		for (size_t i = 0; i < pcmData.size(); i += frameSize) {
-			
-			//break if PCM buffer is exceeded
-			if (i + frameSize > pcmData.size()) break;
-
-			int encodedBytes = opus_encode(encoder, pcmData.data() + i, frameSize, tempBuffer.data(), tempBuffer.size());
-
-			if (encodedBytes > 0) {
-				opusData.insert(opusData.end(), tempBuffer.begin(), tempBuffer.begin() + encodedBytes);
-				std::cout << "[Opus Encoding] Frame " << (i/frameSize) << " | Encoded bytes: " << encodedBytes << " | First Byte: " << (int)tempBuffer[0] << std::endl;
-			}
-			else {
-				std::cout << "[Opus Encoding] Error: " + encodedBytes << std::endl;
-				break;
-			}
-
-
-		}
-
-		CloseEncoder(encoder);
-
-		return opusData;
-
-	}
-
-
-	/**
-	* Continuously records and encodes PCM data into Opus frames.
-	*/
-	std::vector<std::vector<unsigned char>> StreamEncodeMic() {
-		std::vector<std::vector<unsigned char>> encodedPackets;
-
-
-		static unsigned int lastPos = 0;  // Static to persist between calls
-		unsigned int recordPos = 0;
-		unsigned int frameSize = 960;
-
-		fSystem->getRecordPosition(inputDeviceIndex, &recordPos);
-		std::cout << "[DEBUG] Mic Record Position | Current: " << recordPos << " | Last: " << lastPos << std::endl;
-
-		unsigned int availableSamples = (recordPos != lastPos) ? (recordPos - lastPos) : frameSize;
-
-
-		PCMBufferLock lock = LockSound(micInput, lastPos, availableSamples * sizeof(short));
-		if (lock.len1 > 0) {
-			std::vector<short> pcmData = ExtractPCMData(&lock);
-			encodedPackets.push_back(EncodeOpusFrame(pcmData));
-		}
-		UnlockSound(micInput, &lock);
-
-		// Start from beginning of buffer
-		lastPos = recordPos;
-
-		return encodedPackets;
-	}
-
-
-
-
-	/**
-	* Decodes a single Opus packet into PCM samples.
-	*/
-	FMOD::Sound* DecodeOpusFrame(std::vector<unsigned char>& opusData) {
-		std::cout << "[Debug] Decoding Opus Frame | " << opusData.size() << std::endl;
-		OpusDecoder* decoder = OpenDecoder();
-		std::vector<short> pcmData(960);
-
-		int decodedSamples = opus_decode(decoder, opusData.data(), opusData.size(), pcmData.data(), pcmData.size(), 0);
-
-		if (decodedSamples < 0) {
-			std::cerr << "[ERROR] Opus Decoding Failed! Error Code: " << decodedSamples << std::endl;
-			CloseDecoder(decoder);
-			return nullptr;
-		}
-
-		if (decodedSamples < 960) {
-			std::cerr << "[WARNING] Decoded frame is smaller than expected! Size: " << decodedSamples << std::endl;
-		}
-
-		pcmData.resize(decodedSamples);
-		CloseDecoder(decoder);
-
-		return PCMToFSound(pcmData);
-	}
-
-
-
-	/**
-	* Continuously decodes Opus frames into PCM and plays them back.
-	*/
-	void StreamDecodePlayback(std::vector<std::vector<unsigned char>>& encodedPackets) {
-		std::cout << "[DEBUG] StreamDecodePlayback | Packets: " << encodedPackets.size() << std::endl;
-
-		if (encodedPackets.empty()) {
-			std::cerr << "[ERROR] No Encoded Data to Decode!" << std::endl;
-			return;
-		}
-
-		OpusDecoder* decoder = OpenDecoder();
-		if (!decoder) {
-			std::cerr << "[ERROR] Failed to Open Opus Decoder!" << std::endl;
-			return;
-		}
-
-		std::queue<std::vector<short>> pcmQueue;
-
-		for (auto& packet : encodedPackets) {
-			std::cout << "[DEBUG] Calling DecodeOpusFrame()" << std::endl;
-
-			FMOD::Sound* sound = DecodeOpusFrame(packet);
-			if (sound) {
-				std::cout << "[DEBUG] Successfully decoded and created FMOD sound!" << std::endl;
-				fSystem->playSound(sound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), false, &tempChannel);
-
-				// Prevent PCM queue from growing too large (causing slow playback)
-				if (pcmQueue.size() > 5) {
-					std::cout << "[WARNING] PCM Queue too large, discarding old frames!" << std::endl;
-					pcmQueue.pop();
-				}
-			}
-			else {
-				std::cerr << "[ERROR] DecodeOpusFrame() failed!" << std::endl;
-			}
-		}
-
-		CloseDecoder(decoder);
-	}
-
-
-
-
-	/**
-	* Streams and plays decoded PCM dynamically.
-	*/
-	void PlayPCMBuffer(std::queue<std::vector<short>>& pcmQueue) {
-		while (!pcmQueue.empty()) {
-			std::vector<short> pcmData = pcmQueue.front();
-			pcmQueue.pop();
-
-			std::cout << "[DEBUG] Playing PCM | Samples: " << pcmData.size()
-				<< " | First Sample: " << pcmData[0] << std::endl;
-
-			FMOD::Sound* sound = PCMToFSound(pcmData);
-			if (sound) {
-				std::cout << "[DEBUG] Playing New PCM Buffer..." << std::endl;
-				fSystem->playSound(sound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), false, &tempChannel);
-
-				// Ensure FMOD processes playback immediately
-				fSystem->update();
-			}
-			else {
-				std::cerr << "[ERROR] PCMToFSound Failed!" << std::endl;
-			}
-		}
-	}
-
-
-
 
 	/**
 	* Converts a PCM buffer into an FMOD sound for playback.
+	* @return FMOD::Sound* (FMOD sound object)
+	* @param std::vector<short>& (PCM data to convert)
 	*/
 	FMOD::Sound* PCMToFSound(const std::vector<short>& pcmData) {
 		FMOD::Sound* sound;
@@ -385,13 +211,12 @@ public:
 		exinfo.defaultfrequency = sampleRate;
 
 		FMOD_RESULT result = fSystem->createSound(
-			reinterpret_cast<const char*>(pcmData.data()),
-			FMOD_OPENMEMORY | FMOD_OPENRAW,
+			reinterpret_cast<const char*>(pcmData.data()),FMOD_OPENRAW | FMOD_OPENMEMORY,
 			&exinfo,
 			&sound
 		);
 		if (result != FMOD_OK) {
-			std::cerr << "[ERROR] PCMToFSound Failed! FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+			// std::cerr << "[ERROR] PCMToFSound() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
 			return nullptr;
 		}
 
@@ -404,31 +229,418 @@ public:
 	#pragma endregion
 
 
-	#pragma region Opus Testing
-	void CheckSoundFormat(FMOD::Sound* sound) {
-		FMOD_SOUND_FORMAT format;
-		int channels, bits;
-		sound->getFormat(nullptr, &format, &channels, &bits);
+	#pragma region Encoding/Decoding Pipeline
 
-		std::cout << "Sound Format: " << format << ", Channels: " << channels << ", Bit Depth: " << bits << std::endl;
+	/**
+	* Extracts PCM samples from a locked buffer.
+	* Handles single or double buffer chunk locks.
+	* @return std::vector<short> (extracted PCM data)
+	* @param PCMBufferLock* (locked buffer to extract from)
+	*/
+	std::vector<short> ExtractPCMData(PCMBufferLock* lock) {
+		std::vector<short> pcmData;
 
-		if (format != FMOD_SOUND_FORMAT_PCM16) {
-			std::cerr << "Warning: Sound is not in PCM16 format! Decoding may be incorrect." << std::endl;
-		}
-	}
-
-	void UpdateAudioStreaming() {
-
-		std::vector<std::vector<unsigned char>> encodedPackets;
-		if (IsRecording()) encodedPackets = StreamEncodeMic();
-
-		if (!encodedPackets.empty()) {
-			StreamDecodePlayback(encodedPackets);
+		// Extract the first chunk (ptr1)
+		if (lock->ptr1 && lock->len1 > 0) {
+			short* pcmShorts = static_cast<short*>(lock->ptr1);
+			pcmData.insert(pcmData.end(), pcmShorts, pcmShorts + (lock->len1 / sizeof(short)));
+			
+			 std::cout << "[DEBUG]ExtractPCMData(): First Chunk = " << lock->len1 / sizeof(short) << " samples." << std::endl;
 		}
 		else {
-			std::cout << "No encoded packets to decode!" << std::endl;
+			std::cerr << "[ERROR] ExtractPCMData(): PCM Extract Failure, chunk 1 invalid." << std::endl;
+		}
+
+		// Extract the second chunk (ptr2) if available
+		if (lock->ptr2 && lock->len2 > 0) {
+			short* pcmShorts = static_cast<short*>(lock->ptr2);
+			pcmData.insert(pcmData.end(), pcmShorts, pcmShorts + (lock->len2 / sizeof(short)));
+
+			std::cout << "[Debug]ExtractPCMData(): Second Chunk = " << lock->len2 / sizeof(short) << " samples." << std::endl;
+		}
+		else {
+			std::cerr << "[Debug]ExtractPCMData(): No chunk 2." << std::endl;
+		}
+			std::cout << "[Debug]ExtractPCMData(): Total Extracted Samples: " << pcmData.size() << std::endl;
+		return pcmData;
+	}
+
+	void PushSamples(const std::vector<short>& samples) {
+		std::lock_guard<std::mutex> lock(ringBufferMutex);
+
+		for (short s : samples) {
+			if (ringBuffer.size() < ringBufferMaxSize) {
+				ringBuffer.push_back(s);
+			}
+			else {
+				ringBuffer.pop_front();
+				ringBuffer.push_back(s);
+			}
 		}
 	}
+
+	int PopSamples(void* dest, unsigned int bytesRequested) {
+		unsigned int samplesRequested = bytesRequested / sizeof(short);
+
+		std::lock_guard<std::mutex> lock(ringBufferMutex);
+
+		unsigned int samplesAvailable = ringBuffer.size();
+		unsigned int samplesToRead = (samplesRequested < samplesAvailable) ? samplesRequested : samplesAvailable;
+
+		short* out = static_cast<short*>(dest);
+
+		for (unsigned int i = 0; i < samplesToRead; i++) {
+			out[i] = ringBuffer.front();
+			ringBuffer.pop_front();
+		}
+
+		for (unsigned int i = samplesToRead; i < samplesRequested; i++) {
+			out[i] = 0;
+		}
+
+		return samplesToRead * sizeof(short);
+	}
+
+	/**
+	* Encodes a PCM sample buffer to an Opus frame.
+	* Each frame contains 960 samples (20ms at 48kHz).
+	* @return std::vector<unsigned char> (encoded Opus frame)
+	* @param std::vector<short>& (PCM data to encode)
+	*/
+	std::vector<unsigned char> EncodeOpusFrame(std::vector<short>& pcmData) {
+		std::vector<unsigned char> opusFrame;
+
+		std::vector<unsigned char> tempBuffer(4096); // ensures buffer is large enough for any frame
+		int frameSize = 960;
+
+		// Ensure PCM data is always a multiple of 960 samples
+		if (pcmData.size() % frameSize != 0) {
+			pcmData.resize((pcmData.size() / frameSize) * frameSize);  // Trim to nearest multiple of 960
+		}
+
+		for (size_t i = 0; i < pcmData.size(); i += frameSize) {
+			int encodedBytes = opus_encode(encoder, pcmData.data() + i, frameSize, tempBuffer.data(), tempBuffer.size());
+
+			// if encoding successful, append the encoded frame to the output buffer
+			if (encodedBytes > 0) {
+				opusFrame.insert(opusFrame.end(), tempBuffer.begin(), tempBuffer.begin() + encodedBytes);
+				std::cout << "[DEBUG] EncodeOpusFrame() Encoded " << encodedBytes << " bytes." << std::endl;
+			}
+			else {
+				// std::cerr << "[ERROR] EncodeOpusFrame() Error Encoding PCM Data" << std::endl;
+			}
+		}
+		return opusFrame;
+	}
+
+
+	/**
+	* Continuously records and encodes PCM data into Opus frames.
+	*
+	void StreamEncodeMic() {
+		static unsigned int lastPos = 0;
+		unsigned int recordPos = 0;
+		unsigned int frameSize = 960;  // Standard Opus frame size
+
+		fSystem->getRecordPosition(inputDeviceIndex, &recordPos);
+
+
+		std::cout << lastPos << " -> " << recordPos << std::endl;
+
+		unsigned int availableSamples;
+		if (recordPos < lastPos) {
+			availableSamples = (micBufferSamples - lastPos) + recordPos;
+		}
+		else {
+			availableSamples = recordPos - lastPos;
+		}
+
+
+		unsigned int completeFrames = availableSamples / frameSize;
+		if (completeFrames == 0) return; // Not enough samples for a full frame
+
+
+		unsigned int samplesToProcess = completeFrames * frameSize;
+		PCMBufferLock lock = LockSound(micInput, lastPos, samplesToProcess * sizeof(short));
+
+
+		if (lock.len1 == 0) {
+			UnlockSound(micInput, &lock);
+			return;
+		}
+		
+		std::vector<short> pcmData = ExtractPCMData(&lock);
+
+		if (pcmData.size() > samplesToProcess) {
+			pcmData.resize(samplesToProcess);
+		}
+
+		// encode each frame of PCM data and store the encoded packets
+		for (size_t i = 0; i < pcmData.size(); i += frameSize) {
+			std::vector<short> frame(pcmData.begin() + i, pcmData.begin() + i + frameSize);
+			std::vector<unsigned char> encodedPacket = EncodeOpusFrame(frame);
+			if (!encodedPacket.empty()) {
+				encodedPacketQueue.push_back(encodedPacket);
+				// Limit the queue size.
+				if (encodedPacketQueue.size() > 50) {
+					encodedPacketQueue.pop_front();
+				}
+			}
+		}
+
+		UnlockSound(micInput, &lock);
+		lastPos = (lastPos + samplesToProcess) % micBufferSamples;
+	}*/
+
+	void StreamEncodeMic() {
+		static unsigned int lastPos = 0;
+		unsigned int recordPos = 0;
+		unsigned int frameSize = 960; // 20ms at 48kHz
+		fSystem->getRecordPosition(0, &recordPos);
+
+		unsigned int availableSamples = (recordPos < lastPos)
+			? ((sampleRate - lastPos) + recordPos)
+			: (recordPos - lastPos);
+		unsigned int completeFrames = availableSamples / frameSize;
+		if (completeFrames == 0)
+			return;
+		unsigned int samplesToProcess = completeFrames * frameSize;
+
+		void* ptr1 = nullptr, * ptr2 = nullptr;
+		unsigned int len1 = 0, len2 = 0;
+		FMOD_RESULT result = micInput->lock(lastPos * sizeof(short), samplesToProcess * sizeof(short),
+			&ptr1, &ptr2, &len1, &len2);
+		if (result != FMOD_OK) {
+			std::cerr << "[ERROR] micInput lock: " << FMOD_ErrorString(result) << std::endl;
+			return;
+		}
+		std::vector<short> pcmData;
+		short* s1 = static_cast<short*>(ptr1);
+		pcmData.insert(pcmData.end(), s1, s1 + (len1 / sizeof(short)));
+		if (ptr2 && len2 > 0) {
+			short* s2 = static_cast<short*>(ptr2);
+			pcmData.insert(pcmData.end(), s2, s2 + (len2 / sizeof(short)));
+		}
+		micInput->unlock(ptr1, ptr2, len1, len2);
+		if (pcmData.size() > samplesToProcess) {
+			pcmData.resize(samplesToProcess);
+		}
+		std::vector<unsigned char> encodedPacket = EncodeOpusFrame(pcmData);
+		if (!encodedPacket.empty()) {
+			encodedPacketQueue.push_back(encodedPacket);
+		}
+
+		lastPos = (lastPos + samplesToProcess) % sampleRate;
+	}
+
+
+
+	void InitPersistentSound() {
+		FMOD_CREATESOUNDEXINFO exinfo = {};
+		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		exinfo.numchannels = channels;
+		exinfo.format = FMOD_SOUND_FORMAT_PCM16;
+		exinfo.defaultfrequency = sampleRate;
+		exinfo.length = persistentBufferSize * sizeof(short); // total buffer size in bytes
+
+		FMOD_RESULT result = fSystem->createSound(nullptr, FMOD_OPENUSER | FMOD_LOOP_NORMAL , &exinfo, &persistentSound);
+
+		if (result != FMOD_OK) {
+			std::cerr << "[ERROR] InitPersistentSound() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+			persistentSound = nullptr;
+			return;
+		}
+
+		result = fSystem->playSound(persistentSound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), true, &persistentChannel); // NOTE-STARTS PAUSED
+
+		if (result != FMOD_OK) {
+			std::cerr << "[ERROR] InitPersistentSound() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+			return;
+		}
+
+		persistentChannel->setPaused(false);
+		currentWritePos = 0;
+		currentWritePos = 0;
+
+	}
+
+	void UpdatePersistentPlayback(std::vector<unsigned char>& encodedPacket) {
+
+		if (!persistentSound) return;
+
+		std::vector<short> pcmFrame(960);
+		int decodedSamples = opus_decode(decoder, encodedPacket.data(), encodedPacket.size(), pcmFrame.data(), pcmFrame.size(), 0);
+
+		std::cout << "[DEBUG] UpdatePersistentPlayback() Decoded " << decodedSamples << " samples." << std::endl;
+
+		if (decodedSamples < 0) {
+			std::cerr << "[ERROR] UpdatePersistentPlayback() Opus Decoding Failed: " << decodedSamples << std::endl;
+			return;
+		}
+
+		if (decodedSamples < static_cast<int>(pcmFrame.size())) {
+			pcmFrame.resize(decodedSamples);
+		}
+
+		unsigned int bytesToWrite = pcmFrame.size() * sizeof(short);
+		unsigned int bufferSizeBytes = persistentBufferSize * sizeof(short);
+
+		if (currentWritePos * sizeof(short) + bytesToWrite > bufferSizeBytes) {
+
+			unsigned int bytesUntilEnd = bufferSizeBytes - currentWritePos * sizeof(short);
+			void* ptr1 = nullptr;
+			void* ptr2 = nullptr;
+			unsigned int len1 = 0, len2 = 0;
+
+			FMOD_RESULT result = persistentSound->lock(currentWritePos * sizeof(short), bytesUntilEnd, &ptr1, &ptr2, &len1, &len2);
+
+			if (result != FMOD_OK) {
+				std::cerr << "[ERROR] UpdatePersistentPlayback() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+				return;
+			}
+
+			// Copy the first chunk of data
+			memcpy(ptr1, pcmFrame.data(), bytesUntilEnd);
+			persistentSound->unlock(ptr1, ptr2, len1, len2);
+
+			// Copy the remaining data to the start of the buffer
+			unsigned int remainingBytes = bytesToWrite - bytesUntilEnd;
+			result = persistentSound->lock(0, remainingBytes, &ptr1, &ptr2, &len1, &len2);
+
+			if (result != FMOD_OK) {
+				std::cerr << "[ERROR] UpdatePersistentPlayback() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+				return;
+			}
+
+			memcpy(ptr1, ((char*)pcmFrame.data()) + bytesUntilEnd, remainingBytes);
+			persistentSound->unlock(ptr1, ptr2, len1, len2);
+
+			currentWritePos = remainingBytes / sizeof(short);
+
+		}
+		else { // normal write, no wrap-around
+			void* ptr1 = nullptr;
+			void* ptr2 = nullptr;
+			unsigned int len1 = 0, len2 = 0;
+			FMOD_RESULT result = persistentSound->lock(currentWritePos * sizeof(short), bytesToWrite, &ptr1, &ptr2, &len1, &len2);
+			if (result != FMOD_OK) {
+				std::cerr << "[ERROR] UpdatePersistentPlayback() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+				return;
+			}
+			memcpy(ptr1, pcmFrame.data(), bytesToWrite);
+			persistentSound->unlock(ptr1, ptr2, len1, len2);
+			currentWritePos = (currentWritePos + pcmFrame.size()) % persistentBufferSize;
+		}
+		
+	}
+
+	void UpdateAudioDecodePersistent() {
+		if (!encodedPacketQueue.empty()) {
+			std::vector<unsigned char> packet = encodedPacketQueue.front();
+			encodedPacketQueue.pop_front();  // Process oldest frame first
+			UpdatePersistentPlayback(packet);
+		}
+	}
+
+
+	/**
+	* Decodes an Opus packet back into an FMOD sound.
+	* @return FMOD::Sound* (decoded PCM buffer converted to FMOD sound)
+	* @param std::vector<unsigned char>& (Opus data frame to decode)
+	*/
+	FMOD::Sound* DecodeOpusFrame(std::vector<unsigned char>& opusFrame) {
+		//OpusDecoder* decoder = OpenDecoder();
+		std::vector<short> pcmData(960); // 960 samples per frame
+
+		int decodedSamples = opus_decode(decoder, opusFrame.data(), opusFrame.size(), pcmData.data(), pcmData.size(), 0);
+
+		if (decodedSamples < 0) {
+			// std::cerr << "[ERROR]DecodeOpusFrame() Opus Decoding Failed: " << decodedSamples << std::endl;
+			//CloseDecoder(decoder);
+			return nullptr;
+		}
+
+		if (decodedSamples < static_cast<int>(pcmData.size())) {
+			pcmData.resize(decodedSamples);
+		}
+
+		std::cout << "[DEBUG] DecodeOpusFrame() Decoded " << decodedSamples << " samples." << std::endl;
+		//CloseDecoder(decoder);
+
+		return PCMToFSound(pcmData);
+	}
+
+	/**
+	* Continuously decodes Opus frames into PCM and plays them back.
+	* @param std::vector<unsigned char>& (encoded Opus data packet to decode)
+	*/
+	void PlaybackOpusFrame(std::vector<unsigned char>& encodedPacket) {
+
+		if (encodedPacket.empty()) {
+			// std::cerr << "[ERROR] PlaybackOpusFrame(): No Encoded Data to Decode!" << std::endl;
+			return;
+		}
+
+		FMOD::Sound* sound = DecodeOpusFrame(encodedPacket);
+		if (sound) {
+			//// std::cout << "[DEBUG] Successfully decoded and created FMOD sound!" << std::endl;
+			fSystem->playSound(sound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), false, &tempChannel);
+		}
+		else {
+			// std::cerr << "[ERROR] PlaybackOpusFrame(): DecodeOpusFrame() failed!" << std::endl;
+		}
+	}
+
+	#pragma endregion
+
+
+	#pragma region Opus Testing
+
+
+
+
+	void UpdateAudioEncode(){
+
+		StreamEncodeMic();
+
+		if (encodedPacketQueue.empty()) {
+			//// std::cerr << "[ERROR] UpdateAudioEncode() No encoded packets available for playback!" << std::endl;
+		}
+	}
+
+	/*
+	void UpdateAudioDecode() {
+		if (!encodedPacketQueue.empty()) {
+			std::vector<unsigned char> packet = encodedPacketQueue.front();
+			encodedPacketQueue.pop_front();  // Process oldest frame first
+
+			PlaybackOpusFrame(packet);  // Decode & Play Audio
+			//UpdateAudioDecodePersistent();
+		}
+	}*/
+
+	void UpdateAudioDecode() {
+		if (!encodedPacketQueue.empty()) {
+			std::vector<unsigned char> packet = encodedPacketQueue.front();
+			encodedPacketQueue.pop_front();
+			std::vector<short> pcmFrame(960);  // Assume 960 samples per frame.
+			int decodedSamples = opus_decode(decoder, packet.data(), packet.size(), pcmFrame.data(), pcmFrame.size(), 0);
+
+			std::cout << "[DEBUG] UpdateAudioDecode() Decoded " << decodedSamples << " samples." << std::endl;
+			if (decodedSamples < 0) {
+				std::cerr << "[ERROR] Opus decoding failed: " << decodedSamples << std::endl;
+				return;
+			}
+			if (decodedSamples < static_cast<int>(pcmFrame.size()))
+				pcmFrame.resize(decodedSamples);
+			PushSamples(pcmFrame);
+		}
+		else {
+			std::cerr << "[ERROR] UpdateAudioDecode() No encoded packets available for playback!" << std::endl;
+		}
+	}
+
+
 	#pragma endregion
 
 
@@ -508,9 +720,6 @@ private:
 
 	FMOD::Sound* micInput;
 
-	int sampleRate = 48000;
-	int channels = 1;
-
 	std::map<int, std::string> inputDeviceList;
 	int inputDeviceIndex;
 
@@ -519,6 +728,29 @@ private:
 
 	PerspectiveCamera* camera;
 
+	FMOD::Sound* decodeOut;
 	FMOD::Channel* tempChannel;
+
+	OpusDecoder* decoder;
+	OpusEncoder* encoder;
+
+	unsigned int micBufferSamples = (int)(48000 * sizeof(short) * 1) / sizeof(short);
+	int channels = 1;
+	int sampleRate = 48000;
+
+	FMOD::Sound* persistentSound = nullptr;
+	FMOD::Channel* persistentChannel = nullptr;
+	unsigned int persistentBufferSize = sampleRate / 2; // 0.5 second
+	unsigned int currentWritePos = 0; // in samples
+
+	FMOD::Sound* streamSound;
+	FMOD::Channel* streamChannel;
+
+	std::deque<std::vector<unsigned char>> encodedPacketQueue;
+
+	std::deque<short> ringBuffer;
+	std::mutex ringBufferMutex;
+
+	unsigned int ringBufferMaxSize = sampleRate / 2;
 
 };

@@ -40,7 +40,7 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 		colliderObject->GetTransform().SetScale(dimensions * 2.0f).SetPosition(localPosition).SetOrientation(rotationMatrix);
 		colliderObject->SetRenderObject(new RenderObject(&colliderObject->GetTransform(), cubeMesh, basicTex, basicShader));
 
-		phys->SetPhysicsObject(new PhysicsObject(&colliderObject->GetTransform(), bounds->GetBoundingVolume()));
+		phys->SetPhysicsObject(new PhysicsObject(&colliderObject->GetTransform()));
 		phys->GetPhysicsObject()->SetInverseMass(0);
 		phys->GetPhysicsObject()->InitCubeInertia();
 		colliderObject->SetLayerID(Layers::LayerID::Default);
@@ -158,7 +158,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, nullptr, basicShader));
 	player->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
 
-	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform(), bounds->GetBoundingVolume()));
+	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
@@ -183,7 +183,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	floor->GetTransform().SetScale(floorSize * 2.0f).SetPosition(position);
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), bounds->GetBoundingVolume()));
+	phys->SetPhysicsObject(new PhysicsObject(&floor->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(0);
 	phys->GetPhysicsObject()->InitCubeInertia();
@@ -209,7 +209,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	sphere->GetTransform().SetScale(sphereSize).SetPosition(position);
 
 	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), bounds->GetBoundingVolume()));
+	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
@@ -233,7 +233,7 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	cube->GetTransform().SetPosition(position).SetScale(dimensions * 2.0f);
 
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), bounds->GetBoundingVolume()));
+	phys->SetPhysicsObject(new PhysicsObject(&cube->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitCubeInertia();

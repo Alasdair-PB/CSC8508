@@ -116,10 +116,10 @@ namespace NCL::CSC8508
 		virtual void EarlyUpdate(float deltaTime) {}
 		virtual void OnEnable() {}
 		virtual void OnDisable() {}
-
 	private:
 		GameObject& gameObject;
 		bool enabled;
+
 	};
 }
 

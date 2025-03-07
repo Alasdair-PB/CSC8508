@@ -5,7 +5,6 @@
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
-#include "MeshManager.h"
 #include "MaterialManager.h"
 
 using namespace NCL;
@@ -15,8 +14,8 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 {
 	navMesh = new NavigationMesh("smalltest.navmesh");
 	GameObject* navMeshObject = new GameObject();
-	Mesh* navigationMesh = MeshManager::GetMesh("navMesh");
-	Mesh* cubeMesh = MeshManager::GetMesh("cube");
+	Mesh* navigationMesh = MaterialManager::GetMesh("navMesh");
+	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
 	Shader* basicShader = MaterialManager::GetShader("basic");
 
@@ -125,7 +124,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	GameObject* player = new GameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
-	Mesh* capsuleMesh = MeshManager::GetMesh("capsule");
+	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
 	Shader* basicShader = MaterialManager::GetShader("basic");
 
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
@@ -172,7 +171,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	GameObject* floor = new GameObject();
 	Vector3 floorSize = Vector3(200, 2, 200);
 	AABBVolume* volume = new AABBVolume(floorSize);
-	Mesh* cubeMesh = MeshManager::GetMesh("cube");
+	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
 	Shader* basicShader = MaterialManager::GetShader("basic");
 
@@ -197,7 +196,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	GameObject* sphere = new GameObject();
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
-	Mesh* sphereMesh = MeshManager::GetMesh("sphere");
+	Mesh* sphereMesh = MaterialManager::GetMesh("sphere");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
 	Shader* basicShader = MaterialManager::GetShader("basic");
 
@@ -222,7 +221,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
 	GameObject* cube = new GameObject();
 	OBBVolume* volume = new OBBVolume(dimensions);
-	Mesh* cubeMesh = MeshManager::GetMesh("cube");
+	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
 	Shader* basicShader = MaterialManager::GetShader("basic");
 

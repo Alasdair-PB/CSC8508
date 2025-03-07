@@ -43,6 +43,25 @@ namespace NCL::CSC8508
 		void AddToIgnoredLayers(Layers::LayerID layerID) { ignoreLayers.push_back(layerID); }
 		const std::vector<Layers::LayerID>& GetIgnoredLayers() const { return ignoreLayers; }
 
+		/// <summary>
+		/// IComponent Save data struct definition
+		/// </summary>
+		struct BoundsComponentDataStruct;
+
+		/// <summary>
+		/// Loads the PhysicsComponent save data into this PhysicsComponent
+		/// </summary>
+		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
+		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
+		virtual void Load(std::string assetPath, size_t allocationStart) override;
+#
+		/// <summary>
+		/// Saves the PhysicsComponent data into the assetPath file. 
+		/// </summary>
+		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
+		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
+		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+
 	protected:
 		CollisionVolume* boundingVolume;
 		PhysicsComponent* physicsComponent;

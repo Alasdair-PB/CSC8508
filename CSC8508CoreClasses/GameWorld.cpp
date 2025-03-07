@@ -45,7 +45,6 @@ struct  GameWorld::WorldSaveData : ISerializedData {
 	WorldSaveData() : nearPlane(0), farPlane(0), pitch(0), yaw(0), position(Vector3()) {}
 	WorldSaveData(float nearPlane, float farPlane, float pitch, float yaw, Vector3 position) :
 		nearPlane(nearPlane), farPlane(farPlane), pitch(pitch), yaw(yaw), position(position) {}
-
 	float nearPlane;
 	float farPlane;
 	float pitch;
@@ -82,8 +81,9 @@ void GameWorld::Load(std::string assetPath, size_t allocationStart) {
 		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
 		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
 
-		if (i >= gameObjects.size()) break;
-		gameObjects[i]->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
+		GameObject* object = new GameObject();
+		object->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
+		AddGameObject(object);
 	}
 	std::cout << loadedSaveData.nearPlane << std::endl;
 }

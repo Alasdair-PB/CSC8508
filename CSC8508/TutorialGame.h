@@ -42,8 +42,13 @@ namespace NCL {
 
 			void UpdateObjectSelectMode(float dt);
 			bool SelectObject();
-			void DrawUIElements();
-      
+
+			void MoveSelectedObject();
+			void LockedObjectMovement();
+
+			void DrawFramerate();
+			void DrawMainMenu();
+
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
@@ -84,6 +89,8 @@ namespace NCL {
 
 			float framerateDelay = 0;
 			float latestFramerate;
+			bool displayMenu = true;
+			int menuOption = 0;
 		};
 	}
 }

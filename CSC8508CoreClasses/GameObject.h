@@ -259,7 +259,7 @@ namespace NCL::CSC8508 {
 	/// An Event class that defines the data sent to the ComponentAssemblyDefiner where the 
 	/// ComponentAssemblyDefiner defines how components are added to this GameObject from a type mapped id
 	/// </summary>
-	class AddComponentEvent : Event {
+	class AddComponentEvent : public CancellableEvent {
 	public:
 		AddComponentEvent(GameObject& gameObject, size_t entry);
 		GameObject& GetGameObject();

@@ -21,6 +21,8 @@ struct MyX {
 	int x;
 };
 
+enum testGuy {X};
+
 const static std::string folderPath = "../../Assets/Pfabs/"; 
 
 std::string GetAssetPath(std::string pfabName) {
@@ -31,21 +33,24 @@ void TestSaveByType() {
 	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
 	std::string intPath = GetAssetPath("int_data.pfab");
 	std::string structPath = GetAssetPath("struct_data.pfab");
+	std::string enumPath = GetAssetPath("enum_data.pfab");
+
 
 	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
 	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
 	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
-	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
-	std::cout << SaveManager::LoadMyData<MyX>(structPath).x << std::endl;
+	SaveManager::SaveGameData(enumPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
+	std::cout << SaveManager::LoadMyData<MyX>(enumPath).x << std::endl;
+	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<testGuy>(X));
+	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;
 }
 
 void TestSaveGameObject() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	GameObject* myObjectToSave = new GameObject();
-	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-
-	myObjectToSave->Save(gameObjectPath);
+	//PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
+	//myObjectToSave->Save(gameObjectPath);
 	myObjectToSave->Load(gameObjectPath);
 }
 
@@ -72,11 +77,11 @@ void TutorialGame::InitialiseGame() {
 
 	InitialiseAssets();
 
-	physics->UseGravity(true);
 	uiSystem = new UISystem(Window::GetHandle());
 	renderer->SetUISystem(uiSystem);
-	inSelectionMode = false;
 
+	inSelectionMode = false;
+	physics->UseGravity(true);
 	TestSave();
 }
 
@@ -96,7 +101,6 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 }
 
 void TutorialGame::InitialiseAssets() {
-
 	MeshManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MeshManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MeshManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
@@ -173,9 +177,9 @@ void TutorialGame::InitWorld()
 	physics->Clear();
 	AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
 
-	std::string assetPath = GetAssetPath("myScene.pfab");
-	world->Save(assetPath);
-	world->Load(assetPath);
+	//std::string assetPath = GetAssetPath("myScene.pfab");
+	//world->Save(assetPath);
+	//world->Load(assetPath);
 }
 
 bool TutorialGame::SelectObject() {

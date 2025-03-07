@@ -45,11 +45,10 @@ void GameObject::LoadClean(GameObjDataStruct& loadedSaveData, std::string assetP
 		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
 		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
 
-		auto e = AddComponentEvent(*this, loadedSaveData.componentPointers[i].second);
+		AddComponentEvent e = AddComponentEvent(*this, loadedSaveData.componentPointers[i].second);
 		EventManager::Call(&e);
-
-		if (i >= components.size()) break;
-		components[i]->Load(assetPath, loadedSaveData.componentPointers[i].first);
+		if (!e.IsCancelled())
+			components.front()->Load(assetPath, loadedSaveData.componentPointers[i].first);
 	}
 }
 

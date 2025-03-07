@@ -155,7 +155,15 @@ add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
 
 #set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS c;C;M;c++;cc;cpp;cxx;m;mm;mpp;CPP;ixx;cppm)
 
+use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set(ROOT_NAMESPACE CSC8508CoreClasses)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VS_GLOBAL_KEYWORD "Win32Proj"
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
+)
 
 ################################################################################
 # Compile definitions
@@ -218,14 +226,12 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "ws2_32.lib"
     "Event"
 )
-
 add_subdirectory(enet)
 
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
 include_directories("../ImGui/")
-
 
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")

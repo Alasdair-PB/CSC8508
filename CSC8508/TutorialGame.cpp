@@ -16,16 +16,12 @@
 #include "../PS5Core/PS5Controller.h"
 #else
 #include "GameTechRenderer.h"
+#include "KeyboardMouseController.h"
 #endif // USE_PS5
 
 
 using namespace NCL;
 using namespace CSC8508;
-
-
-/*TutorialGame::TutorialGame(GameWorld* inWorld, GameTechRendererInterface* inRenderer)
-	: world(inWorld),
-	renderer(inRenderer)*/
 
 struct MyX {
 	MyX() : x(0) {}
@@ -66,14 +62,19 @@ void TestSave() {
 	TestSaveGameObject();
 }
 
-TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
+/*TutorialGame::TutorialGame(GameWorld* inWorld, GameTechRendererInterface* inRenderer)
+	: world(inWorld),
+	renderer(inRenderer)*/
+
+TutorialGame::TutorialGame()
 {
+	world = new GameWorld();
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	world->GetMainCamera().SetController(*w->GetController());
+	renderer = new GameTechAGCRenderer(*world);
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
-	world->GetMainCamera().SetController(*controller);
 #ifdef USEVULKAN
 	renderer = new GameTechVulkanRenderer(*world);
 	renderer->Init();
@@ -89,7 +90,8 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 
 	controller->MapAxis(3, "XLook");
 	controller->MapAxis(4, "YLook");
-
+	
+	world->GetMainCamera().SetController(*controller);
 	physics = new PhysicsSystem(*world);
 
 	forceMagnitude	= 10.0f;
@@ -158,8 +160,8 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 		Vector3 rayPos;
 		Vector3 rayDir;
 
-		rayDir = selectionObject->GetTransform().GetOrientation() * Vector3(0, 0, -1);
-		rayPos = selectionObject->GetTransform().GetPosition();
+		rayDir = selectionObject->GetGameObject().GetTransform().GetOrientation() * Vector3(0, 0, -1);
+		rayPos = selectionObject->GetGameObject().GetTransform().GetPosition();
 
 		Ray r = Ray(rayPos, rayDir);
 		bool hit = world->Raycast(r, closestCollision, true, selectionObject, new std::vector<Layers::LayerID>({ Layers::LayerID::Player,  Layers::LayerID::Enemy }));
@@ -199,10 +201,10 @@ void TutorialGame::UpdateDrawScreen(float dt) {
 	Debug::Print("Time: " + std::to_string(time), Vector2(70, 10));
 }
 
-void TutorialGame::UpdateGame(float dt) 
+void TutorialGame::UpdateGame(float dt)
 {
 	if (OnEndGame(dt))
-		return; 
+		return;
 
 	uiSystem->StartFrame();
 	/*uiSystem->DrawDemo();*/
@@ -215,45 +217,42 @@ void TutorialGame::UpdateGame(float dt)
 		uiSystem->AudioSliders();
 	}
 
-	//renderer->Render();
-	//renderer->Update(dt);
-	//Debug::UpdateRenderables(dt);
-
 	mainMenu->Update(dt);
-	renderer->Render();	
+	renderer->Render();
 	Debug::UpdateRenderables(dt);
 
 	if (inPause)
 		return;
 
 	UpdateDrawScreen(dt);
-
-	for (auto& obj : updateObjects) {
-		obj->Update(dt);
-	}
+	world->UpdateWorld(dt);
 
 	Window::GetWindow()->ShowOSPointer(true);
 	//Window::GetWindow()->LockMouseToWindow(true);
-
 	physics->Update(dt);
 }
 
-void TutorialGame::LockedObjectMovement() 
+void TutorialGame::LockedObjectMovement()
 {
 	Matrix4 view = world->GetMainCamera().BuildViewMatrix();
 	Matrix4 camWorld = Matrix::Inverse(view);
-	Vector3 rightAxis = Vector3(camWorld.GetColumn(0)); 
+	Vector3 rightAxis = Vector3(camWorld.GetColumn(0));
 	Vector3 fwdAxis = Vector::Cross(Vector3(0, 1, 0), rightAxis);
 
 	fwdAxis.y = 0.0f;
 	fwdAxis = Vector::Normalise(fwdAxis);
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::UP)) 
-		selectionObject->GetPhysicsObject()->AddForce(fwdAxis);
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::DOWN)) 
-		selectionObject->GetPhysicsObject()->AddForce(-fwdAxis);
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::NEXT)) 
-		selectionObject->GetPhysicsObject()->AddForce(Vector3(0,-10,0));
+	auto phys = selectionObject->GetPhysicsComponent();
+
+	if (!phys)
+		return;
+
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::UP))
+		phys->GetPhysicsObject()->AddForce(fwdAxis);
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::DOWN))
+		phys->GetPhysicsObject()->AddForce(-fwdAxis);
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::NEXT))
+		phys->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
 }
 
 void TutorialGame::InitCamera() {
@@ -381,29 +380,32 @@ bool TutorialGame::SelectObject() {
 	if (inSelectionMode) {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::Left)) {
+
+			RenderObject* ro = selectionObject->GetGameObject().GetRenderObject();
+
 			if (selectionObject)
 			{
-				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				ro->SetColour(Vector4(1, 1, 1, 1));
 				selectionObject = nullptr;
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
 
 			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true)) 
+			if (world->Raycast(ray, closestCollision, true))
 			{
-				selectionObject = (GameObject*)closestCollision.node;
-				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+				selectionObject = (BoundsComponent*)closestCollision.node;
+				ro->SetColour(Vector4(0, 1, 0, 1));
 				return true;
 			}
-			else 
+			else
 				return false;
 		}
 		if (Window::GetKeyboard()->KeyPressed(NCL::KeyCodes::L)) {
 			if (selectionObject) {
-				if (lockedObject == selectionObject) 
+				if (lockedObject == selectionObject)
 					lockedObject = nullptr;
-				else 
+				else
 					lockedObject = selectionObject;
 			}
 		}
@@ -415,17 +417,22 @@ bool TutorialGame::SelectObject() {
 void TutorialGame::MoveSelectedObject() {
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 
-	if (!selectionObject) 
+	if (!selectionObject)
 		return;
 
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::Right)) 
+	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::Right))
 	{
 		Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
 		RayCollision closestCollision;
 
-		if (world->Raycast(ray, closestCollision, true)) 
-			if (closestCollision.node == selectionObject) 
-				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+		if (world->Raycast(ray, closestCollision, true)) {
+			if (closestCollision.node == selectionObject) {
+
+				auto phys = selectionObject->GetPhysicsComponent();
+				if (phys)
+					phys->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+			}
+		}
 	}
 }
 

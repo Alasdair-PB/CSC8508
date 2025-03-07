@@ -29,7 +29,7 @@ namespace NCL::Rendering {
 
 	class SimpleFont;
 		
-	class OGLRenderer : public RendererBase, public NCL::CSC8508::GameTechRendererInterface {
+	class OGLRenderer : public RendererBase, public CSC8508::GameTechRendererInterface {
 	public:
 		friend class OGLRenderer;
 		OGLRenderer(Window& w);

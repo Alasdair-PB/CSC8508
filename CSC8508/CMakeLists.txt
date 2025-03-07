@@ -3,9 +3,12 @@ set(PROJECT_NAME CSC8508)
 file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB Legacy_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Legacy/*")
+file(GLOB PS5_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/PS5/*")
 
 list(REMOVE_ITEM Source_Files ${Legacy_Files})
 list(REMOVE_ITEM Header_Files ${Legacy_Files})
+list(REMOVE_ITEM Source_Files ${PS5_Files})
+list(REMOVE_ITEM Header_Files ${PS5_Files})
 
 source_group("Header Files" FILES ${Header_Files})
 source_group("Source Files" FILES ${Source_Files})
@@ -16,13 +19,11 @@ if(USE_VULKAN)
 	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.cpp)
 else()
-	
 	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechVulkanRenderer.h)
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechVulkanRenderer.cpp)
 endif()
 
 if(PS5)
-	file(GLOB PS5_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/PS5/*")
 	source_group("PS5 Files" FILES ${PS5_Files})
 	
 	file(GLOB_RECURSE ALL_SHADERS CONFIGURE_DEPENDS 

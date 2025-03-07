@@ -1,4 +1,5 @@
 #pragma once
+#ifdef USE_PS5
 #include "../CSC8508CoreClasses/GameWorld.h"
 
 #include "../CSC8508/GameTechRendererInterface.h"
@@ -176,3 +177,4 @@ namespace NCL {
 		};
 	}
 }
+#endif // !USE_PS5

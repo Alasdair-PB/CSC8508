@@ -13,6 +13,8 @@
 #include "Debug.h"
 #include "Window.h"
 #include <functional>
+
+#include "CollisionEvent.h"
 using namespace NCL;
 using namespace CSC8508;
 
@@ -161,8 +163,10 @@ void PhysicsSystem::BasicCollisionDetection() {
 				continue;
 			}
 			CollisionDetection::CollisionInfo info;
-			if (CollisionDetection::ObjectIntersection(*i, *j, info)) 
+			if (CollisionDetection::ObjectIntersection(*i, *j, info))
 			{
+				auto e = CollisionEvent((*i)->GetGameObject(), (*j)->GetGameObject(), info);
+				EventManager::Call(&e);
 				ImpulseResolveCollision(*info.a, *info.b, info.point);
 				info.framesLeft = numCollisionFrames;
 				allCollisions.insert(info);
@@ -280,6 +284,8 @@ void PhysicsSystem::NarrowPhase() {
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = broadphaseCollisions.begin(); i != broadphaseCollisions.end(); ++i) {
 		CollisionDetection::CollisionInfo info = *i;
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
+			auto e = CollisionEvent(info.a->GetGameObject(), info.b->GetGameObject(), info);
+			EventManager::Call(&e);
 			info.framesLeft = numCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
 			allCollisions.insert(info); // insert into our main set

@@ -48,6 +48,7 @@ set(Collision_Detection
     "CapsuleVolume.cpp"
     "CollisionDetection.h"
     "CollisionDetection.cpp"
+	"CollisionEvent.h"
     "OBBVolume.h"
     "QuadTree.h"
     "QuadTree.cpp"

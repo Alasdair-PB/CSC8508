@@ -25,4 +25,6 @@ void OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data);
 void LeaveLobby();
 void OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackInfo* Data);
 void OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Data);
-void SetPlayerIPAttribute();
+void SendPacketToSelf();
+void ReceivePacket();
+void AcceptP2PConnection();

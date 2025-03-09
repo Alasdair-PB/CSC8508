@@ -12,6 +12,7 @@ EOSInitialisationManager::EOSInitialisationManager() {
     std::cout << "[EOSInitialisationManager] Constructor called, but initialization deferred to StartEOS()." << std::endl;
 }
 
+// Initializes the EOS SDK and starts the login process
 void EOSInitialisationManager::StartEOS() {
     std::cout << "[EOSInitialisationManager] Initializing EOS SDK..." << std::endl;
 
@@ -49,6 +50,7 @@ void EOSInitialisationManager::StartEOS() {
     }
 }
 
+// Logs in the user anonymously
 void EOSInitialisationManager::LoginAnonymous() {
     std::cout << "[LoginAnonymous] Starting anonymous login..." << std::endl;
 
@@ -65,6 +67,7 @@ void EOSInitialisationManager::LoginAnonymous() {
     EOS_Auth_Login(AuthHandle, &LoginOptions, this, OnAuthLoginComplete);
 }
 
+// Callback function for handling authentication login response
 void EOSInitialisationManager::OnAuthLoginComplete(const EOS_Auth_LoginCallbackInfo* Data) {
     std::cout << "[OnAuthLoginComplete] Callback received." << std::endl;
 
@@ -111,6 +114,7 @@ void EOSInitialisationManager::OnAuthLoginComplete(const EOS_Auth_LoginCallbackI
     }
 }
 
+// Callback function for handling connection login response
 void EOSInitialisationManager::OnConnectLoginComplete(const EOS_Connect_LoginCallbackInfo* Data) {
     std::cout << "[OnConnectLoginComplete] Callback received." << std::endl;
 
@@ -146,14 +150,17 @@ void EOSInitialisationManager::OnConnectLoginComplete(const EOS_Connect_LoginCal
     }
 }
 
+// Returns the EOS platform handle
 EOS_HPlatform EOSInitialisationManager::GetPlatformHandle() const {
     return PlatformHandle;
 }
 
+// Returns the local user ID
 EOS_ProductUserId EOSInitialisationManager::GetLocalUserId() const {
     return LocalUserId;
 }
 
+// Destructor - Releases the EOS platform handle
 EOSInitialisationManager::~EOSInitialisationManager() {
     if (PlatformHandle) {
         EOS_Platform_Release(PlatformHandle);

@@ -24,6 +24,7 @@ EOSLobbySearch::~EOSLobbySearch() {
     }
 }
 
+// Creates a lobby search and initiates a search for a specific lobby
 void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
     std::cout << "[CreateLobbySearch] Attempting to create a lobby search..." << std::endl;
 
@@ -48,35 +49,26 @@ void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
         return;
     }
 
-    // Initialize the lobby search options
     EOS_Lobby_CreateLobbySearchOptions SearchOptions = {};
     SearchOptions.ApiVersion = EOS_LOBBY_CREATELOBBYSEARCH_API_LATEST;
-    SearchOptions.MaxResults = 10;  // Max number of lobbies to return
-
-    // Create the lobby search handle
+    SearchOptions.MaxResults = 10;
 
     EOS_EResult Result = EOS_Lobby_CreateLobbySearch(LobbyHandle, &SearchOptions, &LobbySearchHandle);
 
     if (Result == EOS_EResult::EOS_Success) {
         std::cout << "[CreateLobbySearch] Lobby search created successfully." << std::endl;
 
-        // Search for the specific lobby ID
-        const char* TargetLobbyId = "182f729977914fc0b48d8b9ecd435dcf";  // The given lobby ID
-
         EOS_LobbySearch_SetLobbyIdOptions SetLobbyIdOptions = {};
         SetLobbyIdOptions.ApiVersion = EOS_LOBBYSEARCH_SETLOBBYID_API_LATEST;
-        SetLobbyIdOptions.LobbyId = TargetLobbyId;  // Set the specific lobby ID
+        SetLobbyIdOptions.LobbyId = TargetLobbyId;
 
-        // Set the lobby ID to search by
         EOS_LobbySearch_SetLobbyId(LobbySearchHandle, &SetLobbyIdOptions);
         std::cout << "[CreateLobbySearch] Searching for the lobby with ID: " << TargetLobbyId << std::endl;
 
-        // Set up the FindOptions with LocalUserId
         EOS_LobbySearch_FindOptions FindOptions = {};
         FindOptions.ApiVersion = EOS_LOBBYSEARCH_FIND_API_LATEST;
-        FindOptions.LocalUserId = LocalUserId;  // Use LocalUserId for the search
+        FindOptions.LocalUserId = LocalUserId;
 
-        // Call EOS_LobbySearch_Find to execute the search
         EOS_LobbySearch_Find(LobbySearchHandle, &FindOptions, nullptr, OnFindLobbiesComplete);
     }
     else {
@@ -84,6 +76,7 @@ void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
     }
 }
 
+// Callback function for handling the results of the lobby search
 void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data) {
     if (Data->ResultCode == EOS_EResult::EOS_Success) {
         int32_t numResults = 0;
@@ -124,7 +117,6 @@ void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInf
                 std::cerr << "[LobbyInfo] Max Players: " << LobbyInfo->MaxMembers << "\n";
                 std::cerr << "[LobbyInfo] Owner ID: " << LobbyInfo->LobbyOwnerUserId << "\n";
 
-                // Retrieve and print member IDs
                 EOS_LobbyDetails_GetMemberCountOptions MemberCountOptions = {};
                 MemberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;
                 int32_t memberCount = EOS_LobbyDetails_GetMemberCount(LobbyDetailsHandle, &MemberCountOptions);
@@ -160,7 +152,6 @@ void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInf
                 std::cerr << "[ERROR] Failed to retrieve lobby info. Error: " << EOS_EResult_ToString(InfoResult) << std::endl;
             }
 
-            // Release the lobby details handle
             EOS_LobbyDetails_Release(LobbyDetailsHandle);
         }
         else {
@@ -172,15 +163,17 @@ void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInf
     }
 }
 
-
+// Returns the current lobby search handle
 EOS_HLobbySearch EOSLobbySearch::GetLobbySearchHandle() const {
     return LobbySearchHandle;
 }
 
+// Returns the current lobby details handle
 EOS_HLobbyDetails EOSLobbySearch::GetLobbyDetailsHandle() const {
     return LobbyDetailsHandle;
 }
 
+// Returns a list of member IDs in the found lobby
 std::vector<std::string> EOSLobbySearch::GetLobbyMemberIds() const {
     return LobbyMemberIds;
 }

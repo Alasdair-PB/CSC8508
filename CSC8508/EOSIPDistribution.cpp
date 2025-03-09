@@ -5,6 +5,7 @@ EOSIPDistribution& EOSIPDistribution::GetInstance() {
     return instance;
 }
 
+// Sends a packet containing an IPv4 address to a specified target user using EOS P2P
 void EOSIPDistribution::SendPacket(EOS_ProductUserId TargetUserId)
 {
     EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
@@ -50,6 +51,7 @@ void EOSIPDistribution::SendPacket(EOS_ProductUserId TargetUserId)
     }
 }
 
+// Receives a packet from a specified target user using EOS P2P
 void EOSIPDistribution::ReceivePacket(EOS_ProductUserId TargetUserId)
 {
     EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();

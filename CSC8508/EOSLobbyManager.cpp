@@ -18,6 +18,7 @@ EOSLobbyManager::~EOSLobbyManager() {
     }
 }
 
+//Creates a new lobby and sets its attributes
 void EOSLobbyManager::CreateLobby() {
     std::cout << "[CreateLobby] Attempting to create a lobby..." << std::endl;
 
@@ -70,6 +71,7 @@ void EOSLobbyManager::CreateLobby() {
     std::cout << "[CreateLobby] Lobby created with attribute 'Lobby: Active' set to true." << std::endl;
 }
 
+//Callback function triggered when a lobby is created
 void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data) {
     std::cout << "[OnLobbyCreated] Callback received." << std::endl;
 
@@ -135,6 +137,7 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
     }
 }
 
+//Callback functions triggered when a lobb
 void EOSLobbyManager::OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Data) {
     std::cout << "[OnLobbyUpdated] Callback received." << std::endl;
 

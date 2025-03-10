@@ -20,24 +20,16 @@ namespace NCL::CSC8508
 	public:
 
 		BoundsComponent(GameObject& gameObject, CollisionVolume* collisionVolume, PhysicsComponent* physicsComponent = nullptr);
-
 		~BoundsComponent();
 
-		void SetBoundingVolume(CollisionVolume* vol) {
-			boundingVolume = vol;
-		}
+		void SetBoundingVolume(CollisionVolume* vol) { boundingVolume = vol;}
 
-		const CollisionVolume* GetBoundingVolume() const {
-			return boundingVolume;
-		}
+		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}		
+		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 
-
-		const PhysicsComponent* GetPhysicsComponent() const {
-			return physicsComponent;
-		}
+		const PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
 
 		bool GetBroadphaseAABB(Vector3& outsize) const;
-
 		void UpdateBroadphaseAABB();
 
 		void AddToIgnoredLayers(Layers::LayerID layerID) { ignoreLayers.push_back(layerID); }
@@ -67,6 +59,8 @@ namespace NCL::CSC8508
 		PhysicsComponent* physicsComponent;
 		Vector3 broadphaseAABB;
 		vector<Layers::LayerID> ignoreLayers;
+
+		Vector3 GetBoundsScale();
 	};
 }
 

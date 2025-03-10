@@ -41,6 +41,28 @@ void UISystem::EndFrame() {
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  // Remove this line for PS5
 }
 
+void UISystem::DisplayWindow(int window) {
+	uiList.push_back(window);
+}
+
+void UISystem::HideWindow(int window) {
+	uiList.remove(window);
+}
+
+void UISystem::DrawWindows() {
+	for (auto const& i : uiList) {
+		if (i == framerate) {
+			DisplayFramerate();
+		}
+		if (i == mainMenu) {
+			MainMenu();
+		}
+		if (i == audioSliders) {
+			AudioSliders();
+		}
+	}
+}
+
 void UISystem::DrawDemo() {
 	ImGui::SetNextWindowPos(ImVec2(100, 100));
 	ImGui::SetNextWindowSize(ImVec2(200, 100));
@@ -57,7 +79,7 @@ void UISystem::DrawDemo() {
 	}
 }
 
-void UISystem::DisplayFramerate(float dt) {
+void UISystem::DisplayFramerate() {
 	ImGui::SetNextWindowPos(ImVec2(50, 50));
 	ImGui::SetNextWindowSize(ImVec2(120, 50));
 	bool open = true;
@@ -98,25 +120,25 @@ void UISystem::AudioSliders() {
 	ImGui::End();
 }
 
-int UISystem::MainMenu() {
+void UISystem::MainMenu() {
 	ImGui::SetNextWindowPos(ImVec2(80, 480));
 	ImGui::SetNextWindowSize(ImVec2(600, 500));
 	bool open = true;
-	enum options {none, startOffline, startServer, StartClient};
-	int option = 0;
 	ImGui::Begin("Main Menu", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowFontScale(2);
 	if (ImGui::Button("Start Offline", ImVec2(600, 50))) {
-		option = startOffline;
+		uiList.remove(audioSliders);
+		menuOption = startOffline;
 	}
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
 	if (ImGui::Button("Start as Server", ImVec2(600, 50))) {
-		option = startServer;
+		uiList.remove(audioSliders);
+		menuOption = startServer;
 	}
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
 	if (ImGui::Button("Start as Client", ImVec2(600, 50))) {
-		option = StartClient;
+		uiList.remove(audioSliders);
+		menuOption = StartClient;
 	}
 	ImGui::End();
-	return option;
 }

@@ -5,31 +5,28 @@
 #include "CollisionDetection.h"
 #include "QuadTree.h"
 
-
 namespace NCL {
-	class Camera;
-	using Maths::Ray;
+		class Camera;
+		using Maths::Ray;
 	namespace CSC8508 {
 		class GameObject;
 		class PhysicsComponent;
 		class BoundsComponent;
 		class Constraint;
 
-		typedef std::function<void(GameObject*)> GameObjectFunc;
+		typedef std::function<void(GameObject*)> GameObjectFunc;	
+		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
+
+
+		// To remove all below
 		typedef std::function<void(PhysicsComponent*)> PhysicsComponentFunc;
-		typedef std::function<void(INetworkComponent*)> INetworkComponentFunc;
 		typedef std::function<void(IComponent*)> IComponentFunc;
 
-
-		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
 		typedef std::vector<PhysicsComponent*>::const_iterator PhysicsIterator;
 		typedef std::vector<BoundsComponent*>::const_iterator BoundsIterator;
-		typedef std::vector<INetworkComponent*>::const_iterator INetIterator;
 		typedef std::vector<IComponent*>::const_iterator ICompIterator;
 
-
-
-		class GameWorld {
+		class GameWorld : ISerializable	{
 		public:
 			GameWorld();
 			~GameWorld();
@@ -43,7 +40,7 @@ namespace NCL {
 			void AddConstraint(Constraint* c);
 			void RemoveConstraint(Constraint* c, bool andDelete = false);
 
-			PerspectiveCamera& GetMainCamera() {
+			PerspectiveCamera& GetMainCamera()  {
 				return mainCamera;
 			}
 			void ShuffleWorldConstraints();
@@ -55,6 +52,7 @@ namespace NCL {
 			void ShuffleObjects(bool state) {
 				shuffleObjects = state;
 			}
+			void SetPausedWorld(bool state) {}
 
 			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, BoundsComponent* ignoreThis = nullptr, vector<Layers::LayerID>* ignoreLayers = nullptr) const;
 
@@ -66,7 +64,6 @@ namespace NCL {
 				GameObjectIterator& first,
 				GameObjectIterator& last) const;
 
-
 			void GetPhysicsIterators(
 				PhysicsIterator& first,
 				PhysicsIterator& last) const;
@@ -74,12 +71,6 @@ namespace NCL {
 			void GetBoundsIterators(
 				BoundsIterator& first,
 				BoundsIterator& last) const;
-
-			void GetINetIterators(
-				INetIterator& first,
-				INetIterator& last) const;
-
-
 
 			void GetConstraintIterators(
 				std::vector<Constraint*>::const_iterator& first,
@@ -89,11 +80,17 @@ namespace NCL {
 				return worldStateCounter;
 			}
 
+
+			struct WorldSaveData;
+
+			size_t Save(std::string assetPath, size_t* allocationStart = 0);
+			void  Load(std::string assetPath, size_t allocationStart = 0);
+			void LoadCameraInfo(float nearPlane, float farPlane, float pitch, float yaw, Vector3 position);
+
 		protected:
 			std::vector<PhysicsComponent*> physicsComponents;
 			std::vector<BoundsComponent*> boundsComponents;
 
-			std::vector<INetworkComponent*> networkComponents;
 			std::vector<GameObject*> gameObjects;
 			std::vector<IComponent*> components;
 
@@ -108,3 +105,4 @@ namespace NCL {
 		};
 	}
 }
+

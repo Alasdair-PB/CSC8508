@@ -1,14 +1,6 @@
 #pragma once
 #include "PushdownMachine.h"
 #include "PushdownState.h"
-
-#include "PushdownMachine.h"
-#include "PushdownState.h"
-
-
-#include "StateMachine.h"
-#include "StateTransition.h"
-#include "State.h"
 #include "Window.h"
 
 #include "Debug.h"
@@ -31,7 +23,6 @@ namespace NCL {
 			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline);
 			~MainMenu();
 			void Update(float dt);
-			bool CheckUpdateGame();
 
 			void SetOption(int option) { menuOption = option; }
 
@@ -44,9 +35,7 @@ namespace NCL {
 		protected:
 			PushdownMachine* machine = nullptr;
 			const Controller* activeController = nullptr;
-			void UpdateGameStates();
 			void OnStateAwake();
-
 			void OnStateAwakePause() { setPause(true); }
 			void OnStateAwakeUnpause() { setPause(false); }
 

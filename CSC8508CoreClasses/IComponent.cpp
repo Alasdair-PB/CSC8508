@@ -21,14 +21,11 @@ void IComponent::SetEnabled(bool enabled) {
 struct IComponent::ComponentDataStruct : public ISerializedData {
 	ComponentDataStruct() : enabled(1) {}
 	ComponentDataStruct(bool enabled) : enabled(enabled) {}
-
 	bool enabled;
-	//vector<size_t> constructorArguments; 
 
 	static auto GetSerializedFields() {
 		return std::make_tuple(
 			SERIALIZED_FIELD(ComponentDataStruct, enabled)
-			//, SERIALIZED_FIELD(ComponentDataStruct, constructorArguments)
 		);
 	}
 };

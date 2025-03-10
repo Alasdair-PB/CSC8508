@@ -14,17 +14,44 @@ namespace NCL::CSC8508 {
     class SaveManager final {
     public:
 
+        /// <summary>
+        /// A hash function that returns a unique Id designed for 64 bit architecture
+        /// </summary>
+        /// <param name="key">The data to be hashed</param>
+        /// <param name="len">The length of the input data as bytes</param>
+        /// <param name="seed">The seed used for this hash output</param>
+        /// <returns></returns>
+        static size_t MurmurHash3_64(const void* key, int len, size_t seed = 0) {
+            const uint8_t* data = static_cast<const uint8_t*>(key);
+            size_t h = seed ^ (len * static_cast<size_t>(0xc6a4a7935bd1e995ULL));
+
+            for (int i = 0; i < len; i++) {
+                h ^= static_cast<size_t>(data[i]);
+                h *= static_cast<size_t>(0xc6a4a7935bd1e995ULL);
+                h ^= h >> 47;
+            }
+            return h;
+        }
+
+
+        template <typename T>
+        static size_t UniqueTypeHash() {
+            std::string typeName = typeid(T).name();
+            return MurmurHash3_64(typeName.c_str(), typeName.size());
+        }
+
         struct GameData {
             std::size_t typeHash;
             uint32_t dataSize;
             std::vector<char> data;
-            GameData() : typeHash(std::hash<std::string>{}(typeid(void).name())), dataSize(0) {}
+            GameData() : typeHash(UniqueTypeHash<void>()), dataSize(0) {}
         };
 
         template <typename T, typename = void> struct is_container : std::false_type {};
 
         template <typename T> struct is_container<T, std::void_t<
             typename T::value_type, decltype(std::declval<T>().size()), decltype(std::declval<T>().data())>> : std::true_type {};
+
 
         template <typename T>
         static void SerializeContainer(const T& container, std::vector<uint8_t>& data, uint8_t*& dataPtr, uint32_t containerSize) {
@@ -61,15 +88,15 @@ namespace NCL::CSC8508 {
         /// <summary>
         /// Creates gameData that allows data Types to saved and reinterpreted by the SaveManager
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="...Members"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="...members"></param>
+        /// <typeparam name="T">The type to be saved</typeparam>
+        /// <typeparam name="...Members">The members in the Type if Type T is a container</typeparam>
+        /// <param name="value">The value to be saved as a GameData Asset</param>
+        /// <param name="...members">The member values of type T if Type T is a container. Can be called without members present. </param>
         /// <returns></returns>
         template <typename T, typename... Members>
         static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
             GameData item;
-            item.typeHash = std::hash<std::string>{}(typeid(T).name());
+            item.typeHash = UniqueTypeHash<T>();
             item.dataSize = 0;
 
             ([&] {
@@ -115,7 +142,7 @@ namespace NCL::CSC8508 {
         template <typename T>
         static GameData CreateSaveDataAsset(const T& value) {
             GameData item;
-            item.typeHash = std::hash<std::string>{}(typeid(T).name());
+            item.typeHash = UniqueTypeHash<T>();
 
             if constexpr (is_container<T>::value) {
                 item.dataSize = sizeof(uint32_t) + value.size() * sizeof(typename T::value_type);
@@ -290,7 +317,7 @@ namespace NCL::CSC8508 {
         static T LoadMyData(const std::string& assetPath, const size_t allocationStart = 0, Members T::*... members) {
             GameData loadedData;
             if (!LoadGameData(assetPath, loadedData, allocationStart)) throw std::runtime_error("Failed to load game data");
-            if (loadedData.typeHash != std::hash<std::string>{}(typeid(T).name())) throw std::runtime_error("Type mismatch in game data");
+            if (loadedData.typeHash != UniqueTypeHash<T>()) throw std::runtime_error("Type mismatch in game data");
             T loadedStruct;
 
             if constexpr (sizeof...(members) == 0) 

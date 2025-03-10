@@ -40,10 +40,12 @@ namespace NCL::CSC8508
 		float axisValues[MAX_AXIS_COUNT];
 		float deltaTime = 0;
 		float mouseYaw = 0;
+		int historyStamp = 0;
 
 		InputDeltaPacket() {
 			type = Component_Event;
 			packetSubType = Delta;
+			historyStamp = 0;
 			size = sizeof(InputDeltaPacket) - sizeof(GamePacket);
 		}
 	};
@@ -73,7 +75,7 @@ namespace NCL::CSC8508
 			InputComponent::OnAwake();
 			boundAxis = activeController->GetBoundAxis();
 			for (uint32_t binding : boundButtons) lastBoundState[binding] = false;
-			for (uint32_t binding : boundAxis) lastAxisState[binding] = false;
+			for (uint32_t binding : boundAxis) lastAxisState[binding] = 0;
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -92,14 +94,24 @@ namespace NCL::CSC8508
 				UpdateDeltaAxis(deltaTime);
 			}
 			else {
+				std::map<uint32_t, float> resetMap;
+				for (const auto& state : lastAxisState)
+					resetMap[state.first] = 0.0f;
+				bool reset = true;
+
 				while (!historyQueue.empty()) {
 					HistoryData data = historyQueue.front();
-					lastAxisState = data.axisMap;
-					mouseGameWorldYaw = data.mouseGameWorldYaw;
+					if (data.historyStamp >= lastHistoryEntry) {
+						lastHistoryEntry = data.historyStamp;
+						lastAxisState.clear();
+						lastAxisState = data.axisMap;
+						mouseGameWorldYaw = data.mouseGameWorldYaw;
+						reset = false;
+					}
 					historyQueue.pop();
 				}
-				for (auto state : lastAxisState)
-					state.second = 0;
+				if (reset)
+					lastAxisState = resetMap;
 			}
 		}
 
@@ -118,12 +130,14 @@ namespace NCL::CSC8508
 		{
 			float deltaTime;
 			float mouseGameWorldYaw;
+			int historyStamp;
 			std::map<uint32_t, float> axisMap;
 
-			HistoryData(std::map<uint32_t, float> axisMap, float mouseGameWorldYaw, float deltaTime) {
+			HistoryData(std::map<uint32_t, float> axisMap, float mouseGameWorldYaw, float deltaTime, int historyStamp) {
 				this->axisMap = axisMap;
 				this->deltaTime = deltaTime;
-				this->mouseGameWorldYaw = mouseGameWorldYaw;
+				this->mouseGameWorldYaw = mouseGameWorldYaw; 
+				this->historyStamp = historyStamp;
 			}
 		};
 
@@ -131,7 +145,7 @@ namespace NCL::CSC8508
 		std::map<uint32_t, float> lastAxisState;
 		std::map<uint32_t, bool> lastBoundState;
 		std::queue<HistoryData> historyQueue;
-
+		int lastHistoryEntry = 0;
 			 
 		bool ReadAxisPacket(InputAxisPacket pck) {
 			lastAxisState[pck.axisID] = pck.axisValue;
@@ -143,7 +157,7 @@ namespace NCL::CSC8508
 			std::map<uint32_t, float> elements = std::map<uint32_t, float>();
 			for (int i = 0; i < MAX_AXIS_COUNT; i++)
 				elements[pck.axisIDs[i]] = pck.axisValues[i];
-			HistoryData data = HistoryData(elements, pck.mouseYaw, pck.deltaTime);
+			HistoryData data = HistoryData(elements, pck.mouseYaw, pck.deltaTime, pck.historyStamp);
 			historyQueue.push(data);
 			return true;
 		}
@@ -164,7 +178,7 @@ namespace NCL::CSC8508
 			else if (p.packetSubType == InputTypes::Button) 
 				return ReadButtonPacket((InputButtonPacket&)p);
 			return false;
-		}	
+		}
 		
 		void SendAxisPacket(uint32_t binding, float axisValue) {
 			InputAxisPacket* axisPacket = new InputAxisPacket();
@@ -177,22 +191,33 @@ namespace NCL::CSC8508
 		}
 
 		void UpdateDeltaAxis(float deltaTime) {
-			int t = boundAxis.size();
-			for (int i = 0; i < t; i += MAX_AXIS_COUNT) {
-				InputDeltaPacket* deltaPacket = new InputDeltaPacket();
-				for (int j = 0; j < MAX_AXIS_COUNT && (i + j) < t; j++) 
-				{
+			int t = boundAxis.size();				
+			InputDeltaPacket* deltaPacket = new InputDeltaPacket();
+			bool hasChanged = false;
+			for (int i = 0; i < t; i += MAX_AXIS_COUNT){
+				for (int j = 0; j < MAX_AXIS_COUNT && (i + j) < t; j++) {
 					uint32_t binding = boundAxis[i + j];
 					float axisValue = activeController->GetAxis(binding);
+
+					if (axisValue != 0) 
+						hasChanged = true;
+
 					deltaPacket->axisIDs[j] = binding;
-					deltaPacket->axisValues[j] = axisValue; // : axisValue - lastAxisState[binding];
+					deltaPacket->axisValues[j] = axisValue;
 					lastAxisState[binding] = axisValue;
 				}
-				deltaPacket->deltaTime = deltaTime;
-				deltaPacket->mouseYaw = mouseGameWorldYaw;
+			}				
+			
+			deltaPacket->deltaTime = deltaTime;
+			deltaPacket->mouseYaw = mouseGameWorldYaw;
+			deltaPacket->historyStamp = lastHistoryEntry;
+
+			if (hasChanged) {				
+				lastHistoryEntry++;
 				SendEventPacket(deltaPacket);
-				delete deltaPacket;
+
 			}
+			delete deltaPacket;
 		}
 
 		void UpdateBoundButtons() 

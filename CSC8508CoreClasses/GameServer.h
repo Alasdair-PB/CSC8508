@@ -1,5 +1,6 @@
 #pragma once
 #include "NetworkBase.h"
+#include <unordered_map>
 
 namespace NCL {
 	namespace CSC8508 {

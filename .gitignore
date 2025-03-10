@@ -57,6 +57,8 @@ _deps
 build.ninja
 *.vcxproj
 *.vcxproj.*
+**/*.vcxproj
+**/*.vcxproj.*
 
 # Debugging files
 *.pdb
@@ -75,4 +77,8 @@ Testing/
 # ThirdParty Contents
 /ThirdParty/*
 
-
+# Enet
+enet-master/
+*.zip
+/build_windows
+/Assets

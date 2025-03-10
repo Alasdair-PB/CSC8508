@@ -4,7 +4,6 @@
 #include "NetworkObject.h"
 #include "EventListener.h"
 
-
 namespace NCL {
 	namespace CSC8508 {
 		class GameServer;

@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <io.h>
-#include "../ImGui/imgui.h"
+#include "../ImGui/WIN/imgui.h"
 using namespace NCL;
 using namespace Win32Code;
 
@@ -92,7 +92,7 @@ Win32Window::Win32Window(const WindowInitialisation& winInitInfo) {
 	winMouse->Wake();
 	winKeyboard->Wake();
 
-	handle = GetHandle();
+	// windowHandle = GetHandle();
 
 	LockMouseToWindow(lockMouse);
 	ShowOSPointer(showMouse);

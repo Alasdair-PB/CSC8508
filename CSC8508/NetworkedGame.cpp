@@ -14,7 +14,6 @@
 #include "ComponentManager.h"
 #include "EventManager.h"
 
-
 #define COLLISION_MSG 30
 
 struct MessagePacket : public GamePacket {
@@ -42,6 +41,10 @@ struct SpawnPacket : public GamePacket {
 void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
+
+
+/*NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
+: TutorialGame(gameWorld, renderer) {*/
 
 NetworkedGame::NetworkedGame()	{
 	EventManager::RegisterListener<NetworkEvent>(this);
@@ -118,6 +121,7 @@ void NetworkedGame::UpdateGame(float dt)
 		UpdatePackets(dt);
 		timeToNextPacket += 1.0f / 20.0f; 
 	}
+
 	if (thisServer) 
 		thisServer->UpdateServer();
 	else if (thisClient) 

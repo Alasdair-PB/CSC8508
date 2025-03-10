@@ -7,6 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 */////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "RendererBase.h"
+#include "../CSC8508/GameTechRendererInterface.h"
 
 #ifdef _WIN32
 #include "windows.h"
@@ -28,7 +29,7 @@ namespace NCL::Rendering {
 
 	class SimpleFont;
 		
-	class OGLRenderer : public RendererBase	{
+	class OGLRenderer : public RendererBase, public CSC8508::GameTechRendererInterface {
 	public:
 		friend class OGLRenderer;
 		OGLRenderer(Window& w);
@@ -40,6 +41,9 @@ namespace NCL::Rendering {
 		}
 
 		virtual bool SetVerticalSync(VerticalSyncState s);
+
+		void Render() { RendererBase::Render(); };
+		void Update(float dt) { RendererBase::Update(dt); };
 
 	protected:			
 		void BeginFrame()	override;
@@ -58,7 +62,7 @@ namespace NCL::Rendering {
 		void InitWithWin32(Window& w);
 		void DestroyWithWin32();
 		HDC		deviceContext;		//...Device context?
-		HGLRC	renderContext;		//Permanent Rendering Context		
+		HGLRC	renderContext;		//Permanent Rendering Context	
 #endif
 
 		const OGLMesh*		boundMesh;

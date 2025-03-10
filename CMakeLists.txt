@@ -78,6 +78,9 @@ endif()
 # Create Third Party Directory
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/ThirdParty)
 
+######################################
+# FMOD
+######################################
 
 # Set FMOD path
 set(FMOD_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/FMOD/api/core")
@@ -97,18 +100,18 @@ include_directories("${FMOD_DIR}/inc")
 # Set Opus Install Path
 set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
 
-# Include Opus headers
+if(NOT EXISTS "${OPUS_INSTALL_PATH}")
+    message(FATAL_ERROR "Opus not found, please run opus install batch file to install.")
+endif()
+
+# Add the Opus include directory.
 include_directories("${OPUS_INSTALL_PATH}/include")
 
-# Link Opus libraries
+# Locate the Opus library.
 find_library(OPUS_LIBRARY NAMES opus PATHS "${OPUS_INSTALL_PATH}/lib")
-
 if(NOT OPUS_LIBRARY)
     message(FATAL_ERROR "Opus library not found in ${OPUS_INSTALL_PATH}/lib")
 endif()
-
-
-
 
 
 ################################################################################

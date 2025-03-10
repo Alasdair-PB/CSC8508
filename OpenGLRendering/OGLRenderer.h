@@ -62,7 +62,7 @@ namespace NCL::Rendering {
 		void InitWithWin32(Window& w);
 		void DestroyWithWin32();
 		HDC		deviceContext;		//...Device context?
-		HGLRC	renderContext;		//Permanent Rendering Context		
+		HGLRC	renderContext;		//Permanent Rendering Context	
 #endif
 
 		const OGLMesh*		boundMesh;

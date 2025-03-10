@@ -52,6 +52,7 @@ set(Collision_Detection
     "CapsuleVolume.cpp"
     "CollisionDetection.h"
     "CollisionDetection.cpp"
+	"CollisionEvent.h"
     "OBBVolume.h"
     "QuadTree.h"
     "QuadTree.cpp"
@@ -90,11 +91,10 @@ source_group("Physics" FILES ${Physics})
 
 set(Header_Files
     "Debug.h"
-    "SaveManager.h"
     "GameObject.h"
-    "ISerializable.h"
     "GameWorld.h"
     "RenderObject.h"
+    "MaterialManager.h"
     "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -219,7 +219,7 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
-	"../NCLCoreClasses/GameTimer.h"
+    "../NCLCoreClasses/GameTimer.h"
 
 )
 
@@ -241,7 +241,7 @@ include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
 include_directories("../ImGui/")
-
+include_directories("../SerializedSave/")
 
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")

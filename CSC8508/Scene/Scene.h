@@ -29,8 +29,8 @@ public:
     virtual void OnUnload() { }
 };
 
-// SceneType must be a child class of Scene
+// SceneType must be a child class of Scene, but not Scene
 template <typename T>
-concept SceneType = std::is_base_of_v<Scene, T>;
+concept SceneType = std::is_base_of_v<Scene, T> && !std::is_same_v<Scene, T>;
 
 #endif //SCENE_H

@@ -13,7 +13,10 @@ namespace NCL::CSC8508 {
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) { return 0; }
 		virtual void Load(std::string assetPath, size_t allocationStart) {}
 
-		struct ISerializedData {
+		
+	};
+	
+	struct ISerializedData {
 		public:
 			#define SERIALIZED_FIELD(Derived, field) std::make_tuple(#field, &Derived::field)
 			#define ERROR_GET_SERIALIZED_FIELDS(T) \
@@ -54,7 +57,6 @@ namespace NCL::CSC8508 {
 					static_assert(HasGetSerializedFields<T>::value, ERROR_GET_SERIALIZED_FIELDS(T));
 				return saveData;
 			}
-		};
 	};
 }
 

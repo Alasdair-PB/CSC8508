@@ -62,6 +62,14 @@ namespace NCL::CSC8508
         int GetMaxHealth() const {
             return maxHealth;
         }
+        /// <summary>
+        /// IComponent Save data struct definition
+        /// </summary>
+        struct DamageableComponentDataStruct;
+
+        void Load(std::string assetPath, size_t allocationStart) override;
+        size_t Save(std::string assetPath, size_t* allocationStart) override;
+            
 
     private:
         void InvokeDeathEvent() {

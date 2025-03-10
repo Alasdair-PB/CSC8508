@@ -6,4 +6,5 @@ ${Headers}
 ${Sources})
 
 include_directories(../NCLCoreClasses/)
+include_directories(../OpenGLRendering/)
 include_directories(../ImGui/)

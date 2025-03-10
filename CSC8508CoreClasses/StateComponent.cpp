@@ -1,6 +1,5 @@
 #include "StateComponent.h"
-#include "IState.h"
-#include "IStateTransition.h"
+
 
 using namespace NCL::CSC8508;
 

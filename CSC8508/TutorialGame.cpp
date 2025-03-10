@@ -79,6 +79,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem = new UISystem(Window::GetHandle());
 	renderer->SetUISystem(uiSystem);
 	uiSystem->DisplayWindow(uiSystem->framerate);
+	uiSystem->DisplayWindow(uiSystem->audioSliders);
 	uiSystem->DisplayWindow(uiSystem->mainMenu);
 
 	inSelectionMode = false;
@@ -151,9 +152,6 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 
 void TutorialGame::UpdateGame(float dt) 
 {
-	if (OnEndGame(dt))
-		return; 
-
 	UpdateUI();
 
 	mainMenu->Update(dt);

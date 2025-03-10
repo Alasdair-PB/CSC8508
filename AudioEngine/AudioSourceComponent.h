@@ -127,13 +127,13 @@ public:
 	/**
 	* Cycle through sounds in collection
 	*/
-	void cycleSounds();
+	void CycleSounds();
 
 
 	/**
 	* Play random sound from collection using specified delay
 	*/
-	void randomSounds(int delay);
+	void RandomSounds(int delay);
 
 	/**
 	* Stop Playback

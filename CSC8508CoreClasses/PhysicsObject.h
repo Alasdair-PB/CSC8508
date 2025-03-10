@@ -1,4 +1,6 @@
 #pragma once
+#include "Maths.h"
+
 using namespace NCL::Maths;
 
 namespace NCL {

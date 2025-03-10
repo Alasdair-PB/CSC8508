@@ -5,6 +5,7 @@
 #include "IState.h"
 #include "IComponent.h"
 
+
 namespace NCL {
     namespace CSC8508 {
         class IState;

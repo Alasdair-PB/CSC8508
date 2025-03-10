@@ -34,7 +34,7 @@ void StateComponent::Update(float dt, GameObject& gamneObject) {
 	if (activeState) {
 		activeState->Update(dt, gamneObject);
 
-		std::pair<TransitionIterator, TransitionIterator> range = allTransitions.equal_range(activeState);
+		std::pair<ITransitionIterator, ITransitionIterator> range = allTransitions.equal_range(activeState);
 
 		for (auto& i = range.first; i != range.second; ++i) {
 			if (i->second->CanTransition()) {

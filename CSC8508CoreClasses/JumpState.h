@@ -3,6 +3,7 @@
 #include "PhysicsComponent.h"
 #include "PhysicsObject.h"
 
+
 namespace NCL {
 	namespace CSC8508 {
 		class JumpState : public IState {

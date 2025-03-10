@@ -1,7 +1,10 @@
 #pragma once
 #include "GameObject.h"
 #include "PhysicsComponent.h"
-#include "StateComponent.h"
+#include "..\CSC8508CoreClasses\StateComponent.h"
+#include "WaitState.h"
+#include "JumpState.h"
+#include "IStateTransition.h"
 
 
 namespace NCL {
@@ -12,8 +15,22 @@ namespace NCL {
 
         class JumpWaitStateComponent : public StateComponent {
         public:
-            JumpWaitStateComponent(GameObject& gameObject) {
+            JumpWaitStateComponent(GameObject& gameObject) : StateComponent(gameObject){
                 activeState = nullptr;
+
+                IState* stateA = new WaitState(10.0f);
+                IState* stateB = new JumpState(15.0f);
+
+                this->AddState(stateA);
+                this->AddState(stateB);
+
+                this->AddTransition(new IStateTransition(stateA, stateB, [&]()->bool {
+                    return stateA->IsComplete(GetGameObject());
+                    }));
+                this->AddTransition(new IStateTransition(stateB, stateA, [&]()->bool {
+                    return true;
+                    }));
+
             }
             ~JumpWaitStateComponent() {
                 for (auto& i : allStates) {
@@ -24,10 +41,10 @@ namespace NCL {
                 }
             }
 
-            void AddState(IState* s);
-            void AddTransition(IStateTransition* t);
+            //void AddState(IState* s);
+            //void AddTransition(IStateTransition* t);
 
-            virtual void Update(float dt, GameObject& gameObject);
+            //virtual void Update(float dt, GameObject& gameObject);
 
 
         protected:

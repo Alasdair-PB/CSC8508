@@ -12,7 +12,7 @@ namespace NCL {
 			void Update(float dt, GameObject& gameObject) override{
 				waitTime += dt;
 			}
-			bool IsComplete(float dt, GameObject& gameObject) override {
+			bool IsComplete(GameObject& gameObject) override {
 				return waitDuration <= waitTime ? true : false;
 			}
 

@@ -13,7 +13,7 @@ namespace NCL {
 				
 			}
 
-			virtual bool IsComplete(float dt, GameObject& gameObject) { return true; }
+			virtual bool IsComplete(GameObject& gameObject) { return true; }
 		protected:
 
 		};

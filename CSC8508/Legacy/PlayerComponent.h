@@ -56,6 +56,7 @@ namespace NCL {
                 if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
                     return;
 
+                std::cout << "some small force" << std::endl;
                 Vector3 dir;
                 Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
 

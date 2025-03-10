@@ -16,7 +16,8 @@ namespace NCL {
 		CollisionVolume() {
 			type = VolumeType::Invalid;
 		}
-		~CollisionVolume() {}
+
+		virtual ~CollisionVolume() {}
 
 		VolumeType type;
 		bool isTrigger = false;

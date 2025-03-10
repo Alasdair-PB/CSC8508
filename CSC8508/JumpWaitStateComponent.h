@@ -40,13 +40,6 @@ namespace NCL {
                     delete i.second;
                 }
             }
-
-            //void AddState(IState* s);
-            //void AddTransition(IStateTransition* t);
-
-            //virtual void Update(float dt, GameObject& gameObject);
-
-
         protected:
 
         };

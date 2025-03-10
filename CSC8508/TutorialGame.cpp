@@ -10,6 +10,7 @@
 #include "PositionConstraint.h"
 #include "MaterialManager.h"
 #include "OrientationConstraint.h"
+#include "Assets.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -22,7 +23,7 @@ struct MyX {
 
 enum testGuy {X};
 
-const static std::string folderPath = "../../Assets/Pfabs/"; 
+const static std::string folderPath = NCL::Assets::PFABDIR;
 
 std::string GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;

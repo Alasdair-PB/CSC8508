@@ -13,10 +13,8 @@
 #include "Maths.h"
 #include "Debug.h"
 #include <Transform.h>
-
-using namespace NCL;
-using namespace NCL::Maths;
-using namespace NCL::CSC8508;
+#include "PhysicsComponent.h"
+#include "PhysicsObject.h"
 
 /**
 * Audio Source class for audio engine

@@ -6,11 +6,11 @@
 #include "../OpenGLRendering/OGLMesh.h"
 
 #include "GameWorld.h"
-#include "UISystem.h"
 
 namespace NCL {
 	namespace CSC8508 {
 		class RenderObject;
+		class UISystem;
 
 		class GameTechRenderer : public OGLRenderer {
 		public:
@@ -21,7 +21,7 @@ namespace NCL {
 			Texture* LoadTexture(const std::string& name);
 			Shader* LoadShader(const std::string& vertex, const std::string& fragment);
 
-			void SetUISystem(UISystem* ui) { uiSystem = ui;}
+			UISystem* GetUI() override { return uiSystem; };
 
 		protected:
 			void NewRenderLines();
@@ -41,6 +41,7 @@ namespace NCL {
 			void RenderSkybox();
 
 			void LoadSkybox();
+			void StartUI();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);

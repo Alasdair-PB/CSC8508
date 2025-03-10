@@ -11,8 +11,11 @@ https://research.ncl.ac.uk/game/
 #include "Mouse.h"
 #include <functional>
 #include "Vector.h"
+#ifndef USE_PS5
 #include <windows.h>
 #include <io.h>
+#endif 
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <string>
@@ -88,7 +91,7 @@ namespace NCL {
 		static const Keyboard*	 GetKeyboard() { return keyboard; }
 		static const Mouse*		 GetMouse() { return mouse; }
 		static const GameTimer&	 GetTimer() { return timer; }
-		static const HWND        GetHandle() { return handle; }
+		//static const HWND        GetHandle() { return handle; }
 
 		static Window*	const GetWindow() { return window; }
 
@@ -118,6 +121,6 @@ namespace NCL {
 		static Mouse*		mouse;
 
 		static GameTimer	timer;
-		static HWND         handle;
+		//static HWND         handle;
 	};
 }

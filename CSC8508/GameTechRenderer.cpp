@@ -8,6 +8,8 @@
 #include <windows.h>
 #include <GL/GL.h>
 #include <tchar.h>
+#include "UISystem.h"
+#include "Win32Window.h"
 
 using namespace NCL;
 using namespace Rendering;
@@ -129,6 +131,11 @@ void GameTechRenderer::LoadSkybox() {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
+void GameTechRenderer::StartUI() {
+	Window* w = Window::GetWindow();
+	NCL::Win32Code::Win32Window* w32 = static_cast<NCL::Win32Code::Win32Window*>(w);
+	uiSystem = new UISystem(w32->GetHandle());
+}
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);

@@ -1,6 +1,11 @@
 #include "UISystem.h"
+#ifdef USE_PS5
+#include "imgui_impl_ps.h"
+#else
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
+#endif // USE_PS5
+
 #include "imgui.h"
 #include <filesystem>
 
@@ -12,27 +17,28 @@ UISystem::UISystem(HWND handle) : uiWindow(handle) {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_InitForOpenGL(handle);
-	ImGui_ImplOpenGL3_Init();
+	ImGui_ImplWin32_InitForOpenGL(handle); // Remove this line for PS5
+	ImGui_ImplOpenGL3_Init(); // Remove this line for PS5
 	audioEngine = &AudioEngine::Instance();
 }
 
 UISystem::~UISystem() {
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplWin32_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown(); // Remove this line for PS5
+	ImGui_ImplWin32_Shutdown(); // Remove this line for PS5
 	ImGui::DestroyContext();
 }
 
 void UISystem::StartFrame() {
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplWin32_NewFrame();
+	ImGui_ImplOpenGL3_NewFrame(); // Remove this line for PS5
+	ImGui_ImplWin32_NewFrame(); // Remove this line for PS5
 	ImGui::NewFrame();
 }
 
 void UISystem::EndFrame() {
 	ImGui::Render();
 	ImGui::EndFrame();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	//ImGui_PS::renderDrawData(dcb, ImGui::GetDrawData()); // Remove this line for WIN
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  // Remove this line for PS5
 }
 
 void UISystem::DrawDemo() {

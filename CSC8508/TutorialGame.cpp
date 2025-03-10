@@ -104,8 +104,8 @@ TutorialGame::TutorialGame()
 	world->UpdateWorld(0.1f);
 	physics->Update(0.1f);
 
-	uiSystem = new UISystem(Window::GetHandle());
-	renderer->SetUISystem(uiSystem);
+	renderer->StartUI();
+	uiSystem = renderer->GetUI();
 
 	TestSave();
 }

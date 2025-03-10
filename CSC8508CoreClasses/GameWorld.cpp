@@ -17,31 +17,100 @@
 using namespace NCL;
 using namespace NCL::CSC8508;
 
-GameWorld::GameWorld() {
-	shuffleConstraints = false;
-	shuffleObjects = false;
-	worldIDCounter = 0;
-	worldStateCounter = 0;
+GameWorld::GameWorld()	{
+	shuffleConstraints	= false;
+	shuffleObjects		= false;
+	worldIDCounter		= 0;
+	worldStateCounter	= 0;
 }
 
-GameWorld::~GameWorld() {
-}
+GameWorld::~GameWorld(){}
 
 void GameWorld::Clear() {
 	gameObjects.clear();
 	constraints.clear();
-	worldIDCounter = 0;
-	worldStateCounter = 0;
+	worldIDCounter		= 0;
+	worldStateCounter	= 0;
 }
 
 void GameWorld::ClearAndErase() {
-	for (auto& i : gameObjects) {
+	for (auto& i : gameObjects)
 		delete i;
-	}
-	for (auto& i : constraints) {
+	for (auto& i : constraints)
 		delete i;
-	}
 	Clear();
+}
+
+struct  GameWorld::WorldSaveData : ISerializedData {
+	WorldSaveData() : nearPlane(0), farPlane(0), pitch(0), yaw(0), position(Vector3()) {}
+	WorldSaveData(float nearPlane, float farPlane, float pitch, float yaw, Vector3 position) :
+		nearPlane(nearPlane), farPlane(farPlane), pitch(pitch), yaw(yaw), position(position) {}
+	float nearPlane;
+	float farPlane;
+	float pitch;
+	float yaw;
+	Vector3 position;
+	std::vector<std::pair<size_t, size_t>> gameObjectPointers;
+
+	static auto GetSerializedFields() {
+		return std::make_tuple(
+			SERIALIZED_FIELD(WorldSaveData, nearPlane),
+			SERIALIZED_FIELD(WorldSaveData, farPlane),
+			SERIALIZED_FIELD(WorldSaveData, pitch),
+			SERIALIZED_FIELD(WorldSaveData, yaw),
+			SERIALIZED_FIELD(WorldSaveData, position),
+			SERIALIZED_FIELD(WorldSaveData, gameObjectPointers)
+		);
+	}
+};
+
+void GameWorld::LoadCameraInfo(float nearPlane, float farPlane, float pitch, float yaw, Vector3 position) {
+	GetMainCamera().SetNearPlane(nearPlane);
+	GetMainCamera().SetFarPlane(farPlane);
+	GetMainCamera().SetPitch(pitch);
+	GetMainCamera().SetYaw(yaw);
+	GetMainCamera().SetPosition(position);
+}
+
+void GameWorld::Load(std::string assetPath, size_t allocationStart) {
+	WorldSaveData loadedSaveData = ISerializedData::LoadISerializable<WorldSaveData>(assetPath, allocationStart);
+
+	LoadCameraInfo(loadedSaveData.nearPlane, loadedSaveData.farPlane, 
+		loadedSaveData.pitch, loadedSaveData.yaw, loadedSaveData.position);
+	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
+		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
+		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
+
+		GameObject* object = new GameObject();
+		object->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
+		AddGameObject(object);
+	}
+	std::cout << loadedSaveData.nearPlane << std::endl;
+}
+
+size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
+{
+	bool clearMemory = false;
+	if (allocationStart == nullptr) {
+		allocationStart = new size_t(0);
+		clearMemory = true;
+	}
+	WorldSaveData saveInfo(0.1f, 500.0f, -15.0f, 315.0f, Vector3(-60, 40, 60));
+
+	for (GameObject* gameObject : gameObjects) {
+		size_t nextMemoryLocation = gameObject->Save(assetPath, allocationStart);
+		saveInfo.gameObjectPointers.push_back(std::make_pair(
+			*allocationStart,
+			SaveManager::MurmurHash3_64(typeid(*gameObject).name(), std::strlen(typeid(*gameObject).name()))
+		));
+		*allocationStart = nextMemoryLocation;
+	}
+	SaveManager::GameData saveData = ISerializedData::CreateGameData<WorldSaveData>(saveInfo);
+	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart);
+
+	if (clearMemory)
+		delete allocationStart;
+	return nextMemoryLocation;
 }
 
 void GameWorld::AddGameObject(GameObject* o) {
@@ -55,7 +124,7 @@ void GameWorld::AddGameObject(GameObject* o) {
 	if (bounds)
 		boundsComponents.emplace_back(bounds);
 
-	if (phys)
+	if (phys) 
 		physicsComponents.emplace_back(phys);
 
 	auto newComponents = o->GetAllComponents();
@@ -69,9 +138,8 @@ void GameWorld::AddGameObject(GameObject* o) {
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
 	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());
-	if (andDelete) {
+	if (andDelete)
 		delete o;
-	}
 	worldStateCounter++;
 }
 
@@ -81,14 +149,6 @@ void GameWorld::GetPhysicsIterators(
 
 	first = physicsComponents.begin();
 	last = physicsComponents.end();
-}
-
-void GameWorld::GetINetIterators(
-	INetIterator& first,
-	INetIterator& last) const {
-
-	first = networkComponents.begin();
-	last = networkComponents.end();
 }
 
 void GameWorld::GetBoundsIterators(
@@ -103,19 +163,18 @@ void GameWorld::GetObjectIterators(
 	GameObjectIterator& first,
 	GameObjectIterator& last) const {
 
-	first = gameObjects.begin();
-	last = gameObjects.end();
+	first	= gameObjects.begin();
+	last	= gameObjects.end();
 }
 
 
 void GameWorld::OperateOnContents(GameObjectFunc f) {
-	for (GameObject* g : gameObjects) {
+	for (GameObject* g : gameObjects)
 		f(g);
-	}
 }
 
 
-void GameWorld::UpdateWorld(float dt) {
+void GameWorld::UpdateWorld(float dt){
 
 	ComponentManager::OperateOnAllIComponentBufferOperators(
 		[&](IComponent* c) {
@@ -124,7 +183,7 @@ void GameWorld::UpdateWorld(float dt) {
 		});
 	ComponentManager::OperateOnAllIComponentBufferOperators(
 		[&](IComponent* c) {
-			if (c->IsEnabled())
+			if (c->IsEnabled()) 
 				c->InvokeUpdate(dt);
 		});
 	OperateOnContents(
@@ -151,9 +210,9 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	RayCollision collision;
 
 	for (auto& i : boundsComponents) {
-		if (!i->GetBoundingVolume())
+		if (!i->GetBoundingVolume()) 
 			continue;
-		if (i == ignoreThis)
+		if (i == ignoreThis) 
 			continue;
 		bool toContinue = false;
 
@@ -174,8 +233,8 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 
 		RayCollision thisCollision;
 		if (CollisionDetection::RayIntersection(r, *i, thisCollision)) {
-
-			if (!closestObject) {
+				
+			if (!closestObject) {	
 				closestCollision = collision;
 				closestCollision.node = i;
 				return true;
@@ -210,6 +269,6 @@ void GameWorld::RemoveConstraint(Constraint* c, bool andDelete) {
 void GameWorld::GetConstraintIterators(
 	std::vector<Constraint*>::const_iterator& first,
 	std::vector<Constraint*>::const_iterator& last) const {
-	first = constraints.begin();
-	last = constraints.end();
+	first	= constraints.begin();
+	last	= constraints.end();
 }

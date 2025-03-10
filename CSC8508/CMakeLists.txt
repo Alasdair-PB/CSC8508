@@ -280,6 +280,7 @@ if(PS5)
 	PUBLIC ${CMAKE_SOURCE_DIR}/Event
     PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
 	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
+	PUBLIC ${CMAKE_SOURCE_DIR}/SerializedSave
 	)
 else()
 	target_include_directories (${PROJECT_NAME} 
@@ -289,6 +290,7 @@ else()
 	PUBLIC ${CMAKE_SOURCE_DIR}/Event
     PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
 	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
+	PUBLIC ${CMAKE_SOURCE_DIR}/SerializedSave
 	)
 endif()
 
@@ -344,6 +346,7 @@ if(PS5)
 		ImGui
 		UISystem
 		enet
+		SerializedSave
 	)
 
 	add_dependencies(${PROJECT_NAME}
@@ -382,6 +385,7 @@ else()
 		ImGui
 		UISystem
 		enet
+		SerializedSave
 	)
 	target_link_libraries(${PROJECT_NAME} 
 		PUBLIC ${PROJECT_DEPENDENCIES}

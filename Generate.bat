@@ -1,0 +1,1 @@
+cmake.exe -DCMAKE_TOOLCHAIN_FILE="C:\Program Files (x86)\SCE\Prospero\Tools\CMake\PS5.cmake" -A Prospero "C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5" -DDEBUG_ASSET_ROOT:STRING=/app0/Assets/ -DCMAKE_CXX_FLAGS="-Wno-unknown-warning-option"

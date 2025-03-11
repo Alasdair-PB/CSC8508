@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Window.h"
+#include <cmath>
 
 using namespace NCL;
 

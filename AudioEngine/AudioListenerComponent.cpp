@@ -18,6 +18,8 @@ AudioListenerComponent::AudioListenerComponent(GameObject& gameObject, Perspecti
 	outputDeviceIndex = 0;
 
 
+	encodedPacketQueue = &audioEngine->GetEncodedPacketQueue();
+
 	InitMicSound();
 	InitPersistentSound();
 
@@ -30,8 +32,8 @@ AudioListenerComponent::AudioListenerComponent(GameObject& gameObject, Perspecti
 	fPosition = VecToFMOD(transform->GetPosition());
 
 	// Comment out for where you want the up and forward vectors to be updated from for testing
-	//SetCamOrientation();
-	SetPlayerOrientation();
+	SetCamOrientation();
+	//SetPlayerOrientation();
 
 
 }
@@ -64,8 +66,8 @@ void AudioListenerComponent::Update(float deltatime) {
 
 
 	// Comment out for where you want the up and forward vectors to be updated from for testing
-	//SetCamOrientation();
-	SetPlayerOrientation();
+	SetCamOrientation();
+	//SetPlayerOrientation();
 
 	fSystem ? fSystem->set3DListenerAttributes(fIndex, &fPosition, &fVelocity, &fForward, &fUp) : 0;
 
@@ -179,41 +181,7 @@ void AudioListenerComponent::PrintOutputList() {
 
 #pragma endregion
 
-void AudioListenerComponent::PushSamples(const std::vector<short>& samples) {
-	std::lock_guard<std::mutex> lock(ringBufferMutex);
-
-	for (short s : samples) {
-		if (ringBuffer.size() < ringBufferMaxSize) {
-			ringBuffer.push_back(s);
-		}
-		else {
-			ringBuffer.pop_front();
-			ringBuffer.push_back(s);
-		}
-	}
-}
-
-int AudioListenerComponent::PopSamples(void* dest, unsigned int bytesRequested) {
-	unsigned int samplesRequested = bytesRequested / sizeof(short);
-
-	std::lock_guard<std::mutex> lock(ringBufferMutex);
-
-	unsigned int samplesAvailable = ringBuffer.size();
-	unsigned int samplesToRead = (samplesRequested < samplesAvailable) ? samplesRequested : samplesAvailable;
-
-	short* out = static_cast<short*>(dest);
-
-	for (unsigned int i = 0; i < samplesToRead; i++) {
-		out[i] = ringBuffer.front();
-		ringBuffer.pop_front();
-	}
-
-	for (unsigned int i = samplesToRead; i < samplesRequested; i++) {
-		out[i] = 0;
-	}
-
-	return samplesToRead * sizeof(short);
-}
+#pragma region Encoding VOIP Pipeline
 
 std::vector<unsigned char> AudioListenerComponent::EncodeOpusFrame(std::vector<short>& pcmData) {
 	std::vector<unsigned char> opusFrame;
@@ -293,7 +261,7 @@ void AudioListenerComponent::StreamEncodeMic() {
 	}
 	std::vector<unsigned char> encodedPacket = EncodeOpusFrame(pcmData);
 	if (!encodedPacket.empty()) {
-		encodedPacketQueue.push_back(encodedPacket);
+		encodedPacketQueue->push_back(encodedPacket);
 	}
 
 	// Update last position
@@ -328,10 +296,9 @@ void AudioListenerComponent::InitPersistentSound() {
 
 }
 
-void AudioListenerComponent::UpdatePersistentPlayback(std::vector<unsigned char>& encodedPacket) {
+#pragma endregion
 
-	if (!persistentSound) return;
-
+std::vector<short> AudioListenerComponent::DecodeOpusFrame(std::vector<unsigned char>& encodedPacket) {
 	std::vector<short> pcmFrame(960);
 	int decodedSamples = opus_decode(decoder, encodedPacket.data(), encodedPacket.size(), pcmFrame.data(), pcmFrame.size(), 0);
 
@@ -339,11 +306,26 @@ void AudioListenerComponent::UpdatePersistentPlayback(std::vector<unsigned char>
 
 	if (decodedSamples < 0) {
 		std::cerr << "[ERROR] UpdatePersistentPlayback() Opus Decoding Failed: " << decodedSamples << std::endl;
-		return;
+		return std::vector<short>();
 	}
 
 	if (decodedSamples < static_cast<int>(pcmFrame.size())) {
 		pcmFrame.resize(decodedSamples);
+	}
+
+	return pcmFrame;
+
+}
+
+void AudioListenerComponent::DecodePersistentPlayback(std::vector<unsigned char>& encodedPacket) {
+
+	if (!persistentSound) return;
+
+	std::vector<short> pcmFrame = DecodeOpusFrame(encodedPacket);
+
+	if (pcmFrame.empty()) {
+		std::cerr << "[ERROR] UpdatePersistentPlayback() Decoded PCM Frame is empty." << std::endl;
+		return;
 	}
 
 	unsigned int bytesToWrite = pcmFrame.size() * sizeof(short);
@@ -396,17 +378,4 @@ void AudioListenerComponent::UpdatePersistentPlayback(std::vector<unsigned char>
 		currentWritePos = (currentWritePos + pcmFrame.size()) % persistentBufferSize;
 	}
 
-}
-
-static FMOD_RESULT F_CALLBACK PCMReadCallback(FMOD_SOUND* sound, void* data, unsigned int datalen) {
-	void* userData = nullptr;
-	FMOD_RESULT result = FMOD_Sound_GetUserData(sound, &userData);
-
-	if (result != FMOD_OK || userData == nullptr) {
-		return FMOD_ERR_INVALID_HANDLE;
-	}
-
-	AudioListenerComponent* instance = static_cast<AudioListenerComponent*>(userData);
-	instance->PopSamples(data, datalen);
-	return FMOD_OK;
 }

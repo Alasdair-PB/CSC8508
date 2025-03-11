@@ -68,17 +68,19 @@ namespace NCL::CSC8508
 			vector<GamePacket*> packets;
 
 			DeltaPacket* dp = new DeltaPacket();
-			TransformNetworkState state;
+			TransformNetworkState* state = nullptr;
 			int stateID = lastFullState->stateID;
 
-			if (!GetNetworkState(stateID, &state))
+			if (!GetNetworkState(stateID, state))
 				return packets;
-
 			Vector3 currentPos = GetGameObject().GetTransform().GetPosition();
 			Quaternion currentOrientation = GetGameObject().GetTransform().GetOrientation();
 
-			currentPos -= state.position;
-			currentOrientation -= state.orientation;
+			if (state == nullptr)
+				return packets;
+
+			currentPos -= state->position;
+			currentOrientation -= state->orientation;
 
 			dp->pos[0] = (char)currentPos.x;
 			dp->pos[1] = (char)currentPos.y;

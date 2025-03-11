@@ -111,23 +111,24 @@ void UISystem::AudioSliders() {
 	ImGui::End();
 }
 
+const float screenCount = 4; 
 void UISystem::MainMenu() {
-	ImGui::SetNextWindowPos(ImVec2(80, 480));
-	ImGui::SetNextWindowSize(ImVec2(600, 500));
+	ImGui::SetNextWindowPos(ImVec2(80/ screenCount, 480/ screenCount));
+	ImGui::SetNextWindowSize(ImVec2(600/screenCount, 500 / screenCount));
 	bool open = true;
 	ImGui::Begin("Main Menu", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 	ImGui::SetWindowFontScale(2);
-	if (ImGui::Button("Start Offline", ImVec2(600, 50))) {
+	if (ImGui::Button("Start Offline", ImVec2(600 / screenCount, 50 / screenCount))) {
 		uiList.remove(audioSliders);
 		menuOption = startOffline;
 	}
-	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
-	if (ImGui::Button("Start as Server", ImVec2(600, 50))) {
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50 / screenCount);
+	if (ImGui::Button("Start as Server", ImVec2(600 / screenCount, 50 / screenCount))) {
 		uiList.remove(audioSliders);
 		menuOption = startServer;
 	}
-	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
-	if (ImGui::Button("Start as Client", ImVec2(600, 50))) {
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50 / screenCount);
+	if (ImGui::Button("Start as Client", ImVec2(600 / screenCount, 50 / screenCount))) {
 		uiList.remove(audioSliders);
 		menuOption = StartClient;
 	}

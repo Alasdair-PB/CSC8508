@@ -67,7 +67,7 @@ namespace NCL::CSC8508
 	public:
 		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, bool clientOwned) :
 			InputComponent(gameObject, controller), 
-			INetworkComponent(objId, ownId, componId, clientOwned) {}
+			INetworkComponent(objId, ownId, componId, clientOwned), reset(true) {}
 
 		~InputNetworkComponent() = default;
 
@@ -94,6 +94,7 @@ namespace NCL::CSC8508
 				UpdateDeltaAxis(deltaTime);
 			}
 			else {
+				reset = true;
 				while (!historyQueue.empty()) {
 					HistoryData data = historyQueue.front();
 					if (data.historyStamp >= lastHistoryEntry) {
@@ -112,13 +113,12 @@ namespace NCL::CSC8508
 			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
 				uint32_t binding = activeController->GetNamedAxisBinding(name);
-				if (reset) {
-					return 0;
-				}
-				return lastAxisState[binding];
+				return reset ? 0 : lastAxisState[binding];
 			}
 		}
 
+	private:
+		bool reset;
 	protected:
 
 		struct HistoryData
@@ -135,7 +135,7 @@ namespace NCL::CSC8508
 				this->historyStamp = historyStamp;
 			}
 		};
-		bool reset = true;
+
 		vector<uint32_t> boundAxis;
 		std::map<uint32_t, float> lastAxisState;
 		std::map<uint32_t, bool> lastBoundState;

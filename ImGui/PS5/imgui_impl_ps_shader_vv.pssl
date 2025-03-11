@@ -1,0 +1,17 @@
+﻿/* SIE CONFIDENTIAL
+PlayStation(R)5 Programmer Tool Runtime Library Release 10.00.00.40-00.00.00.0.1
+* Copyright (C) 2019 Sony Interactive Entertainment Inc.
+* 
+*/
+#include "imgui_impl_ps_shader_common.h"
+
+using namespace ImGui_PS::EmbeddedShader;
+
+CXX_SYMBOL("ImGui_PS::EmbeddedShader::shader_vv")
+Varying main(SRT srt : S_SRT_DATA, Attribute attr) {
+    Varying var;
+    var.posSys = mul(srt.cbPerFrame->matProj, float4(attr.posInModel, 0, 1));
+    var.color = attr.color;
+    var.texCoord = attr.texCoord;
+    return var;
+}

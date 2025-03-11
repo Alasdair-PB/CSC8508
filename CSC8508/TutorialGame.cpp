@@ -11,6 +11,16 @@
 #include "MaterialManager.h"
 #include "OrientationConstraint.h"
 
+#ifdef USE_PS5
+#include "../PS5Starter/GameTechAGCRenderer.h"
+#include "../PS5Core/PS5Window.h"
+#include "../PS5Core/PS5Controller.h"
+#else
+#include "GameTechRenderer.h"
+#include "KeyboardMouseController.h"
+#endif // USE_PS5
+
+
 using namespace NCL;
 using namespace CSC8508;
 
@@ -58,12 +68,12 @@ void TestSave() {
 	TestSaveGameObject();
 }
 
-void LoadControllerMappings(Controller& controller)
+void LoadControllerMappings(Controller* controller)
 {
-	controller.MapAxis(0, "Sidestep");
-	controller.MapAxis(2, "Forward");
-	controller.MapAxis(3, "XLook");
-	controller.MapAxis(4, "YLook");
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(2, "Forward");
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
 }
 
 void TutorialGame::InitialiseGame() {
@@ -71,13 +81,14 @@ void TutorialGame::InitialiseGame() {
 	componentAssembly = new ComponentAssemblyDefiner();
 	componentAssembly->InitializeMap();
 
-	world->GetMainCamera().SetController(controller);
+	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
 
 	InitialiseAssets();
 
-	uiSystem = new UISystem(Window::GetHandle());
-	renderer->SetUISystem(uiSystem);
+	renderer->StartUI();
+	uiSystem = renderer->GetUI();
+
 	uiSystem->DisplayWindow(uiSystem->framerate);
 	uiSystem->DisplayWindow(uiSystem->audioSliders);
 	uiSystem->DisplayWindow(uiSystem->mainMenu);
@@ -88,16 +99,24 @@ void TutorialGame::InitialiseGame() {
 	//TestSave();
 }
 
-TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
+TutorialGame::TutorialGame()
 {
 	world = new GameWorld();
+#ifdef USE_PS5
+	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
+	controller = *w->GetController()
+	renderer = new GameTechAGCRenderer(*world);
+#else
+	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
 #ifdef USEVULKAN
-	renderer	= new GameTechVulkanRenderer(*world);
+	renderer = new GameTechVulkanRenderer(*world);
 	renderer->Init();
 	renderer->InitStructures();
-#else 
+#else
 	renderer = new GameTechRenderer(*world);
 #endif
+#endif
+	
 	physics = new PhysicsSystem(*world);
 
 	InitialiseGame();
@@ -123,6 +142,7 @@ TutorialGame::~TutorialGame()
 	delete physics;
 	delete renderer;
 	delete world;
+	delete controller;
 	delete navMesh;
 	delete uiSystem;
 }
@@ -151,12 +171,12 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 	SelectObject();
 }
 
-void TutorialGame::UpdateGame(float dt) 
+void TutorialGame::UpdateGame(float dt)
 {
 	UpdateUI();
 
 	mainMenu->Update(dt);
-	renderer->Render();	
+	renderer->Render();
 	Debug::UpdateRenderables(dt);
 
 	world->UpdateWorld(dt);
@@ -190,24 +210,21 @@ bool TutorialGame::SelectObject() {
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
 			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true)) 
+			if (world->Raycast(ray, closestCollision, true))
 			{
 				selectionObject = (BoundsComponent*)closestCollision.node;
 				ro->SetColour(Vector4(0, 1, 0, 1));
 				return true;
 			}
-			else 
+			else
 				return false;
 		}
 	}
 	return false;
 }
 
-
-
 void TutorialGame::UpdateUI() {
 	uiSystem->StartFrame();
-
 	framerateDelay += 1;
 
 	if (framerateDelay > 10) {

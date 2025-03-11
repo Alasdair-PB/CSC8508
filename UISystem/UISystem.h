@@ -1,5 +1,6 @@
 #pragma once
-#include "OGLRenderer.h"
+#include "../OpenGLRendering/OGLRenderer.h"
+#include "../AudioEngine/AudioEngine.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui.h"
@@ -10,7 +11,7 @@
 #include <list>
 
 namespace NCL {
-	namespace CSC8508 {
+	namespace UI {
 
 		class UISystem {
 

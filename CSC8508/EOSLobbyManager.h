@@ -1,3 +1,4 @@
+#ifndef EOS_LOBBY_MANAGER_H
 #define EOS_LOBBY_MANAGER_H
 
 #include <iostream>
@@ -11,7 +12,8 @@ public:
     static EOSLobbyManager& GetInstance();
     EOS_HLobby GetLobbyHandle() const;
     void CreateLobby();
-
+    EOS_HLobby LobbyHandle = nullptr;
+    char LobbyId[256];
 private:
     EOSLobbyManager();
     ~EOSLobbyManager();
@@ -19,5 +21,7 @@ private:
     static void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data);
     static void OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Data);
 
-    EOS_HLobby LobbyHandle = nullptr;
+    std::atomic<bool> lobbyCreated = false; // Track whether the lobby is created
 };
+
+#endif // EOS_LOBBY_MANAGER_H

@@ -81,6 +81,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->DisplayWindow(uiSystem->framerate);
 	uiSystem->DisplayWindow(uiSystem->audioSliders);
 	uiSystem->DisplayWindow(uiSystem->mainMenu);
+	uiSystem->DisplayWindow(uiSystem->healthbar);
 
 	inSelectionMode = false;
 	physics->UseGravity(true);

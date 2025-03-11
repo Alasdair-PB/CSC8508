@@ -25,13 +25,17 @@ namespace NCL {
 				dt = delta;
 			}
 
+			void UpdateHealth(int healthVal) {
+				health = healthVal;
+			}
+
 			void StartFrame();
 			void EndFrame();
 			void DisplayWindow(int window);
 			void HideWindow(int window);
 			void DrawWindows();
 
-			enum uiElements { framerate, mainMenu, audioSliders };
+			enum uiElements { framerate, mainMenu, audioSliders, healthbar };
 
 		protected:
 
@@ -39,6 +43,7 @@ namespace NCL {
 			void DisplayFramerate();
 			void AudioSliders();
 			void MainMenu();
+			void Healthbar();
 
 			HWND uiWindow;
 			bool showDemo = true;
@@ -49,6 +54,7 @@ namespace NCL {
 			float voiceVolume = 100;
 
 			float dt = 0;
+			int health = 50;
 
 			int menuOption = 0;
 			enum menuOptions { none, startOffline, startServer, StartClient };

@@ -51,6 +51,9 @@ void UISystem::DrawWindows() {
 		if (i == audioSliders) {
 			AudioSliders();
 		}
+		if (i == healthbar) {
+			Healthbar();
+		}
 	}
 }
 

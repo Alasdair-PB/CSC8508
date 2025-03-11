@@ -3,7 +3,7 @@
 #include "imgui.h"
 
 namespace NCL {
-	namespace CSC8508 {
+	namespace UI {
 		class AudioSliders {
 		public:
 			AudioSliders();

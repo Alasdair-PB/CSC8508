@@ -2,7 +2,7 @@
 #include <filesystem>        
 
 using namespace NCL;
-using namespace CSC8508;
+using namespace UI;
 
 AudioSliders::AudioSliders() {
 	audioEngine = &AudioEngine::Instance();

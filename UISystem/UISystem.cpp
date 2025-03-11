@@ -51,16 +51,16 @@ void UISystem::HideWindow(int window) {
 void UISystem::DrawWindows() {
 	for (auto const& i : uiList) {
 		if (i == framerate) {
-			NCL::CSC8508::FramerateUI::FramerateUI().Draw(dt);
+			FramerateUI().Draw(dt);
 		}
 		if (i == mainMenu) {
-			menuOption = NCL::CSC8508::MainMenuUI::MainMenuUI().Draw();
+			MainMenuUI().Draw();
 		}
 		if (i == audioSliders) {
-			NCL::CSC8508::AudioSliders::AudioSliders().Draw();
+			AudioSliders().Draw();
 		}
 		if (i == healthbar) {
-			NCL::CSC8508::Healthbar::Healthbar().Draw(health);
+			Healthbar().Draw(health);
 		}
 	}
 }

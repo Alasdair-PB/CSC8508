@@ -32,6 +32,7 @@ namespace NCL::CSC8508
 		}
 	};
 
+
 	struct IFullNetworkPacket : INetworkPacket
 	{
 		INetworkState fullState;
@@ -52,7 +53,8 @@ namespace NCL::CSC8508
 		bool ReadDeltaFullPacket(INetworkPacket& p);
 		void UpdateStateHistory(int minID);
 
-	protected:
+	protected:	
+		const int MAX_PACKETID = 1000;
 		bool GetNetworkState(int frameID, INetworkState* state);
 		bool ReadDeltaPacketState(IDeltaNetworkPacket& p);
 		bool ReadFullPacketState(IFullNetworkPacket& p);

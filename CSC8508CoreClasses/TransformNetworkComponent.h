@@ -109,6 +109,8 @@ namespace NCL::CSC8508
 			fp->fullState.orientation = myObject.GetTransform().GetOrientation();
 			fp->fullState.stateID = lastFullState->stateID;
 
+			if (clientOwned && lastFullState->stateID >= MAX_PACKETID)
+				lastFullState->stateID = 2;
 			SetPacketOwnership(fp);
 			packets.push_back(fp);
 			return packets;
@@ -154,6 +156,8 @@ namespace NCL::CSC8508
 			FullPacket p = ((FullPacket&) ifp);		
 
 			if (p.fullState.stateID < lastFullState->stateID) return false;
+			if (p.fullState.stateID >= MAX_PACKETID) 
+				lastFullState->stateID = 1;
 
 			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;

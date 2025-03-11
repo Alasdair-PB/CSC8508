@@ -218,6 +218,7 @@ void TutorialGame::UpdateUI() {
 	if (uiSystem->GetMenuOption() != 0) {
 		mainMenu->SetOption(uiSystem->GetMenuOption());
 		uiSystem->HideWindow(uiSystem->mainMenu);
+		uiSystem->HideWindow(uiSystem->audioSliders);
 	}
 
 	uiSystem->DrawWindows();

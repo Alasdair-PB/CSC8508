@@ -4,6 +4,8 @@
 #include "PhysicsComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "INetworkComponent.h"
+#include "DamageableComponent.h"
+
 
 using namespace NCL;
 using namespace CSC8508;
@@ -22,6 +24,11 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
         std::cout << "Navmesh added" << std::endl;
         object.AddComponent<PhysicsComponent>();
         break;
+    }case ComponentMapId::Damageable: {
+        std::cout << "Damageable added" << std::endl;
+        object.AddComponent<DamageableComponent>(1, 1);
+        break;
+    
     }case ComponentMapId::Error:
             std::cout << "Error adding component" << std::endl;
             break;

@@ -138,12 +138,18 @@ void GameTechRenderer::StartUI() {
 }
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
-	glClearColor(1, 1, 1, 1);
+	glEnable(GL_STENCIL_TEST);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	glStencilFunc(GL_ALWAYS, 2, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
 	BuildObjectList();
 	SortObjectList();
 	RenderShadowMap();
-	RenderSkybox();
 	RenderCamera();
+	RenderSkybox();
+	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
@@ -153,6 +159,7 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderText();
 	uiSystem->EndFrame();
 
+	
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -214,9 +221,9 @@ void GameTechRenderer::RenderShadowMap() {
 }
 
 void GameTechRenderer::RenderSkybox() {
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glStencilFunc(GL_EQUAL, 0, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);	
 
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
@@ -237,9 +244,7 @@ void GameTechRenderer::RenderSkybox() {
 	BindMesh(*skyboxMesh);
 	DrawBoundMesh();
 
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 }
 
 void GameTechRenderer::RenderCamera() {

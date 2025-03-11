@@ -19,7 +19,6 @@ UISystem::UISystem(HWND handle) : uiWindow(handle) {
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_InitForOpenGL(handle); // Remove this line for PS5
 	ImGui_ImplOpenGL3_Init(); // Remove this line for PS5
-	audioEngine = &AudioEngine::Instance();
 }
 
 UISystem::~UISystem() {
@@ -52,16 +51,16 @@ void UISystem::HideWindow(int window) {
 void UISystem::DrawWindows() {
 	for (auto const& i : uiList) {
 		if (i == framerate) {
-			FramerateUI().Draw(dt);
+			NCL::CSC8508::FramerateUI::FramerateUI().Draw(dt);
 		}
 		if (i == mainMenu) {
-			menuOption = MainMenuUI().Draw();
+			menuOption = NCL::CSC8508::MainMenuUI::MainMenuUI().Draw();
 		}
 		if (i == audioSliders) {
-			AudioSliders().Draw();
+			NCL::CSC8508::AudioSliders::AudioSliders().Draw();
 		}
 		if (i == healthbar) {
-			Healthbar().Draw(health);
+			NCL::CSC8508::Healthbar::Healthbar().Draw(health);
 		}
 	}
 }

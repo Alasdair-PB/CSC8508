@@ -12,7 +12,7 @@ public:
     static EOSIPDistribution& GetInstance();
 
     void SendPacket(EOS_ProductUserId TargetUserId);
-    void ReceivePacket(EOS_ProductUserId TargetUserId);
+    bool ReceivePacket(EOS_ProductUserId LocalUserId, std::unordered_map<std::string, std::string>& collectedIPs);
 
 private:
     static constexpr uint8_t CHANNEL = 0;

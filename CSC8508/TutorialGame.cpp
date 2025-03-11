@@ -78,6 +78,9 @@ void TutorialGame::InitialiseGame() {
 
 	uiSystem = new UISystem(Window::GetHandle());
 	renderer->SetUISystem(uiSystem);
+	uiSystem->DisplayWindow(uiSystem->framerate);
+	uiSystem->DisplayWindow(uiSystem->audioSliders);
+	uiSystem->DisplayWindow(uiSystem->mainMenu);
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -149,16 +152,7 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 
 void TutorialGame::UpdateGame(float dt) 
 {
-	uiSystem->StartFrame();
-	/*uiSystem->DrawDemo();*/
-	DrawFramerate();
-	if (displayMenu == true) {
-		DrawMainMenu();
-	}
-
-	//if (inPause) {
-	//	uiSystem->AudioSliders();
-	//}
+	UpdateUI();
 
 	mainMenu->Update(dt);
 	renderer->Render();	
@@ -208,21 +202,24 @@ bool TutorialGame::SelectObject() {
 	return false;
 }
 
-void TutorialGame::DrawFramerate() {
+
+
+void TutorialGame::UpdateUI() {
+	uiSystem->StartFrame();
+
 	framerateDelay += 1;
+
 	if (framerateDelay > 10) {
-		latestFramerate = Window::GetTimer().GetTimeDeltaSeconds();
+		uiSystem->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
 	}
-	uiSystem->DisplayFramerate(latestFramerate);
-}
 
-void TutorialGame::DrawMainMenu() {
-	menuOption = uiSystem->MainMenu();
-	if (menuOption != 0) {
-		displayMenu = false;
-		mainMenu->SetOption(menuOption);
+	if (uiSystem->GetMenuOption() != 0) {
+		mainMenu->SetOption(uiSystem->GetMenuOption());
+		uiSystem->HideWindow(uiSystem->mainMenu);
 	}
+
+	uiSystem->DrawWindows();
 }
 
 

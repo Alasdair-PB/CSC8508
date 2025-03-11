@@ -2,33 +2,43 @@
 #include "EOSInitialisationManager.h"
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
+#include "EOSIPDistribution.h"
+#include <unordered_map>
 
+// Attempts to join a lobby
 void EOSLobbyFunctions::JoinLobby() {
+    // Retrieves the local user's EOS ProductUserId and platform handle from the initialisation manager
     EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
     EOS_ProductUserId LocalUserId = eosInitManager.GetLocalUserId();
     EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
 
+    // Gets the EOS lobby handle from the lobby manager
     EOSLobbyManager& eosManager = EOSLobbyManager::GetInstance();
     EOS_HLobby LobbyHandle = eosManager.GetLobbyHandle();
 
+    // Gets the handle for the specific lobby details to join
     EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
     EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
 
+    // Ensures that the LocalUserId is valid before attempting to join the lobby
     if (LocalUserId == nullptr) {
         std::cerr << "[ERROR] LocalUserId is null, cannot join lobby\n";
         return;
     }
 
+    // Ensures that a valid lobby details handle is available
     if (LobbyDetailsHandle == nullptr) {
         std::cerr << "[ERROR] Invalid LobbyDetailsHandle before JoinLobby()\n";
         return;
     }
 
+    // Ensures that a valid lobby handle is available
     if (LobbyHandle == nullptr) {
         std::cerr << "[ERROR] Invalid LobbyHandle before JoinLobby()\n";
         return;
     }
 
+    // Configures the options for joining a lobby
     EOS_Lobby_JoinLobbyOptions JoinOptions = {};
     JoinOptions.ApiVersion = EOS_LOBBY_JOINLOBBY_API_LATEST;
     JoinOptions.LobbyDetailsHandle = LobbyDetailsHandle;
@@ -38,24 +48,23 @@ void EOSLobbyFunctions::JoinLobby() {
     JoinOptions.bCrossplayOptOut = EOS_FALSE;
     JoinOptions.RTCRoomJoinActionType = EOS_ELobbyRTCRoomJoinActionType::EOS_LRRJAT_AutomaticJoin;
 
+    // Initiates the lobby join request
     EOS_Lobby_JoinLobby(LobbyHandle, &JoinOptions, nullptr, EOSLobbyFunctions::OnJoinLobbyComplete);
 
+    // Loop to continuously update the EOS platform services
     while (true) { // Add a flag to control the loop
         EOS_Platform_Tick(PlatformHandle);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-
-
-
 }
 
-
+// Callback function triggered when the attempt to join a lobby completes
 void EOSLobbyFunctions::OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data) {
     if (Data->ResultCode == EOS_EResult::EOS_Success) {
         std::cout << "[OnJoinLobbyComplete] Successfully joined lobby.\n";
         EOSLobbyFunctions& eosLobbyFunctions = EOSLobbyFunctions::GetInstance();
 
-        // Call UpdateLobbyDetails on the instance
+        // Calls UpdateLobbyDetails to refresh lobby information after joining
         eosLobbyFunctions.UpdateLobbyDetails();
     }
     else {
@@ -63,26 +72,33 @@ void EOSLobbyFunctions::OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInf
     }
 }
 
+// Attempts to leave a lobby
 void EOSLobbyFunctions::LeaveLobby() {
+    // Retrieves the local user's local user ID and platform handle from the initialisation manager
     EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
     EOS_ProductUserId LocalUserId = eosInitManager.GetLocalUserId();
     EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
 
+    // Gets the lobby handle from the lobby manager
     EOSLobbyManager& eosManager = EOSLobbyManager::GetInstance();
     EOS_HLobby LobbyHandle = eosManager.GetLobbyHandle();
 
+    // Gets the handle for the specific lobby details from the search manager
     EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
-    EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
     LobbyHandle = EOS_Platform_GetLobbyInterface(PlatformHandle);
 
+
+    // Configures the options for leaving a lobby
     EOS_Lobby_LeaveLobbyOptions LeaveOptions = {};
     LeaveOptions.ApiVersion = EOS_LOBBY_LEAVELOBBY_API_LATEST;
     LeaveOptions.LocalUserId = LocalUserId;
     LeaveOptions.LobbyId = "8b04b581a080487c98ee5ee27338e65b";
 
+    // Initiates the request to leave the lobby
     EOS_Lobby_LeaveLobby(LobbyHandle, &LeaveOptions, nullptr, OnLeaveLobbyComplete);
 }
 
+// Callback function triggered when the attempt to leave a lobby completes
 void EOSLobbyFunctions::OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackInfo* Data) {
     if (Data->ResultCode == EOS_EResult::EOS_Success) {
         std::cout << "[OnLeaveLobbyComplete] Successfully left lobby: " << Data->LobbyId << "\n";
@@ -92,81 +108,32 @@ void EOSLobbyFunctions::OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackI
     }
 }
 
+// Continuously updates and synchronises lobby details with all members
+void EOSLobbyFunctions::UpdateLobbyDetails()
+{
+    // Stores users EOS IDs along with their IP addresses
+    std::unordered_map<std::string, std::string> collectedIPs; 
 
-std::vector<std::string> EOSLobbyFunctions::FetchLobbyMembers() {
-    std::vector<std::string> memberIds;
-
+    // Retrieves instances of required EOS managers
+    EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
     EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
     EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
 
-    EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
-    EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
-
-    if (LobbyDetailsHandle == nullptr) {
-        std::cerr << "[ERROR] LobbyDetailsHandle is null, cannot fetch members.\n";
-        return memberIds;
-    }
-
-    // Initialize options for getting the member count
-    EOS_LobbyDetails_GetMemberCountOptions MemberCountOptions = {};
-    MemberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;
-
-    // Get the member count using the correct options structure
-    uint32_t MemberCount = EOS_LobbyDetails_GetMemberCount(LobbyDetailsHandle, &MemberCountOptions);
-    std::cout << "[FetchLobbyMembers] Total members in lobby: " << MemberCount << "\n";
-
-    if (MemberCount == 0) {
-        std::cerr << "[WARNING] No members found in the lobby.\n";
-        return memberIds;
-    }
-
-    // Reserve space in vector to avoid multiple allocations
-    memberIds.reserve(MemberCount);
-
-    // Iterate through the lobby members
-    for (uint32_t i = 0; i < MemberCount; ++i) {
-        EOS_LobbyDetails_GetMemberByIndexOptions GetMemberOptions = {};
-        GetMemberOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERBYINDEX_API_LATEST;
-        GetMemberOptions.MemberIndex = i;
-
-        EOS_ProductUserId MemberId = EOS_LobbyDetails_GetMemberByIndex(LobbyDetailsHandle, &GetMemberOptions);
-        if (MemberId) {
-            char MemberIdString[EOS_PRODUCTUSERID_MAX_LENGTH];
-            int32_t BufferSize = sizeof(MemberIdString);
-            EOS_ProductUserId_ToString(MemberId, MemberIdString, &BufferSize);
-
-            memberIds.push_back(std::string(MemberIdString));
-        }
-        else {
-            std::cerr << "[ERROR] Failed to retrieve member ID at index " << i << "\n";
-        }
-    }
-
-    return memberIds;
-}
-
-void EOSLobbyFunctions::UpdateLobbyDetails()
-{
+    // This loop continuously updates lobby information
     while (true) {
-        EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
-        EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
-        EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
         EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
 
+        // Ensures a valid lobby details handle is available
         if (!LobbyDetailsHandle)
         {
             std::cerr << "Error: Invalid lobby details handle." << std::endl;
             return;
         }
 
-        // Clear the console screen
-#ifdef _WIN32
+        // Clears the console screen
         system("CLS");
-#else
-        system("clear");
-#endif
 
-        // Copy lobby details
+        // Retrieves lobby information
         EOS_LobbyDetails_CopyInfoOptions copyInfoOptions = {};
         copyInfoOptions.ApiVersion = EOS_LOBBYDETAILS_COPYINFO_API_LATEST;
 
@@ -179,23 +146,25 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             return;
         }
 
-        // Display basic lobby data
         std::cout << "Lobby ID: " << lobbyInfo->LobbyId << std::endl;
         std::cout << "Max Members: " << lobbyInfo->MaxMembers << std::endl;
 
-        char userIdString[EOS_PRODUCTUSERID_MAX_LENGTH + 1] = { 0 };
-        int32_t bufferSize = sizeof(userIdString);
+        // Retrieves the lobby owner ID as a string
+        char ownerUserIdString[EOS_PRODUCTUSERID_MAX_LENGTH + 1] = { 0 };
+        int32_t bufferSize = sizeof(ownerUserIdString);
+        bool isOwner = false;
 
-        if (EOS_ProductUserId_ToString(lobbyInfo->LobbyOwnerUserId, userIdString, &bufferSize) == EOS_EResult::EOS_Success) {
-            std::cout << "Lobby owner: " << userIdString << std::endl;
+        if (EOS_ProductUserId_ToString(lobbyInfo->LobbyOwnerUserId, ownerUserIdString, &bufferSize) == EOS_EResult::EOS_Success) {
+            std::cout << "Lobby owner: " << ownerUserIdString << std::endl;
         }
         else {
             std::cerr << "Failed to convert LobbyOwnerUserId to string!" << std::endl;
         }
 
-        // Get local user ID
+        // Retrieves the local user ID
         EOS_ProductUserId localUserId = eosInitManager.GetLocalUserId();
-        char localUserStr[EOS_PRODUCTUSERID_MAX_LENGTH] = {};
+        char localUserStr[EOS_PRODUCTUSERID_MAX_LENGTH + 1] = {};
+        bufferSize = EOS_PRODUCTUSERID_MAX_LENGTH + 1;
 
         if (EOS_ProductUserId_IsValid(localUserId))
         {
@@ -203,32 +172,37 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             if (localToStringResult == EOS_EResult::EOS_Success)
             {
                 std::cout << "You (Local User): " << localUserStr << std::endl;
+
+                // Determines if the local user is the owner
+                if (strcmp(localUserStr, ownerUserIdString) == 0) {
+                    isOwner = true;
+                }
             }
             else
             {
-                std::cerr << "Error: Failed to convert Local User ID to string. Error code: " << static_cast<int>(localToStringResult) << std::endl;
+                std::cerr << "Error: Failed to convert Local User ID to string. Error code: "
+                    << static_cast<int>(localToStringResult) << std::endl;
             }
         }
         else
         {
-            std::cerr << "Error: Invalid Local User ID." << std::endl;
+            std::cerr << "Error: Invalid Local User ID. Check EOS authentication." << std::endl;
         }
 
-        // Get member count
+        // Retrieves the number of members in the lobby
         EOS_LobbyDetails_GetMemberCountOptions memberCountOptions = {};
         memberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;
 
         int32_t memberCount = EOS_LobbyDetails_GetMemberCount(LobbyDetailsHandle, &memberCountOptions);
         std::cout << "Other Members Count: " << (memberCount > 1 ? memberCount - 1 : 0) << std::endl;
 
-        // Iterate through other members only if there are more than 1 members
+        std::vector<EOS_ProductUserId> otherUsers;
+
         if (memberCount > 1)
         {
-            // Start at index 1 if there are exactly 2 members (to skip the local user)
-            int startIndex = (memberCount == 2) ? 1 : 0;
-
-            for (int32_t i = startIndex; i < memberCount; ++i)
+            for (int32_t i = 0; i < memberCount; ++i)
             {
+                // Retrieves each member's ID
                 EOS_LobbyDetails_GetMemberByIndexOptions memberByIndexOptions = {};
                 memberByIndexOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERBYINDEX_API_LATEST;
                 memberByIndexOptions.MemberIndex = i;
@@ -240,28 +214,61 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
                 if (!EOS_ProductUserId_IsValid(memberId))
                 {
                     std::cerr << "Error: Invalid ProductUserId retrieved for member " << i + 1 << std::endl;
-                    continue;  // Skip this iteration
+                    continue;
                 }
 
                 EOS_EResult toStringResult = EOS_ProductUserId_ToString(memberId, memberStr, &bufferSize);
                 if (toStringResult == EOS_EResult::EOS_Success)
                 {
                     std::cout << "Member " << i << ": " << memberStr << std::endl;
+
+                    // Store other user IDs for P2P communication
+                    if (strcmp(localUserStr, memberStr) != 0) {
+                        otherUsers.push_back(memberId);
+                    }
                 }
                 else
                 {
                     std::cerr << "Error: Failed to convert ProductUserId to string. Error code: " << static_cast<int>(toStringResult) << std::endl;
                 }
-
-                // If there are exactly 2 members, iterate only once
-                if (memberCount == 2) break;
             }
         }
 
-        // Tick the EOS platform and sleep for 5 seconds
+        // Send own IP to all other users
+        std::cout << "Sending my IP to all members..." << std::endl;
+        for (const auto& targetUser : otherUsers) {
+            EOSIPDistribution::GetInstance().SendPacket(targetUser);
+        }
+
+        // Wait until all expected IPs have been received
+        std::cout << "Waiting to collect all members' IP addresses..." << std::endl;
+        while (collectedIPs.size() < (size_t)(memberCount - 1))
+        {
+            if (EOSIPDistribution::GetInstance().ReceivePacket(localUserId, collectedIPs)) {
+                std::cout << "[DEBUG] IPs collected: " << collectedIPs.size() << "/" << (memberCount - 1) << "\n";
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));  // Avoid CPU overload
+        }
+
+
+        std::cout << "All IP addresses received successfully!\n";
+        for (const auto& entry : collectedIPs) {
+            std::cout << "User " << entry.first << " -> IP: " << entry.second << "\n";
+        }
+
+        // Now all users have all IPs, and the game can proceed.
+        if (isOwner)
+        {
+            std::cout << "Press 'P' to start the game..." << std::endl;
+            char input;
+            std::cin >> input;
+            if (input == 'P' || input == 'p') {
+                std::cout << "Game starting..." << std::endl;
+            }
+        }
+
         EOS_Platform_Tick(PlatformHandle);
         std::this_thread::sleep_for(std::chrono::seconds(5));
-
         eosSearchManager.CreateLobbySearch(lobbyInfo->LobbyId);
     }
 }

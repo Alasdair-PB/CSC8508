@@ -71,7 +71,6 @@ int main(int argc, char** argv)
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{
 		float dt = w->GetTimer().GetTimeDeltaSeconds();
-		w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
 		g->UpdateGame(dt);
 		Debug::UpdateRenderables(dt);
 	}

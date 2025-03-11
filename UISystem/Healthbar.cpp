@@ -1,10 +1,17 @@
-#include "UISystem.h"
+#include "Healthbar.h"
 #include <filesystem>        
 
 using namespace NCL;
 using namespace CSC8508;
 
-void UISystem::Healthbar() {
+Healthbar::Healthbar() {
+
+}
+
+Healthbar::~Healthbar() {
+}
+
+void Healthbar::Draw(int health) {
 	ImGui::SetNextWindowPos(ImVec2(100, 1000));
 	ImGui::SetNextWindowSize(ImVec2(400, 100));
 	bool open = true;

@@ -24,10 +24,8 @@ PS5Window::PS5Window(const std::string& title, int sizeX, int sizeY) {
 		std::cout << "PS4Input: Failed to initialise User Service!" << std::endl;
 	};
 
-
 	SceUserServiceUserId userId;
 	int ret = sceUserServiceGetInitialUser(&userId);
-
 
 	scePadInit();
 

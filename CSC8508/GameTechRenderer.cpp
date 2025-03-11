@@ -134,7 +134,7 @@ void GameTechRenderer::LoadSkybox() {
 void GameTechRenderer::StartUI() {
 	Window* w = Window::GetWindow();
 	NCL::Win32Code::Win32Window* w32 = static_cast<NCL::Win32Code::Win32Window*>(w);
-	uiSystem = new UISystem(w32->GetHandle());
+	uiSystem = new UI::UISystem(w32->GetHandle());
 }
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);

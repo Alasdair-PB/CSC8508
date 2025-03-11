@@ -10,7 +10,7 @@
 #include <filesystem>
 
 using namespace NCL;
-using namespace CSC8508;
+using namespace UI;
 
 UISystem::UISystem(HWND handle) : uiWindow(handle) {
 	IMGUI_CHECKVERSION();

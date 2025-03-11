@@ -7,7 +7,7 @@
 #include <list>
 
 namespace NCL {
-	namespace CSC8508 {
+	namespace UI {
 
 		class UISystem {
 

@@ -3,7 +3,7 @@
 #include "Healthbar.h"
 
 namespace NCL {
-	namespace CSC8508 {
+	namespace UI {
 
 		class Healthbar {
 

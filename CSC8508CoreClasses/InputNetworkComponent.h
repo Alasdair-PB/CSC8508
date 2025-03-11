@@ -94,24 +94,16 @@ namespace NCL::CSC8508
 				UpdateDeltaAxis(deltaTime);
 			}
 			else {
-				std::map<uint32_t, float> resetMap;
-				for (const auto& state : lastAxisState)
-					resetMap[state.first] = 0.0f;
-				bool reset = true;
-
 				while (!historyQueue.empty()) {
 					HistoryData data = historyQueue.front();
 					if (data.historyStamp >= lastHistoryEntry) {
 						lastHistoryEntry = data.historyStamp;
-						lastAxisState.clear();
 						lastAxisState = data.axisMap;
 						mouseGameWorldYaw = data.mouseGameWorldYaw;
 						reset = false;
 					}
 					historyQueue.pop();
 				}
-				if (reset)
-					lastAxisState = resetMap;
 			}
 		}
 
@@ -120,6 +112,9 @@ namespace NCL::CSC8508
 			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
 				uint32_t binding = activeController->GetNamedAxisBinding(name);
+				if (reset) {
+					return 0;
+				}
 				return lastAxisState[binding];
 			}
 		}
@@ -140,7 +135,7 @@ namespace NCL::CSC8508
 				this->historyStamp = historyStamp;
 			}
 		};
-
+		bool reset = true;
 		vector<uint32_t> boundAxis;
 		std::map<uint32_t, float> lastAxisState;
 		std::map<uint32_t, bool> lastBoundState;
@@ -215,7 +210,6 @@ namespace NCL::CSC8508
 			if (hasChanged) {				
 				lastHistoryEntry++;
 				SendEventPacket(deltaPacket);
-
 			}
 			delete deltaPacket;
 		}

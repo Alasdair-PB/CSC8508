@@ -84,7 +84,7 @@ namespace NCL {
 			}
 
 			GameObject* objClosest = nullptr;
-			UISystem* uiSystem;
+			UI::UISystem* uiSystem;
 
 			float framerateDelay = 0;
 		};

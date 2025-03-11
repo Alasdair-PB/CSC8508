@@ -21,7 +21,7 @@ namespace NCL {
 			Texture* LoadTexture(const std::string& name);
 			Shader* LoadShader(const std::string& vertex, const std::string& fragment);
 
-			UISystem* GetUI() override { return uiSystem; };
+			UI::UISystem* GetUI() override { return uiSystem; };
 
 		protected:
 			void NewRenderLines();
@@ -80,7 +80,7 @@ namespace NCL {
 			GLuint textTexVBO;
 			size_t textCount;
 
-			UISystem* uiSystem;
+			UI::UISystem* uiSystem;
 		};
 	}
 }

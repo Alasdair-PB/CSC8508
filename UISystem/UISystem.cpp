@@ -54,7 +54,7 @@ void UISystem::DrawWindows() {
 			FramerateUI().Draw(dt);
 		}
 		if (i == mainMenu) {
-			MainMenuUI().Draw();
+			menuOption = MainMenuUI().Draw();
 		}
 		if (i == audioSliders) {
 			AudioSliders().Draw();

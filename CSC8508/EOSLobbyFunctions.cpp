@@ -2,7 +2,6 @@
 #include "EOSInitialisationManager.h"
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
-#include "EOSIPDistribution.h"
 #include <unordered_map>
 
 // Attempts to join a lobby
@@ -283,22 +282,10 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             }
         }
 
-        // Send own IP to all other users
-        std::cout << "Sending my IP to all members..." << std::endl;
-        for (const auto& targetUser : otherUsers) {
-            EOSIPDistribution::GetInstance().SendPacket(targetUser);
-        }
 
         // Wait until all expected IPs have been received
         std::cout << "Waiting to collect all members' IP addresses..." << std::endl;
-        while (collectedIPs.size() < (size_t)(memberCount - 1))
-        {
-            if (EOSIPDistribution::GetInstance().ReceivePacket(localUserId, collectedIPs)) {
-                std::cout << "[DEBUG] IPs collected: " << collectedIPs.size() << "/" << (memberCount - 1) << "\n";
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));  // Avoid CPU overload
-        }
-
+       
 
         std::cout << "All IP addresses received successfully!\n";
         for (const auto& entry : collectedIPs) {

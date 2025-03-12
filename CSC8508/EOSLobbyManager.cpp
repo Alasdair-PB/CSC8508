@@ -1,6 +1,5 @@
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
-#include "EOSIPDistribution.h"
 #include "EOSLobbyFunctions.h"
 
 #define STRINGIFY(x) #x

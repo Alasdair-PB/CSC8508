@@ -1,10 +1,10 @@
-#include "../NCLCoreClasses/KeyboardMouseController.h"
+#pragma once
+#include "Controller.h"
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
 #include "Legacy/MainMenu.h"
 #include "Math.h"
-#pragma once
-#include "GameTechRenderer.h"
+#include "GameTechRendererInterface.h"
 #include "UISystem.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
@@ -63,11 +63,11 @@ namespace NCL {
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;
 #else
-			GameTechRenderer* renderer;
+			GameTechRendererInterface* renderer;
 #endif
 			PhysicsSystem* physics;
 			GameWorld* world;
-			KeyboardMouseController controller;
+			Controller* controller;
 
 			bool inSelectionMode;
 
@@ -84,7 +84,7 @@ namespace NCL {
 			}
 
 			GameObject* objClosest = nullptr;
-			UISystem* uiSystem;
+			UI::UISystem* uiSystem;
 
 			float framerateDelay = 0;
 		};

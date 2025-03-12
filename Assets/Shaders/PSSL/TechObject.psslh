@@ -1,0 +1,5 @@
+struct ObjectState {
+		matrix modelMatrix;
+		float4 colour;
+		int index[4];
+};

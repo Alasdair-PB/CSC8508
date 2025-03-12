@@ -11,14 +11,13 @@
 
 namespace NCL::CSC8508 
 {
-	class IComponent
+	class IComponent : public ISerializable
 	{
 	public:
 
 		IComponent(GameObject& gameObject) : gameObject(gameObject), enabled(true) {}
 
 		virtual ~IComponent() = default;
-
 
 		/**
 		 * Function invoked after the object and components have been instantiated.
@@ -36,7 +35,7 @@ namespace NCL::CSC8508
 		 * Function invoked each frame after Update.
 		 * @param deltaTime Time since last frame
 		 */
-		void InvokeLateUpdate(float deltaTime) { LateUpdate(deltaTime); }
+		void InvokeEarlyUpdate(float deltaTime) { EarlyUpdate(deltaTime); }
 
 		/**
 		 * Function invoked when the component is enabled.
@@ -74,25 +73,53 @@ namespace NCL::CSC8508
 			return typeid(*this).name();
 		}
 
+		/// <summary>
+		/// Query for derived types of this IComponet. 
+		/// </summary>
+		/// <returns>A set of type_indexes of IComponents that are marked as derived from this IComponent</returns>
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const {
 			static std::unordered_set<std::type_index> types = { std::type_index(typeid(IComponent)) };
 			return types;
 		}
 
+		/// <summary>
+		/// Query if this IComponent is derived from a type matching type_info
+		/// </summary>
+		/// <param name="typeInfo">The type info of the queried type</param>
+		/// <returns>True if this IComponent derives from type_info otherwise returns false</returns>
 		bool IsDerived(const std::type_info& typeInfo) const {
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
+		/// <summary>
+		/// Loads the IComponent save data into this IComponent
+		/// </summary>
+		/// <param name="assetPath">The loaded IComponent save data </param>
+		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
+		virtual void Load(std::string assetPath, size_t allocationStart) override;
+#
+		/// <summary>
+		/// Saves the IComponent data into the assetPath file. 
+		/// </summary>
+		/// <param name="assetPath">The loaded IComponent save data </param>
+		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
+		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+
+
+		/// <summary>
+		/// IComponent Save data struct definition
+		/// </summary>
+		struct ComponentDataStruct;
 
 	protected:
 		virtual void OnAwake() {}
 		virtual void Update(float deltaTime) {}
-		virtual void LateUpdate(float deltaTime) {}
+		virtual void EarlyUpdate(float deltaTime) {}
 		virtual void OnEnable() {}
 		virtual void OnDisable() {}
-
 	private:
 		GameObject& gameObject;
 		bool enabled;
+
 	};
 }
 

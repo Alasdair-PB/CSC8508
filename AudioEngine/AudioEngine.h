@@ -5,8 +5,9 @@
 #ifndef AUDIOENGINE_H
 #define AUDIOENGINE_H
 
-
 #include <fmod.hpp>
+#include <map>
+
 
 /**
 * Type of Channel Group
@@ -18,7 +19,7 @@
 enum class ChannelGroupType {
 	SFX,
 	MUSIC,
-	VOICE,
+	CHAT,
 	MASTER
 };
 

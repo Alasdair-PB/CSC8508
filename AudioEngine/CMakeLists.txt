@@ -12,16 +12,16 @@ if(NOT CMAKE_VS_PLATFORM_NAME)
 endif()
 
 if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
-    message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
+    #message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
 endif()
 
 # Define AudioEngine library
 add_library(AudioEngine STATIC
     AudioEngine.cpp
     AudioEngine.h
-    AudioObject.cpp
     AudioObject.h
     AudioListenerComponent.h
+    AudioListenerComponent.cpp
     AudioSourceComponent.h
 )
 
@@ -59,7 +59,6 @@ target_precompile_headers(AudioEngine PRIVATE
 ################################################################################
 # Dependencies
 ################################################################################
-
 
 target_link_libraries(AudioEngine LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(AudioEngine LINK_PUBLIC CSC8508CoreClasses)

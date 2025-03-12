@@ -4,12 +4,9 @@
 using namespace NCL;
 using namespace CSC8508;
 
-PhysicsObject::PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume)	{
+PhysicsObject::PhysicsObject(Transform* parentTransform)	{
 	transform	= parentTransform;
-	volume		= parentVolume;
-
 	inverseMass = 1.0f;
-	elasticity	= 0.8f;
 	friction	= 0.8f;
 }
 
@@ -41,6 +38,8 @@ void PhysicsObject::AddTorque(const Vector3& addedTorque) {
 }
 
 float PhysicsObject::GetFriction() { return friction; }
+
+float PhysicsObject::GetCRestitution() { return cRestitution; }
 
 void PhysicsObject::ClearForces() {
 	force				= Vector3();

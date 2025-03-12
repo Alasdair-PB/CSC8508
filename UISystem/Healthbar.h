@@ -1,6 +1,5 @@
 #pragma once
 #include "imgui.h"
-#include "Healthbar.h"
 
 namespace NCL {
 	namespace UI {

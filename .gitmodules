@@ -1,12 +1,15 @@
+[submodule "GLTFLoader"]
+	path = GLTFLoader
+	url = https://github.com/RichDavisonNCL/GLTFLoader
 [submodule "NCLCoreClasses"]
 	path = NCLCoreClasses
 	url = https://github.com/RichDavisonNCL/NCLCoreClasses
+[submodule "PS5Core"]
+	path = PS5Core
+	url = https://github.com/RichDavisonNCL/PS5Core
+[submodule "CSC8503"]
+	path = CSC8503
+	url = https://github.com/RichDavisonNCL/CSC8503
 [submodule "CSC8503CoreClasses"]
 	path = CSC8503CoreClasses
 	url = https://github.com/RichDavisonNCL/CSC8503CoreClasses
-[submodule "VulkanRendering"]
-	path = VulkanRendering
-	url = https://github.com/RichDavisonNCL/VulkanRendering
-[submodule "OpenGLRendering"]
-	path = OpenGLRendering
-	url = https://github.com/RichDavisonNCL/OpenGLRendering

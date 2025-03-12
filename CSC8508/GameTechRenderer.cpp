@@ -8,6 +8,8 @@
 #include <windows.h>
 #include <GL/GL.h>
 #include <tchar.h>
+#include "UISystem.h"
+#include "Win32Window.h"
 
 using namespace NCL;
 using namespace Rendering;
@@ -74,14 +76,19 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	debugTexMesh->SetVertexIndices({ 0,1,2,2,3,0 });
 	debugTexMesh->UploadToGPU();
 
-
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000); 
 }
 
 GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &shadowTex);
+	glDeleteTextures(1, &skyboxTex);
 	glDeleteFramebuffers(1, &shadowFBO);
+
+	glDeleteFramebuffers(1, &lineVertVBO);
+	glDeleteFramebuffers(1, &textVertVBO);
+	glDeleteFramebuffers(1, &textColourVBO);
+	glDeleteFramebuffers(1, &textTexVBO);
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -124,6 +131,11 @@ void GameTechRenderer::LoadSkybox() {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
+void GameTechRenderer::StartUI() {
+	Window* w = Window::GetWindow();
+	NCL::Win32Code::Win32Window* w32 = static_cast<NCL::Win32Code::Win32Window*>(w);
+	uiSystem = new UI::UISystem(w32->GetHandle());
+}
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);

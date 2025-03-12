@@ -87,14 +87,32 @@ namespace NCL::CSC8508
 			return types;
 		}
 
-		void EarlyUpdate(float deltaTime) override
-		{
-			if (clientOwned) {
-				UpdateMouseGameWorldPitchYaw();
-				UpdateDeltaAxis(deltaTime);
+		/// <summary>
+		/// Manages the tracking of skippedFrames (frames where multiple packets have arrived simultaneously)
+		/// Keeps previous frames in history for each skipped frame counted where an input has not arrived. 
+		/// </summary>
+		void ManageFramePrediction() {
+			if (reset) {
+				if (skippedFrames > skipLimit) skippedFrames /= 2;
+				if (frameCount < skippedFrames) {
+					frameCount++;
+					skippedFrames--;
+					reset = false;
+				}
 			}
-			else {
-				reset = true;
+			else 
+				frameCount = 0;
+		}
+
+		/// <summary>
+		/// Set lastAxisState and mouseGameWorldYaw using history data recieved over the network
+		/// In cases where multiple packets arrive simultaneously only set a single frames worth of data is set
+		/// when this happens skippedFrames is incremented to notify ManageFramePrediction() of skippedFrames/ lostFrames
+		/// </summary>
+		void PredictUpdate() {
+			reset = true;
+			if (!historyQueue.empty()) {
+				skippedFrames--;
 				while (!historyQueue.empty()) {
 					HistoryData data = historyQueue.front();
 					if (data.historyStamp >= lastHistoryEntry) {
@@ -103,8 +121,21 @@ namespace NCL::CSC8508
 						mouseGameWorldYaw = data.mouseGameWorldYaw;
 						reset = false;
 					}
+					skippedFrames++;
 					historyQueue.pop();
 				}
+			}
+		}
+
+		void EarlyUpdate(float deltaTime) override
+		{
+			if (clientOwned) {
+				UpdateMouseGameWorldPitchYaw();
+				UpdateDeltaAxis(deltaTime);
+			}
+			else {
+				PredictUpdate();
+				ManageFramePrediction();
 			}
 		}
 
@@ -119,6 +150,9 @@ namespace NCL::CSC8508
 
 	private:
 		bool reset;
+		int frameCount;
+		int skippedFrames;
+		const int skipLimit = 10;
 	protected:
 
 		struct HistoryData

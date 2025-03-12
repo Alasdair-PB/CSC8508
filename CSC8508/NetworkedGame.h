@@ -4,7 +4,6 @@
 #include "NetworkObject.h"
 #include "EventListener.h"
 
-
 namespace NCL {
 	namespace CSC8508 {
 		class GameServer;
@@ -29,7 +28,6 @@ namespace NCL {
 			void SpawnPlayerClient(int ownerId, int objectId, Prefab prefab);
 			void SpawnPlayerServer(int ownerId, Prefab prefab);
 
-
 			void StartLevel();
 			void ReceivePacket(int type, GamePacket* payload, int source) override;
 
@@ -49,17 +47,20 @@ namespace NCL {
 			void BroadcastOwnedObjects(bool deltaFrame);
 
 			bool SendToAllClients(GamePacket* dataPacket);
+
+			void ReceiveComponentEventPacket(int type, GamePacket* payload);
+			void ReceiveFullDeltaStatePacket(int type, GamePacket* payload);
+			void ReceiveSpawnPacket(int type, GamePacket* payload);
 			bool SendToAllOtherClients(GamePacket* dataPacket, int ownerId);
 
 			GameServer* thisServer;
 			GameClient* thisClient;
+
 			float timeToNextPacket;
 			int packetsToSnapshot;
-
 			int nextObjectId;
 
 			vector<GameObject*> ownedObjects;
-
 			GameObject* GetPlayerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 			std::vector<int> playerStates;
 

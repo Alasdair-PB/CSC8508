@@ -50,16 +50,16 @@ namespace NCL::CSC8508
 
 		vector<GamePacket*> WriteDeltaFullPacket(bool deltaFrame);
 		bool ReadDeltaFullPacket(INetworkPacket& p);
-
 		void UpdateStateHistory(int minID);
 
 	protected:
 		bool GetNetworkState(int frameID, INetworkState* state);
 		bool ReadDeltaPacketState(IDeltaNetworkPacket& p);
+		bool ReadFullPacketState(IFullNetworkPacket& p);
 		virtual bool ReadDeltaPacket(IDeltaNetworkPacket& p) { return false; }
 		virtual bool ReadFullPacket(IFullNetworkPacket& p) { return false; }
 
-		virtual vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame, int stateID) { return vector<GamePacket*>(); }
+		virtual vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) { return vector<GamePacket*>(); }
 		virtual vector<GamePacket*> WriteFullPacket(){ return vector<GamePacket*>(); }
 
 		INetworkState* lastFullState = nullptr;

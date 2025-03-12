@@ -18,7 +18,6 @@
 #include "CollisionDetection.h"
 
 #include "GameWorld.h"
-#include "UpdateObject.h"
 
 namespace NCL {
     namespace CSC8508 {

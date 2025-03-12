@@ -10,6 +10,7 @@ https://research.ncl.ac.uk/game/
 #include "Vector.h"
 #include "Matrix.h"
 #include "Controller.h"
+#include <functional>
 
 namespace NCL {
 	using namespace NCL::Maths;
@@ -35,8 +36,6 @@ namespace NCL {
 		}
 
 		~Camera(void) = default;
-
-		virtual void UpdateCamera(float dt);
 
 		float GetNearPlane() const {
 			return nearPlane;

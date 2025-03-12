@@ -82,4 +82,4 @@ enet-master/
 *.zip
 /build_windows
 /Assets
-/Assets/*/Untracked
+**/Untracked

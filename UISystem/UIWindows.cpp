@@ -1,3 +1,4 @@
+#ifndef USE_PS5
 #include "UIWindows.h"
 #include <filesystem>    
 #include "imgui_impl_win32.h"
@@ -28,3 +29,4 @@ void UIWindows::EndFrame() {
 	UISystem::EndFrame();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+#endif // USE_PS5

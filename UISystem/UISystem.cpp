@@ -1,7 +1,6 @@
 #include "UISystem.h"
 #ifdef USE_PS5
 #include "UIPlayStation.h"
-#include "imgui_impl_ps.h"
 #else
 #include "UIWindows.h"
 #endif // USE_PS5

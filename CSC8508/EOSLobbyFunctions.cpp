@@ -189,6 +189,55 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             std::cerr << "Error: Invalid Local User ID. Check EOS authentication." << std::endl;
         }
 
+        // Retrieve the number of attributes
+        EOS_LobbyDetails_GetAttributeCountOptions attributeCountOptions = {};
+        attributeCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETATTRIBUTECOUNT_API_LATEST;
+        int32_t attributeCount = EOS_LobbyDetails_GetAttributeCount(LobbyDetailsHandle, &attributeCountOptions);
+
+        std::cout << "Lobby Attributes: " << std::endl;
+
+        for (int32_t i = 0; i < attributeCount; ++i)
+        {
+            EOS_LobbyDetails_CopyAttributeByIndexOptions attributeByIndexOptions = {};
+            attributeByIndexOptions.ApiVersion = EOS_LOBBYDETAILS_COPYATTRIBUTEBYINDEX_API_LATEST;
+            attributeByIndexOptions.AttrIndex = i;
+
+            EOS_Lobby_Attribute* attribute = nullptr;
+            EOS_EResult result = EOS_LobbyDetails_CopyAttributeByIndex(LobbyDetailsHandle, &attributeByIndexOptions, &attribute);
+
+            if (result == EOS_EResult::EOS_Success && attribute)
+            {
+                std::cout << "  Key: " << attribute->Data->Key << " -> ";
+
+                // Use EOS_EAttributeType for ValueType without prefixing
+                switch (attribute->Data->ValueType)
+                {
+                case EOS_EAttributeType::EOS_AT_STRING:  
+                    std::cout << "Value (String): " << attribute->Data->Value.AsUtf8 << std::endl;
+                    break;
+                case EOS_EAttributeType::EOS_AT_INT64:
+                    std::cout << "Value (Int): " << attribute->Data->Value.AsInt64 << std::endl;
+                    break;
+                case EOS_EAttributeType::EOS_AT_DOUBLE:
+                    std::cout << "Value (Double): " << attribute->Data->Value.AsDouble << std::endl;
+                    break;
+                case EOS_EAttributeType::EOS_AT_BOOLEAN:
+                    std::cout << "Value (Bool): " << (attribute->Data->Value.AsBool ? "True" : "False") << std::endl;
+                    break;
+                default:
+                    std::cout << "Unknown Attribute Type" << std::endl;
+                    break;
+                }
+
+                // Free allocated memory for attribute
+                EOS_Lobby_Attribute_Release(attribute);
+            }
+            else
+            {
+                std::cerr << "Error retrieving lobby attribute at index " << i << std::endl;
+            }
+        }
+
         // Retrieves the number of members in the lobby
         EOS_LobbyDetails_GetMemberCountOptions memberCountOptions = {};
         memberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;

@@ -105,6 +105,20 @@ endif()
 include_directories("${EOS_DIR}/Include")
 
 ################################################################################
+# IP Address
+################################################################################
+
+execute_process(
+    COMMAND powershell -Command "(Invoke-WebRequest -Uri 'https://api64.ipify.org' -UseBasicParsing).Content"
+    OUTPUT_VARIABLE PUBLIC_IP
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+message(STATUS "Public IP Address: ${PUBLIC_IP}")
+
+add_definitions(-DPUBLIC_IP_ADDRESS=${PUBLIC_IP})
+
+################################################################################
 # Sub-projects
 ################################################################################
 add_subdirectory(NCLCoreClasses)

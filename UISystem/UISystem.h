@@ -1,32 +1,23 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
 #include "../AudioEngine/AudioEngine.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui.h"
-#include <list>
 
 namespace NCL {
 	namespace UI {
-
 		class UISystem {
-
 			std::list<int> uiList;
 
 		public:
-			UISystem(HWND handle);
-			~UISystem();
+			static UISystem* GetInstance() {return instance;}
+			static void Shutdown() { if (instance) { delete instance; } }
 
-			int GetMenuOption() {
-				return menuOption;
-			}
+			int GetMenuOption() {return menuOption;}
 
-			void UpdateFramerate(float delta) {
-				dt = delta;
-			}
+			void UpdateFramerate(float delta) {dt = delta;}
 
-			void StartFrame();
-			void EndFrame();
+			virtual void StartFrame() = 0;
+			virtual void EndFrame() = 0;
+
 			void DisplayWindow(int window);
 			void HideWindow(int window);
 			void DrawWindows();
@@ -34,13 +25,15 @@ namespace NCL {
 			enum uiElements { framerate, mainMenu, audioSliders };
 
 		protected:
+			UISystem();
+			virtual ~UISystem();
 
 			void DrawDemo();
 			void DisplayFramerate();
 			void AudioSliders();
 			void MainMenu();
 
-			HWND uiWindow;
+			static UISystem* instance;
 			bool showDemo = true;
 
 			float masterVolume = 100;
@@ -49,7 +42,6 @@ namespace NCL {
 			float voiceVolume = 100;
 
 			float dt = 0;
-
 			int menuOption = 0;
 			enum menuOptions { none, startOffline, startServer, StartClient };
 

@@ -8,7 +8,7 @@
 #include <windows.h>
 #include <GL/GL.h>
 #include <tchar.h>
-#include "UISystem.h"
+#include "UIWindows.h"
 #include "Win32Window.h"
 
 using namespace NCL;
@@ -78,6 +78,8 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000); 
+
+	StartUI();
 }
 
 GameTechRenderer::~GameTechRenderer()	{
@@ -89,6 +91,8 @@ GameTechRenderer::~GameTechRenderer()	{
 	glDeleteFramebuffers(1, &textVertVBO);
 	glDeleteFramebuffers(1, &textColourVBO);
 	glDeleteFramebuffers(1, &textTexVBO);
+
+	UI::UISystem::Shutdown();
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -134,7 +138,7 @@ void GameTechRenderer::LoadSkybox() {
 void GameTechRenderer::StartUI() {
 	Window* w = Window::GetWindow();
 	NCL::Win32Code::Win32Window* w32 = static_cast<NCL::Win32Code::Win32Window*>(w);
-	uiSystem = new UI::UISystem(w32->GetHandle());
+	UI::UIWindows::Initialize(w32->GetHandle());
 }
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
@@ -157,7 +161,7 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderLines();
 	NewRenderTextures();
 	NewRenderText();
-	uiSystem->EndFrame();
+	UI::UIWindows::GetInstance()->EndFrame();
 
 	
 	glDisable(GL_BLEND);

@@ -33,7 +33,6 @@ bool INetworkDeltaComponent::ReadDeltaPacketState(IDeltaNetworkPacket& p)
 {
 	if (p.fullID != lastFullState->stateID)
 		return false;
-	UpdateStateHistory(p.fullID);
 	return ReadDeltaPacket(p);
 }
 
@@ -53,17 +52,4 @@ void INetworkDeltaComponent::UpdateStateHistory(int minID) {
 		else
 			++i;
 	}
-}
-
-bool INetworkDeltaComponent::GetNetworkState(int stateID, INetworkState* state) {
-	if (!state)
-		return false;
-
-	for (auto i = stateHistory.begin(); i < stateHistory.end(); ++i) {
-		if ((*i)->stateID == stateID) {
-			state = *i;
-			return true;
-		}
-	}
-	return false;
 }

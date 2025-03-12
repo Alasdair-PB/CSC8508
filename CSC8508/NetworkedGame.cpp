@@ -167,7 +167,7 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		{
 			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
 			if (!c) return;
-			if ((thisClient && c->IsOwner()) || thisServer) {
+			if (c->IsOwner()) {
 				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
 				for (GamePacket* packet : packets)
 				{
@@ -308,7 +308,7 @@ void NetworkedGame::ReceiveSpawnPacket(int type, GamePacket* payload) {
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
-	ReceiveFullDeltaStatePacket(type, payload);
+	//ReceiveFullDeltaStatePacket(type, payload);
 	ReceiveComponentEventPacket(type, payload);
 	ReceiveSpawnPacket(type, payload);
 	if (thisClient) thisClient->ReceivePacket(type, payload, source);

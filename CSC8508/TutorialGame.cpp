@@ -93,6 +93,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->DisplayWindow(uiSystem->framerate);
 	uiSystem->DisplayWindow(uiSystem->audioSliders);
 	uiSystem->DisplayWindow(uiSystem->mainMenu);
+	uiSystem->DisplayWindow(uiSystem->healthbar);
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -235,6 +236,7 @@ void TutorialGame::UpdateUI() {
 	if (uiSystem->GetMenuOption() != 0) {
 		mainMenu->SetOption(uiSystem->GetMenuOption());
 		uiSystem->HideWindow(uiSystem->mainMenu);
+		uiSystem->HideWindow(uiSystem->audioSliders);
 	}
 
 	uiSystem->DrawWindows();

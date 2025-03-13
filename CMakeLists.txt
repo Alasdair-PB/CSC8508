@@ -70,6 +70,10 @@ endif()
 # Create Third Party Directory
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/ThirdParty)
 
+################################################################################
+# FMOD Integration
+################################################################################
+
 # Set FMOD path
 if(PS5)
 set(FMOD_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/FMOD PS5/api/core")
@@ -84,6 +88,21 @@ endif()
 
 # Include FMOD headers globally
 include_directories("${FMOD_DIR}/inc")
+
+################################################################################
+# EOS Integration
+################################################################################
+
+# Set EOS path
+set(EOS_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/EOS/SDK")
+
+# Check if EOS is installed
+if(NOT EXISTS "${EOS_DIR}")
+    message(FATAL_ERROR "EOS not found. Please install EOS in the ThirdParty directory.")
+endif()
+
+# Include EOS headers globally
+include_directories("${EOS_DIR}/Include")
 
 ################################################################################
 # Sub-projects
@@ -111,6 +130,11 @@ target_link_libraries(AudioEngine PRIVATE "${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_N
 target_link_libraries(CSC8508 PRIVATE AudioEngine)
 target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
 
+# Link EOS Engine
+target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")
+target_include_directories(CSC8508 PRIVATE "${EOS_DIR}/Include")
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT CSC8508)
 if(MSVC)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT CSC8508)
 endif()

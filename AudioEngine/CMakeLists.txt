@@ -75,16 +75,20 @@ message(STATUS "FMOD Library File: ${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmo
 target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/x64/fmod_vc.lib)
 
 # Set Opus Install Path
+set(OPUS_SOURCE_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source")
 set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
 
-# Include Opus headers
+
+# Include Opus headers from the install folder.
 target_include_directories(AudioEngine PRIVATE "${OPUS_INSTALL_PATH}/include")
 
-find_library(OPUS_LIBRARY NAMES opus PATHS "${OPUS_INSTALL_PATH}/lib" NO_DEFAULT_PATH)
 
-if(NOT OPUS_LIBRARY)
-    message(FATAL_ERROR "Opus static library not found in ${OPUS_INSTALL_PATH}/lib")
+# Bypass any configuration-time file check (using SKIP_OPUS_CHECK)
+# and link directly against the imported target (OpusLib) defined in the top-level file.
+if(NOT SKIP_OPUS_CHECK)
+    set(SKIP_OPUS_CHECK TRUE)
 endif()
 
-target_link_libraries(AudioEngine PRIVATE ${OPUS_LIBRARY})
+target_link_libraries(AudioEngine PRIVATE OpusLib)
+
 

@@ -97,25 +97,43 @@ include_directories("${FMOD_DIR}/inc")
 # OPUS
 ######################################
 
-# Set Opus Install Path
+# Set Opus Paths and ensure the directory exists.
+set(OPUS_SOURCE_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source")
 set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
+file(MAKE_DIRECTORY ${OPUS_INSTALL_PATH})
 
-if(NOT EXISTS "${OPUS_INSTALL_PATH}")
-    message(FATAL_ERROR "Opus not found, please run opus install batch file to install.")
-endif()
+# Include ExternalProject module.
+include(ExternalProject)
 
-# Add the Opus include directory.
+# Define an external project to build Opus.
+ExternalProject_Add(opus_build
+    GIT_REPOSITORY "https://github.com/xiph/opus.git"     # Use the Opus repository.
+    GIT_TAG "v1.3.1"                                      # Use a specific version of Opus.
+    SOURCE_DIR "${OPUS_SOURCE_PATH}"                      # Use the existing opus_source folder.
+    BINARY_DIR "${OPUS_INSTALL_PATH}/build"               # Build output will be placed here.
+    CMAKE_ARGS 
+        -DCMAKE_INSTALL_PREFIX=${OPUS_INSTALL_PATH}       # Install files into opus_install.
+        -DCMAKE_BUILD_TYPE=Release
+        -G "Visual Studio 17 2022"
+    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+)
+
+# After building, the Opus headers will be in ${OPUS_INSTALL_PATH}/include
 include_directories("${OPUS_INSTALL_PATH}/include")
 
-# Locate the Opus library.
-find_library(OPUS_LIBRARY NAMES opus PATHS "${OPUS_INSTALL_PATH}/lib")
-if(NOT OPUS_LIBRARY)
-    message(FATAL_ERROR "Opus library not found in ${OPUS_INSTALL_PATH}/lib")
-endif()
+# Create an imported target for the built Opus library.
+add_library(OpusLib STATIC IMPORTED GLOBAL)
+set_target_properties(OpusLib PROPERTIES
+    IMPORTED_LOCATION "${OPUS_INSTALL_PATH}/lib/opus.lib"
+)
+
+# Set flag so subprojects (like AudioEngine) skip configuration-time checks.
+set(SKIP_OPUS_CHECK TRUE)
 
 
 ################################################################################
-# Sub-projects
+# Sub-projects & Linking
 ################################################################################
 add_subdirectory(NCLCoreClasses)
 add_subdirectory(Event)
@@ -127,12 +145,16 @@ if(USE_VULKAN)
     add_subdirectory(VulkanRendering)
 endif()
 
+if(TARGET AudioEngine)
+    add_dependencies(AudioEngine opus_build)
+endif()
 
-# Link Audio Engine
+# Link FMOD
 target_link_libraries(AudioEngine PRIVATE "${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
 target_link_libraries(CSC8508 PRIVATE AudioEngine)
 target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
 
+# Link Opus
 target_link_libraries(AudioEngine PRIVATE ${OPUS_LIBRARY})
 
 

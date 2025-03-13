@@ -207,7 +207,7 @@ namespace NCL::CSC8508 {
 
             if (component->IsDerived(typeid(T2))) {
                 BufferOperators.push_back(
-                    new Action(
+                    new Action<IComponent>(
                         [](std::function<void(IComponent*)> func) {
                             OperateOnBufferContents<T>(
                                 [&func](T* derived) { func(static_cast<IComponent*>(derived)); }

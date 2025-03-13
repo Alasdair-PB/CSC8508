@@ -2,6 +2,7 @@
 #include "PhysicsObject.h"
 #include "GameObject.h"
 #include "InputComponent.h"
+#include "StaminaComponent.h"
 
 #include "Ray.h"
 #include "EventListener.h"
@@ -12,24 +13,12 @@
 namespace NCL {
     namespace CSC8508 {
 
-        class OnJumpEvent : public Event {};
-        class PlayerComponent : public IComponent, public EventListener<OnJumpEvent> {
+        class PlayerComponent : public IComponent {
         public:
 
             PlayerComponent(GameObject& gameObject);
             ~PlayerComponent();
 
-            typedef std::function<void(bool hasWon)> EndGame;
-            typedef std::function<void(float points)> IncreaseScore;
-
-            void OnEvent(OnJumpEvent* e) override
-            {
-                // do math stuff
-            }
-
-            void SetEndGame(EndGame endGame) {
-                this->endGame = endGame;
-            }
 
            /**
             * Function invoked each frame after Update.
@@ -39,6 +28,7 @@ namespace NCL {
             {
                 physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
                 inputComponent = GetGameObject().TryGetComponent<InputComponent>();
+                staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();   //Need to write stamina component
 
                 if (physicsComponent)
                     physicsObj = physicsComponent->GetPhysicsObject();
@@ -71,12 +61,20 @@ namespace NCL {
  
         protected:
             float speed = 10.0f;
-            EndGame endGame;
-            IncreaseScore increaseScore;
-
+  
             InputComponent* inputComponent = nullptr;
+            StaminaComponent* staminaComponent = nullptr;
             PhysicsComponent* physicsComponent = nullptr;
             PhysicsObject* physicsObj = nullptr;
+
+            uint32_t onJumpBinding;
+            uint32_t onDashBinding;
+            uint32_t onItemPickUpBinding;
+            stack<uint32> inputStack; //?????
+
+            bool isGrounded;
+            bool isJumping;
+            bool isDashing;
         };
     }
 }

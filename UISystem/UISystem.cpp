@@ -16,7 +16,6 @@ UISystem::UISystem() {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-	audioEngine = &AudioEngine::Instance();
 }
 
 UISystem::~UISystem() {
@@ -30,7 +29,6 @@ void UISystem::StartFrame() {
 void UISystem::EndFrame() {
 	ImGui::Render();
 	ImGui::EndFrame();
-	//ImGui_PS::renderDrawData(dcb, ImGui::GetDrawData()); // Remove this line for WIN
 }
 
 void UISystem::DisplayWindow(int window) {

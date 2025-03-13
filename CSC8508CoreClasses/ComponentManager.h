@@ -90,25 +90,6 @@ namespace NCL::CSC8508 {
             }()), ...); 
         }
 
-        /// <summary>
-        /// Executes func on all IComponent derived from type T. <Warning intended for deprication>
-        /// </summary>
-        /// <typeparam name="T">The type required for iteration of function func</typeparam>
-        /// <param name="func">the function that operates on each component in the iterator of type T</param>
-        template <typename T>
-            requires std::is_base_of_v<IComponent, T>
-        static void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
-        {
-            for (auto& entry : allComponents)
-            {
-                for (auto* component : entry.second) {
-                    if (!component->IsDerived(typeid(T)))
-                       break;
-                    func(component);
-                }
-            }
-        }
-
         template <typename T> requires std::is_base_of_v<IComponent, T>
         using Action = std::function<void(std::function<void(T*)> func)>;
 

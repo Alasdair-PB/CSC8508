@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "InputComponent.h"
 #include "StaminaComponent.h"
+#include "CollisionEvent.h"
 
 #include "Ray.h"
 #include "EventListener.h"
@@ -13,12 +14,21 @@
 namespace NCL {
     namespace CSC8508 {
 
-        class PlayerComponent : public IComponent {
+        class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent> {
         public:
 
             PlayerComponent(GameObject& gameObject);
             ~PlayerComponent();
 
+
+            void OnEvent(InputButtonEvent* buttonEvent) override {
+                if (buttonEvent->owner.GetWorldID() != GetGameObject().GetWorldID()) { return; }
+                inputStack.push(buttonEvent->buttonId);
+            }
+
+            void OnEvent(CollisionEvent* collisionEvent) override {
+                // add stuff for pickup, grounded etc as in document
+            }
 
            /**
             * Function invoked each frame after Update.
@@ -61,6 +71,7 @@ namespace NCL {
  
         protected:
             float speed = 10.0f;
+            float dashMultiplier = 1.5f;
   
             InputComponent* inputComponent = nullptr;
             StaminaComponent* staminaComponent = nullptr;
@@ -70,7 +81,7 @@ namespace NCL {
             uint32_t onJumpBinding;
             uint32_t onDashBinding;
             uint32_t onItemPickUpBinding;
-            stack<uint32> inputStack; //?????
+            std::stack<uint32_t> inputStack; 
 
             bool isGrounded;
             bool isJumping;

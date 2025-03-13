@@ -10,6 +10,7 @@
 #include "PositionConstraint.h"
 #include "MaterialManager.h"
 #include "OrientationConstraint.h"
+#include "Assets.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -32,7 +33,7 @@ struct MyX {
 
 enum testGuy {X};
 
-const static std::string folderPath = "../../Assets/Pfabs/"; 
+const static std::string folderPath = NCL::Assets::PFABDIR;
 
 std::string GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;

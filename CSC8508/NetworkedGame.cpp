@@ -174,7 +174,7 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		{
 			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
 			if (!c) return;
-			if ((thisClient && c->IsOwner()) || thisServer) {
+			if (c->IsOwner()) {
 				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
 				for (GamePacket* packet : packets)
 				{

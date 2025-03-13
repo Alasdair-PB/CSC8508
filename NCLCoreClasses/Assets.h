@@ -16,7 +16,7 @@ namespace NCL::Assets {
 	const std::string SOUNDSDIR(ASSETROOT + "Sounds/");
 	const std::string FONTSSDIR(ASSETROOT + "Fonts/");
 	const std::string DATADIR(ASSETROOT + "Data/");
-	const std::string PREFABDIR(ASSETROOT + "Pfabs/");
+	const std::string PFABDIR(ASSETROOT + "Pfabs/");
 
 	extern bool ReadTextFile(const std::string& filepath, std::string& result);
 	extern bool ReadBinaryFile(const std::string& filepath, char** into, size_t& size);

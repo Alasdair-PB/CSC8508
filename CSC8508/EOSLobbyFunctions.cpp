@@ -2,8 +2,8 @@
 #include "EOSInitialisationManager.h"
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
-#include "EOSIPDistribution.h"
 #include <unordered_map>
+#include "NetworkedGame.h"
 
 // Attempts to join a lobby
 void EOSLobbyFunctions::JoinLobby() {
@@ -109,6 +109,11 @@ void EOSLobbyFunctions::OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackI
 }
 
 // Continuously updates and synchronises lobby details with all members
+
+/*
+ * Once the user receives the owner's ip, they should send their own ip across to the owner
+*/
+
 void EOSLobbyFunctions::UpdateLobbyDetails()
 {
     // Stores users EOS IDs along with their IP addresses
@@ -118,6 +123,8 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
     EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
     EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
     EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
+
+    
 
     // This loop continuously updates lobby information
     while (true) {
@@ -189,6 +196,51 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             std::cerr << "Error: Invalid Local User ID. Check EOS authentication." << std::endl;
         }
 
+        // Retrieve the number of attributes
+        EOS_LobbyDetails_GetAttributeCountOptions attributeCountOptions = {};
+        attributeCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETATTRIBUTECOUNT_API_LATEST;
+        int32_t attributeCount = EOS_LobbyDetails_GetAttributeCount(LobbyDetailsHandle, &attributeCountOptions);
+
+        // Ensure there is at least one attribute
+        if (attributeCount > 0) {
+            // Copy the first attribute (which is always OWNER_IP)
+            EOS_LobbyDetails_CopyAttributeByIndexOptions attributeByIndexOptions = {};
+            attributeByIndexOptions.ApiVersion = EOS_LOBBYDETAILS_COPYATTRIBUTEBYINDEX_API_LATEST;
+            attributeByIndexOptions.AttrIndex = 0;  // Always retrieve the first attribute
+
+            EOS_Lobby_Attribute* attribute = nullptr;
+            EOS_EResult result = EOS_LobbyDetails_CopyAttributeByIndex(LobbyDetailsHandle, &attributeByIndexOptions, &attribute);
+
+            if (result == EOS_EResult::EOS_Success && attribute) {
+                // Ensure the attribute key is OWNER_IP
+                if (std::string(attribute->Data->Key) == "OWNER_IP" && attribute->Data->ValueType == EOS_EAttributeType::EOS_AT_STRING) {
+                    // Store the OWNER_IP in the class variable
+                    ownerIP = attribute->Data->Value.AsUtf8;
+                    std::cout << "OWNER_IP stored successfully!" << std::endl;
+                }
+                else {
+                    std::cerr << "Error: First attribute is not OWNER_IP!" << std::endl;
+                }
+
+                // Free allocated memory for attribute
+                EOS_Lobby_Attribute_Release(attribute);
+            }
+            else {
+                std::cerr << "Error: Failed to retrieve OWNER_IP attribute." << std::endl;
+            }
+        }
+        else {
+            std::cerr << "Error: No attributes found in the lobby." << std::endl;
+        }
+
+        int ip1, ip2, ip3, ip4;
+        if (sscanf_s(ownerIP.c_str(), "%d.%d.%d.%d", &ip1, &ip2, &ip3, &ip4) == 4) {
+            std::cout << "IP Segments: " << ip1 << ", " << ip2 << ", " << ip3 << ", " << ip4 << std::endl;
+        }
+        else {
+            std::cerr << "Error: Invalid IP format!" << std::endl;
+        }
+
         // Retrieves the number of members in the lobby
         EOS_LobbyDetails_GetMemberCountOptions memberCountOptions = {};
         memberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;
@@ -234,22 +286,8 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             }
         }
 
-        // Send own IP to all other users
-        std::cout << "Sending my IP to all members..." << std::endl;
-        for (const auto& targetUser : otherUsers) {
-            EOSIPDistribution::GetInstance().SendPacket(targetUser);
-        }
-
         // Wait until all expected IPs have been received
         std::cout << "Waiting to collect all members' IP addresses..." << std::endl;
-        while (collectedIPs.size() < (size_t)(memberCount - 1))
-        {
-            if (EOSIPDistribution::GetInstance().ReceivePacket(localUserId, collectedIPs)) {
-                std::cout << "[DEBUG] IPs collected: " << collectedIPs.size() << "/" << (memberCount - 1) << "\n";
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));  // Avoid CPU overload
-        }
-
 
         std::cout << "All IP addresses received successfully!\n";
         for (const auto& entry : collectedIPs) {
@@ -265,6 +303,11 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             if (input == 'P' || input == 'p') {
                 std::cout << "Game starting..." << std::endl;
             }
+
+            /*
+            * This should be when the server starts sending the packets to the users
+            */
+
         }
 
         EOS_Platform_Tick(PlatformHandle);

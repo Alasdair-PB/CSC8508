@@ -1,7 +1,9 @@
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
-#include "EOSIPDistribution.h"
 #include "EOSLobbyFunctions.h"
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 EOSLobbyManager& EOSLobbyManager::GetInstance() {
     static EOSLobbyManager instance;
@@ -106,7 +108,9 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
         // Requests a modification handle to update lobby attributes
         EOS_EResult Result = EOS_Lobby_UpdateLobbyModification(eosLobbyManager.LobbyHandle, &ModOptions, &LobbyModificationHandle);
         if (Result == EOS_EResult::EOS_Success) {
+            const std::string PUBLIC_IP_ADDRESS = "128.366.543.43"; // fake ip
             std::cout << "[OnLobbyCreated] Lobby Modification Handle successfully created." << std::endl;
+            std::cout << "Public IP Address: " << TOSTRING(PUBLIC_IP_ADDRESS) << std::endl;
 
             // Stores the lobby ID in the manager
             strncpy_s(eosLobbyManager.LobbyId, Data->LobbyId, 256 - 1);
@@ -117,9 +121,9 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
             lobbyAttributeData.ApiVersion = EOS_LOBBY_ATTRIBUTEDATA_API_LATEST;
             lobbyAttributeData.ValueType = EOS_ELobbyAttributeType::EOS_AT_STRING;
 
-            // Sets the attribute key and value
-            lobbyAttributeData.Key = "LOBBYSERVICEATTRIBUTE1";
-            lobbyAttributeData.Value.AsUtf8 = "SEARCHKEYWORDS";
+            // Sets the attribute key and value to the owner's IP address
+            lobbyAttributeData.Key = "OWNER_IP";
+            lobbyAttributeData.Value.AsUtf8 = TOSTRING(PUBLIC_IP_ADDRESS); // Assuming PUBLIC_IP_ADDRESS is defined correctly
 
             // Configures the lobby attribute for visibility
             EOS_Lobby_Attribute lobbyAttribute = {};
@@ -136,10 +140,10 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
             // Adds the attribute to the lobby modification handle
             EOS_EResult Result = EOS_LobbyModification_AddAttribute(LobbyModificationHandle, &lobbyModAttribute);
             if (Result == EOS_EResult::EOS_Success) {
-                std::cout << "[OnLobbyCreated] Attribute 'LobbyStatus: Active' added successfully." << std::endl;
+                std::cout << "[OnLobbyCreated] Attribute 'OWNER_IP' set to: " << TOSTRING(PUBLIC_IP_ADDRESS) << " successfully." << std::endl;
             }
             else {
-                std::cerr << "[ERROR] Failed to add attribute. Error: " << EOS_EResult_ToString(Result) << std::endl;
+                std::cerr << "[ERROR] Failed to add 'OWNER_IP' attribute. Error: " << EOS_EResult_ToString(Result) << std::endl;
             }
 
             // Configures the update options for modifying the lobby

@@ -12,10 +12,11 @@ AudioSliders::~AudioSliders() {
 
 }
 
-void AudioSliders::Draw() {
-	ImGui::SetNextWindowPos(ImVec2(800, 300));
-	ImGui::SetNextWindowSize(ImVec2(500, 125));
-	ImGui::Begin("Audio Sliders");
+void AudioSliders::Draw(int winWidth, int winHeight) {
+	ImGui::SetNextWindowPos(ImVec2(winWidth * 0.4, winHeight * 0.3));
+	ImGui::SetNextWindowSize(ImVec2(winWidth * 0.3, winHeight * 0.12));
+	bool open = true;
+	ImGui::Begin("Audio Sliders", &open, ImGuiWindowFlags_NoResize);
 
 	masterVolume = audioEngine->GetChannelVolume(ChannelGroupType::MASTER);
 	masterVolume = masterVolume * 100;

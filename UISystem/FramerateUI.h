@@ -9,7 +9,7 @@ namespace NCL {
 			FramerateUI();
 			~FramerateUI();
 
-			void Draw(float dt);
+			void Draw(float dt, int winWidth, int winHeight);
 
 		protected:
 			float dt = 0;

@@ -10,7 +10,7 @@ namespace NCL {
 			Healthbar();
 			~Healthbar();
 
-			void Draw(int health);
+			void Draw(int health, int winWidth, int winHeight);
 
 		};
 	}

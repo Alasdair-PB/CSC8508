@@ -9,7 +9,7 @@ namespace NCL {
 			MainMenuUI();
 			~MainMenuUI();
 
-			int Draw();
+			int Draw(int winWidth, int winHeight);
 
 			int GetMenuOption() {
 				return menuOption;

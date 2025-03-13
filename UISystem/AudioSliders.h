@@ -9,7 +9,7 @@ namespace NCL {
 			AudioSliders();
 			~AudioSliders();
 
-			void Draw();
+			void Draw(int winWidth, int winHeight);
 
 		protected:
 			float masterVolume = 100;

@@ -89,6 +89,7 @@ void TutorialGame::InitialiseGame() {
 	renderer->StartUI();
 	uiSystem = renderer->GetUI();
 
+	uiSystem->SetWinSize(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y);
 	uiSystem->DisplayWindow(uiSystem->framerate);
 	uiSystem->DisplayWindow(uiSystem->audioSliders);
 	uiSystem->DisplayWindow(uiSystem->mainMenu);
@@ -237,6 +238,8 @@ void TutorialGame::UpdateUI() {
 		uiSystem->HideWindow(uiSystem->mainMenu);
 		uiSystem->HideWindow(uiSystem->audioSliders);
 	}
+
+	uiSystem->SetWinSize(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y);
 
 	uiSystem->DrawWindows();
 }

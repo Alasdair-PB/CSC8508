@@ -25,12 +25,13 @@ namespace NCL {
 				return menuOption;
 			}
 
-			void UpdateFramerate(float delta) {
-				dt = delta;
+			void SetWinSize(int width, int height) {
+				winWidth = width;
+				winHeight = height;
 			}
 
-			void UpdateHealth(int healthVal) {
-				health = healthVal;
+			void UpdateFramerate(float delta) {
+				dt = delta;
 			}
 
 			void StartFrame();
@@ -44,8 +45,11 @@ namespace NCL {
 		protected:
 			HWND uiWindow;
 
-			float dt = 0;
+			float dt = 60;
 			int health = 50;
+
+			int winWidth = 0;
+			int winHeight = 0;
 
 			int menuOption = 0;
 			enum menuOptions { none, startOffline, startServer, StartClient };

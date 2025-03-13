@@ -51,16 +51,16 @@ void UISystem::HideWindow(int window) {
 void UISystem::DrawWindows() {
 	for (auto const& i : uiList) {
 		if (i == framerate) {
-			FramerateUI().Draw(dt);
+			FramerateUI().Draw(dt, winWidth, winHeight);
 		}
 		if (i == mainMenu) {
-			menuOption = MainMenuUI().Draw();
+			menuOption = MainMenuUI().Draw(winWidth, winHeight);
 		}
 		if (i == audioSliders) {
-			AudioSliders().Draw();
+			AudioSliders().Draw(winWidth, winHeight);
 		}
 		if (i == healthbar) {
-			Healthbar().Draw(health);
+			Healthbar().Draw(health, winWidth, winHeight);
 		}
 	}
 }

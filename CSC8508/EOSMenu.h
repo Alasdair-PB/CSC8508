@@ -14,7 +14,6 @@ public:
 
 private:
     void AuthenticateUser();
-    void ClearConsole();
     void DisplayOptions();
     void CreateLobby();
     void JoinLobby();

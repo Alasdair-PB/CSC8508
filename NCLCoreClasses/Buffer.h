@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 namespace NCL::Rendering {
 	class Buffer {//Opaque GPU Buffer Type

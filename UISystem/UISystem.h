@@ -4,6 +4,10 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui.h"
+#include "AudioSliders.h"
+#include "FramerateUI.h"
+#include "MainMenuUI.h"
+#include "Healthbar.h"
 #include <list>
 
 namespace NCL {
@@ -25,35 +29,26 @@ namespace NCL {
 				dt = delta;
 			}
 
+			void UpdateHealth(int healthVal) {
+				health = healthVal;
+			}
+
 			void StartFrame();
 			void EndFrame();
 			void DisplayWindow(int window);
 			void HideWindow(int window);
 			void DrawWindows();
 
-			enum uiElements { framerate, mainMenu, audioSliders };
+			enum uiElements { framerate, mainMenu, audioSliders, healthbar };
 
 		protected:
-
-			void DrawDemo();
-			void DisplayFramerate();
-			void AudioSliders();
-			void MainMenu();
-
 			HWND uiWindow;
-			bool showDemo = true;
-
-			float masterVolume = 100;
-			float musicVolume = 100;
-			float sfxVolume = 100;
-			float voiceVolume = 100;
 
 			float dt = 0;
+			int health = 50;
 
 			int menuOption = 0;
 			enum menuOptions { none, startOffline, startServer, StartClient };
-
-			AudioEngine* audioEngine;
 		};
 	}
 }

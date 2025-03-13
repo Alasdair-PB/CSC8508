@@ -154,11 +154,10 @@ namespace NCL::CSC8508 {
             }
             T* component = new (GetComponentsBuffer<T>() + componentCount<T>) T(std::forward<Args>(args)...);
             componentCount<T>++;
-            allComponents[typeid(T)].push_back(component);
-
             AddOperatorBuffer<T, IComponent>(IComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkComponent>(INetworkComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
+            allComponents[typeid(T)].push_back(component);
 
             return component;
         }
@@ -202,7 +201,7 @@ namespace NCL::CSC8508 {
         template <typename T, typename T2> requires std::is_base_of_v<IComponent, T>
         static void AddOperatorBuffer(std::vector<Action<IComponent>*>& BufferOperators, T* component)
         {
-            if (allComponents.find(typeid(T)) == allComponents.end())
+            if (allComponents.find(typeid(T)) != allComponents.end())
                 return;
 
             if (component->IsDerived(typeid(T2))) {
@@ -216,8 +215,6 @@ namespace NCL::CSC8508 {
                     ));
             }
         }
-
-
     };
 
     template <typename T> requires std::is_base_of_v<IComponent, T>

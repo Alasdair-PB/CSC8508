@@ -60,25 +60,25 @@ namespace NCL::CSC8508 {
 		 * Function invoked after the object and components have been instantiated.
 		 * @param deltaTime Time since last frame
 		 */
-		void InvokeOnAwake() { OnAwake(); }
+		void InvokeOnAwake(){}
 
 		/**
 		 * Function invoked each frame.
 		 * @param deltaTime Time since last frame
 		 */
-		void InvokeUpdate(float deltaTime) { Update(deltaTime); }
+		void InvokeUpdate(float deltaTime){}
 
 		/**
 		 * Function invoked each frame after Update.
 		 * @param deltaTime Time since last frame
 		 */
-		void InvokeEarlyUpdate(float deltaTime) { EarlyUpdate(deltaTime); }
+		void InvokeEarlyUpdate(float deltaTime){}
 
 		/* Function invoked when the component is enabled. */
-		void InvokeOnEnable() { OnEnable(); }
+		void InvokeOnEnable(){}
 
 		/* Function invoked when the component is disabled. */
-		void InvokeOnDisable() { OnDisable(); }
+		void InvokeOnDisable(){}
 
 		/// <summary>
 		/// Returns the render object of this GameObject
@@ -242,12 +242,6 @@ namespace NCL::CSC8508 {
 		Tags::Tag GetTag() const { return tag;}
 
 	protected:
-		virtual void OnAwake() {}
-		virtual void Update(float deltaTime) {}
-		virtual void EarlyUpdate(float deltaTime) {}
-		virtual void OnEnable() {}
-		virtual void OnDisable() {}
-
 		bool isEnabled;
 		const bool isStatic;
 		int worldID;

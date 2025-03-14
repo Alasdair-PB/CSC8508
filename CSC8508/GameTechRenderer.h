@@ -1,23 +1,27 @@
 #pragma once
-#include "OGLRenderer.h"
-#include "OGLShader.h"
-#include "OGLTexture.h"
-#include "OGLMesh.h"
+#ifndef USE_PS5
+#include "../OpenGLRendering/OGLRenderer.h"
+#include "../OpenGLRendering/OGLShader.h"
+#include "../OpenGLRendering/OGLTexture.h"
+#include "../OpenGLRendering/OGLMesh.h"
 
 #include "GameWorld.h"
 
 namespace NCL {
 	namespace CSC8508 {
 		class RenderObject;
+		class UISystem;
 
-		class GameTechRenderer : public OGLRenderer	{
+		class GameTechRenderer : public OGLRenderer {
 		public:
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
 
-			Mesh*		LoadMesh(const std::string& name);
-			Texture*	LoadTexture(const std::string& name);
-			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
+			Mesh* LoadMesh(const std::string& name);
+			Texture* LoadTexture(const std::string& name);
+			Shader* LoadShader(const std::string& vertex, const std::string& fragment);
+
+			UI::UISystem* GetUI() override { return uiSystem; };
 
 		protected:
 			void NewRenderLines();
@@ -26,31 +30,31 @@ namespace NCL {
 
 			void RenderFrame()	override;
 
-			OGLShader*		defaultShader;
+			OGLShader* defaultShader;
 
-			GameWorld&	gameWorld;
+			GameWorld& gameWorld;
 
 			void BuildObjectList();
 			void SortObjectList();
 			void RenderShadowMap();
-			void RenderCamera(); 
+			void RenderCamera();
 			void RenderSkybox();
 
 			void LoadSkybox();
+			void StartUI();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
-
 			vector<const RenderObject*> activeObjects;
 
-			OGLShader*  debugShader;
-			OGLShader*  skyboxShader;
-			OGLMesh*	skyboxMesh;
-			OGLMesh*	debugTexMesh;
+			OGLShader* debugShader;
+			OGLShader* skyboxShader;
+			OGLMesh* skyboxMesh;
+			OGLMesh* debugTexMesh;
 			GLuint		skyboxTex;
 
 			//shadow mapping things
-			OGLShader*	shadowShader;
+			OGLShader* shadowShader;
 			GLuint		shadowTex;
 			GLuint		shadowFBO;
 			Matrix4     shadowMatrix;
@@ -75,7 +79,11 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
+
+			UI::UISystem* uiSystem;
 		};
 	}
 }
+#endif // DEBUG
+
 

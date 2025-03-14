@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <functional>
 using std::vector;
 
 namespace NCL::CSC8508 {
@@ -18,23 +19,36 @@ namespace NCL::CSC8508 {
     class INetworkComponent;
     class INetworkDeltaComponent;
 
-    class PhysicsComponent;
-
     class ComponentManager final {
     public:
 
+        /// <summary>
+        /// Returns the Component buffer of type T
+        /// </summary>
+        /// <typeparam name="T">The type required for the returned IComponent Buffer</typeparam>
+        /// <returns>A pointer to the IComponent buffer</returns>
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
         static T* GetComponentsBuffer() {
             return reinterpret_cast<T*>(componentBuffer<T>);
         }
 
+        // <summary>
+        /// Returns a Component Iterator created of type T
+        /// </summary>
+        /// <typeparam name="T">The type required for the returned IComponent Iterator</typeparam>
+        /// <returns>A pair including the Component Buffer and count of type T</returns>
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
         static std::pair<T*, size_t> GetComponentsIterator() {
             return { componentBuffer<T>, componentCount<T> };
         }
 
+        /// <summary>
+        /// Operates on IComponent contents as Iterator
+        /// </summary>
+        /// <typeparam name="T">The type required for iteration of function func</typeparam>
+        /// <param name="func">the function that operates on each component in the iterator of type T</param>
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnContents(std::function<void(T*)> func) {
@@ -44,6 +58,11 @@ namespace NCL::CSC8508 {
             }
         }
 
+        /// <summary>
+        /// Executes func on all IComponents of types T.
+        /// </summary>
+        /// <typeparam name="T">The type required for iteration of function func</typeparam>
+        /// <param name="func">the function that operates on each component in the iterator of type T</param>
         template <typename T>
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnBufferContents(std::function<void(T*)> func) {
@@ -53,8 +72,14 @@ namespace NCL::CSC8508 {
                 func(&buffer[i]);
         }
 
+        /// <summary>
+        /// Executes func on all IComponents of types Types that derived from type T as type T.
+        /// </summary>
+        /// <typeparam name="T">The type required for iteration of function func</typeparam>
+        /// <typeparam name="...Types">The types iterated as type T</typeparam>
+        /// <param name="func">the function that operates on each component in the buffer of each type provided in Types</param>
         template <typename T, typename... Types>
-        void OperateOnBufferContentsAs(std::function<void(T*)> func) {
+        static void OperateOnBufferContentsAs(std::function<void(T*)> func) {
             (([&] {
                 T* buffer = dynamic_cast<T*>(GetComponentsBuffer<Types>());
                 if (buffer) {
@@ -65,57 +90,43 @@ namespace NCL::CSC8508 {
             }()), ...); 
         }
 
-        template <typename T>
-            requires std::is_base_of_v<IComponent, T>
-        static void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
-        {
-            for (auto& entry : allComponents)
-            {
-                for (auto* component : entry.second) {
-                    if (!component->IsDerived(typeid(T)))
-                       break;
-                    func(component);
-                }
-            }
-        }
-
         template <typename T> requires std::is_base_of_v<IComponent, T>
         using Action = std::function<void(std::function<void(T*)> func)>;
 
+        /// <summary>
+        /// Executes func on all IComponents derived from IComponent TParameters
+        /// </summary>
+        /// <param name="func"> the function that operates on each component in the buffer of type IComponent.</param>
         static void OperateOnAllIComponentBufferOperators(std::function<void(IComponent*)> func) {
             for (Action<IComponent>* myAction : IComponentBufferOperators) 
                 (*myAction)(func);
         }
 
+        /// <summary>
+        /// Executes func on all IComponents derived from the INetworkComponent interface TParameters
+        /// </summary>
+        /// <param name="func"> the function that operates on each component in the buffer of type IComponent.</param>
         static void OperateOnAllINetworkComponentBufferOperators(std::function<void(IComponent*)> func) {
             for (Action<IComponent>* myAction : INetworkComponentBufferOperators) 
                 (*myAction)(func);
         }
 
+        /// <summary>
+        /// Executes func on all IComponents derived from the INetworkDeltaComponent interface Parameters:
+        /// </summary>
+        /// <param name="func"> the function that operates on each component in the buffer of type IComponent.</param>
         static void OperateOnAllINetworkDeltaComponentBufferOperators(std::function<void(IComponent*)> func) {
             for (Action<IComponent>* myAction : INetworkDeltaComponentBufferOperators)
                 (*myAction)(func);
         }
 
-        template <typename T, typename T2> requires std::is_base_of_v<IComponent, T>
-        static void AddOperatorBuffer(std::vector<Action<IComponent>*>& BufferOperators, T* component)
-        {
-            if (allComponents.find(typeid(T)) == allComponents.end())
-                return;
-
-            if (component->IsDerived(typeid(T2))) {
-                BufferOperators.push_back(
-                    new Action(
-                        [](std::function<void(IComponent*)> func) {
-                            OperateOnBufferContents<T>(
-                                [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
-                            );
-                        }
-                    ));
-            }
-        }
-
-
+        /// <summary>
+        /// Adds a component of type T to the ComponentManager Buffers of type T
+        /// </summary>
+        /// <typeparam name="T">The type of the IComponent</typeparam>
+        /// <typeparam name="...Args">The type of arguments used to declare this IComponent</typeparam>
+        /// <param name="...args">The arguments used to declare this IComponent</param>
+        /// <returns>A pointer to the created IComponent</returns>
         template <typename T, typename... Args> requires std::is_base_of_v<IComponent, T>
         static T* AddComponent(Args&&... args) {
             if (componentCount<T> >= MAX_COMPONENTS<T>) {
@@ -124,15 +135,17 @@ namespace NCL::CSC8508 {
             }
             T* component = new (GetComponentsBuffer<T>() + componentCount<T>) T(std::forward<Args>(args)...);
             componentCount<T>++;
-            allComponents[typeid(T)].push_back(component);
-
             AddOperatorBuffer<T, IComponent>(IComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkComponent>(INetworkComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
+            allComponents[typeid(T)].push_back(component);
 
             return component;
         }
 
+        /// <summary>
+        /// Cleans memory allocations created by the ComponentManager
+        /// </summary>
         static void CleanUp()
         {
             for (auto& [type, componentsList] : allComponents) {
@@ -149,23 +162,41 @@ namespace NCL::CSC8508 {
         static constexpr size_t MAX_COMPONENTS = 1000;
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
-        static size_t componentCount;
+        inline static size_t componentCount;
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
-        static alignas(T) std::byte componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
+        inline static std::byte componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
 
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static std::vector<Action<IComponent>*> INetworkComponentBufferOperators;
         inline static std::vector<Action<IComponent>*> IComponentBufferOperators;
         inline static std::vector<Action<IComponent>*> INetworkDeltaComponentBufferOperators;
 
+        /// <summary>
+        /// Adds a component to a buffer operator as type T
+        /// </summary>
+        /// <typeparam name="T">The type of IComponent to add as BufferOperator</typeparam>
+        /// <typeparam name="T2">The type of the BufferOperator that Type T will be added as</typeparam>
+        /// <param name="BufferOperators">The BufferOperation object of type T2</param>
+        /// <param name="component">The IComponent to be added to Buffer Operations</param>
+        template <typename T, typename T2> requires std::is_base_of_v<IComponent, T>
+        static void AddOperatorBuffer(std::vector<Action<IComponent>*>& BufferOperators, T* component)
+        {
+            if (allComponents.find(typeid(T)) != allComponents.end())
+                return;
+
+            if (component->IsDerived(typeid(T2))) {
+                BufferOperators.push_back(
+                    new Action<IComponent>(
+                        [](std::function<void(IComponent*)> func) {
+                            OperateOnBufferContents<T>(
+                                [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
+                            );
+                        }
+                    ));
+            }
+        }
     };
-
-    template <typename T> requires std::is_base_of_v<IComponent, T>
-    size_t ComponentManager::componentCount<T> = 0;
-
-    template <typename T> requires std::is_base_of_v<IComponent, T>
-    alignas(T) std::byte ComponentManager::componentBuffer<T>[MAX_COMPONENTS<T> *sizeof(T)] = {};
 }
 
 #endif // COMPONENTMANAGER_H

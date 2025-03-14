@@ -14,7 +14,6 @@
 #include "ComponentManager.h"
 #include "EventManager.h"
 
-
 #define COLLISION_MSG 30
 
 struct MessagePacket : public GamePacket {
@@ -26,7 +25,6 @@ struct MessagePacket : public GamePacket {
 		size = sizeof(short) * 2;
 	}
 };
-
 
 struct SpawnPacket : public GamePacket {
 
@@ -44,6 +42,13 @@ void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 
+
+void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
+void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
+
+/*NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
+: TutorialGame(gameWorld, renderer) {*/
+
 NetworkedGame::NetworkedGame()	{
 	EventManager::RegisterListener<NetworkEvent>(this);
 	EventManager::RegisterListener<ClientConnectedEvent>(this);
@@ -51,7 +56,7 @@ NetworkedGame::NetworkedGame()	{
 	thisServer = nullptr;
 	thisClient = nullptr;
 
-	mainMenu = new MainMenu([&](bool state) -> void { this->SetPause(state); },
+	mainMenu = new MainMenu([&](bool state) -> void {world->SetPausedWorld(state); },
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
 		[&]() -> void { this->StartOfflineCallBack();});
@@ -119,6 +124,7 @@ void NetworkedGame::UpdateGame(float dt)
 		UpdatePackets(dt);
 		timeToNextPacket += 1.0f / 20.0f; 
 	}
+
 	if (thisServer) 
 		thisServer->UpdateServer();
 	else if (thisClient) 
@@ -168,7 +174,7 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		{
 			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
 			if (!c) return;
-			if ((thisClient && c->IsOwner()) || thisServer) {
+			if (c->IsOwner()) {
 				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
 				for (GamePacket* packet : packets)
 				{

@@ -38,12 +38,20 @@ public:
 		defaultChannelGroup = type;
 		fVolume = 1.0f;
 
+
+		// Initialise Decode Pipeline
+		InitPersistentSound();
+		decoder = OpenDecoder();
 		encodedPacketQueue = &audioEngine->GetEncodedPacketQueue();
 
-		decoder = OpenDecoder();
+		audioEngine->StartDecodeThread(this);
+	}
 
-		InitPersistentSound();
-
+	/**
+	* Destructor for Audio Source
+	*/
+	~AudioSourceComponent() {
+		fChannel ? fChannel->stop() : 0;
 	}
 
 	/**
@@ -54,7 +62,7 @@ public:
 		Vector3 pos = transform->GetPosition();
 		fPosition = VecToFMOD(pos);
 
-		/*
+		
 		PhysicsComponent* physComp = GetGameObject().TryGetComponent<PhysicsComponent>();
 
 		if (physComp) {
@@ -63,14 +71,14 @@ public:
 		}
 		else if(debug) {
 			std::cout << "No Physics Component found for AudioSourceComponentComponent!" << std::endl;
-		}*/
+		}
 		
 		fChannel->set3DAttributes(&fPosition, &fVelocity);
 
 		fSystem->update();
 
 		if (debug) {
-			Debug::Print("Source Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z), Vector2(5, 5));
+			std::cout << "Source Pos: " << std::to_string(pos.x) << ", " + std::to_string(pos.y) << ", " << std::to_string(pos.z) << std::endl;
 		}
 	}
 
@@ -184,7 +192,7 @@ public:
 		std::vector<short> pcmFrame(960);
 		int decodedSamples = opus_decode(decoder, encodedPacket.data(), encodedPacket.size(), pcmFrame.data(), pcmFrame.size(), 0);
 
-		std::cout << "[DEBUG] UpdatePersistentPlayback() Decoded " << decodedSamples << " samples." << std::endl;
+		//std::cout << "[DEBUG] UpdatePersistentPlayback() Decoded " << decodedSamples << " samples." << std::endl;
 
 		if (decodedSamples < 0) {
 			std::cerr << "[ERROR] UpdatePersistentPlayback() Opus Decoding Failed: " << decodedSamples << std::endl;
@@ -302,12 +310,6 @@ public:
 
 private:
 
-	/**
-	* Destructor for Audio Source
-	*/
-	~AudioSourceComponent() {
-		fChannel ? fChannel->stop() : 0;
-	}
 
 	FMOD::Channel* fChannel;
 	ChannelGroupType defaultChannelGroup;

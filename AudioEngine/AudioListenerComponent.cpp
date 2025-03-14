@@ -18,24 +18,22 @@ AudioListenerComponent::AudioListenerComponent(GameObject& gameObject, Perspecti
 	outputDeviceIndex = 0;
 
 
-	encodedPacketQueue = &audioEngine->GetEncodedPacketQueue();
-
-	InitMicSound();
-	InitPersistentSound();
-
-	encoder = OpenEncoder();
-	decoder = OpenDecoder();
-
 	this->camera = &camera;
-
-	// Initialise position and orientation vectors
-	fPosition = VecToFMOD(transform->GetPosition());
-
 	// Comment out for where you want the up and forward vectors to be updated from for testing
 	SetCamOrientation();
 	//SetPlayerOrientation();
 
 
+	// Initialise position and orientation vectors
+	fPosition = VecToFMOD(transform->GetPosition());
+
+
+	// Initialise Encoding Pipeline
+	InitMicSound();
+	encoder = OpenEncoder();
+	encodedPacketQueue = &audioEngine->GetEncodedPacketQueue();
+
+	audioEngine->StartEncodeThread(this);
 }
 
 AudioListenerComponent::~AudioListenerComponent() {
@@ -72,7 +70,7 @@ void AudioListenerComponent::Update(float deltatime) {
 	fSystem ? fSystem->set3DListenerAttributes(fIndex, &fPosition, &fVelocity, &fForward, &fUp) : 0;
 
 	if (debug) {
-		Debug::Print("Listener Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z), Vector2(5, 5));
+		std::cout << "Listener Pos: " << std::to_string(pos.x) << ", " << std::to_string(pos.y) << ", " << std::to_string(pos.z) << std::endl;
 	}
 
 }
@@ -80,7 +78,6 @@ void AudioListenerComponent::Update(float deltatime) {
 void AudioListenerComponent::SetCamOrientation() {
 		Quaternion forwardRotation = Quaternion::EulerAnglesToQuaternion(camera->GetPitch(), camera->GetYaw(), 0.0f);
 		fForward = VecToFMOD(forwardRotation * Vector3(0, 0, -1));
-
 
 		Quaternion upRotation = Quaternion::EulerAnglesToQuaternion(camera->GetPitch(), camera->GetYaw(), 0.0f);
 		fUp = VecToFMOD(upRotation * Vector3(0, 1, 0));
@@ -200,7 +197,7 @@ std::vector<unsigned char> AudioListenerComponent::EncodeOpusFrame(std::vector<s
 		// if encoding successful, append the encoded frame to the output buffer
 		if (encodedBytes > 0) {
 			opusFrame.insert(opusFrame.end(), tempBuffer.begin(), tempBuffer.begin() + encodedBytes);
-			std::cout << "[DEBUG] EncodeOpusFrame() Encoded " << encodedBytes << " bytes." << std::endl;
+			//std::cout << "[DEBUG] EncodeOpusFrame() Encoded " << encodedBytes << " bytes." << std::endl;
 		}
 		else {
 			// std::cerr << "[ERROR] EncodeOpusFrame() Error Encoding PCM Data" << std::endl;

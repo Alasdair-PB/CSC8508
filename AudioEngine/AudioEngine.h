@@ -9,6 +9,10 @@
 #include <map>
 #include <deque>
 #include <vector>
+#include <thread>
+
+class AudioListenerComponent;
+class AudioSourceComponent;
 
 
 /**
@@ -98,6 +102,15 @@ public:
 		return encodedPacketQueue;
 	}
 
+	
+	void StartEncodeThread(AudioListenerComponent* listener);
+
+	void StopEncodeThread();
+
+	
+	void StartDecodeThread(AudioSourceComponent* source);
+
+	void StopDecodeThread();
 
 private:
     AudioEngine();
@@ -117,6 +130,12 @@ private:
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
 
 	std::deque<std::vector<unsigned char>> encodedPacketQueue;
+
+	std::atomic<bool> encodeThreadRunning;
+	std::atomic<bool> decodeThreadRunning;
+
+	std::thread encodeThread;
+	std::thread decodeThread;
 	
 };
 

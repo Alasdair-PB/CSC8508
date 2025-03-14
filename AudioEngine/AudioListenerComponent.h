@@ -37,6 +37,7 @@ public:
 
 	AudioListenerComponent(GameObject& gameObject, PerspectiveCamera& camera);
 
+	~AudioListenerComponent();
 
 	/**
 	*
@@ -239,8 +240,5 @@ private:
 	FMOD_VECTOR fUp;
 
 	PerspectiveCamera* camera;
-
-
-	~AudioListenerComponent();
 
 };

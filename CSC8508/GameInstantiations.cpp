@@ -131,6 +131,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
+	AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
+
 	int componentIdCount = 0;
 
 	if (spawnData)
@@ -163,6 +165,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	phys->GetPhysicsObject()->InitSphereInertia();
 
 	world->AddGameObject(player);
+
+	std::cout << "Input Device : " << listenerComp->GetInputDeviceList()[0] << std::endl;
+	std::cout << "Output Device : " << listenerComp->GetOutputDeviceList()[0] << std::endl;
 	return player;
 }
 

@@ -15,6 +15,8 @@
 #include <vector>
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
+#include "../AudioEngine/AudioListenerComponent.h"
+#include "../AudioEngine/AudioSourceComponent.h"
 
 
 using std::vector;
@@ -66,6 +68,7 @@ namespace NCL {
 			GameTechRendererInterface* renderer;
 #endif
 			PhysicsSystem* physics;
+			AudioEngine* audioEngine = nullptr;
 			GameWorld* world;
 			Controller* controller;
 

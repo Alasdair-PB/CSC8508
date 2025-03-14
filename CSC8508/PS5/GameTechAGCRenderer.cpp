@@ -533,7 +533,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 	int at = 0;
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsActive()) {
+			if (o->IsEnabled()) {
 				RenderObject* g = o->GetRenderObject();
 				if (g) {
 					activeObjects.push_back(g);

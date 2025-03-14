@@ -1,8 +1,6 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
 #include "../AudioEngine/AudioEngine.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_opengl3.h"
 #include "imgui.h"
 #include "AudioSliders.h"
 #include "FramerateUI.h"
@@ -12,29 +10,24 @@
 
 namespace NCL {
 	namespace UI {
-
 		class UISystem {
-
 			std::list<int> uiList;
 
 		public:
-			UISystem(HWND handle);
-			~UISystem();
+			static UISystem* GetInstance() {return instance;}
+			static void Shutdown() { if (instance) { delete instance; } }
 
-			int GetMenuOption() {
-				return menuOption;
-			}
+			int GetMenuOption() {return menuOption;}
 
-			void UpdateFramerate(float delta) {
-				dt = delta;
-			}
+			void UpdateFramerate(float delta) {dt = delta;}
+
+			virtual void StartFrame() = 0;
+			virtual void EndFrame() = 0;
 
 			void UpdateHealth(int healthVal) {
 				health = healthVal;
 			}
 
-			void StartFrame();
-			void EndFrame();
 			void DisplayWindow(int window);
 			void HideWindow(int window);
 			void DrawWindows();
@@ -42,7 +35,10 @@ namespace NCL {
 			enum uiElements { framerate, mainMenu, audioSliders, healthbar };
 
 		protected:
-			HWND uiWindow;
+			UISystem();
+			virtual ~UISystem();
+
+			static UISystem* instance;
 
 			float dt = 0;
 			int health = 50;

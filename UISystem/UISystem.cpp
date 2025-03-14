@@ -1,9 +1,8 @@
 #include "UISystem.h"
 #ifdef USE_PS5
-#include "imgui_impl_ps.h"
+#include "UIPlayStation.h"
 #else
-#include "imgui_impl_win32.h"
-#include "imgui_impl_opengl3.h"
+#include "UIWindows.h"
 #endif // USE_PS5
 
 #include "imgui.h"
@@ -12,32 +11,24 @@
 using namespace NCL;
 using namespace UI;
 
-UISystem::UISystem(HWND handle) : uiWindow(handle) {
+UISystem::UISystem() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_InitForOpenGL(handle); // Remove this line for PS5
-	ImGui_ImplOpenGL3_Init(); // Remove this line for PS5
 }
 
 UISystem::~UISystem() {
-	ImGui_ImplOpenGL3_Shutdown(); // Remove this line for PS5
-	ImGui_ImplWin32_Shutdown(); // Remove this line for PS5
 	ImGui::DestroyContext();
 }
 
 void UISystem::StartFrame() {
-	ImGui_ImplOpenGL3_NewFrame(); // Remove this line for PS5
-	ImGui_ImplWin32_NewFrame(); // Remove this line for PS5
 	ImGui::NewFrame();
 }
 
 void UISystem::EndFrame() {
 	ImGui::Render();
 	ImGui::EndFrame();
-	//ImGui_PS::renderDrawData(dcb, ImGui::GetDrawData()); // Remove this line for WIN
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  // Remove this line for PS5
 }
 
 void UISystem::DisplayWindow(int window) {

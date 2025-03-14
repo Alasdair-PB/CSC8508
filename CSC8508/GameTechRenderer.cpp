@@ -8,7 +8,7 @@
 #include <windows.h>
 #include <GL/GL.h>
 #include <tchar.h>
-#include "UISystem.h"
+#include "UIWindows.h"
 #include "Win32Window.h"
 
 using namespace NCL;
@@ -78,6 +78,8 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000); 
+
+	StartUI();
 }
 
 GameTechRenderer::~GameTechRenderer()	{
@@ -89,6 +91,8 @@ GameTechRenderer::~GameTechRenderer()	{
 	glDeleteFramebuffers(1, &textVertVBO);
 	glDeleteFramebuffers(1, &textColourVBO);
 	glDeleteFramebuffers(1, &textTexVBO);
+
+	UI::UISystem::Shutdown();
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -134,16 +138,22 @@ void GameTechRenderer::LoadSkybox() {
 void GameTechRenderer::StartUI() {
 	Window* w = Window::GetWindow();
 	NCL::Win32Code::Win32Window* w32 = static_cast<NCL::Win32Code::Win32Window*>(w);
-	uiSystem = new UI::UISystem(w32->GetHandle());
+	UI::UIWindows::Initialize(w32->GetHandle());
 }
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
-	glClearColor(1, 1, 1, 1);
+	glEnable(GL_STENCIL_TEST);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	glStencilFunc(GL_ALWAYS, 2, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
 	BuildObjectList();
 	SortObjectList();
 	RenderShadowMap();
-	RenderSkybox();
 	RenderCamera();
+	RenderSkybox();
+	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
@@ -151,8 +161,9 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderLines();
 	NewRenderTextures();
 	NewRenderText();
-	uiSystem->EndFrame();
+	UI::UIWindows::GetInstance()->EndFrame();
 
+	
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -214,9 +225,9 @@ void GameTechRenderer::RenderShadowMap() {
 }
 
 void GameTechRenderer::RenderSkybox() {
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glStencilFunc(GL_EQUAL, 0, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);	
 
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
@@ -237,9 +248,7 @@ void GameTechRenderer::RenderSkybox() {
 	BindMesh(*skyboxMesh);
 	DrawBoundMesh();
 
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 }
 
 void GameTechRenderer::RenderCamera() {

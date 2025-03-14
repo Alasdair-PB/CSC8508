@@ -108,7 +108,7 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
         // Requests a modification handle to update lobby attributes
         EOS_EResult Result = EOS_Lobby_UpdateLobbyModification(eosLobbyManager.LobbyHandle, &ModOptions, &LobbyModificationHandle);
         if (Result == EOS_EResult::EOS_Success) {
-            const std::string PUBLIC_IP_ADDRESS = "128.366.543.43"; // fake ip
+           // const std::string PUBLIC_IP_ADDRESS = "128.366.543.43"; // fake ip
             std::cout << "[OnLobbyCreated] Lobby Modification Handle successfully created." << std::endl;
             std::cout << "Public IP Address: " << TOSTRING(PUBLIC_IP_ADDRESS) << std::endl;
 

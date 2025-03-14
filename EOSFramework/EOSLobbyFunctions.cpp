@@ -3,7 +3,6 @@
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
 #include <unordered_map>
-#include "NetworkedGame.h"
 
 // Attempts to join a lobby
 void EOSLobbyFunctions::JoinLobby() {

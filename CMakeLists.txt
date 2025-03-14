@@ -64,6 +64,20 @@ if(MSVC)
 endif()
 
 ################################################################################
+# IP Address
+################################################################################
+if(NOT PS5)
+execute_process(
+    COMMAND powershell -Command "(Invoke-WebRequest -Uri 'https://api64.ipify.org' -UseBasicParsing).Content"
+    OUTPUT_VARIABLE PUBLIC_IP
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+message(STATUS "Public IP Address: ${PUBLIC_IP}")
+add_definitions(-DPUBLIC_IP_ADDRESS=${PUBLIC_IP})
+endif()
+
+################################################################################
 # Third-Party Integration
 ################################################################################
 
@@ -112,6 +126,7 @@ add_subdirectory(CSC8508)
 add_subdirectory(CSC8508CoreClasses)
 add_subdirectory(ImGui)
 add_subdirectory(Event)
+add_subdirectory(EOSFramework)
 add_subdirectory(SerializedSave)
 add_subdirectory(UISystem)
 add_subdirectory(AudioEngine)

@@ -70,9 +70,11 @@ endif()
 # Create Third Party Directory
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/ThirdParty)
 
-################################################################################
-# FMOD Integration
-################################################################################
+
+######################################
+# FMOD
+######################################
+
 
 # Set FMOD path
 if(PS5)
@@ -89,9 +91,47 @@ endif()
 # Include FMOD headers globally
 include_directories("${FMOD_DIR}/inc")
 
-################################################################################
-# EOS Integration
-################################################################################
+######################################
+# OPUS
+######################################
+
+# Set Opus Paths and ensure the directory exists.
+set(OPUS_SOURCE_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source")
+set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
+file(MAKE_DIRECTORY ${OPUS_INSTALL_PATH})
+
+# Include ExternalProject module.
+include(ExternalProject)
+
+# Define an external project to build Opus.
+ExternalProject_Add(opus_build
+    GIT_REPOSITORY "https://github.com/xiph/opus.git"     # Use the Opus repository.
+    GIT_TAG "v1.3.1"                                      # Use a specific version of Opus.
+    SOURCE_DIR "${OPUS_SOURCE_PATH}"                      # Use the existing opus_source folder.
+    BINARY_DIR "${OPUS_INSTALL_PATH}/build"               # Build output will be placed here.
+    CMAKE_ARGS 
+        -DCMAKE_INSTALL_PREFIX=${OPUS_INSTALL_PATH}       # Install files into opus_install.
+        -DCMAKE_BUILD_TYPE=Release
+        -G "Visual Studio 17 2022"
+    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+)
+
+# After building, the Opus headers will be in ${OPUS_INSTALL_PATH}/include
+include_directories("${OPUS_INSTALL_PATH}/include")
+
+# Create an imported target for the built Opus library.
+add_library(OpusLib STATIC IMPORTED GLOBAL)
+set_target_properties(OpusLib PROPERTIES
+    IMPORTED_LOCATION "${OPUS_INSTALL_PATH}/lib/opus.lib"
+)
+
+# Set flag so subprojects (like AudioEngine) skip configuration-time checks.
+set(SKIP_OPUS_CHECK TRUE)
+
+######################################
+# EOS
+######################################
 
 # Set EOS path
 set(EOS_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/EOS/SDK")
@@ -105,7 +145,7 @@ endif()
 include_directories("${EOS_DIR}/Include")
 
 ################################################################################
-# Sub-projects
+# Sub-projects & Linking
 ################################################################################
 add_subdirectory(NCLCoreClasses)
 add_subdirectory(CSC8508)
@@ -125,10 +165,17 @@ else()
 	add_subdirectory(OpenGLRendering)
 endif()
 
-# Link Audio Engine
+if(TARGET AudioEngine)
+    add_dependencies(AudioEngine opus_build)
+endif()
+
+# Link FMOD
 target_link_libraries(AudioEngine PRIVATE "${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
 target_link_libraries(CSC8508 PRIVATE AudioEngine)
 target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
+
+# Link Opus
+target_link_libraries(AudioEngine PRIVATE ${OPUS_LIBRARY})
 
 # Link EOS Engine
 target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")

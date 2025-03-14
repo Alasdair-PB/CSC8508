@@ -6,6 +6,52 @@ void EOSMenu::ShowMenu() {
     AuthenticateUser();
 }
 
+
+EOSMenu::EOSMenu() {
+    stateMachine = new StateMachine();
+    State* joinLobby = new State([&](float deltaTime) { InitiliseLobby(deltaTime); });
+    stateMachine->AddState(joinLobby);
+    stateMachine->AddTransition(new StateTransition(joinLobby, joinLobby, [&]()->bool {LobbyIDAssigned(); }));
+   
+}
+
+void EOSMenu::Update(float dt) {
+    stateMachine->Update(dt);
+}
+
+void CreateMyLobby() {
+    EOSLobbySearch& lobbySearch = EOSLobbySearch::GetInstance();
+    lobbySearch.searchComplete = false;
+    std::cout << "[EOSMenu] Creating lobby..." << std::endl;
+
+    // Requests to create the lobby
+    EOSLobbyManager& lobbyManager = EOSLobbyManager::GetInstance();
+    lobbyManager.CreateLobby();
+}
+
+// To move after setup
+EOSLobbyManager& lobbyManager;
+bool LobbyIDAssigned() { 
+    EOS_Platform_Tick(EOSInitialisationManager::GetInstance().GetPlatformHandle());
+    if (lobbyManager.LobbyId[0] == '\0') 
+        return false;
+    return true; 
+}
+
+void InitiliseLobby(float dt) 
+{
+    EOSLobbySearch& lobbySearch = EOSLobbySearch::GetInstance();
+    lobbySearch.searchComplete = false;
+    std::cout << "[EOSMenu] Creating lobby..." << std::endl;
+
+    // Requests to create the lobby
+    EOSLobbyManager& lobbyManager = EOSLobbyManager::GetInstance();
+    lobbyManager.CreateLobby();
+}
+void CreateLobbyds() {
+    EOS_Platform_Tick(EOSInitialisationManager::GetInstance().GetPlatformHandle());
+}
+
 void EOSMenu::AuthenticateUser() {
     std::cout << "[EOSMenu] Starting authentication..." << std::endl;
 
@@ -45,6 +91,9 @@ void EOSMenu::DisplayOptions() {
         }
     }
 }
+
+
+
 
 // Creates a new lobby and initiates a search to retrieve its details
 void EOSMenu::CreateLobby() {

@@ -15,8 +15,6 @@
 #include <vector>
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
-#include "../AudioEngine/AudioListenerComponent.h"
-#include "../AudioEngine/AudioSourceComponent.h"
 
 
 using std::vector;

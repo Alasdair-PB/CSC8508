@@ -122,7 +122,7 @@ void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string asse
 		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);
 		saveInfo.componentPointers.push_back(std::make_pair(
 			*allocationStart,
-			SaveManager::MurmurHash3_64(typeid(*component).name(), std::strlen(typeid(*component).name()))
+			SaveManager::UniqueTypeHash(*component)
 		));
 		*allocationStart = nextMemoryLocation;
 	}

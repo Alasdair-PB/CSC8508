@@ -36,7 +36,7 @@ namespace NCL::CSC8508
 			return physicsComponent;
 		}
 
-		bool GetBroadphaseAABB(Vector3& outsize) const;
+		bool GetBroadphaseAABB(Vector3& outsize);
 
 		void UpdateBroadphaseAABB();
 

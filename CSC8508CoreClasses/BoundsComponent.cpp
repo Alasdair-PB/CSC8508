@@ -20,10 +20,11 @@ BoundsComponent::~BoundsComponent() {
 	delete boundingVolume;
 }
 
-bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) const {
+bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize){
 	if (!boundingVolume) {
 		return false;
 	}
+	if (broadphaseAABB.IsEmpty()) UpdateBroadphaseAABB();
 	outSize = broadphaseAABB;
 	return true;
 }
@@ -40,6 +41,7 @@ void BoundsComponent::UpdateBroadphaseAABB() {
 		broadphaseAABB = Vector3(r, r, r);
 	}
 	else if (static_cast<int>(boundingVolume->type) == static_cast<int>(VolumeType::OBB)) {
+		std::cout << "Tried to get broadphase of OBB but it doesn't exist yet! Soz!\n";
 		/*Matrix3 mat = Quaternion::RotationMatrix<Matrix3>(transform.GetOrientation());
 		mat = Matrix::Absolute(mat);
 		Vector3 halfSizes = ((OBBVolume&)*boundingVolume).GetHalfDimensions();

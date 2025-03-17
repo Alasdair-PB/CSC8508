@@ -99,9 +99,11 @@ size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
 
 	for (GameObject* gameObject : gameObjects) {
 		size_t nextMemoryLocation = gameObject->Save(assetPath, allocationStart);
+		std::string typeName = SaveManager::Demangle(typeid(*gameObject).name());
+
 		saveInfo.gameObjectPointers.push_back(std::make_pair(
 			*allocationStart,
-			SaveManager::MurmurHash3_64(typeid(*gameObject).name(), std::strlen(typeid(*gameObject).name()))
+			SaveManager::MurmurHash3_64(typeName.c_str(), std::strlen(typeName.c_str()))
 		));
 		*allocationStart = nextMemoryLocation;
 	}

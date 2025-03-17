@@ -69,8 +69,8 @@ namespace NCL::CSC8508
 		* Function gets the component type
 		* @return the component type
 		*/
-		virtual const char* GetType() const {
-			return typeid(*this).name();
+		virtual std::string GetType() const {
+			return SaveManager::Demangle(typeid(this).name());
 		}
 
 		/// <summary>

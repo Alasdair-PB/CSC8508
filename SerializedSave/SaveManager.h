@@ -7,6 +7,16 @@
 #include <typeindex>
 #include <type_traits>
 #include <iostream>
+
+#ifdef _MSC_VER
+#include <windows.h>
+#include <dbghelp.h>
+#pragma comment(lib, "dbghelp.lib")
+#elif defined(__GNUG__)
+#include <cxxabi.h>
+#include <memory>
+#endif
+
 using std::vector;
 
 namespace NCL::CSC8508 {
@@ -33,10 +43,27 @@ namespace NCL::CSC8508 {
             return h;
         }
 
+        static std::string Demangle(const char* mangledName) {
+            #ifdef _MSC_VER
+                char demangledName[1024];
+                if (UnDecorateSymbolName(mangledName, demangledName, sizeof(demangledName), UNDNAME_COMPLETE))
+                    return demangledName;
+                return mangledName;
+            #elif defined(__GNUG__)
+                int status = 0;
+                std::unique_ptr<char, void(*)(void*)> demangled(
+                    abi::__cxa_demangle(mangledName, nullptr, nullptr, &status),
+                    std::free
+                );
+                return (status == 0) ? demangled.get() : mangledName;
+            #else
+                return mangledName;
+            #endif
+        }
 
         template <typename T>
         static size_t UniqueTypeHash() {
-            std::string typeName = typeid(T).name();
+            std::string typeName = Demangle(typeid(T).name());
             return MurmurHash3_64(typeName.c_str(), typeName.size());
         }
 

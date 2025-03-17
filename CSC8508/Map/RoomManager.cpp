@@ -7,5 +7,12 @@
 std::vector<RoomPrefab*> RoomManager::prefabs = std::vector<RoomPrefab*>();
 
 void RoomManager::LoadPrefabs() {
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
     // TODO
 }
+
+RoomPrefab* RoomManager::GetRandom() {
+    int const index = std::rand() % prefabs.size();
+    return prefabs[index];
+}
+

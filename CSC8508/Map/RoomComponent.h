@@ -20,7 +20,11 @@ using namespace NCL::Rendering;
  */
 class RoomComponent final : public IComponent {
 public:
-    explicit RoomComponent(RoomPrefab* prefab, GameObject& gameObject) : IComponent(gameObject), prefab(prefab) { }
+    explicit RoomComponent(RoomPrefab* prefab, GameObject& gameObject) : IComponent(gameObject), prefab(prefab) {
+        std::srand(static_cast<unsigned>(std::time(nullptr)));
+    }
+
+    RoomComponent* GenerateNew();
 
 private:
     RoomPrefab* prefab;

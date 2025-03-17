@@ -139,7 +139,7 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 }
 
 bool GameObject::HasChild(GameObject* child) {
-	return std::find(children.begin(), children.end(), child) != children.end());
+	return std::find(children.begin(), children.end(), child) != children.end();
 }
 
 void GameObject::AddChild(GameObject* child)

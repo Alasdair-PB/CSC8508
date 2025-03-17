@@ -45,15 +45,14 @@ void TestSaveByType() {
 	std::string structPath = GetAssetPath("struct_data.pfab");
 	std::string enumPath = GetAssetPath("enum_data.pfab");
 
-
-	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	/*SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
 	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
 	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
 	SaveManager::SaveGameData(enumPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
 	std::cout << SaveManager::LoadMyData<MyX>(enumPath).x << std::endl;
 	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<testGuy>(X));
-	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;
+	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;*/
 }
 
 void TestSaveGameObject() {
@@ -85,6 +84,10 @@ void TutorialGame::InitialiseGame() {
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
 
+	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
+	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
+
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 
@@ -103,7 +106,7 @@ TutorialGame::TutorialGame()
 	world = new GameWorld();
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
-	controller = *w->GetController()
+	controller = w->GetController();
 	renderer = new GameTechAGCRenderer(*world);
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
@@ -125,7 +128,7 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
+	//MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 
@@ -188,6 +191,8 @@ void TutorialGame::InitWorld()
 	physics->Clear();
 	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
 	//delete x;
+
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//world->Save(assetPath);
 	world->Load(assetPath);

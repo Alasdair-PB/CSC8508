@@ -43,6 +43,9 @@ void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 
 
+void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
+void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
+
 /*NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
 : TutorialGame(gameWorld, renderer) {*/
 
@@ -171,7 +174,7 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		{
 			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
 			if (!c) return;
-			if ((thisClient && c->IsOwner()) || thisServer) {
+			if (c->IsOwner()) {
 				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
 				for (GamePacket* packet : packets)
 				{

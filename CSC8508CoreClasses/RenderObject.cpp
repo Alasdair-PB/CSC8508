@@ -25,6 +25,7 @@ void RenderObject::UpdateAnimation(float dt) {
 
 		if (inverseBindPose.size() != anim->GetJointCount()) {
 			//oh no
+			std::cerr << "Animation skeleton does not match bind pose!" << std::endl;
 			return;
 		}
 

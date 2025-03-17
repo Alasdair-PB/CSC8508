@@ -5,9 +5,14 @@
 #include "AudioEngine.h"
 #include <fmod.hpp>
 #include <iostream>
+#include <opus/opus.h>
 
 AudioEngine::AudioEngine() : audioSystem(nullptr) {
     FMOD::System_Create(&audioSystem);
+
+
+	audioSystem->setDriver(0);
+
 	// Set FMOD to use a right-handed coordinate system
 	audioSystem->init(512, FMOD_INIT_3D_RIGHTHANDED, nullptr);
 

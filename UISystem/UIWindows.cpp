@@ -1,3 +1,4 @@
+#ifndef USE_PS5
 #include "UIWindows.h"
 #include <filesystem>    
 #include "imgui_impl_win32.h"
@@ -11,13 +12,11 @@ UISystem* UISystem::instance = nullptr;
 UIWindows::UIWindows(HWND handle) : handle(handle) {
 	ImGui_ImplWin32_InitForOpenGL(handle);
 	ImGui_ImplOpenGL3_Init();
-	audioEngine = &AudioEngine::Instance();
 }
 
 UIWindows::~UIWindows() {
-	ImGui_ImplWin32_InitForOpenGL(handle);
-	ImGui_ImplOpenGL3_Init();
-	audioEngine = &AudioEngine::Instance();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplWin32_Shutdown();
 }
 
 void UIWindows::StartFrame() {
@@ -30,3 +29,4 @@ void UIWindows::EndFrame() {
 	UISystem::EndFrame();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+#endif // USE_PS5

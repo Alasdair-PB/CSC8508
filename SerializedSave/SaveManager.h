@@ -316,8 +316,8 @@ namespace NCL::CSC8508 {
         template <typename T, typename... Members>
         static T LoadMyData(const std::string& assetPath, const size_t allocationStart = 0, Members T::*... members) {
             GameData loadedData;
-            if (!LoadGameData(assetPath, loadedData, allocationStart)) throw std::runtime_error("Failed to load game data");
-            if (loadedData.typeHash != UniqueTypeHash<T>()) throw std::runtime_error("Type mismatch in game data");
+            if (!LoadGameData(assetPath, loadedData, allocationStart)) std::cerr<< "Failed to load game data" <<std::endl;
+            if (loadedData.typeHash != UniqueTypeHash<T>()) std::cerr << "Type mismatch in game data" << std::endl;
             T loadedStruct;
 
             if constexpr (sizeof...(members) == 0) 

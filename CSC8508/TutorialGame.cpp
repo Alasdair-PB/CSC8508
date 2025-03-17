@@ -10,6 +10,7 @@
 #include "PositionConstraint.h"
 #include "MaterialManager.h"
 #include "OrientationConstraint.h"
+#include "Assets.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -32,7 +33,7 @@ struct MyX {
 
 enum testGuy {X};
 
-const static std::string folderPath = "../../Assets/Pfabs/"; 
+const static std::string folderPath = NCL::Assets::PFABDIR;
 
 std::string GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
@@ -90,6 +91,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->DisplayWindow(uiSystem->framerate);
 	uiSystem->DisplayWindow(uiSystem->audioSliders);
 	uiSystem->DisplayWindow(uiSystem->mainMenu);
+	uiSystem->DisplayWindow(uiSystem->healthbar);
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -231,6 +233,7 @@ void TutorialGame::UpdateUI() {
 	if (uiSystem->GetMenuOption() != 0) {
 		mainMenu->SetOption(uiSystem->GetMenuOption());
 		uiSystem->HideWindow(uiSystem->mainMenu);
+		uiSystem->HideWindow(uiSystem->audioSliders);
 	}
 
 	uiSystem->DrawWindows();

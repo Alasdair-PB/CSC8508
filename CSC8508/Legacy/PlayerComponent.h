@@ -20,6 +20,14 @@ namespace NCL {
             PlayerComponent(GameObject& gameObject);
             ~PlayerComponent();
 
+            void SetBindingJump(uint32_t j) {
+                onJumpBinding = j;
+            }
+
+            void SetBindingPickUp(uint32_t p) {
+                onItemPickUpBinding = p;
+            }
+
 
             void OnEvent(InputButtonEvent* buttonEvent) override {
                 if (buttonEvent->owner.GetWorldID() != GetGameObject().GetWorldID()) { return; }
@@ -42,6 +50,7 @@ namespace NCL {
 
                 if (physicsComponent)
                     physicsObj = physicsComponent->GetPhysicsObject();
+
             }
 
             /**
@@ -55,6 +64,9 @@ namespace NCL {
 
                 if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
                     return;
+
+                
+
 
                 Vector3 dir;
                 Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();

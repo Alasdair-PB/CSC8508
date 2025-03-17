@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\CSC8508CoreClasses.dir\cmake_pch.hxx.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\Debug.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameObject.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameWorld.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\RenderObject.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\RenderObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\BehaviourAction.h">
+      <Filter>AI\Behaviour Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\BehaviourNode.h">
+      <Filter>AI\Behaviour Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\BehaviourNodeWithChildren.h">
+      <Filter>AI\Behaviour Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\BehaviourSelector.h">
+      <Filter>AI\Behaviour Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\BehaviourSelector.cpp">
+      <Filter>AI\Behaviour Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\BehaviourSequence.h">
+      <Filter>AI\Behaviour Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\BehaviourSequence.cpp">
+      <Filter>AI\Behaviour Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PushdownMachine.h">
+      <Filter>AI\Pushdown Automata</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PushdownMachine.cpp">
+      <Filter>AI\Pushdown Automata</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PushdownState.h">
+      <Filter>AI\Pushdown Automata</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PushdownState.cpp">
+      <Filter>AI\Pushdown Automata</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\State.h">
+      <Filter>AI\State Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\StateMachine.h">
+      <Filter>AI\State Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\StateMachine.cpp">
+      <Filter>AI\State Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\StateTransition.h">
+      <Filter>AI\State Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NavigationGrid.h">
+      <Filter>AI\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NavigationGrid.cpp">
+      <Filter>AI\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NavigationMesh.cpp">
+      <Filter>AI\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NavigationMesh.h">
+      <Filter>AI\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NavigationMap.h">
+      <Filter>AI\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NavigationPath.h">
+      <Filter>AI\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\AABBVolume.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CapsuleVolume.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CapsuleVolume.cpp">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CollisionDetection.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CollisionDetection.cpp">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CollisionVolume.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\OBBVolume.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\QuadTree.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\QuadTree.cpp">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\Ray.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\SphereVolume.h">
+      <Filter>Collision Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameClient.h">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameClient.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameServer.h">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\GameServer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NetworkBase.h">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NetworkBase.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NetworkObject.h">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NetworkObject.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NetworkState.h">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\NetworkState.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\Constraint.h">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PositionConstraint.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PositionConstraint.h">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\OrientationConstraint.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\OrientationConstraint.h">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PhysicsObject.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PhysicsObject.h">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PhysicsSystem.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\PhysicsSystem.h">
+      <Filter>Physics</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\CSC8508CoreClasses.dir\Debug\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\CSC8508CoreClasses.dir\Release\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\CSC8508CoreClasses.dir\MinSizeRel\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeFiles\CSC8508CoreClasses.dir\RelWithDebInfo\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508CoreClasses\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="AI">
+      <UniqueIdentifier>{058D0028-C9F1-3480-BCB8-2FC035AAED2E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Behaviour Trees">
+      <UniqueIdentifier>{813A9586-FCB4-343F-8102-9BCFCA3D4F8A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Pathfinding">
+      <UniqueIdentifier>{6F37B831-5A96-3CAD-8166-C264C1C8BA34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Pushdown Automata">
+      <UniqueIdentifier>{6B38D508-9031-3F18-9080-28E727DD8DC1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\State Machine">
+      <UniqueIdentifier>{94C5A46F-A517-3533-88F9-C4FE891DBC09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collision Detection">
+      <UniqueIdentifier>{B5F15247-1AA5-3843-8815-1C61CDD8E78E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{F12218EC-9F57-3743-B99E-F14B78487950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{27B89B3B-E24D-3359-8A09-9E341AF6FBCD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{35DB2EAD-D0E6-3186-A898-AC9274CB3A2D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Precompile Header File">
+      <UniqueIdentifier>{43BAE8BF-26B0-3E68-A52C-F962B0C9C405}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{621742AB-EB97-3B8C-8A15-9AED7F78FD54}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

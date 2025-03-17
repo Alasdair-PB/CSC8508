@@ -28,6 +28,10 @@ set(AI_State_Machine
     "StateMachine.cpp"
     "StateMachine.h"
     "StateTransition.h"
+    "IState.h"
+    "IStateTransition.h"
+    "WaitState.h"
+    "JumpState.h"
 )
 source_group("AI\\State Machine" FILES ${AI_State_Machine})
 
@@ -87,11 +91,10 @@ source_group("Physics" FILES ${Physics})
 
 set(Header_Files
     "Debug.h"
-    "SaveManager.h"
     "GameObject.h"
-    "ISerializable.h"
     "GameWorld.h"
     "RenderObject.h"
+    "MaterialManager.h"
     "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -123,6 +126,8 @@ set(Components
     "BoundsComponent.h"
     "PhysicsComponent.cpp"
     "BoundsComponent.cpp"
+    "StateComponent.cpp"
+    "StateComponent.h"
 )
 source_group("Components" FILES ${Components})
 
@@ -131,28 +136,6 @@ set(NetworkComponents
     "TransformNetworkComponent.h"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
-
-set(enet_Files
-    #"./enet/callbacks.h"
-    "./enet/callbacks.c"
-    "./enet/list.h"
-    "./enet/list.c"
-    "./enet/protocol.h"
-    "./enet/protocol.c"
-    "./enet/win32.h"
-    "./enet/win32.c"
-
-    "./enet/enet.h"
-    "./enet/time.h"
-    "./enet/types.h"
-    "./enet/utility.h"
-
-    "./enet/compress.c"
-    "./enet/host.c"
-    "./enet/packet.c"
-    "./enet/peer.c"
-)
-source_group("eNet" FILES ${enet_Files})
 
 set(ALL_FILES
     ${Header_Files}
@@ -167,7 +150,6 @@ set(ALL_FILES
     ${Components}
     ${ComponentSystems}
     ${NetworkComponents}
-    ${enet_Files}
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
@@ -188,9 +170,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 set_target_properties(${PROJECT_NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
 )
+
 ################################################################################
 # Compile definitions
 ################################################################################
+
+#[[
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "UNICODE"
     "_UNICODE"
@@ -198,23 +183,39 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_WINSOCK_DEPRECATED_NO_WARNINGS"
 	"NOMINMAX"
 )
+]]
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
-    <vector>
-    <map>
-    <stack>
-    <string>
-    <list>
-    <thread>
-    <atomic>
+	<fstream>
+    <sstream>
+	<iostream>
+	<iosfwd>
+	
+    <memory>
+	<string>
+	<thread>
+    <filesystem>
     <functional>
-    <iostream>
-    <set>
+	<assert.h>  
+	<chrono>	
+  
+    <unordered_set>
+	<set>
+    <vector>
+	<stack>
+	<unordered_map>
+    <map> 
+	<list>
+	<thread>
+    <atomic>
+	<functional>
+	<stack> 
+	
     "../NCLCoreClasses/Vector.h"
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
-	"../NCLCoreClasses/GameTimer.h"
+    "../NCLCoreClasses/GameTimer.h"
 
 )
 
@@ -231,12 +232,13 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "ws2_32.lib"
     "Event"
 )
+add_subdirectory(enet)
 
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
 include_directories("../ImGui/")
-
+include_directories("../SerializedSave/")
 
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")

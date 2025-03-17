@@ -1,0 +1,790 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Prospero">
+      <Configuration>Debug</Configuration>
+      <Platform>Prospero</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Prospero">
+      <Configuration>Release</Configuration>
+      <Platform>Prospero</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Prospero">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Prospero</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Prospero">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Prospero</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FFB9D9A0-C211-3779-BB2D-848BD9B496D8}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Prospero</Platform>
+    <ProjectName>Textures</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>PS5Clang</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>PS5Clang</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>PS5Clang</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>PS5Clang</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\85143e19543c8206f5fc2240cb6548f9\skyrender0001.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0001.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\85143e19543c8206f5fc2240cb6548f9\skyrender0002.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0002.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\85143e19543c8206f5fc2240cb6548f9\skyrender0003.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0003.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\85143e19543c8206f5fc2240cb6548f9\skyrender0004.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0004.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\85143e19543c8206f5fc2240cb6548f9\skyrender0005.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0005.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\85143e19543c8206f5fc2240cb6548f9\skyrender0006.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Cubemap/skyrender0006.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\c3d03c74374fd5b375cbb990bfea8412\PressStart2P.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/PressStart2P.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\c3d03c74374fd5b375cbb990bfea8412\Skybox.dds.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/Skybox.dds.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\c3d03c74374fd5b375cbb990bfea8412\checkerboard.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/checkerboard.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\c3d03c74374fd5b375cbb990bfea8412\doge.png.gnf.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Generating GNF for texture C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+image2gnf.exe -g 1 -i "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png" -o "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/Assets/Textures/doge.png.gnf" -f Bc1UNorm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\8bf393c4b684e29bb33beb62e7c00596\Textures.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\ON;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\Textures</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\ON;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\Textures</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\ON;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\Textures</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\ON;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png.gnf;C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png.gnf;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\Textures</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</VerifyInputsAndOutputsExist>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" "-BC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" --check-stamp-file "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" "-BC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" --check-stamp-file "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" "-BC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" --check-stamp-file "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Prospero'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">Building Custom Rule C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" "-BC:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5" --check-stamp-file "C:/Users/c0011935/OneDrive - Newcastle University/MASTERS/Group Leth/PS5/PS5Starter/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Prospero'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\Textures">
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\ZERO_CHECK.vcxproj">
+      <Project>{F87EA2D4-C21A-3B65-9FF8-5AB3C41A45C2}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

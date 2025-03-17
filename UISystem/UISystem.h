@@ -1,36 +1,50 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
 #include "../AudioEngine/AudioEngine.h"
+#include "imgui.h"
+#include "AudioSliders.h"
+#include "FramerateUI.h"
+#include "MainMenuUI.h"
+#include "Healthbar.h"
+#include <list>
 
 namespace NCL {
-	namespace CSC8508 {
+	namespace UI {
 		class UISystem {
-		public:
-			UISystem(HWND handle);
-			~UISystem();
+			std::list<int> uiList;
 
-			void SetWindow(HWND handle) {
-				uiWindow = handle;
+		public:
+			static UISystem* GetInstance() {return instance;}
+			static void Shutdown() { if (instance) { delete instance; } }
+
+			int GetMenuOption() {return menuOption;}
+
+			void UpdateFramerate(float delta) {dt = delta;}
+
+			virtual void StartFrame() = 0;
+			virtual void EndFrame() = 0;
+
+			void UpdateHealth(int healthVal) {
+				health = healthVal;
 			}
 
-			void StartFrame();
-			void EndFrame();
+			void DisplayWindow(int window);
+			void HideWindow(int window);
+			void DrawWindows();
 
-			void DrawDemo();
-			void DisplayFramerate(float dt);
-			void AudioSliders();
-			int MainMenu();
+			enum uiElements { framerate, mainMenu, audioSliders, healthbar };
 
 		protected:
-			HWND uiWindow;
-			bool showDemo = true;
+			UISystem();
+			virtual ~UISystem();
 
-			float masterVolume = 100;
-			float musicVolume = 100;
-			float sfxVolume = 100;
-			float voiceVolume = 100;
+			static UISystem* instance;
 
-			AudioEngine* audioEngine;
+			float dt = 0;
+			int health = 50;
+
+			int menuOption = 0;
+			enum menuOptions { none, startOffline, startServer, StartClient };
 		};
 	}
 }

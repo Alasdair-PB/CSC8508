@@ -12,7 +12,7 @@ if(NOT CMAKE_VS_PLATFORM_NAME)
 endif()
 
 if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
-    message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
+    #message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
 endif()
 
 # Define AudioEngine library
@@ -60,7 +60,6 @@ target_precompile_headers(AudioEngine PRIVATE
 # Dependencies
 ################################################################################
 
-
 target_link_libraries(AudioEngine LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(AudioEngine LINK_PUBLIC CSC8508CoreClasses)
 
@@ -73,3 +72,22 @@ target_link_directories(AudioEngine PRIVATE "${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM
 
 message(STATUS "FMOD Library File: ${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
 target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/x64/fmod_vc.lib)
+
+# Set Opus Install Path
+set(OPUS_SOURCE_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source")
+set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
+
+
+# Include Opus headers from the install folder.
+target_include_directories(AudioEngine PRIVATE "${OPUS_INSTALL_PATH}/include")
+
+
+# Bypass any configuration-time file check (using SKIP_OPUS_CHECK)
+# and link directly against the imported target (OpusLib) defined in the top-level file.
+if(NOT SKIP_OPUS_CHECK)
+    set(SKIP_OPUS_CHECK TRUE)
+endif()
+
+target_link_libraries(AudioEngine PRIVATE OpusLib)
+
+

@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\CSC8508.dir\cmake_pch.hxx.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\GameInstantiations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\GameTechRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\GameTechRendererInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\EnemyGameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\Kitten.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\MainMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\PlayerGameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\StateGameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\Swarm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\NetworkPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\NetworkedGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Scene\SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\TutorialGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\GameTechRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\GameTechRendererInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\CollectMe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\EnemyGameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\Kitten.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\MainMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\NavMeshAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\PlayerGameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\StateGameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\Swarm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\UpdateObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Legacy\VictoryPlatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\NetworkPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\NetworkedGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Scene\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\Scene\SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\TutorialGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\CSC8508.dir\Debug\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\CSC8508.dir\Release\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\CSC8508.dir\MinSizeRel\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeFiles\CSC8508.dir\RelWithDebInfo\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\CSC8508\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{F12218EC-9F57-3743-B99E-F14B78487950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Precompile Header File">
+      <UniqueIdentifier>{43BAE8BF-26B0-3E68-A52C-F962B0C9C405}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{621742AB-EB97-3B8C-8A15-9AED7F78FD54}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

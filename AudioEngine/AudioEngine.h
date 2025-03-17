@@ -5,9 +5,10 @@
 #ifndef AUDIOENGINE_H
 #define AUDIOENGINE_H
 
-
 #include <fmod.hpp>
 #include <map>
+#include <deque>
+#include <vector>
 
 
 /**
@@ -93,6 +94,10 @@ public:
 		return volume;
 	}
 
+	std::deque<std::vector<unsigned char>>& GetEncodedPacketQueue() {
+		return encodedPacketQueue;
+	}
+
 
 private:
     AudioEngine();
@@ -110,6 +115,8 @@ private:
 	FMOD::ChannelGroup* voiceGroup;
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
+
+	std::deque<std::vector<unsigned char>> encodedPacketQueue;
 	
 };
 

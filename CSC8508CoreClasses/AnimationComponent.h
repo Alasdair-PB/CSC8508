@@ -36,6 +36,10 @@ namespace NCL::CSC8508
 		void SetAnimation(Rendering::MeshAnimation& inAnim);
 		void UpdateAnimation(float dt);
 
+		void Update(float dt) override {
+			UpdateAnimation(dt);
+		}
+
 	protected:
 		AnimationData animData;
 		std::vector<Matrix4> skeleton;

@@ -29,11 +29,11 @@ GameObject::~GameObject() {
 
 struct GameObject::GameObjDataStruct : public ISerializedData {
 	GameObjDataStruct() : isEnabled(true), orientation(Quaternion()), position(Vector3()), scale(Vector3(1,1,1)), colour(Vector4()),
-		meshPointer(0), texturePointer(0), shaderPointer(0) { }
+		meshPointer(0), texturePointer(0), shaderPointer(0), name("") { }
 	GameObjDataStruct(bool isEnabled, Quaternion orientation, Vector3 position, Vector3 scale, 
-		Vector4 colour, size_t meshPointer, size_t texturePointer, size_t shaderPointer) :
+		Vector4 colour, size_t meshPointer, size_t texturePointer, size_t shaderPointer, std::string name) :
 		isEnabled(isEnabled), orientation(orientation), position(position), scale(scale), 
-		colour(colour), texturePointer(texturePointer), meshPointer(meshPointer), shaderPointer(shaderPointer) {}
+		colour(colour), texturePointer(texturePointer), meshPointer(meshPointer), shaderPointer(shaderPointer), name(name) {}
 
 	bool isEnabled;
 	Quaternion orientation;
@@ -44,6 +44,7 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	size_t meshPointer;
 	size_t texturePointer;
 	size_t shaderPointer;
+	std::string name;
 
 	std::vector<size_t> childrenPointers;
 	std::vector<std::pair<size_t, size_t>> componentPointers;
@@ -57,6 +58,7 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 			SERIALIZED_FIELD(GameObjDataStruct, colour),
 			SERIALIZED_FIELD(GameObjDataStruct, meshPointer),
 			SERIALIZED_FIELD(GameObjDataStruct, texturePointer),
+			SERIALIZED_FIELD(GameObjDataStruct, name),
 			SERIALIZED_FIELD(GameObjDataStruct, shaderPointer),
 			SERIALIZED_FIELD(GameObjDataStruct, childrenPointers),
 			SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
@@ -107,12 +109,12 @@ void GameObject::Load(std::string assetPath, size_t allocationStart) {
 void GameObject::GetGameObjData(GameObjDataStruct& saveInfo) {
 	saveInfo = renderObject == nullptr ?
 		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
-			Vector4(), 0, 0, 0) :
+			Vector4(), 0, 0, 0, name) :
 		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
 			renderObject->GetColour(),
 			MaterialManager::GetMeshPointer(renderObject->GetMesh()),
 			MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture()),
-			MaterialManager::GetShaderPointer(renderObject->GetShader()));
+			MaterialManager::GetShaderPointer(renderObject->GetShader()), name);
 }
 
 void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart) {
@@ -126,6 +128,19 @@ void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string asse
 	}
 }
 
+size_t GameObject::GetNameHash(GameObject* obj) {
+	return SaveManager::MurmurHash3_64((obj->name).c_str(), (obj->name).length());
+}
+
+void GameObject::GetChildData(GameObjDataStruct& saveInfo) {
+	for (GameObject* child : children) 
+		saveInfo.childrenPointers.push_back(GetNameHash(child));
+}
+
+void LoadSerializations(){
+
+}
+
 size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 {
 	bool clearMemory = false;
@@ -136,6 +151,7 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 
 	GameObjDataStruct saveInfo;
 	GetGameObjData(saveInfo);
+	GetChildData(saveInfo);
 	GetIComponentData(saveInfo, assetPath, allocationStart);
 
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<GameObjDataStruct>(saveInfo);

@@ -33,7 +33,6 @@ namespace NCL::CSC8508 {
             return h;
         }
 
-
         template <typename T>
         static size_t UniqueTypeHash() {
             std::string typeName = typeid(T).name();

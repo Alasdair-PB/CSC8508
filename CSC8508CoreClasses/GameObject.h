@@ -296,9 +296,11 @@ namespace NCL::CSC8508 {
 
 		Layers::LayerID	layerID;
 		Tags::Tag tag; 		
-		
+		size_t GetNameHash(GameObject* child);
+
 		void GetGameObjData(GameObjDataStruct& saveInfo);
 		void GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
+		void GetChildData(GameObjDataStruct& saveInfo);
 	};
 
 	/// <summary>

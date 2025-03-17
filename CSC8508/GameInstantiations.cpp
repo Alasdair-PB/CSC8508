@@ -6,6 +6,9 @@
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
+#include "../AudioEngine/AudioListenerComponent.h"
+#include "../AudioEngine/NetworkedListenerComponent.h"
+#include "../AudioEngine/AudioSourceComponent.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -144,12 +147,19 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
+		NetworkedListenerComponent* listenerComp = player->AddComponent<NetworkedListenerComponent>(
+			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+		listenerComp->RecordMic();
+
 		if (spawnData->clientOwned) 
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 	}
 	else {
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
+
+		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
+		listenerComp->RecordMic();
 	}
 
 	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);

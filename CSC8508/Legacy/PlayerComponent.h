@@ -24,6 +24,13 @@ namespace NCL {
                 onJumpBinding = j;
             }
 
+            void SetBindingDash(uint32_t d) {
+                onDashBinding = d;
+                if (staminaComponent) {
+                    staminaComponent->SetStaminaAction(d, dashTickStam);
+                }
+            }
+
             void SetBindingPickUp(uint32_t p) {
                 onItemPickUpBinding = p;
             }
@@ -53,6 +60,19 @@ namespace NCL {
 
             }
 
+            void OnJump() {
+                if (physicsObj->GetLinearVelocity().y <= 0.0f) {
+                    physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
+                }
+                if (isGrounded) { isJumping = false; }
+            }
+
+            void OnDashInput() {
+                isDashing = true;
+                staminaComponent->PerformActionIfAble(onDashBinding);
+            }
+            
+
             /**
              * Function invoked each frame.
              * @param deltaTime Time since last frame
@@ -65,8 +85,13 @@ namespace NCL {
                 if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
                     return;
 
-                
+                while (!inputStack.empty()) {
+                    if (inputStack.top() == onDashBinding) {
+                        OnDashInput();
+                    }
+                }
 
+                OnJump();
 
                 Vector3 dir;
                 Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
@@ -77,12 +102,16 @@ namespace NCL {
                 Matrix3 offsetRotation = Matrix::RotationMatrix3x3(0.0f, Vector3(0, 1, 0));
                 dir = offsetRotation * dir;
 
-                physicsObj->AddForce(dir * speed);
+
+                physicsObj->AddForce(dir * speed * (isDashing ? dashMultiplier: 1.0f));
                 physicsObj->RotateTowardsVelocity();
+
+                isDashing = false;
+                isGrounded = false;
             }
  
         protected:
-            float speed = 10.0f;
+            float speed = 15.0f;
             float dashMultiplier = 1.5f;
   
             InputComponent* inputComponent = nullptr;
@@ -94,6 +123,9 @@ namespace NCL {
             uint32_t onDashBinding;
             uint32_t onItemPickUpBinding;
             std::stack<uint32_t> inputStack; 
+
+            float downwardsVelocityMod;
+            float dashTickStam = 2.0f;
 
             bool isGrounded;
             bool isJumping;

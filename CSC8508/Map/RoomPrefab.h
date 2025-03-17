@@ -19,7 +19,7 @@ public:
 protected:
     GameObject* roomObject;
     NavigationMesh* navMesh;
-    std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>(); // TODO: Look at spatially efficient structures
+    std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>(); // TODO: Replace with more spatially efficient structure
     std::vector<Vector3> possibleDoorLocations = std::vector<Vector3>();
 };
 

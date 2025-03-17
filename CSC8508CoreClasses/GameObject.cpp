@@ -40,10 +40,13 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	Vector3 position;
 	Vector3 scale;
 	Vector4 colour;
+
+	std::string name;
 	size_t meshPointer;
 	size_t texturePointer;
 	size_t shaderPointer;
 
+	std::vector<size_t> childrenPointers;
 	std::vector<std::pair<size_t, size_t>> componentPointers;
 
 	static auto GetSerializedFields() {
@@ -56,6 +59,8 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 			SERIALIZED_FIELD(GameObjDataStruct, meshPointer),
 			SERIALIZED_FIELD(GameObjDataStruct, texturePointer),
 			SERIALIZED_FIELD(GameObjDataStruct, shaderPointer),
+			SERIALIZED_FIELD(GameObjDataStruct, name),
+			SERIALIZED_FIELD(GameObjDataStruct, childrenPointers),
 			SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
 		);
 	}
@@ -164,3 +169,8 @@ void GameObject::SetParent(GameObject* newParent)
 }
 
 bool GameObject::HasParent() { return parent == nullptr ? false : true; }
+
+void GameObject::OperateOnChildren(std::function<void(GameObject*)> func) {
+	for (GameObject* child : children)
+		func(child);
+}

@@ -42,7 +42,11 @@ namespace NCL::CSC8508 {
 		/// </summary>
 		/// <param name="isEnabled">The new enabled state of this GameObject</param>
 		/// <returns></returns>
-		void SetEnabled(bool isEnabled) { this->isEnabled = isEnabled;  }
+		void SetEnabled(bool isEnabled) { 
+			this->isEnabled = isEnabled;
+			OperateOnChildren([&](GameObject* object) {
+				object->SetEnabled(isEnabled);});
+		}
 
 		/// <summary>
 		/// Query if this GameObject is static
@@ -241,6 +245,9 @@ namespace NCL::CSC8508 {
 		/// <returns>True if the tag is found otherwise returns false</returns>
 		bool HasTag(Tags::Tag tag);
 
+		
+		void OperateOnChildren(std::function<void(GameObject*)> func);
+
 		/// <summary>
 		/// Query if this GameObject has a component of type T attatched
 		/// </summary>
@@ -258,6 +265,7 @@ namespace NCL::CSC8508 {
 		bool isEnabled;
 		const bool isStatic;
 		int worldID;
+		std::string name;
 
 		Transform transform;
 		RenderObject* renderObject;

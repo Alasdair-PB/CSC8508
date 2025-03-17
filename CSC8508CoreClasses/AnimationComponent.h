@@ -1,0 +1,45 @@
+#pragma once
+//
+// Contributors: David
+//
+
+#ifndef ANIMATIONCOMPONENT_H
+#define ANIMATIONCOMPONENT_H
+
+#include "Mesh.h"
+#include "MeshAnimation.h"
+#include "IComponent.h"
+
+namespace NCL::CSC8508
+{
+	class RenderObject;
+
+	/**
+		Struct holding animation data
+	*/
+	struct AnimationData {
+		Rendering::MeshAnimation* anim;
+		int currentAnimFrame = 0.0f;
+		float animTime = 0;
+	};
+
+	class AnimationComponent : public IComponent
+	{
+	public:
+		AnimationComponent(GameObject& gameObject);
+		~AnimationComponent();
+		
+		std::vector<Matrix4>& GetSkeleton() {
+			return skeleton;
+		}
+
+		void SetAnimation(Rendering::MeshAnimation& inAnim);
+		void UpdateAnimation(float dt);
+
+	protected:
+		AnimationData animData;
+		std::vector<Matrix4> skeleton;
+		RenderObject* ro;
+	};
+}
+#endif //ANIMATIONCOMPONENT_H

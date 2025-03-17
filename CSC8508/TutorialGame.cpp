@@ -103,7 +103,7 @@ TutorialGame::TutorialGame()
 	world = new GameWorld();
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
-	controller = *w->GetController()
+	controller = w->GetController();
 	renderer = new GameTechAGCRenderer(*world);
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());

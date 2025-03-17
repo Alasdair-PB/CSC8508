@@ -204,6 +204,19 @@ namespace NCL::CSC8508 {
 		void AddChild(GameObject* child);
 
 		/// <summary>
+		/// Check if a GameObject is referenced as a child by this GameObject
+		/// </summary>
+		/// <param name="child">The child GameObject to check</param>
+		/// <returns>true if this GameObject contains a reference to child in their children, otherwise returns false</returns>
+		bool HasChild(GameObject* child);
+
+		/// <summary>
+		/// Removes a child GameObject from this GameObject
+		/// </summary>
+		/// <param name="child">The removed child GameObject</param>
+		void RemoveChild(GameObject*child);
+
+		/// <summary>
 		/// Return the Parent Gameobject of this GameObject otherwise return nullptr
 		/// </summary>
 		/// <returns>The parent gameobject if one exists otherwise returnn nullptr</returns>
@@ -213,7 +226,7 @@ namespace NCL::CSC8508 {
 		/// Sets the Parent of this GameObject
 		/// </summary>
 		/// <param name="parent">The new parent of this GameObject</param>
-		void SetParent(GameObject* parent);
+		void SetParent(GameObject* newParent);
 
 		/// <summary>
 		/// Checks if this GameObject has a parent otherwise false
@@ -250,6 +263,7 @@ namespace NCL::CSC8508 {
 		RenderObject* renderObject;
 		GameObject* parent;
 		vector<IComponent*> components; 
+		vector<GameObject*> children;
 
 		Layers::LayerID	layerID;
 		Tags::Tag tag; 

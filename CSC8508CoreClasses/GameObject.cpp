@@ -137,3 +137,30 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 		delete allocationStart;
 	return nextMemoryLocation;
 }
+
+bool GameObject::HasChild(GameObject* child) {
+	return std::find(children.begin(), children.end(), child) != children.end());
+}
+
+void GameObject::AddChild(GameObject* child)
+{
+	if (child == nullptr || HasChild(child)) return;
+	children.push_back(child);
+	child->SetParent(this);
+}
+
+void GameObject::RemoveChild(GameObject* child) {
+	if (child == nullptr || HasChild(child)) return;
+	children.erase(std::remove(children.begin(), children.end(), child), children.end());
+}
+
+GameObject* GameObject::TryGetParent() { return parent; }
+
+void GameObject::SetParent(GameObject* newParent)
+{
+	if (newParent == nullptr) return;
+	newParent->AddChild(this);
+	this->parent = newParent;
+}
+
+bool GameObject::HasParent() { return parent == nullptr ? false : true; }

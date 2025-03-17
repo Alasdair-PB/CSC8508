@@ -4,10 +4,15 @@ using namespace NCL::CSC8508;
 
 Transform::Transform()	{
 	scale = Vector3(1, 1, 1);
+	parentTransform = nullptr;
 }
 
 Transform::~Transform()	{
 
+}
+
+void Transform::SetParent(Transform* parentTransform) {
+	this->parentTransform = parentTransform;
 }
 
 void Transform::UpdateMatrix() {
@@ -34,3 +39,20 @@ Transform& Transform::SetOrientation(const Quaternion& worldOrientation) {
 	UpdateMatrix();
 	return *this;
 }
+
+Vector3 Transform::GetPosition() const {
+	return parentTransform == nullptr ? position : position + parentTransform->GetPosition();
+}
+
+Vector3 Transform::GetScale() const {
+	return parentTransform == nullptr ? scale : scale * parentTransform->GetScale();
+}
+
+Quaternion Transform::GetOrientation() const {
+	return parentTransform == nullptr ? orientation : orientation * parentTransform->GetOrientation();
+}
+
+Matrix4 Transform::GetMatrix() const {
+	return parentTransform == nullptr ? matrix : matrix * parentTransform->GetMatrix();
+}
+

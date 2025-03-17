@@ -13,7 +13,7 @@ AddComponentEvent::AddComponentEvent(GameObject& gameObject, size_t entry) : gam
 GameObject& AddComponentEvent::GetGameObject() { return gameObject; }
 size_t AddComponentEvent::GetEntry() { return entry; }
 
-GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nullptr) {
+GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nullptr), name("") {
 	worldID = -1;
 	isEnabled = true;
 	layerID = Layers::LayerID::Default;
@@ -29,7 +29,7 @@ GameObject::~GameObject() {
 
 struct GameObject::GameObjDataStruct : public ISerializedData {
 	GameObjDataStruct() : isEnabled(true), orientation(Quaternion()), position(Vector3()), scale(Vector3(1,1,1)), colour(Vector4()),
-		meshPointer(0), texturePointer(0), shaderPointer(0){}
+		meshPointer(0), texturePointer(0), shaderPointer(0) { }
 	GameObjDataStruct(bool isEnabled, Quaternion orientation, Vector3 position, Vector3 scale, 
 		Vector4 colour, size_t meshPointer, size_t texturePointer, size_t shaderPointer) :
 		isEnabled(isEnabled), orientation(orientation), position(position), scale(scale), 
@@ -41,7 +41,6 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	Vector3 scale;
 	Vector4 colour;
 
-	std::string name;
 	size_t meshPointer;
 	size_t texturePointer;
 	size_t shaderPointer;
@@ -59,7 +58,6 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 			SERIALIZED_FIELD(GameObjDataStruct, meshPointer),
 			SERIALIZED_FIELD(GameObjDataStruct, texturePointer),
 			SERIALIZED_FIELD(GameObjDataStruct, shaderPointer),
-			SERIALIZED_FIELD(GameObjDataStruct, name),
 			SERIALIZED_FIELD(GameObjDataStruct, childrenPointers),
 			SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
 		);
@@ -74,7 +72,6 @@ void GameObject::LoadClean(GameObjDataStruct& loadedSaveData, std::string assetP
 		if (!e.IsCancelled())
 			components.back()->Load(assetPath, loadedSaveData.componentPointers[i].first);
 		std::cout << "new component added" << std::endl;
-
 	}
 }
 
@@ -107,6 +104,28 @@ void GameObject::Load(std::string assetPath, size_t allocationStart) {
 	LoadGameObjectInstanceData(loadedSaveData);
 }
 
+void GameObject::GetGameObjData(GameObjDataStruct& saveInfo) {
+	saveInfo = renderObject == nullptr ?
+		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
+			Vector4(), 0, 0, 0) :
+		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
+			renderObject->GetColour(),
+			MaterialManager::GetMeshPointer(renderObject->GetMesh()),
+			MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture()),
+			MaterialManager::GetShaderPointer(renderObject->GetShader()));
+}
+
+void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart) {
+	for (IComponent* component : components) {
+		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);
+		saveInfo.componentPointers.push_back(std::make_pair(
+			*allocationStart,
+			SaveManager::MurmurHash3_64(typeid(*component).name(), std::strlen(typeid(*component).name()))
+		));
+		*allocationStart = nextMemoryLocation;
+	}
+}
+
 size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 {
 	bool clearMemory = false;
@@ -114,26 +133,10 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 		allocationStart = new size_t(0);
 		clearMemory = true;
 	}
+
 	GameObjDataStruct saveInfo;
-
-	saveInfo = renderObject == nullptr ?
-		
-		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
-			Vector4(), 0, 0, 0) :
-		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
-			renderObject->GetColour(), 
-			MaterialManager::GetMeshPointer(renderObject->GetMesh()),
-			MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture()), 
-			MaterialManager::GetShaderPointer(renderObject->GetShader()));
-
-	for (IComponent* component : components) {
-		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);		
-		saveInfo.componentPointers.push_back(std::make_pair(
-			*allocationStart,
-			SaveManager::MurmurHash3_64(typeid(*component).name(), std::strlen(typeid(*component).name()))
-		));
-		*allocationStart = nextMemoryLocation;
-	}
+	GetGameObjData(saveInfo);
+	GetIComponentData(saveInfo, assetPath, allocationStart);
 
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<GameObjDataStruct>(saveInfo);
 	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart);
@@ -142,6 +145,7 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 		delete allocationStart;
 	return nextMemoryLocation;
 }
+
 
 bool GameObject::HasChild(GameObject* child) {
 	return std::find(children.begin(), children.end(), child) != children.end();
@@ -165,6 +169,7 @@ void GameObject::SetParent(GameObject* newParent)
 {
 	if (newParent == nullptr) return;
 	newParent->AddChild(this);
+	transform.SetParent(&newParent->GetTransform());
 	this->parent = newParent;
 }
 

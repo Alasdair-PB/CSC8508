@@ -245,7 +245,22 @@ namespace NCL::CSC8508 {
 		/// <returns>True if the tag is found otherwise returns false</returns>
 		bool HasTag(Tags::Tag tag);
 
+		/// <summary>
+		/// Sets the name of this GameObject
+		/// </summary>
+		/// <param name="name">The name GameObject name</param>
+		void SetName(std::string name) { this->name = name; }
+
+		/// <summary>
+		/// Get the name of this GameObject
+		/// </summary>
+		/// <returns>The name of this GameObject</returns>
+		std::string GetName() { return name; }
 		
+		/// <summary>
+		/// Call function func on all Child GameObjects of this GameObject
+		/// </summary>
+		/// <param name="func">A reference to any function that takes parameter GameObject*</param>
 		void OperateOnChildren(std::function<void(GameObject*)> func);
 
 		/// <summary>
@@ -254,7 +269,13 @@ namespace NCL::CSC8508 {
 		/// <typeparam name="T">The type of the queried Component</typeparam>
 		/// <param name="type">The queried Component</param>
 		/// <returns>True if a component of type T is attatched to this GameObject otherwise returns false</returns>
-		template <typename T> bool HasComponent(T type);
+		template <typename T> bool HasComponent(T type) {
+			for (IComponent* component : components) {
+				if (T* casted = dynamic_cast<T*>(component))
+					return true;
+			}
+			return false;
+		}
 
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
@@ -274,7 +295,10 @@ namespace NCL::CSC8508 {
 		vector<GameObject*> children;
 
 		Layers::LayerID	layerID;
-		Tags::Tag tag; 
+		Tags::Tag tag; 		
+		
+		void GetGameObjData(GameObjDataStruct& saveInfo);
+		void GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
 	};
 
 	/// <summary>
@@ -289,6 +313,8 @@ namespace NCL::CSC8508 {
 	protected:
 		GameObject& gameObject;
 		size_t entry;
+
+
 	};
 
 }

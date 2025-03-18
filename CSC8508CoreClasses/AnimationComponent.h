@@ -9,6 +9,9 @@
 #include "Mesh.h"
 #include "MeshAnimation.h"
 #include "IComponent.h"
+#include <memory>
+
+using std::vector;
 
 namespace NCL::CSC8508
 {
@@ -18,7 +21,7 @@ namespace NCL::CSC8508
 		Struct holding animation data
 	*/
 	struct AnimationData {
-		Rendering::MeshAnimation* anim;
+		std::shared_ptr<Rendering::MeshAnimation> anim;
 		int currentAnimFrame = 0.0f;
 		float animTime = 0;
 	};
@@ -26,14 +29,14 @@ namespace NCL::CSC8508
 	class AnimationComponent : public IComponent
 	{
 	public:
-		AnimationComponent(GameObject& gameObject);
+		AnimationComponent(GameObject& gameObject, Rendering::MeshAnimation* anim = nullptr);
 		~AnimationComponent();
 		
 		std::vector<Matrix4>& GetSkeleton() {
 			return skeleton;
 		}
 
-		void SetAnimation(Rendering::MeshAnimation& inAnim);
+		void SetAnimation(Rendering::MeshAnimation* inAnim);
 		void UpdateAnimation(float dt);
 
 		void Update(float dt) override {

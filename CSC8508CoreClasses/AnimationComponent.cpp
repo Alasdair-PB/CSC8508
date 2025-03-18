@@ -2,10 +2,19 @@
 #include "RenderObject.h"
 
 using namespace NCL::CSC8508;
+AnimationComponent::AnimationComponent(GameObject& gameObject, Rendering::MeshAnimation* anim) : IComponent(gameObject) {
+	ro = gameObject.GetRenderObject();
+	SetAnimation(anim);
+}
 
-void AnimationComponent::SetAnimation(Rendering::MeshAnimation& inAnim) {
-	animData.anim = &inAnim;
-	skeleton.resize(animData.anim->GetJointCount());
+AnimationComponent::~AnimationComponent() {
+}
+
+void AnimationComponent::SetAnimation(Rendering::MeshAnimation* inAnim) {
+	if(inAnim){
+		animData.anim = std::shared_ptr<Rendering::MeshAnimation>(inAnim);
+		skeleton.resize(animData.anim->GetJointCount());
+	}
 }
 
 void AnimationComponent::UpdateAnimation(float dt) {

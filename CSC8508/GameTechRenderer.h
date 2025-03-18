@@ -43,6 +43,7 @@ namespace NCL {
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
+
 			vector<const RenderObject*> activeObjects;
 
 			OGLShader* debugShader;

@@ -61,6 +61,12 @@ namespace NCL {
 				return colour;
 			}	
 
+			float GetCameraDistance() const { return distanceFromCamera; }
+			void SetCameraDistance(float f) { distanceFromCamera = f; }
+			static const bool CompareByCameraDistance(const RenderObject* a, const RenderObject* b) {
+				return a->distanceFromCamera < b->distanceFromCamera;
+			}
+
 		protected:
 			Buffer* buffer;
 			Mesh* mesh;
@@ -69,6 +75,7 @@ namespace NCL {
 			Transform* transform;
 			Vector4			colour;
 
+			float distanceFromCamera;
 		};
 	}
 }

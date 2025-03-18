@@ -6,6 +6,8 @@
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
+#include "AnimationComponent.h"
+#include "MeshAnimation.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -130,6 +132,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+
+	//AnimationComponent* anim = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Role_T.anm"));
 
 	int componentIdCount = 0;
 

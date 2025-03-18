@@ -392,7 +392,6 @@ namespace NCL::CSC8508 {
                 for (size_t i = 0; i < containerSize; ++i)
                     container[i] = LoadMember<ValueType>(loadedData, offset);
                 //}
-                std::cout << "loaded" << std::endl;
                 //else {               
                 //    std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(ValueType));
                 //    offset += containerSize * sizeof(ValueType);

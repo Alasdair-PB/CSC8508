@@ -148,6 +148,12 @@ namespace NCL::CSC8508 {
 		}
 
 		/// <summary>
+		/// Get children set as references to this GameObject
+		/// </summary>
+		/// <returns>A vector of all children of this GameObject</returns>
+		vector<GameObject*> GetChildren() { return children; }
+
+		/// <summary>
 		/// Returns a pointer to a attatched GameObject if the component
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -182,20 +188,6 @@ namespace NCL::CSC8508 {
 		size_t Save(std::string assetPath, size_t* = nullptr) override;
 
 		/// <summary>
-		/// Loads the save data as new components
-		/// </summary>
-		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
-		/// <param name="assetPath">The path to the asset file</param>
-		void LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath);
-
-		/// <summary>
-		/// Loads the save data into exisiting components
-		/// </summary>
-		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
-		/// <param name="assetPath">The path to the asset file</param>
-		void LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath);
-
-		/// <summary>
 		/// Loads GameObject specific Data into this GameObject
 		/// </summary>
 		/// <param name="loadedSaveData">The loaded data used to set this GameObject's properties to the loaded data</param>
@@ -225,12 +217,6 @@ namespace NCL::CSC8508 {
 		/// </summary>
 		/// <returns>The parent gameobject if one exists otherwise returnn nullptr</returns>
 		GameObject* TryGetParent();
-
-		/// <summary>
-		/// Sets the Parent of this GameObject
-		/// </summary>
-		/// <param name="parent">The new parent of this GameObject</param>
-		void SetParent(GameObject* newParent);
 
 		/// <summary>
 		/// Checks if this GameObject has a parent otherwise false
@@ -300,7 +286,35 @@ namespace NCL::CSC8508 {
 
 		void GetGameObjData(GameObjDataStruct& saveInfo);
 		void GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
-		void GetChildData(GameObjDataStruct& saveInfo);
+		void GetChildData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
+
+		/// <summary>
+		/// Sets the Parent of this GameObject
+		/// </summary>
+		/// <param name="parent">The new parent of this GameObject</param>
+		void SetParent(GameObject* newParent);
+
+
+		/// <summary>
+		/// Loads the save data as new components
+		/// </summary>
+		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
+		/// <param name="assetPath">The path to the asset file</param>
+		void LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath);
+
+		/// <summary>
+		/// Loads the save data into exisiting components
+		/// </summary>
+		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
+		/// <param name="assetPath">The path to the asset file</param>
+		void LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath);
+
+		/// <summary>
+		/// Loads Child GameObjects as children
+		/// </summary>
+		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
+		/// <param name="assetPath">The path to the asset file</param>
+		void LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath);
 	};
 
 	/// <summary>

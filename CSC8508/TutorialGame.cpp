@@ -61,6 +61,7 @@ void TestSaveGameObject() {
 	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
 	myObjectToSave->Save(gameObjectPath);
 	myObjectToSave->Load(gameObjectPath);
+
 }
 
 void TestSave() {
@@ -181,14 +182,13 @@ void TutorialGame::UpdateGame(float dt)
 
 void TutorialGame::InitWorld() 
 {
-	//TestSave();
-
+	TestSave();
 	world->ClearAndErase();
 	physics->Clear();
 	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
 	//delete x;
-//
-	std::cout << world->GetGameObjectCount() << std::endl;
+
+	//std::cout << world->GetGameObjectCount() << std::endl;
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//world->Save(assetPath);
 	world->Load(assetPath);

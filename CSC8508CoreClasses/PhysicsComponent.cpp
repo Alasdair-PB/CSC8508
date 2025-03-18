@@ -64,7 +64,4 @@ void PhysicsComponent::Load(std::string assetPath, size_t allocationStart) {
 	physicsObject->SetInverseMass(loadedSaveData.inverseMass);
 	physicsObject->SetFriction(loadedSaveData.friction);
 	physicsObject->SetRestitution(loadedSaveData.cRestitution);
-
-	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
-	std::cout << physicsObject->GetInverseMass() << ": Component inverse mass" << std::endl;
 }

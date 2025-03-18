@@ -68,18 +68,15 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 
 void GameObject::LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath) {
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
-		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
 		AddComponentEvent e = AddComponentEvent(*this, loadedSaveData.componentPointers[i].second);
 		EventManager::Call(&e);
 		if (!e.IsCancelled())
 			components.back()->Load(assetPath, loadedSaveData.componentPointers[i].first);
-		std::cout << "new component added" << std::endl;
 	}
 }
 
 void GameObject::LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath) {
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
-		std::cout << loadedSaveData.componentPointers[i].first << std::endl;
 		if (i >= components.size()) break;
 		components[i]->Load(assetPath, loadedSaveData.componentPointers[i].first);
 	}
@@ -97,12 +94,12 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 
 	renderObject = new RenderObject(&GetTransform(), cubeMesh, basicTex, basicShader);
 	renderObject->SetColour(loadedSaveData.colour);
-	std::cout << loadedSaveData.isEnabled << std::endl;
 }
 
 void GameObject::Load(std::string assetPath, size_t allocationStart) {
 	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
 	components.size() > 0 ? LoadInto(loadedSaveData, assetPath) : LoadClean(loadedSaveData, assetPath);
+	LoadChildInstanceData(loadedSaveData, assetPath);
 	LoadGameObjectInstanceData(loadedSaveData);
 }
 
@@ -123,7 +120,6 @@ void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string asse
 		saveInfo.componentPointers.push_back(std::make_pair(
 			*allocationStart,
 			SaveManager::MurmurHash3_64(typeid(*component).name(), std::strlen(typeid(*component).name()))
-			//SaveManager::UniqueTypeHash(*component)
 		));
 		*allocationStart = nextMemoryLocation;
 	}
@@ -133,13 +129,20 @@ size_t GameObject::GetNameHash(GameObject* obj) {
 	return SaveManager::MurmurHash3_64((obj->name).c_str(), (obj->name).length());
 }
 
-void GameObject::GetChildData(GameObjDataStruct& saveInfo) {
-	for (GameObject* child : children) 
-		saveInfo.childrenPointers.push_back(GetNameHash(child));
+void GameObject::GetChildData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart) {
+	for (GameObject* child : children) {
+		size_t nextMemoryLocation = child->Save(assetPath, allocationStart);
+		saveInfo.childrenPointers.push_back(*allocationStart);
+		*allocationStart = nextMemoryLocation;
+	}
 }
 
-void LoadSerializations(){
-
+void GameObject::LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath){
+	for (int i = 0; i < loadedSaveData.childrenPointers.size(); i++) {
+		GameObject* object = new GameObject();
+		object->Load(assetPath, loadedSaveData.childrenPointers[i]);
+		children.push_back(object);
+	}
 }
 
 size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
@@ -152,7 +155,7 @@ size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 
 	GameObjDataStruct saveInfo;
 	GetGameObjData(saveInfo);
-	GetChildData(saveInfo);
+	GetChildData(saveInfo, assetPath, allocationStart);
 	GetIComponentData(saveInfo, assetPath, allocationStart);
 
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<GameObjDataStruct>(saveInfo);
@@ -170,7 +173,7 @@ bool GameObject::HasChild(GameObject* child) {
 
 void GameObject::AddChild(GameObject* child)
 {
-	if (child == nullptr || HasChild(child)) return;
+	if (child == nullptr || HasChild(child) || child->TryGetParent() == this) return;
 	children.push_back(child);
 	child->SetParent(this);
 }
@@ -185,7 +188,6 @@ GameObject* GameObject::TryGetParent() { return parent; }
 void GameObject::SetParent(GameObject* newParent)
 {
 	if (newParent == nullptr) return;
-	newParent->AddChild(this);
 	transform.SetParent(&newParent->GetTransform());
 	this->parent = newParent;
 }

@@ -78,8 +78,6 @@ void GameWorld::Load(std::string assetPath, size_t allocationStart) {
 		loadedSaveData.pitch, loadedSaveData.yaw, loadedSaveData.position);
 
 	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
-		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
-		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
 		GameObject* object = new GameObject();
 		object->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
 		AddGameObject(object);
@@ -96,6 +94,9 @@ size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
 	WorldSaveData saveInfo(0.1f, 500.0f, -15.0f, 315.0f, Vector3(-60, 40, 60));
 
 	for (GameObject* gameObject : gameObjects) {
+		if (gameObject->HasParent())
+			continue;
+
 		size_t nextMemoryLocation = gameObject->Save(assetPath, allocationStart);
 		saveInfo.gameObjectPointers.push_back(std::make_pair(
 			*allocationStart,
@@ -119,11 +120,8 @@ void GameWorld::AddGameObject(GameObject* o) {
 	auto bounds = o->TryGetComponent<BoundsComponent>();
 	auto phys = o->TryGetComponent<PhysicsComponent>();
 
-	if (bounds)
-		boundsComponents.emplace_back(bounds);
-
-	if (phys) 
-		physicsComponents.emplace_back(phys);
+	if (bounds) boundsComponents.emplace_back(bounds);
+	if (phys) physicsComponents.emplace_back(phys);
 
 	auto newComponents = o->GetAllComponents();
 
@@ -131,6 +129,9 @@ void GameWorld::AddGameObject(GameObject* o) {
 		this->components.push_back(component);
 		component->InvokeOnAwake();
 	}
+
+	for (GameObject* child : o->GetChildren())
+		AddGameObject(child);
 	o->InvokeOnAwake();
 }
 

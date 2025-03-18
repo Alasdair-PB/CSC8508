@@ -1,5 +1,6 @@
 #pragma once
 #include "PushdownState.h"
+#include <stack>
 
 namespace NCL {
 	namespace CSC8508 {

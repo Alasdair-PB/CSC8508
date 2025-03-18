@@ -26,12 +26,8 @@ namespace NCL {
 				winHeight = height;
 			}
 
-			void UpdateFramerate(float delta) {
-				dt = delta;
-			}
-
-			void StartFrame();
-			void EndFrame();
+			virtual void StartFrame() = 0;
+			virtual void EndFrame() = 0;
 			void DisplayWindow(int window);
 			void HideWindow(int window);
 			void DrawWindows();

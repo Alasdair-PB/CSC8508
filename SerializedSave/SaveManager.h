@@ -187,7 +187,6 @@ namespace NCL::CSC8508 {
                 std::cerr << "Error: Missing end marker. File may be corrupted!" << std::endl;
                 return false;
             }
-
             if (checksum != (magic ^ version))
                 std::cerr << "Warning: Checksum mismatch. File may be corrupted!" << std::endl;
 
@@ -223,7 +222,7 @@ namespace NCL::CSC8508 {
             return loadedStruct;
         }
 
-        /// <summary>
+       /// <summary>
        /// Creates gameData that allows data Types to saved and reinterpreted by the SaveManager
        /// </summary>
        /// <typeparam name="T">The type to be saved</typeparam>
@@ -240,17 +239,19 @@ namespace NCL::CSC8508 {
             if constexpr (sizeof...(members) == 0)
                 return ResizeAndSaveMember(value, item);
             else {
+                ([&] {
+                    const auto& container = value.*members;
+                    ResizeAndSaveMember(container, item);
+                    //CalculateSize(container, item);
+                    }(), ...);
 
-                ([&] {
-                    const auto& container = value.*members;
-                    CalculateSize(container, item);
-                    }(), ...);
-                item.data.resize(item.dataSize);
-                ([&] {
-                    const auto& container = value.*members;
-                    uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data() + item.dataSize);
-                    SaveMember(container, item, dataPtr);
-                    }(), ...);
+                // Would be better to resize once, but causing scope error will investigate 
+                // item.data.resize(item.dataSize);
+                //([&] {
+                //     const auto& container = value.*members;
+                //    uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data() + item.dataSize);
+                //   SaveMember(container, item, dataPtr);
+                //   }(), ...);
                 return item;
             }
         }
@@ -286,14 +287,19 @@ namespace NCL::CSC8508 {
             else if constexpr (is_specialization<T, std::pair>::value) {
                 using FirstType = typename T::first_type;
                 using SecondType = typename T::second_type;
-                item.dataSize += sizeof(uint32_t);
                 CalculateSize(container.first, item);
                 CalculateSize(container.second, item);
             }
             else if constexpr (is_container<T>::value) {
                 item.dataSize += sizeof(uint32_t);
-                for (const auto& val : container)
-                    CalculateSize(val, item);
+                using ValueType = typename T::value_type;
+
+                if constexpr (std::is_trivially_copyable_v<ValueType> && !is_specialization<ValueType, std::pair>::value)
+                    item.dataSize += container.size() * sizeof(ValueType);
+                else {
+                    for (const auto& val : container)
+                        CalculateSize(val, item);
+                }
             }
             else if constexpr (std::is_trivially_copyable_v<T>) 
                 item.dataSize += sizeof(T);
@@ -363,11 +369,10 @@ namespace NCL::CSC8508 {
             if constexpr (is_specialization<T, std::pair>::value) {
                 using FirstType = typename T::first_type;
                 using SecondType = typename T::second_type;
-                uint32_t containerSize;
-                offset += sizeof(containerSize);
 
-                container.first = LoadMember<FirstType>(loadedData, offset);
-                container.second = LoadMember<SecondType>(loadedData, offset);
+                FirstType first = LoadMember<FirstType>(loadedData, offset);
+                SecondType second = LoadMember<SecondType>(loadedData, offset);
+                container = { first, second };
                 return container;
             } 
             else if constexpr (std::is_same_v<T, std::string>) {
@@ -381,23 +386,25 @@ namespace NCL::CSC8508 {
                 return container;
             }
             else if constexpr (is_container<T>::value) {
-                uint32_t containerSize;
-                std::memcpy(&containerSize, loadedData.data.data() + offset, sizeof(containerSize));
+                uint32_t containerSize = container.size();
+                std::memcpy(&containerSize, loadedData.data.data() + offset, containerSize);
                 offset += sizeof(containerSize);
                 container.resize(containerSize);
-                using ValueType = typename T::value_type;
 
-                if (!std::is_trivially_copyable_v<ValueType>) {
+                using ValueType = typename T::value_type;
+                if (!std::is_trivially_copyable_v<ValueType> || is_specialization<ValueType, std::pair>::value) {
                     for (size_t i = 0; i < containerSize; ++i)
                         container[i] = LoadMember<ValueType>(loadedData, offset);
                 }
-                else {
+                else {               
                     std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(ValueType));
                     offset += containerSize * sizeof(ValueType);
                 }
                 return container;
             }
             else if constexpr (std::is_trivially_copyable_v<T>) {
+                if (offset + sizeof(container) > loadedData.data.size()) 
+                   throw std::runtime_error("Offset out of bounds in LoadMember");
                 std::memcpy(&container, loadedData.data.data() + offset, sizeof(container));
                 offset += sizeof(container);
                 return container;

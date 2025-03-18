@@ -79,7 +79,7 @@ namespace NCL::CSC8508 {
         /// <typeparam name="...Types">The types iterated as type T</typeparam>
         /// <param name="func">the function that operates on each component in the buffer of each type provided in Types</param>
         template <typename T, typename... Types>
-        void OperateOnBufferContentsAs(std::function<void(T*)> func) {
+        static void OperateOnBufferContentsAs(std::function<void(T*)> func) {
             (([&] {
                 T* buffer = dynamic_cast<T*>(GetComponentsBuffer<Types>());
                 if (buffer) {
@@ -88,25 +88,6 @@ namespace NCL::CSC8508 {
                         func(&buffer[i]);
                 }
             }()), ...); 
-        }
-
-        /// <summary>
-        /// Executes func on all IComponent derived from type T. <Warning intended for deprication>
-        /// </summary>
-        /// <typeparam name="T">The type required for iteration of function func</typeparam>
-        /// <param name="func">the function that operates on each component in the iterator of type T</param>
-        template <typename T>
-            requires std::is_base_of_v<IComponent, T>
-        static void OperateOnBufferContentsDynamicType(std::function<void(T*)> func)
-        {
-            for (auto& entry : allComponents)
-            {
-                for (auto* component : entry.second) {
-                    if (!component->IsDerived(typeid(T)))
-                       break;
-                    func(component);
-                }
-            }
         }
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
@@ -181,10 +162,10 @@ namespace NCL::CSC8508 {
         static constexpr size_t MAX_COMPONENTS = 1000;
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
-        static size_t componentCount;
+        inline static size_t componentCount;
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
-        static alignas(T) std::byte componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
+        inline static std::byte componentBuffer[MAX_COMPONENTS<T> *sizeof(T)];
 
         inline static std::unordered_map<std::type_index, std::vector<IComponent*>> allComponents;
         inline static std::vector<Action<IComponent>*> INetworkComponentBufferOperators;
@@ -206,7 +187,7 @@ namespace NCL::CSC8508 {
 
             if (component->IsDerived(typeid(T2))) {
                 BufferOperators.push_back(
-                    new Action(
+                    new Action<IComponent>(
                         [](std::function<void(IComponent*)> func) {
                             OperateOnBufferContents<T>(
                                 [&func](T* derived) { func(static_cast<IComponent*>(derived)); }
@@ -216,12 +197,6 @@ namespace NCL::CSC8508 {
             }
         }
     };
-
-    template <typename T> requires std::is_base_of_v<IComponent, T>
-    size_t ComponentManager::componentCount<T> = 0;
-
-    template <typename T> requires std::is_base_of_v<IComponent, T>
-    alignas(T) std::byte ComponentManager::componentBuffer<T>[MAX_COMPONENTS<T> *sizeof(T)] = {};
 }
 
 #endif // COMPONENTMANAGER_H

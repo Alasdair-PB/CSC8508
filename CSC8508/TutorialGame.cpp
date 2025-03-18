@@ -86,9 +86,7 @@ void TutorialGame::InitialiseGame() {
 	LoadControllerMappings(controller);
 
 	InitialiseAssets();
-
-	renderer->StartUI();
-	uiSystem = renderer->GetUI();
+	uiSystem = UI::UISystem::GetInstance();
 
 	uiSystem->SetWinSize(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y);
 	uiSystem->DisplayWindow(uiSystem->framerate);
@@ -146,7 +144,6 @@ TutorialGame::~TutorialGame()
 	delete world;
 	delete controller;
 	delete navMesh;
-	delete uiSystem;
 }
 
 void TutorialGame::UpdateObjectSelectMode(float dt) {

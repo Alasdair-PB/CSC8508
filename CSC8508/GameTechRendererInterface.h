@@ -22,8 +22,6 @@ namespace NCL::CSC8508 {
 		virtual NCL::Rendering::Shader* LoadShader(const std::string& vertex, const std::string& fragment) = 0;
 		virtual void Update(float dt) {}
 		virtual void Render() {}
-		virtual NCL::UI::UISystem* GetUI() = 0;
-		virtual void StartUI() {};
 	};
 }
 

@@ -186,11 +186,11 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-	delete x;
+	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+	//delete x;
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	world->Save(assetPath);
-	//world->Load(assetPath);
+	//world->Save(assetPath);
+	world->Load(assetPath);
 }
 
 bool TutorialGame::SelectObject() {

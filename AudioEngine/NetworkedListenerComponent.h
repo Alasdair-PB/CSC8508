@@ -29,7 +29,7 @@ namespace NCL::CSC8508 {
 
 		~NetworkedListenerComponent() = default;
 
-		void OnAwake() override;
+		void OnAwake() override {}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
 			static std::unordered_set<std::type_index> derivedTypes = {

@@ -5,6 +5,9 @@ using namespace NCL::CSC8508;
 AnimationComponent::AnimationComponent(GameObject& gameObject, Rendering::MeshAnimation* anim) : IComponent(gameObject) {
 	ro = gameObject.GetRenderObject();
 	SetAnimation(anim);
+	if (!ro) {
+		std::cerr << "No render object set!" << std::endl;
+	}
 }
 
 AnimationComponent::~AnimationComponent() {

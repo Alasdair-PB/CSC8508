@@ -74,18 +74,16 @@ void GameWorld::LoadCameraInfo(float nearPlane, float farPlane, float pitch, flo
 
 void GameWorld::Load(std::string assetPath, size_t allocationStart) {
 	WorldSaveData loadedSaveData = ISerializedData::LoadISerializable<WorldSaveData>(assetPath, allocationStart);
-
 	LoadCameraInfo(loadedSaveData.nearPlane, loadedSaveData.farPlane, 
 		loadedSaveData.pitch, loadedSaveData.yaw, loadedSaveData.position);
+
 	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
 		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
 		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
-
 		GameObject* object = new GameObject();
 		object->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
 		AddGameObject(object);
 	}
-	std::cout << loadedSaveData.nearPlane << std::endl;
 }
 
 size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)

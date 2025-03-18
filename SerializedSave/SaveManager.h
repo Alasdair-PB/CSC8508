@@ -216,8 +216,8 @@ namespace NCL::CSC8508 {
             else {
                 ([&] {
                     auto& container = loadedStruct.*members;
-                    LoadMember<typename std::decay_t<decltype(container)>>(loadedData, offset);
-                    }(), ...);
+                    container = LoadMember<typename std::decay_t<decltype(container)>>(loadedData, offset);
+                }(), ...);
             }
             return loadedStruct;
         }
@@ -240,18 +240,17 @@ namespace NCL::CSC8508 {
                 return ResizeAndSaveMember(value, item);
             else {
                 ([&] {
-                    const auto& container = value.*members;
-                    ResizeAndSaveMember(container, item);
-                    //CalculateSize(container, item);
-                    }(), ...);
+                    const auto& container = value.*members; 
+                    CalculateSize(container, item);
+                }(), ...);
 
-                // Would be better to resize once, but causing scope error will investigate 
-                // item.data.resize(item.dataSize);
-                //([&] {
-                //     const auto& container = value.*members;
-                //    uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data() + item.dataSize);
-                //   SaveMember(container, item, dataPtr);
-                //   }(), ...);
+                item.data.resize(item.dataSize);
+                uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
+
+                ([&] {
+                   const auto& container = value.*members;
+                   SaveMember(container, item, dataPtr);
+                   }(), ...);
                 return item;
             }
         }
@@ -265,10 +264,10 @@ namespace NCL::CSC8508 {
         /// <returns>The saved data struct</returns>
         template <typename T>
         static GameData ResizeAndSaveMember(const T& value, GameData& item) {
-            CalculateSize(value, item);
+            CalculateSize<T>(value, item);
             item.data.resize(item.dataSize);
             uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
-            SaveMember(value, item, dataPtr);
+            SaveMember<T>(value, item, dataPtr);
             return item;
         }
 
@@ -294,12 +293,12 @@ namespace NCL::CSC8508 {
                 item.dataSize += sizeof(uint32_t);
                 using ValueType = typename T::value_type;
 
-                if constexpr (std::is_trivially_copyable_v<ValueType> && !is_specialization<ValueType, std::pair>::value)
-                    item.dataSize += container.size() * sizeof(ValueType);
-                else {
+                //if constexpr (std::is_trivially_copyable_v<ValueType> && !is_specialization<ValueType, std::pair>::value)
+                //    item.dataSize += container.size() * sizeof(ValueType);
+                //else {
                     for (const auto& val : container)
                         CalculateSize(val, item);
-                }
+               // }
             }
             else if constexpr (std::is_trivially_copyable_v<T>) 
                 item.dataSize += sizeof(T);
@@ -316,35 +315,34 @@ namespace NCL::CSC8508 {
         /// <param name="dataPtr">The offset in memory from the last saved value</param>
         template <typename T>
         static void SaveMember(const T& container, GameData& item, uint8_t*& dataPtr) {
-            
-            if constexpr (std::is_same_v<T, std::string>) {
-                uint32_t strLength = container.size();
-                std::memcpy(dataPtr, &strLength, sizeof(strLength));
-                dataPtr += sizeof(strLength);
-
-                std::memcpy(dataPtr, container.data(), strLength);
-                dataPtr += strLength;
-            }           
-            else if constexpr (is_specialization<T, std::pair>::value) {
+            if constexpr (is_specialization<T, std::pair>::value) {
                 using FirstType = typename T::first_type;
                 using SecondType = typename T::second_type;
 
                 SaveMember(container.first, item, dataPtr);
                 SaveMember(container.second, item, dataPtr);
             }
+            else if constexpr (std::is_same_v<T, std::string>) {
+                uint32_t strLength = container.size();
+                std::memcpy(dataPtr, &strLength, sizeof(strLength));
+                dataPtr += sizeof(strLength);
+
+                std::memcpy(dataPtr, container.data(), strLength);
+                dataPtr += strLength;
+            } 
             else if constexpr (is_container<T>::value) {
                 uint32_t containerSize = container.size();
                 std::memcpy(dataPtr, &containerSize, sizeof(containerSize));
                 dataPtr += sizeof(containerSize);
 
-                if constexpr (std::is_trivially_copyable_v<typename T::value_type>) {
-                    std::memcpy(dataPtr, container.data(), containerSize * sizeof(typename T::value_type));
-                    dataPtr += containerSize * sizeof(typename T::value_type);
-                }
-                else {
+                //if constexpr (std::is_trivially_copyable_v<typename T::value_type>) {
+                //    std::memcpy(dataPtr, container.data(), containerSize * sizeof(typename T::value_type));
+                //    dataPtr += containerSize * sizeof(typename T::value_type);
+                //}
+                //else {
                     for (const auto& p : container)
                         SaveMember(p, item, dataPtr);
-                }
+               // }
             }
             else if constexpr (std::is_trivially_copyable_v<T>) {
                 std::memcpy(dataPtr, &container, sizeof(container));
@@ -373,7 +371,6 @@ namespace NCL::CSC8508 {
                 FirstType first = LoadMember<FirstType>(loadedData, offset);
                 SecondType second = LoadMember<SecondType>(loadedData, offset);
                 container = { first, second };
-                return container;
             } 
             else if constexpr (std::is_same_v<T, std::string>) {
                 uint32_t strLength;
@@ -383,36 +380,32 @@ namespace NCL::CSC8508 {
                 container.resize(strLength);
                 std::memcpy(container.data(), loadedData.data.data() + offset, strLength);
                 offset += strLength;
-                return container;
             }
             else if constexpr (is_container<T>::value) {
                 uint32_t containerSize = container.size();
-                std::memcpy(&containerSize, loadedData.data.data() + offset, containerSize);
+                std::memcpy(&containerSize, loadedData.data.data() + offset, sizeof(containerSize));
                 offset += sizeof(containerSize);
                 container.resize(containerSize);
 
                 using ValueType = typename T::value_type;
-                if (!std::is_trivially_copyable_v<ValueType> || is_specialization<ValueType, std::pair>::value) {
-                    for (size_t i = 0; i < containerSize; ++i)
-                        container[i] = LoadMember<ValueType>(loadedData, offset);
-                }
-                else {               
-                    std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(ValueType));
-                    offset += containerSize * sizeof(ValueType);
-                }
-                return container;
+                //if (!std::is_trivially_copyable_v<ValueType> || is_specialization<ValueType, std::pair>::value) {
+                for (size_t i = 0; i < containerSize; ++i)
+                    container[i] = LoadMember<ValueType>(loadedData, offset);
+                //}
+                std::cout << "loaded" << std::endl;
+                //else {               
+                //    std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(ValueType));
+                //    offset += containerSize * sizeof(ValueType);
+                //}
             }
             else if constexpr (std::is_trivially_copyable_v<T>) {
-                if (offset + sizeof(container) > loadedData.data.size()) 
-                   throw std::runtime_error("Offset out of bounds in LoadMember");
                 std::memcpy(&container, loadedData.data.data() + offset, sizeof(container));
                 offset += sizeof(container);
-                return container;
             }
             else {
                 static_assert(sizeof(T) == -1, "Unsupported type for deserialization");
-                return container;
             }
+            return container;
         }
 
     private:

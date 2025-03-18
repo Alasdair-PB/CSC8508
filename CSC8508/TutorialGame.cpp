@@ -45,7 +45,6 @@ void TestSaveByType() {
 	std::string structPath = GetAssetPath("struct_data.pfab");
 	std::string enumPath = GetAssetPath("enum_data.pfab");
 
-
 	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
 	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
@@ -95,7 +94,6 @@ void TutorialGame::InitialiseGame() {
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
-	//TestSave();
 }
 
 TutorialGame::TutorialGame()
@@ -128,7 +126,6 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
-
 	lockedObject = nullptr;
 	InitWorld();
 }
@@ -184,10 +181,14 @@ void TutorialGame::UpdateGame(float dt)
 
 void TutorialGame::InitWorld() 
 {
+	//TestSave();
+
 	world->ClearAndErase();
 	physics->Clear();
 	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
 	//delete x;
+//
+	std::cout << world->GetGameObjectCount() << std::endl;
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//world->Save(assetPath);
 	world->Load(assetPath);

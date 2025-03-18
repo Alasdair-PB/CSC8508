@@ -73,7 +73,7 @@ namespace NCL {
 			Texture* texture;
 			Shader* shader;
 			Transform* transform;
-			Vector4			colour;
+			Vector4	colour;
 
 			float distanceFromCamera;
 		};

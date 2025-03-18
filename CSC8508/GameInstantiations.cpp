@@ -226,7 +226,7 @@ GameObject* TutorialGame::AddRoleTToWorld(const Vector3& position, float inverse
 	CapsuleVolume* volume = new CapsuleVolume(10.0f, 10.0f);
 	Mesh* roleTMesh = MaterialManager::GetMesh("Role_T");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* animShader = MaterialManager::GetShader("basic");
+	Shader* animShader = MaterialManager::GetShader("anim");
 
 	PhysicsComponent* phys = roleT->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = roleT->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);

@@ -6,7 +6,6 @@
 #define AXIS_H
 
 #include <cstdint>
-#include <iostream>
 
 enum Axis : uint8_t
 {

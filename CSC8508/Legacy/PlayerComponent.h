@@ -71,7 +71,20 @@ namespace NCL {
                 isDashing = true;
                 staminaComponent->PerformActionIfAble(onDashBinding);
             }
+
+            void OnJumpInput() {
+                if (isJumping || !isGrounded) {
+                    return;
+                }
+                if (staminaComponent->PerformActionIfAble(onJumpBinding)) {
+                    isJumping = true;
+                    physicsObj->AddForce(Vector3(0, jumpForce, 0));
+                }
+            }
             
+            void onItemPickUp() {
+
+            }
 
             /**
              * Function invoked each frame.
@@ -89,6 +102,13 @@ namespace NCL {
                     if (inputStack.top() == onDashBinding) {
                         OnDashInput();
                     }
+                    else if (inputStack.top() == onJumpBinding) {
+                            OnJumpInput();
+                    }
+                    else if (inputStack.top() == onItemPickUpBinding) {
+                        onItemPickUp();
+                    }
+                    inputStack.pop();
                 }
 
                 OnJump();
@@ -108,11 +128,13 @@ namespace NCL {
 
                 isDashing = false;
                 isGrounded = false;
+                inputStack.empty();
             }
  
         protected:
             float speed = 15.0f;
             float dashMultiplier = 1.5f;
+            float jumpForce = 15.0f;
   
             InputComponent* inputComponent = nullptr;
             StaminaComponent* staminaComponent = nullptr;

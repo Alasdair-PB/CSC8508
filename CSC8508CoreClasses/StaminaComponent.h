@@ -35,10 +35,12 @@ namespace NCL {
                 return true;
             }
 
-            void PerformActionIfAble(uint32_t a) {
+            bool PerformActionIfAble(uint32_t a) {
                 if (CanPerformAction(a)) {
                     stamina -= staminaActionMap[a];
+                    return true;
                 }
+                return false;
             }
 
             void SetStamina(float s) {

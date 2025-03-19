@@ -141,7 +141,7 @@ void GameObject::LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::s
 	for (int i = 0; i < loadedSaveData.childrenPointers.size(); i++) {
 		GameObject* object = new GameObject();
 		object->Load(assetPath, loadedSaveData.childrenPointers[i]);
-		children.push_back(object);
+		AddChild(object);
 	}
 }
 

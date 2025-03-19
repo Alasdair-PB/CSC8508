@@ -19,4 +19,5 @@ RoomComponent* RoomComponent::GenerateNew() {
     // 3: Randomly select a valid position
 
     // 4: Spawn room in
+    return nullptr;
 }

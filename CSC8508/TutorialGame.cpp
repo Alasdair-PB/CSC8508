@@ -58,20 +58,34 @@ void TestSaveByType() {
 	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;
 }
 
+GameObject* TutorialGame::CreateChildInstance(Vector3 offset, bool isStatic) {
+	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, 0, false);
+	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
+
+	phys->SetInitType(PhysicsComponent::Sphere);
+	phys->SetPhysicsObject(new PhysicsObject(&myObjectToSave->GetTransform()));
+	isStatic ? phys->GetPhysicsObject()->SetInverseMass(0) : phys->GetPhysicsObject()->SetInverseMass(10);
+	phys->GetPhysicsObject()->InitSphereInertia();
+	myObjectToSave->TryGetComponent<BoundsComponent>()->SetPhysicsComponent(phys);
+	return myObjectToSave;
+}
+
 void TutorialGame::TestSaveGameObject(std::string assetPath) {
 
 	Vector3 position = Vector3(90 + 5, 22, -50);
 	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, false);
-	GameObject* myObjectToSaveB = AddSphereToWorld(Vector3(0, 5, 0), 1, 0, false);
+	PhysicsComponent* phys = myObjectToSaveA->AddComponent<PhysicsComponent>();	
+	myObjectToSaveA->TryGetComponent<BoundsComponent>()->SetPhysicsComponent(phys);
 
-	PhysicsComponent* phys = myObjectToSaveA->AddComponent<PhysicsComponent>();
 	phys->SetInitType(PhysicsComponent::Sphere);
 	phys->SetPhysicsObject(new PhysicsObject(&myObjectToSaveA->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(10);
 	phys->GetPhysicsObject()->InitSphereInertia();
 
-	myObjectToSaveA->TryGetComponent<BoundsComponent>()->SetPhysicsComponent(phys);
-	myObjectToSaveA->AddChild(myObjectToSaveB);
+	GameObject* child = CreateChildInstance(Vector3(5, 0, 0), false);
+	child->AddChild(CreateChildInstance(Vector3(5, 0, 0), true));
+
+	myObjectToSaveA->AddChild(child);
 	myObjectToSaveA->Save(assetPath);
 	world->AddGameObject(myObjectToSaveA);	
 }
@@ -85,8 +99,8 @@ void TutorialGame::TestLoadGameObject(std::string assetPath) {
 
 void TutorialGame::TestSave() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	TestSaveByType();
-	TestSaveGameObject(gameObjectPath);
+	//TestSaveByType();
+	//TestSaveGameObject(gameObjectPath);
 	TestLoadGameObject(gameObjectPath);
 }
 
@@ -216,7 +230,8 @@ const bool load = true;
 void TutorialGame::InitWorld() 
 {
 	world->ClearAndErase();
-	physics->Clear();	
+	physics->Clear();
+	//TestSave();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
 }

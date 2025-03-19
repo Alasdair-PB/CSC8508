@@ -231,17 +231,16 @@ Quaternion Quaternion::VectorsToQuaternion(Vector3 const& fromVector, Vector3 co
 
 	// 3: Find the angle of rotation
 	float const dot = Vector::Dot(from, to);
-	std::cout << "Dot = " << dot << '\n';
-	//if (angle == 1.0f) return {0.0f, 0.0f, 0.0f, 1.0f}; // TODO: Remove if unnecessary
 
-
-	if (dot == (-1.0f)) { // TODO: Replace with a check on the normalised vectors
+	// If the orientation is 180 degrees, Quaternions don't work properly so the maths has to be doctored accordingly:
+	if (fabs(dot + 1.0f) < FLT_EPSILON) {
 		std::cout << "Hello!\n";
 		axis = Vector::Cross(from, Vector3(1.0f, 0.0f, 0.0f));
 		if (Vector::Length(axis) == 0.0f) axis = Vector::Cross(from, Vector3(0.0f, 1.0f, 0.0f));
 		axis = Vector::Normalise(axis);
 		return { axis.x, axis.y, axis.z, 0.0f };
 	}
+
 	float const angle = std::acos(dot); // in radians
 
 	// 4: Calculate and return the quaternion

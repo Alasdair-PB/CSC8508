@@ -195,7 +195,7 @@ void TutorialGame::InitWorld()
 	world->Load(assetPath);
 	
 	//AddSphereToWorld(Vector3(93, 22, -50), 100.0f); //PS5
-	AddRoleTToWorld(Vector3(90, 25, -52)); //PS5
+	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }
 
 bool TutorialGame::SelectObject() {

@@ -328,11 +328,6 @@ void GameTechRenderer::RenderCamera() {
 			activeShader = shader;
 		}
 
-		AnimationComponent* a = o->TryGetComponent<AnimationComponent>();
-		if (a) {
-			glUniformMatrix4fv(jointLocation, a->GetSkeleton().size(), false, (float*)a->GetSkeleton().data());
-		}
-
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		glUniformMatrix4fv(modelLocation, 1, false, (float*)&modelMatrix);			
 		
@@ -341,6 +336,11 @@ void GameTechRenderer::RenderCamera() {
 
 		Vector4 colour = i->GetColour();
 		glUniform4fv(colourLocation, 1, &colour.x);
+
+		AnimationComponent* a = o->TryGetComponent<AnimationComponent>();
+		if (a) {
+			glUniformMatrix4fv(jointLocation, a->GetSkeleton().size(), false, (float*)a->GetSkeleton().data());
+		}
 
 		glUniform1i(hasVColLocation, !(*i).GetMesh()->GetColourData().empty());
 

@@ -8,7 +8,7 @@ namespace NCL {
 
         class StaminaComponent : public IComponent {
         public:
-            StaminaComponent(float initStam, float maxStam) {
+            StaminaComponent(GameObject& gameObject, float initStam, float maxStam): IComponent(gameObject) {
                 maxStamina = std::max(1.0f, maxStam);
                 stamina = std::min(initStam, maxStamina);
             }

@@ -240,6 +240,7 @@ namespace NCL::CSC8508 {
 		Layers::LayerID GetLayerID() const {return layerID; }
 		void SetTag(Tags::Tag newTag) {  tag = newTag;}
 		Tags::Tag GetTag() const { return tag;}
+		bool HasTag(Tags::Tag tag) const { return false; }
 
 	protected:
 		virtual void OnAwake() {}

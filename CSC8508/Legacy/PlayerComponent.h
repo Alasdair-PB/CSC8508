@@ -13,7 +13,7 @@
 
 namespace NCL {
     namespace CSC8508 {
-
+        using namespace NCL::CSC8508::Tags;
         class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent> {
         public:
 
@@ -22,6 +22,9 @@ namespace NCL {
 
             void SetBindingJump(uint32_t j) {
                 onJumpBinding = j;
+                if (staminaComponent) {
+                    staminaComponent->SetStaminaAction(j, jumpStamCost);
+                }
             }
 
             void SetBindingDash(uint32_t d) {
@@ -41,8 +44,14 @@ namespace NCL {
                 inputStack.push(buttonEvent->buttonId);
             }
 
-            void OnEvent(CollisionEvent* collisionEvent) override {
-                // add stuff for pickup, grounded etc as in document
+            void OnEvent(CollisionEvent* collisionEvent) override
+            {
+                auto x = collisionEvent->object2;
+                bool hasTag = (collisionEvent->object1.HasTag(Tags::Ground) && &collisionEvent->object2 == &GetGameObject()) ||
+                    (collisionEvent->object2.HasTag(Tags::Ground) && &collisionEvent->object1 == &GetGameObject());
+                if (hasTag) {
+                    isGrounded = true;
+                }
             }
 
            /**
@@ -148,6 +157,7 @@ namespace NCL {
 
             float downwardsVelocityMod;
             float dashTickStam = 2.0f;
+            float jumpStamCost = 10.0f;
 
             bool isGrounded;
             bool isJumping;

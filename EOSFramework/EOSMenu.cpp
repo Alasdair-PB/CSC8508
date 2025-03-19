@@ -6,19 +6,6 @@ void EOSMenu::ShowMenu() {
     AuthenticateUser();
 }
 
-
-EOSMenu::EOSMenu() {
-    stateMachine = new StateMachine();
-    State* joinLobby = new State([&](float deltaTime) { InitiliseLobby(deltaTime); });
-    stateMachine->AddState(joinLobby);
-    stateMachine->AddTransition(new StateTransition(joinLobby, joinLobby, [&]()->bool {LobbyIDAssigned(); }));
-   
-}
-
-void EOSMenu::Update(float dt) {
-    stateMachine->Update(dt);
-}
-
 void CreateMyLobby() {
     EOSLobbySearch& lobbySearch = EOSLobbySearch::GetInstance();
     lobbySearch.searchComplete = false;
@@ -30,8 +17,8 @@ void CreateMyLobby() {
 }
 
 // To move after setup
-EOSLobbyManager& lobbyManager;
 bool LobbyIDAssigned() { 
+    EOSLobbyManager& lobbyManager = EOSLobbyManager::GetInstance();
     EOS_Platform_Tick(EOSInitialisationManager::GetInstance().GetPlatformHandle());
     if (lobbyManager.LobbyId[0] == '\0') 
         return false;
@@ -48,9 +35,20 @@ void InitiliseLobby(float dt)
     EOSLobbyManager& lobbyManager = EOSLobbyManager::GetInstance();
     lobbyManager.CreateLobby();
 }
+
 void CreateLobbyds() {
     EOS_Platform_Tick(EOSInitialisationManager::GetInstance().GetPlatformHandle());
 }
+
+EOSMenu::EOSMenu() {
+    stateMachine = new StateMachine();
+    State* joinLobby = new State([&](float deltaTime) { InitiliseLobby(deltaTime); });
+    stateMachine->AddState(joinLobby);
+    stateMachine->AddTransition(new StateTransition(joinLobby, joinLobby, [&]()->bool { return LobbyIDAssigned(); }));
+
+}
+
+void EOSMenu::Update(float dt) { stateMachine->Update(dt);}
 
 void EOSMenu::AuthenticateUser() {
     std::cout << "[EOSMenu] Starting authentication..." << std::endl;

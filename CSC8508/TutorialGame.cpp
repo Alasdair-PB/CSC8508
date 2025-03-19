@@ -211,13 +211,14 @@ void TutorialGame::SaveWorld(std::string assetPath) {
 	world->Save(assetPath);
 }
 
+const bool load = true;
+
 void TutorialGame::InitWorld() 
 {
 	world->ClearAndErase();
-	physics->Clear();
+	physics->Clear();	
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	world->Load(assetPath);	
-	TestSave();
+	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
 }
 
 bool TutorialGame::SelectObject() {

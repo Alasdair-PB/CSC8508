@@ -15,6 +15,8 @@
 #include <vector>
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
+#include "UIElementsGroup.h"
+#include "FramerateUI.h"
 
 
 using std::vector;

@@ -89,10 +89,13 @@ void TutorialGame::InitialiseGame() {
 	uiSystem = UI::UISystem::GetInstance();
 
 	uiSystem->SetWinSize(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y);
-	uiSystem->DisplayWindow(uiSystem->framerate);
+	/*uiSystem->DisplayWindow(uiSystem->framerate);
 	uiSystem->DisplayWindow(uiSystem->audioSliders);
 	uiSystem->DisplayWindow(uiSystem->mainMenu);
-	uiSystem->DisplayWindow(uiSystem->healthbar);
+	uiSystem->DisplayWindow(uiSystem->healthbar);*/
+
+	UI::FramerateUI* framerate = new UI::FramerateUI;
+
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -172,7 +175,8 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 
 void TutorialGame::UpdateGame(float dt)
 {
-	UpdateUI();
+	/*UpdateUI();*/
+	uiSystem->StartFrame();
 
 	mainMenu->Update(dt);
 	renderer->Render();
@@ -222,7 +226,7 @@ bool TutorialGame::SelectObject() {
 	return false;
 }
 
-void TutorialGame::UpdateUI() {
+/*void TutorialGame::UpdateUI() {
 	uiSystem->StartFrame();
 	framerateDelay += 1;
 
@@ -240,6 +244,6 @@ void TutorialGame::UpdateUI() {
 	uiSystem->SetWinSize(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y);
 
 	uiSystem->DrawWindows();
-}
+}*/
 
 

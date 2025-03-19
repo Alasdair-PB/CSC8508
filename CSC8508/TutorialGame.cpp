@@ -11,6 +11,9 @@
 #include "MaterialManager.h"
 #include "OrientationConstraint.h"
 #include "Assets.h"
+#include "PhysicsComponent.h"
+#include "BoundsComponent.h"
+
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -55,18 +58,36 @@ void TestSaveByType() {
 	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;
 }
 
-void TestSaveGameObject() {
-	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	GameObject* myObjectToSave = new GameObject();
-	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-	myObjectToSave->Save(gameObjectPath);
-	myObjectToSave->Load(gameObjectPath);
+void TutorialGame::TestSaveGameObject(std::string assetPath) {
 
+	Vector3 position = Vector3(90 + 5, 22, -50);
+	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, false);
+	GameObject* myObjectToSaveB = AddSphereToWorld(Vector3(0, 5, 0), 1, 0, false);
+
+	PhysicsComponent* phys = myObjectToSaveA->AddComponent<PhysicsComponent>();
+	phys->SetInitType(PhysicsComponent::Sphere);
+	phys->SetPhysicsObject(new PhysicsObject(&myObjectToSaveA->GetTransform()));
+	phys->GetPhysicsObject()->SetInverseMass(10);
+	phys->GetPhysicsObject()->InitSphereInertia();
+
+	myObjectToSaveA->TryGetComponent<BoundsComponent>()->SetPhysicsComponent(phys);
+	myObjectToSaveA->AddChild(myObjectToSaveB);
+	myObjectToSaveA->Save(assetPath);
+	world->AddGameObject(myObjectToSaveA);	
 }
 
-void TestSave() {
+void TutorialGame::TestLoadGameObject(std::string assetPath) {
+	GameObject* myObjectToLoad = new GameObject();
+	myObjectToLoad->Load(assetPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(2, 0, 2));
+	world->AddGameObject(myObjectToLoad);
+}
+
+void TutorialGame::TestSave() {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	TestSaveByType();
-	TestSaveGameObject();
+	TestSaveGameObject(gameObjectPath);
+	TestLoadGameObject(gameObjectPath);
 }
 
 void LoadControllerMappings(Controller* controller)
@@ -180,18 +201,23 @@ void TutorialGame::UpdateGame(float dt)
 	physics->Update(dt);
 }
 
+void TutorialGame::LoadWorld(std::string assetPath) {
+	world->Load(assetPath);
+}
+
+void TutorialGame::SaveWorld(std::string assetPath) {
+	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+	delete x;
+	world->Save(assetPath);
+}
+
 void TutorialGame::InitWorld() 
 {
-	TestSave();
 	world->ClearAndErase();
 	physics->Clear();
-	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-	//delete x;
-
-	//std::cout << world->GetGameObjectCount() << std::endl;
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	//world->Save(assetPath);
-	world->Load(assetPath);
+	world->Load(assetPath);	
+	TestSave();
 }
 
 bool TutorialGame::SelectObject() {

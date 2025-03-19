@@ -289,11 +289,32 @@ namespace NCL::CSC8508 {
 		void GetChildData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
 
 		/// <summary>
+		/// Orders Components to ensure an IComponents is saved after another IComponents it may depend on. 
+		/// Called before saving GameObjects so loading can be done without Errors
+		/// </summary>
+		void OrderComponentsByDependencies();
+
+		void InitializeComponentMaps(
+			std::unordered_map<IComponent*, int>& inDegree,
+			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+			std::unordered_map<std::type_index, IComponent*>& typeToComponent);
+
+		void BuildDependencyGraph(
+			std::unordered_map<IComponent*, int>& inDegree,
+			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+			const std::unordered_map<std::type_index, IComponent*>& typeToComponent);
+
+		bool TopologicalSort(
+			std::unordered_map<IComponent*, int>& inDegree,
+			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+			const std::unordered_map<std::type_index, IComponent*>& typeToComponent,
+			std::vector<IComponent*>& sortedComponents);
+
+		/// <summary>
 		/// Sets the Parent of this GameObject
 		/// </summary>
 		/// <param name="parent">The new parent of this GameObject</param>
 		void SetParent(GameObject* newParent);
-
 
 		/// <summary>
 		/// Loads the save data as new components

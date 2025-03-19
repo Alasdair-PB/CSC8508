@@ -6,7 +6,10 @@
 #include "EventManager.h"
 #include "MaterialManager.h"
 #include "RenderObject.h"
-
+#include <unordered_map>
+#include <unordered_set>
+#include <typeindex>
+#include <queue>
 using namespace NCL::CSC8508;
 
 AddComponentEvent::AddComponentEvent(GameObject& gameObject, size_t entry) : gameObject(gameObject), entry(entry) {}
@@ -88,11 +91,11 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 	transform.SetScale(loadedSaveData.scale);
 	SetEnabled(loadedSaveData.isEnabled);
 
-	Mesh* cubeMesh = MaterialManager::GetMesh(loadedSaveData.meshPointer);
+	Mesh* mesh = MaterialManager::GetMesh(loadedSaveData.meshPointer);
 	Texture* basicTex = MaterialManager::GetTexture(loadedSaveData.texturePointer);
 	Shader* basicShader = MaterialManager::GetShader(loadedSaveData.shaderPointer);
 
-	renderObject = new RenderObject(&GetTransform(), cubeMesh, basicTex, basicShader);
+	renderObject = new RenderObject(&GetTransform(), mesh, basicTex, basicShader);
 	renderObject->SetColour(loadedSaveData.colour);
 }
 
@@ -103,11 +106,78 @@ void GameObject::Load(std::string assetPath, size_t allocationStart) {
 	LoadGameObjectInstanceData(loadedSaveData);
 }
 
+void GameObject::InitializeComponentMaps(
+	std::unordered_map<IComponent*, int>& inDegree,
+	std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+	std::unordered_map<std::type_index, IComponent*>& typeToComponent)
+{
+	for (IComponent* component : components) {
+		typeToComponent[std::type_index(typeid(*component))] = component;
+		inDegree[component] = 0;
+	}
+}
+
+void GameObject::BuildDependencyGraph(
+	std::unordered_map<IComponent*, int>& inDegree,
+	std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+	const std::unordered_map<std::type_index, IComponent*>& typeToComponent)
+{
+	for (IComponent* component : components) {
+		for (const std::type_index& depType : component->GetDependentTypes()) {
+			if (typeToComponent.count(depType)) {
+				IComponent* dependency = typeToComponent.at(depType);
+				dependencies[dependency].insert(std::type_index(typeid(*component)));
+				inDegree[component]++;
+			}
+		}
+	}
+}
+
+bool GameObject::TopologicalSort(
+	std::unordered_map<IComponent*, int>& inDegree,
+	std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+	const std::unordered_map<std::type_index, IComponent*>& typeToComponent,
+	std::vector<IComponent*>& sortedComponents)
+{
+	std::queue<IComponent*> ready;
+	for (IComponent* component : components) {
+		if (inDegree[component] == 0)
+			ready.push(component);
+	}
+
+	while (!ready.empty()) {
+		IComponent* current = ready.front();
+		ready.pop();
+		sortedComponents.push_back(current);
+
+		for (const std::type_index& depType : dependencies[current]) {
+			IComponent* dependentComponent = typeToComponent.at(depType);
+			if (--inDegree[dependentComponent] == 0)
+				ready.push(dependentComponent);
+		}
+	}
+	return sortedComponents.size() == components.size();
+}
+
+void GameObject::OrderComponentsByDependencies() {
+	std::unordered_map<IComponent*, int> inDegree;
+	std::unordered_map<IComponent*, std::unordered_set<std::type_index>> dependencies;
+	std::unordered_map<std::type_index, IComponent*> typeToComponent;
+
+	InitializeComponentMaps(inDegree, dependencies, typeToComponent);
+	BuildDependencyGraph(inDegree, dependencies, typeToComponent);
+
+	std::vector<IComponent*> sortedComponents;
+	if (!TopologicalSort(inDegree, dependencies, typeToComponent, sortedComponents))
+		std::cerr << "Error:: Cyclic dependency discovered in components" << std::endl;
+	components = std::move(sortedComponents);
+}
+
 void GameObject::GetGameObjData(GameObjDataStruct& saveInfo) {
 	saveInfo = renderObject == nullptr ?
-		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
+		GameObjDataStruct(isEnabled, transform.GetLocalOrientation(), transform.GetLocalPosition(), transform.GetLocalScale(),
 			Vector4(), 0, 0, 0, name) :
-		GameObjDataStruct(isEnabled, transform.GetOrientation(), transform.GetPosition(), transform.GetScale(),
+		GameObjDataStruct(isEnabled, transform.GetLocalOrientation(), transform.GetLocalPosition(), transform.GetLocalScale(),
 			renderObject->GetColour(),
 			MaterialManager::GetMeshPointer(renderObject->GetMesh()),
 			MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture()),
@@ -147,6 +217,7 @@ void GameObject::LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::s
 
 size_t GameObject::Save(std::string assetPath, size_t* allocationStart)
 {
+	OrderComponentsByDependencies();
 	bool clearMemory = false;
 	if (allocationStart == nullptr) {
 		allocationStart = new size_t(0);

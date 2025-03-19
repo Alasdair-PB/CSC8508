@@ -194,7 +194,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	return floor;
 }
 
-GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass)
+GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool addToWorld)
 {
 	GameObject* sphere = new GameObject();
 	Vector3 sphereSize = Vector3(radius, radius, radius);
@@ -207,7 +207,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	bounds->SetBoundingVolume((CollisionVolume*)volume);
 	sphere->GetTransform().SetScale(sphereSize).SetPosition(position);
 	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
-	world->AddGameObject(sphere);
+	if (addToWorld) world->AddGameObject(sphere);
 	return sphere;
 }
 

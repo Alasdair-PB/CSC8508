@@ -49,6 +49,7 @@ namespace NCL {
 			void UpdateUI();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddRoleTToWorld(const Vector3& position, float inverseMass = 10.0f); // Anim
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			GameObject* AddNavMeshToWorld(const Vector3& position, Vector3 dimensions);

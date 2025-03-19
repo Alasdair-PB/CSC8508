@@ -299,6 +299,8 @@ namespace NCL::CSC8508 {
 			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
 			std::unordered_map<std::type_index, IComponent*>& typeToComponent);
 
+		bool HasNoDependencies(const std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies) const;
+
 		void BuildDependencyGraph(
 			std::unordered_map<IComponent*, int>& inDegree,
 			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,

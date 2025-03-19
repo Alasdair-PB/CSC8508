@@ -159,6 +159,16 @@ bool GameObject::TopologicalSort(
 	return sortedComponents.size() == components.size();
 }
 
+bool GameObject::HasNoDependencies(
+	const std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies) const
+{
+	for (const auto& [component, depSet] : dependencies) {
+		if (!depSet.empty())
+			return false;
+	}
+	return true;
+}
+
 void GameObject::OrderComponentsByDependencies() {
 	std::unordered_map<IComponent*, int> inDegree;
 	std::unordered_map<IComponent*, std::unordered_set<std::type_index>> dependencies;
@@ -166,7 +176,7 @@ void GameObject::OrderComponentsByDependencies() {
 
 	InitializeComponentMaps(inDegree, dependencies, typeToComponent);
 	BuildDependencyGraph(inDegree, dependencies, typeToComponent);
-
+	if (HasNoDependencies(dependencies)) return;
 	std::vector<IComponent*> sortedComponents;
 	if (!TopologicalSort(inDegree, dependencies, typeToComponent, sortedComponents))
 		std::cerr << "Error:: Cyclic dependency discovered in components" << std::endl;

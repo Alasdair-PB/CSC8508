@@ -2,6 +2,7 @@
 #include "ComponentAssemblyDefiner.h"
 #include "BoundsComponent.h"
 #include "PhysicsComponent.h"
+#include "AnimationComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "INetworkComponent.h"
 #include "DamageableComponent.h"
@@ -29,6 +30,11 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
         object.AddComponent<DamageableComponent>(1, 1);
         break;
     
+    }case ComponentMapId::Animation: {
+        std::cout << "Damageable added" << std::endl;
+        object.AddComponent<AnimationComponent>();
+        break;
+
     }case ComponentMapId::Error:
             std::cout << "Error adding component" << std::endl;
             break;

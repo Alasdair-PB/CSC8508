@@ -137,7 +137,7 @@ TutorialGame::TutorialGame()
 	world = new GameWorld();
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
-	controller = *w->GetController()
+	controller = w->GetController();
 	renderer = new GameTechAGCRenderer(*world);
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
@@ -160,8 +160,11 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
 	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
+	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
+	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
+
 	lockedObject = nullptr;
 	InitWorld();
 }
@@ -234,6 +237,8 @@ void TutorialGame::InitWorld()
 	//TestSave();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
+	//AddSphereToWorld(Vector3(93, 22, -50), 100.0f); //PS5
+	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }
 
 bool TutorialGame::SelectObject() {

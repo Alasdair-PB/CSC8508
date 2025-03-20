@@ -160,7 +160,7 @@ namespace NCL::CSC8508 {
 		/// <returns></returns>
 		template <typename T>
 			requires std::is_base_of_v<IComponent, T>
-		T* TryGetComponent() {
+		T* TryGetComponent() const {
 			for (IComponent* component : components) {
 				if (T* casted = dynamic_cast<T*>(component))
 					return casted;

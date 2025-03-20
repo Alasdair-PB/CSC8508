@@ -138,6 +138,7 @@ source_group("Components" FILES ${Components})
 set(NetworkComponents
     "InputNetworkComponent.h"
     "TransformNetworkComponent.h"
+    "FullTransformNetworkComponent.h"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 

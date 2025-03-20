@@ -37,10 +37,7 @@ namespace NCL::CSC8508
 
 		virtual void EarlyUpdate(float deltaTime) override
 		{
-			for (auto binding : boundButtons) {
-				if (activeController->GetBoundButton(binding))
-					CallInputEvent(binding);
-			}
+			CheckButtonBindings();
 			UpdateMouseGameWorldPitchYaw();
 		}
 
@@ -58,6 +55,13 @@ namespace NCL::CSC8508
 		void CallInputEvent(uint32_t button) {
 			InputButtonEvent inputEvent = InputButtonEvent(button, GetGameObject());
 			EventManager::Call<InputButtonEvent>(&inputEvent);
+		}
+
+		void CheckButtonBindings() {
+			for (auto binding : boundButtons) {
+				if (activeController->GetBoundButton(binding))
+					CallInputEvent(binding);
+			}
 		}
 
 		void UpdateMouseGameWorldPitchYaw() {

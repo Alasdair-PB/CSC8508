@@ -66,26 +66,37 @@ namespace NCL {
                     physicsObj = physicsComponent->GetPhysicsObject();
             }
 
-            void OnJump() {
-                if (physicsObj->GetLinearVelocity().y <= 0.0f) {
-                    physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
-                }
-                if (isGrounded) { isJumping = false; }
-            }
-
             void OnDashInput() {
                 if (staminaComponent->PerformActionIfAble(onDashBinding))             
                     isDashing = true;
+            }
+
+            void SetLinearVelocity(float jumpDuration) {
+                Vector3 velocity = physicsObj->GetLinearVelocity();
+                physicsObj->SetLinearVelocity(Vector3(velocity.x, jumpForce * (1 + (0.2f-jumpDuration)), velocity.z));
             }
 
             void OnJumpInput() {
                 if (isJumping || !isGrounded) return;
                 if (staminaComponent->PerformActionIfAble(onJumpBinding)) {
                     isJumping = true;
-                    physicsObj->AddForce(Vector3(0, jumpForce, 0));
+                    jumpDuration = 0;
+                    SetLinearVelocity(0);
                 }
             }
-            
+
+           void OnJump(float deltaTime) {
+                if (!isJumping) return;
+                jumpDuration += deltaTime;
+                if (jumpDuration < 0.2f)
+                    SetLinearVelocity(jumpDuration);
+                else {
+                    if (physicsObj->GetLinearVelocity().y <= 0.0f)
+                        physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
+                    if (isGrounded) { isJumping = false; }
+                }
+            }
+
             void OnItemPickUp() {
                 std::cout << "pick up item" << "\n";
             }
@@ -129,7 +140,7 @@ namespace NCL {
                 if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
                     return;
                 CheckInputStack();
-                OnJump();
+                OnJump(deltaTime);
                 OnPlayerMove();
                 isDashing = false;
                 isGrounded = false;
@@ -138,7 +149,9 @@ namespace NCL {
         protected:
             float speed = 15.0f;
             float dashMultiplier = 1.5f;
-            float jumpForce = 1500.0f;
+            float jumpForce = 10.0f;
+            float jumpDuration = 0;
+            Transform& transform; 
   
             InputComponent* inputComponent = nullptr;
             StaminaComponent* staminaComponent = nullptr;
@@ -150,7 +163,7 @@ namespace NCL {
             uint32_t onItemPickUpBinding;
             std::stack<uint32_t> inputStack; 
 
-            float downwardsVelocityMod;
+            float downwardsVelocityMod = 50.0f;
             float dashTickStam = 2.0f;
             float jumpStamCost = 10.0f;
 

@@ -5,32 +5,13 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-EOSLobbyManager& EOSLobbyManager::GetInstance() {
-    static EOSLobbyManager instance;
-    return instance;
-}
-
-EOSLobbyManager::EOSLobbyManager() {
-    std::cout << "[EOSLobbyManager] Constructor called." << std::endl;
-}
-
-EOSLobbyManager::~EOSLobbyManager() {
-    if (LobbyHandle) {
-        LobbyHandle = nullptr;
-    }
-}
 
 //Creates a new lobby and sets its attributes
 void EOSLobbyManager::CreateLobby() {
     std::cout << "[CreateLobby] Attempting to create a lobby..." << std::endl;
 
-    // Retrieves the user's IP and the platform handle from the initialisation manager
-    EOSInitialisationManager& eosManager = EOSInitialisationManager::GetInstance();
-    EOS_ProductUserId LocalUserId = eosManager.GetLocalUserId();
-    EOS_HPlatform PlatformHandle = eosManager.GetPlatformHandle();
-
     // Ensures the user is authenticated before creating a lobby
-    if (!LocalUserId) {
+    if (!eosManager.LocalUserId) {
         std::cerr << "[ERROR] LocalUserId is NULL. Authentication must be complete before creating a lobby." << std::endl;
         return;
     }
@@ -44,7 +25,7 @@ void EOSLobbyManager::CreateLobby() {
     }
 
     // Validates the LocalUserId before creating a lobby
-    if (!EOS_ProductUserId_IsValid(LocalUserId)) {
+    if (!EOS_ProductUserId_IsValid(eosManager.LocalUserId)) {
         std::cerr << "[ERROR] LocalUserId is invalid. Cannot create a lobby." << std::endl;
         return;
     }
@@ -61,7 +42,7 @@ void EOSLobbyManager::CreateLobby() {
     // Configures the options for creating a new lobby
     EOS_Lobby_CreateLobbyOptions CreateOptions = {};
     CreateOptions.ApiVersion = EOS_LOBBY_CREATELOBBY_API_LATEST;
-    CreateOptions.LocalUserId = LocalUserId;
+    CreateOptions.LocalUserId = eosManager.LocalUserId;
     CreateOptions.MaxLobbyMembers = 4;
     CreateOptions.PermissionLevel = EOS_ELobbyPermissionLevel::EOS_LPL_PUBLICADVERTISED;
     CreateOptions.BucketId = "game_bucket";
@@ -77,22 +58,14 @@ void EOSLobbyManager::CreateLobby() {
     EOS_Lobby_CreateLobby(LobbyHandle, &CreateOptions, nullptr, OnLobbyCreated);
 
     std::cout << "[CreateLobby] Lobby created with attribute 'Lobby: Active' set to true." << std::endl;
-
-    // Waits for the lobby to be created before proceeding
-    while (!lobbyCreated) {
-        EOS_Platform_Tick(PlatformHandle);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
 }
 
 //Callback function triggered when a lobby is created
 void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data) {
     std::cout << "[OnLobbyCreated] Callback received." << std::endl;
+    EOSLobbyManager* self = static_cast<EOSLobbyManager*>(Data->ClientData); // Cast back to instance
 
-    // Retrieves the EOS Lobby Interface handle and assigns it to the manager
-    EOSInitialisationManager& eosManager = EOSInitialisationManager::GetInstance();
-    EOSLobbyManager& eosLobbyManager = EOSLobbyManager::GetInstance();
-    eosLobbyManager.LobbyHandle = EOS_Platform_GetLobbyInterface(eosManager.GetPlatformHandle());
+    self->LobbyHandle = EOS_Platform_GetLobbyInterface(self->eosManager.GetPlatformHandle());
 
     // Checks if the lobby creation was successful
     if (Data->ResultCode == EOS_EResult::EOS_Success) {
@@ -103,18 +76,18 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
         EOS_Lobby_UpdateLobbyModificationOptions ModOptions = {};
         ModOptions.ApiVersion = EOS_LOBBY_UPDATELOBBYMODIFICATION_API_LATEST;
         ModOptions.LobbyId = Data->LobbyId;
-        ModOptions.LocalUserId = eosManager.GetLocalUserId();
+        ModOptions.LocalUserId = self->eosManager.GetLocalUserId();
 
         // Requests a modification handle to update lobby attributes
-        EOS_EResult Result = EOS_Lobby_UpdateLobbyModification(eosLobbyManager.LobbyHandle, &ModOptions, &LobbyModificationHandle);
+        EOS_EResult Result = EOS_Lobby_UpdateLobbyModification(self->LobbyHandle, &ModOptions, &LobbyModificationHandle);
         if (Result == EOS_EResult::EOS_Success) {
            // const std::string PUBLIC_IP_ADDRESS = "128.366.543.43"; // fake ip
             std::cout << "[OnLobbyCreated] Lobby Modification Handle successfully created." << std::endl;
             std::cout << "Public IP Address: " << TOSTRING(PUBLIC_IP_ADDRESS) << std::endl;
 
             // Stores the lobby ID in the manager
-            strncpy_s(eosLobbyManager.LobbyId, Data->LobbyId, 256 - 1);
-            eosLobbyManager.LobbyId[256 - 1] = '\0';  // Ensure null
+            strncpy_s(self->LobbyId, Data->LobbyId, 256 - 1);
+            self->LobbyId[256 - 1] = '\0';  // Ensure null
 
             // Defines a new attribute for the lobby
             EOS_Lobby_AttributeData lobbyAttributeData = {};
@@ -152,7 +125,7 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
             UpdateOptions.LobbyModificationHandle = LobbyModificationHandle;
 
             // Applies the lobby update
-            EOS_Lobby_UpdateLobby(eosLobbyManager.LobbyHandle, &UpdateOptions, nullptr, OnLobbyUpdated);
+            EOS_Lobby_UpdateLobby(self->LobbyHandle, &UpdateOptions, nullptr, OnLobbyUpdated);
 
             // Releases the lobby modification handle as it is no longer needed
             EOS_LobbyModification_Release(LobbyModificationHandle);
@@ -174,12 +147,12 @@ void EOSLobbyManager::OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Da
 void EOSLobbyManager::OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Data) {
     std::cout << "[OnLobbyUpdated] Callback received." << std::endl;
 
+    EOSLobbyManager* self = static_cast<EOSLobbyManager*>(Data->ClientData); // Cast back to instance
+
     if (Data->ResultCode == EOS_EResult::EOS_Success) {
         std::cout << "[OnLobbyUpdated] Lobby update successful!" << std::endl;
 
-        // Sets the lobby creation flag to true, indicating the lobby is now fully created and updated
-        EOSLobbyManager& eosLobbyManager = EOSLobbyManager::GetInstance();
-        eosLobbyManager.lobbyCreated = true;
+        self->lobbyCreated = true;
     }
     else {
         std::cerr << "[ERROR] Lobby update failed. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;

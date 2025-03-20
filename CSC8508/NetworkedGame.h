@@ -37,6 +37,8 @@ namespace NCL {
 			void StartAsServer();
 			void StartAsClient(char a, char b, char c, char d);
 
+			void HostGame();
+
 			void UpdateGame(float dt) override;
 
 			void SpawnPlayerClient(int ownerId, int objectId, Prefab prefab);
@@ -58,6 +60,7 @@ namespace NCL {
 			void StartClientCallBack();
 			void StartServerCallBack();
 			void StartOfflineCallBack();
+			void StartEOSCallBack();
 
 			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastOwnedObjects(bool deltaFrame);
@@ -71,6 +74,8 @@ namespace NCL {
 
 			GameServer* thisServer;
 			GameClient* thisClient;
+
+			EOSInitialisationManager* eosManager = nullptr;
 
 			float timeToNextPacket;
 			int packetsToSnapshot;

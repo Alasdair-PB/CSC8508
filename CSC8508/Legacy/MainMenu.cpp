@@ -21,12 +21,13 @@ namespace NCL {
 			}
 		};
 
-		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline)
+		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
 			this->startServer = startServer;
 			this->startOffline = startOffline;
+			this->startEOS = startEOS;
 
 			machine = new PushdownMachine(new OverlayScreen(
 				[&]() -> void { this->OnStateAwake(); },
@@ -98,6 +99,13 @@ namespace NCL {
 			if (menuOption == startOfflineOpt) {
 				setPause(false);
 				startOffline();
+				return PushdownState::PushdownResult::Pop;
+			}
+			if (menuOption == hostRoomOpt)
+			{
+				setPause(false);
+				std::cout << "Here";
+				startEOS();
 				return PushdownState::PushdownResult::Pop;
 			}
 			return PushdownState::PushdownResult::NoChange;

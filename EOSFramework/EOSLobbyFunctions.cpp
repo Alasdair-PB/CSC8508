@@ -6,6 +6,7 @@
 
 // Attempts to join a lobby
 void EOSLobbyFunctions::JoinLobby() {
+    /*
     // Retrieves the local user's EOS ProductUserId and platform handle from the initialisation manager
     EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
     EOS_ProductUserId LocalUserId = eosInitManager.GetLocalUserId();
@@ -18,21 +19,22 @@ void EOSLobbyFunctions::JoinLobby() {
     // Gets the handle for the specific lobby details to join
     EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
     EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
+    */
 
     // Ensures that the LocalUserId is valid before attempting to join the lobby
-    if (LocalUserId == nullptr) {
+    if (eosInitManager.LocalUserId == nullptr) {
         std::cerr << "[ERROR] LocalUserId is null, cannot join lobby\n";
         return;
     }
 
     // Ensures that a valid lobby details handle is available
-    if (LobbyDetailsHandle == nullptr) {
+    if (eosSearchManager.LobbyDetailsHandle == nullptr) {
         std::cerr << "[ERROR] Invalid LobbyDetailsHandle before JoinLobby()\n";
         return;
     }
 
     // Ensures that a valid lobby handle is available
-    if (LobbyHandle == nullptr) {
+    if (eosManager.LobbyHandle == nullptr) {
         std::cerr << "[ERROR] Invalid LobbyHandle before JoinLobby()\n";
         return;
     }
@@ -40,31 +42,26 @@ void EOSLobbyFunctions::JoinLobby() {
     // Configures the options for joining a lobby
     EOS_Lobby_JoinLobbyOptions JoinOptions = {};
     JoinOptions.ApiVersion = EOS_LOBBY_JOINLOBBY_API_LATEST;
-    JoinOptions.LobbyDetailsHandle = LobbyDetailsHandle;
-    JoinOptions.LocalUserId = LocalUserId;
+    JoinOptions.LobbyDetailsHandle = eosSearchManager.LobbyDetailsHandle;
+    JoinOptions.LocalUserId = eosInitManager.LocalUserId;
     JoinOptions.LocalRTCOptions = NULL;
     JoinOptions.bPresenceEnabled = EOS_TRUE;
     JoinOptions.bCrossplayOptOut = EOS_FALSE;
     JoinOptions.RTCRoomJoinActionType = EOS_ELobbyRTCRoomJoinActionType::EOS_LRRJAT_AutomaticJoin;
 
     // Initiates the lobby join request
-    EOS_Lobby_JoinLobby(LobbyHandle, &JoinOptions, nullptr, EOSLobbyFunctions::OnJoinLobbyComplete);
-
-    // Loop to continuously update the EOS platform services
-    while (true) { // Add a flag to control the loop
-        EOS_Platform_Tick(PlatformHandle);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    EOS_Lobby_JoinLobby(eosManager.LobbyHandle, &JoinOptions, nullptr, EOSLobbyFunctions::OnJoinLobbyComplete);
 }
 
 // Callback function triggered when the attempt to join a lobby completes
 void EOSLobbyFunctions::OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data) {
-    if (Data->ResultCode == EOS_EResult::EOS_Success) {
+if (Data->ResultCode == EOS_EResult::EOS_Success) {
         std::cout << "[OnJoinLobbyComplete] Successfully joined lobby.\n";
-        EOSLobbyFunctions& eosLobbyFunctions = EOSLobbyFunctions::GetInstance();
+
+        EOSLobbyFunctions* self = static_cast<EOSLobbyFunctions*>(Data->ClientData); // Cast back to instance
 
         // Calls UpdateLobbyDetails to refresh lobby information after joining
-        eosLobbyFunctions.UpdateLobbyDetails();
+        self->UpdateLobbyDetails();
     }
     else {
         std::cerr << "[ERROR] Failed to join lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
@@ -73,28 +70,14 @@ void EOSLobbyFunctions::OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInf
 
 // Attempts to leave a lobby
 void EOSLobbyFunctions::LeaveLobby() {
-    // Retrieves the local user's local user ID and platform handle from the initialisation manager
-    EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
-    EOS_ProductUserId LocalUserId = eosInitManager.GetLocalUserId();
-    EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
-
-    // Gets the lobby handle from the lobby manager
-    EOSLobbyManager& eosManager = EOSLobbyManager::GetInstance();
-    EOS_HLobby LobbyHandle = eosManager.GetLobbyHandle();
-
-    // Gets the handle for the specific lobby details from the search manager
-    EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
-    LobbyHandle = EOS_Platform_GetLobbyInterface(PlatformHandle);
-
-
     // Configures the options for leaving a lobby
     EOS_Lobby_LeaveLobbyOptions LeaveOptions = {};
     LeaveOptions.ApiVersion = EOS_LOBBY_LEAVELOBBY_API_LATEST;
-    LeaveOptions.LocalUserId = LocalUserId;
+    LeaveOptions.LocalUserId = eosInitManager.LocalUserId;
     LeaveOptions.LobbyId = "8b04b581a080487c98ee5ee27338e65b";
 
     // Initiates the request to leave the lobby
-    EOS_Lobby_LeaveLobby(LobbyHandle, &LeaveOptions, nullptr, OnLeaveLobbyComplete);
+    EOS_Lobby_LeaveLobby(eosManager.LobbyHandle, &LeaveOptions, nullptr, OnLeaveLobbyComplete);
 }
 
 // Callback function triggered when the attempt to leave a lobby completes
@@ -117,13 +100,6 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
 {
     // Stores users EOS IDs along with their IP addresses
     std::unordered_map<std::string, std::string> collectedIPs; 
-
-    // Retrieves instances of required EOS managers
-    EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
-    EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
-    EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
-
-    
 
     // This loop continuously updates lobby information
     while (true) {
@@ -308,9 +284,6 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             */
 
         }
-
-        EOS_Platform_Tick(PlatformHandle);
-        std::this_thread::sleep_for(std::chrono::seconds(5));
         eosSearchManager.CreateLobbySearch(lobbyInfo->LobbyId);
     }
 }

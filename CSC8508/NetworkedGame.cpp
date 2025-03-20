@@ -13,6 +13,7 @@
 #include "INetworkDeltaComponent.h"
 #include "ComponentManager.h"
 #include "EventManager.h"
+#include "EOSInitialisationManager.h"
 
 #define COLLISION_MSG 30
 
@@ -41,7 +42,7 @@ struct SpawnPacket : public GamePacket {
 void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
-
+void NetworkedGame::StartEOSCallBack() { HostGame(); };
 
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
 void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
@@ -56,10 +57,14 @@ NetworkedGame::NetworkedGame()	{
 	thisServer = nullptr;
 	thisClient = nullptr;
 
-	mainMenu = new MainMenu([&](bool state) -> void {world->SetPausedWorld(state); },
+	mainMenu = new MainMenu(
+		[&](bool state) -> void { world->SetPausedWorld(state); },
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
-		[&]() -> void { this->StartOfflineCallBack();});
+		[&]() -> void { this->StartOfflineCallBack(); },
+		[&]() -> void { this->StartEOSCallBack(); }
+	);
+
 
 	NetworkBase::Initialise();
 	timeToNextPacket  = 0.0f;
@@ -98,6 +103,16 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
+}
+
+void NetworkedGame::HostGame()
+{
+	std::cout << "[NetworkedGame] Starting EOS authentication for hosting a game..." << std::endl;
+
+	// Create EOSInitialisationManager instance
+	eosManager = new EOSInitialisationManager();
+	// Start EOS authentication
+	eosManager->StartEOS();
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

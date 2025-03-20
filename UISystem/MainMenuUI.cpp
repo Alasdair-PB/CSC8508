@@ -1,5 +1,6 @@
 #include "MainMenuUI.h"
 #include <filesystem>        
+#include <iostream>
 
 using namespace NCL;
 using namespace UI;
@@ -28,6 +29,10 @@ int MainMenuUI::Draw() {
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
 	if (ImGui::Button("Start as Client", ImVec2(600, 50))) {
 		menuOption = StartClient;
+	}
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
+	if (ImGui::Button("Host Lobby", ImVec2(600, 50))) {
+		menuOption = hostRoom;
 	}
 	ImGui::End();
 	return menuOption;

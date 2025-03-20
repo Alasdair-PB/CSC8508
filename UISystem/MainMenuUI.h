@@ -17,7 +17,7 @@ namespace NCL {
 
 		protected:
 			int menuOption = 0;
-			enum menuOptions { none, startOffline, startServer, StartClient };
+			enum menuOptions { none, startOffline, startServer, StartClient, hostRoom, joinRoom };
 		};
 	}
 }

@@ -9,10 +9,10 @@
 #include "eos_sdk.h"
 #include "eos_lobby.h"
 #include "EOSInitialisationManager.h"
+#include "EOSLobbyManager.h"
 
 class EOSLobbySearch {
 public:
-    static EOSLobbySearch& GetInstance();
 
     void CreateLobbySearch(const char* TargetLobbyId);
     EOS_HLobbySearch GetLobbySearchHandle() const;
@@ -25,9 +25,7 @@ public:
     EOS_HLobbyDetails LobbyDetailsHandle = nullptr;
 
 private:
-    EOSLobbySearch();
-    ~EOSLobbySearch();
-    
     std::vector<std::string> LobbyMemberIds;
-    
+    EOSInitialisationManager eosInitManager;
+    EOSLobbyManager eosLobbyManager;
 };

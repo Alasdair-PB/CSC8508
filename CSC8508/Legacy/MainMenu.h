@@ -5,6 +5,7 @@
 
 #include "Debug.h"
 #include "Controller.h"
+#include <EOSInitialisationManager.h>
 
 
 namespace NCL {
@@ -13,6 +14,7 @@ namespace NCL {
 		typedef std::function<void()> StartClient;
 		typedef std::function<void()> StartServer;
 		typedef std::function<void()> StartOffline;
+		typedef std::function<void()> StartEOS;
 
 
 		class MainMenu {
@@ -20,7 +22,7 @@ namespace NCL {
 		public:			
 			typedef std::function<void(bool state)> SetPauseGame;
 
-			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline);
+			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS);
 			~MainMenu();
 			void Update(float dt);
 
@@ -30,21 +32,21 @@ namespace NCL {
 			StartClient startClient;
 			StartServer startServer;
 			StartOffline startOffline;
-
+			StartEOS startEOS;
 
 		protected:
 			PushdownMachine* machine = nullptr;
 			const Controller* activeController = nullptr;
+			
 			void OnStateAwake();
 			void OnStateAwakePause() { setPause(true); }
 			void OnStateAwakeUnpause() { setPause(false); }
-
 
 			PushdownState::PushdownResult IntroScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult GameScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult PauseScreenOnUpdate(float dt, PushdownState** newState);
 
-			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt };
+			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, hostRoomOpt, joinRoomOpt };
 			int menuOption = 0;
 		};
 	}

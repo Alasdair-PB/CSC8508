@@ -3,23 +3,20 @@
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
 
-// Singleton instance retrieval method
-EOSInitialisationManager& EOSInitialisationManager::GetInstance() {
-    static EOSInitialisationManager instance;
-    return instance;
-}
-
 // Constructor - Defers initialisation to StartEOS()
 EOSInitialisationManager::EOSInitialisationManager() {
     std::cout << "[EOSInitialisationManager] Constructor called, but initialization deferred to StartEOS()." << std::endl;
 }
 
+// Destructor - Releases the EOS platform handle
+EOSInitialisationManager::~EOSInitialisationManager() {
+}
+
 // Initializes the EOS SDK and starts the login process
-void EOSInitialisationManager::StartEOS(std::function<void()> onAuthComplete) {
+void EOSInitialisationManager::StartEOS() {
     std::cout << "[EOSInitialisationManager] Initializing EOS SDK..." << std::endl;
     
     // Assigns the onAuthComplete function to authCompleteCallback for handling authentication completion
-    authCompleteCallback = onAuthComplete;
 
     // Creates a initialisation handler and sets its options
     EOS_InitializeOptions InitOptions = {};
@@ -45,6 +42,12 @@ void EOSInitialisationManager::StartEOS(std::function<void()> onAuthComplete) {
 
     // Creates a platform handle, along with a message upom its completion
     PlatformHandle = EOS_Platform_Create(&PlatformOptions);
+
+    running = true;
+    //updateThread = std::thread(&EOSInitialisationManager::RunUpdateLoop, this);
+
+    std::cout << "Platform Handle set";
+
     if (!PlatformHandle) {
         std::cerr << "[ERROR] Failed to create EOS Platform." << std::endl;
         return;
@@ -54,12 +57,9 @@ void EOSInitialisationManager::StartEOS(std::function<void()> onAuthComplete) {
 
     LoginAnonymous();
 
-    // Loop to continuously update the EOS platform services
-    while (true) {
-        EOS_Platform_Tick(PlatformHandle);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    RunUpdateLoop();
 }
+
 
 // Logs the user in anonymously with their authorised Epic Online Services account
 void EOSInitialisationManager::LoginAnonymous() {
@@ -72,7 +72,7 @@ void EOSInitialisationManager::LoginAnonymous() {
     Credentials.ApiVersion = EOS_AUTH_CREDENTIALS_API_LATEST;
 
     // Change this so when not first time login, use *PersistentLogin*
-    Credentials.Type = EOS_ELoginCredentialType::EOS_LCT_AccountPortal; 
+    Credentials.Type = EOS_ELoginCredentialType::EOS_LCT_AccountPortal;
 
     EOS_Auth_LoginOptions LoginOptions = {};
     LoginOptions.ApiVersion = EOS_AUTH_LOGIN_API_LATEST;
@@ -81,6 +81,18 @@ void EOSInitialisationManager::LoginAnonymous() {
     // Logs the user in
     EOS_Auth_Login(AuthHandle, &LoginOptions, this, OnAuthLoginComplete);
 }
+
+// New function to keep updating EOS
+void EOSInitialisationManager::RunUpdateLoop() 
+{
+    while (running) {
+        if (PlatformHandle) {
+            EOS_Platform_Tick(PlatformHandle);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Avoid excessive CPU usage
+    }
+}
+
 
 // Callback method from the user login
 void EOSInitialisationManager::OnAuthLoginComplete(const EOS_Auth_LoginCallbackInfo* Data) {
@@ -108,6 +120,8 @@ void EOSInitialisationManager::OnAuthLoginComplete(const EOS_Auth_LoginCallbackI
     else {
         std::cerr << "[ERROR] Login Failed: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
     }
+
+
 }
 
 
@@ -135,11 +149,21 @@ void EOSInitialisationManager::HandleSuccessfulLogin(const EOS_Auth_LoginCallbac
     // Retrieves the EOSInitialisationManager instance
     EOSInitialisationManager* instance = static_cast<EOSInitialisationManager*>(Data->ClientData);
 
-
     if (!instance) {
         std::cerr << "[ERROR] ClientData is null in HandleSuccessfulLogin!" << std::endl;
         return;
     }
+
+    if (!instance->PlatformHandle) {
+        std::cerr << "[ERROR] PlatformHandle is NULL in HandleSuccessfulLogin!" << std::endl;
+        return;
+    }
+
+    if (!Data->LocalUserId) {
+        std::cerr << "[ERROR] LocalUserId is NULL in HandleSuccessfulLogin!" << std::endl;
+        return;
+    }
+
 
     // Retrieves the EOS Connect and Auth interfaces from the EOS platform handle
     EOS_HConnect ConnectHandle = EOS_Platform_GetConnectInterface(instance->PlatformHandle);
@@ -172,7 +196,6 @@ void EOSInitialisationManager::HandleSuccessfulLogin(const EOS_Auth_LoginCallbac
         // Initiates the connect login process with EOS Connect
         EOS_Connect_Login(ConnectHandle, &ConnectLoginOptions, instance, OnConnectLoginComplete);
 
-        // Releases auth token used for login
         EOS_Auth_Token_Release(AuthToken);
     }
     else {
@@ -186,6 +209,7 @@ void EOSInitialisationManager::OnConnectLoginComplete(const EOS_Connect_LoginCal
 
     // Retrieves the EOSInitialisationManager instance
     EOSInitialisationManager* instance = static_cast<EOSInitialisationManager*>(Data->ClientData);
+
     if (!instance) {
         std::cerr << "[ERROR] ClientData is null in OnConnectLoginComplete!" << std::endl;
         return;
@@ -251,6 +275,7 @@ void EOSInitialisationManager::OnCreateUserComplete(const EOS_Connect_CreateUser
 
     // Retrieves the EOSInitialisationManager instance
     EOSInitialisationManager* instance = static_cast<EOSInitialisationManager*>(Data->ClientData);
+    instance->running = false;
     if (!instance) {
         std::cerr << "[ERROR] ClientData is null in OnCreateUserComplete!" << std::endl;
         return;
@@ -289,6 +314,16 @@ void EOSInitialisationManager::OnCreateUserComplete(const EOS_Connect_CreateUser
     else {
         std::cerr << "[ERROR] Failed to create EOS Connect User: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
     }
+
+
+}
+
+void EOSInitialisationManager::Tick() {
+    if (PlatformHandle) {
+        std::cout << "Platform handle valie";
+        EOS_Platform_Tick(PlatformHandle);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Avoid CPU overuse
+    }
 }
 
 // Returns the EOS platform handle
@@ -299,12 +334,4 @@ EOS_HPlatform EOSInitialisationManager::GetPlatformHandle() const {
 // Returns the local user ID
 EOS_ProductUserId EOSInitialisationManager::GetLocalUserId() const {
     return LocalUserId;
-}
-
-// Destructor - Releases the EOS platform handle
-EOSInitialisationManager::~EOSInitialisationManager() {
-    if (PlatformHandle) {
-        EOS_Platform_Release(PlatformHandle);
-        PlatformHandle = nullptr;
-    }
 }

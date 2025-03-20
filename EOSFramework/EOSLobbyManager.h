@@ -9,19 +9,18 @@
 
 class EOSLobbyManager {
 public:
-    static EOSLobbyManager& GetInstance();
     EOS_HLobby GetLobbyHandle() const;
     void CreateLobby();
     EOS_HLobby LobbyHandle = nullptr;
     char LobbyId[256];
 private:
-    EOSLobbyManager();
-    ~EOSLobbyManager();
+
 
     static void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data);
     static void OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Data);
 
     std::atomic<bool> lobbyCreated = false; // Track whether the lobby is created
+    EOSInitialisationManager& eosManager;
 };
 
 #endif // EOS_LOBBY_MANAGER_H

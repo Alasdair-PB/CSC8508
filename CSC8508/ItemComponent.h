@@ -8,22 +8,19 @@
 
 namespace NCL::CSC8508 {
 
-    class ItemComponent : public IComponent {
+    class ItemComponent : public IComponent, public EventListener<DeathEvent> {
     private:
         int saleValue;
-        DamageableComponent* damageable;
+        vector<IComponent*> disabledOnPickup;
 
     public:
         ItemComponent(GameObject& gameObject, int initialSaleValue)
-            : IComponent(gameObject), saleValue(initialSaleValue), damageable(nullptr) {
-            if (gameObject.HasComponent<DamageableComponent>()) {
-                damageable = gameObject.GetComponent<DamageableComponent>();
-                EventManager::Subscribe<DeathEvent>(this, &ItemComponent::OnDeath);
-            }
+            : IComponent(gameObject), saleValue(initialSaleValue){
+            EventManager::RegisterListener<DeathEvent>(this);
         }
 
         ~ItemComponent() {
-            EventManager::Unsubscribe<DeathEvent>(this, &ItemComponent::OnDeath);
+            disabledOnPickup.clear();
         }
 
         int GetSaleValue() const {
@@ -34,10 +31,18 @@ namespace NCL::CSC8508 {
             saleValue = std::max(0, value);
         }
 
-        void OnDeath(DeathEvent* event) {
-            if (&event->GetGameObject() == &GetGameObject()) {
-                SetSaleValue(0); // **物品损坏，售价归零**
-            }
+        void OnEvent(DeathEvent* event) override {
+            if (&event->GetGameObject() == &GetGameObject())
+                SetSaleValue(0);
+        }
+
+        void DisableIComponentOnPickup(IComponent* component) {
+            disabledOnPickup.push_back(component);
+        }
+
+        void SetEnabledComponentStates(bool state) {
+            for (IComponent* icom : disabledOnPickup)
+                icom->SetEnabled(state);
         }
 
         /// <summary>

@@ -86,7 +86,7 @@ void TutorialGame::TestSave() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	TestSaveByType();
 	TestSaveGameObject(gameObjectPath);
-	TestLoadGameObject(gameObjectPath);
+	//TestLoadGameObject(gameObjectPath);
 }
 
 void LoadControllerMappings(Controller* controller)
@@ -221,9 +221,8 @@ void TutorialGame::InitWorld()
 	physics->Clear();
 	//TestSave();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
-
-	//AddSphereToWorld(Vector3(93, 22, -50), 100.0f); //PS5
+	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);
+	LoadWorld(assetPath);
 	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }
 

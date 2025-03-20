@@ -22,6 +22,9 @@ namespace NCL::CSC8508
 		PhysicsComponent(GameObject& gameObject);
 		~PhysicsComponent();
 
+		static const char* Name() { return "Physics"; }
+		const char* GetName() const override { return Name(); }
+
 		enum InitType { None, Sphere, Cube };
 
 		PhysicsObject* GetPhysicsObject() const {

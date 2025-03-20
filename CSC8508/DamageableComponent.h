@@ -23,6 +23,9 @@ namespace NCL::CSC8508
         GameObject& owner;
 
     public:
+        static const char* Name() { return "Damageable"; }
+        const char* GetName() const override { return Name(); }
+
         DamageableComponent(GameObject& gameObject, int initialHealth, int initialMaxHealth)
             : IComponent(gameObject), owner(gameObject),
             health(std::max(0, initialHealth)),

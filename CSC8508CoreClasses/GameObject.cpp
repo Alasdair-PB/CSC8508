@@ -198,10 +198,13 @@ void GameObject::GetGameObjData(GameObjDataStruct& saveInfo) {
 
 void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart) {
 	for (IComponent* component : components) {
+		std::string name = component->GetName();
+		size_t id = SaveManager::MurmurHash3_64(name.c_str(), name.size());
+
 		size_t nextMemoryLocation = component->Save(assetPath, allocationStart);
 		saveInfo.componentPointers.push_back(std::make_pair(
 			*allocationStart,
-			SaveManager::MurmurHash3_64(typeid(*component).name(), std::strlen(typeid(*component).name()))
+			id
 		));
 		*allocationStart = nextMemoryLocation;
 	}

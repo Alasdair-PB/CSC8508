@@ -1,3 +1,4 @@
+#pragma once
 #include "GameTechAGCRenderer.h"
 #include "GameObject.h"
 #include "RenderObject.h"
@@ -9,6 +10,7 @@
 #include "../PS5Core/AGCShader.h"
 
 #include "../CSC8508CoreClasses/Debug.h"
+#include "../UISystem/UIPlayStation.h"
 
 using namespace NCL;
 using namespace Rendering;
@@ -439,6 +441,13 @@ void GameTechAGCRenderer::UpdateDebugData() {
 		currentFrame->data.bytesWritten += count;
 		verts.clear();
 	}
+}
+
+void GameTechAGCRenderer::InitialiseImGui() {
+	UI::UIPlayStation::Initialize(&frameContext->m_dcb, &allocator, SWAPCOUNT);
+
+
+
 }
 
 void GameTechAGCRenderer::DisplayRenderPass() {

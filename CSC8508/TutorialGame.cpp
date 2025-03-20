@@ -195,7 +195,7 @@ void TutorialGame::InitWorld()
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//world->Save(assetPath);
-	world->Load(assetPath);
+	//world->Load(assetPath);
 }
 
 bool TutorialGame::SelectObject() {

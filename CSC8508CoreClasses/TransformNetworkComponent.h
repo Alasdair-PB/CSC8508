@@ -146,10 +146,8 @@ namespace NCL::CSC8508
 			int newStateId = 0; 			
 			FullPacket p = ((FullPacket&) ifp);		
 
-			if (!UpdateFullStateHistory<TransformNetworkState, FullPacket>(p, &newStateId)) {
-				std::cout << "Returning false from incorrect history" << std::endl;
+			if (!UpdateFullStateHistory<TransformNetworkState, FullPacket>(p, &newStateId))
 				return false;
-			}
 			
 			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;

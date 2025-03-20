@@ -81,4 +81,7 @@ Testing/
 enet-master/
 *.zip
 /build_windows
-/Assets
+
+**/Untracked
+/ImGui/PS5
+/sce_module

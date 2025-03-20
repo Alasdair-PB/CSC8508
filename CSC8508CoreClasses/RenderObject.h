@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Buffer.h"
 
 namespace NCL {
 	using namespace NCL::Rendering;
@@ -13,26 +14,42 @@ namespace NCL {
 		class RenderObject
 		{
 		public:
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader);
-			~RenderObject();
+			RenderObject(Transform* inTransform, Mesh* inMesh, Texture* inTex, Shader* inShader) {
+				buffer = nullptr;
+
+				transform = inTransform;
+				mesh = inMesh;
+				texture = inTex;
+				shader = inShader;
+				colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+			~RenderObject() {}
 
 			void SetDefaultTexture(Texture* t) {
 				texture = t;
+			}
+
+			Buffer* GetGPUBuffer() const {
+				return buffer;
+			}
+
+			void SetGPUBuffer(Buffer* b) {
+				buffer = b;
 			}
 
 			Texture* GetDefaultTexture() const {
 				return texture;
 			}
 
-			Mesh*	GetMesh() const {
+			Mesh* GetMesh() const {
 				return mesh;
 			}
 
-			Transform*		GetTransform() const {
+			Transform* GetTransform() const {
 				return transform;
 			}
 
-			Shader*		GetShader() const {
+			Shader* GetShader() const {
 				return shader;
 			}
 
@@ -42,14 +59,23 @@ namespace NCL {
 
 			Vector4 GetColour() const {
 				return colour;
+			}	
+
+			float GetCameraDistance() const { return distanceFromCamera; }
+			void SetCameraDistance(float f) { distanceFromCamera = f; }
+			static const bool CompareByCameraDistance(const RenderObject* a, const RenderObject* b) {
+				return a->distanceFromCamera < b->distanceFromCamera;
 			}
 
 		protected:
-			Mesh*		mesh;
-			Texture*	texture;
-			Shader*		shader;
-			Transform*	transform;
-			Vector4		colour;
+			Buffer* buffer;
+			Mesh* mesh;
+			Texture* texture;
+			Shader* shader;
+			Transform* transform;
+			Vector4	colour;
+
+			float distanceFromCamera;
 		};
 	}
 }

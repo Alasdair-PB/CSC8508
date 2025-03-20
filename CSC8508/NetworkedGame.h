@@ -11,11 +11,25 @@ namespace NCL {
 		class NetworkPlayer;
 		enum Prefab { Player, EnemyA };
 
+		class HostLobbyConnectEvent : public Event {};
+		class ClientLobbyConnectEvent : public Event 
+		{
+			ClientLobbyConnectEvent(char a, char b, char c, char d) : a(a), b(b), c(c), d(d) {}
+			ClientLobbyConnectEvent() : a(), b(), c(), d() {}
+		public:
+			char a;
+			char b; 
+			char c; 
+			char d;
+		};
+
 		class NetworkedGame : 
 			public TutorialGame,
 			public PacketReceiver, 
 			public EventListener<NetworkEvent>, 
-			public EventListener<ClientConnectedEvent> {
+			public EventListener<ClientConnectedEvent>,
+			public EventListener<HostLobbyConnectEvent>,
+			public EventListener<ClientLobbyConnectEvent> {
 		public:
 			NetworkedGame();
 			~NetworkedGame();
@@ -33,6 +47,8 @@ namespace NCL {
 
 			void OnEvent(ClientConnectedEvent* e) override;
 			void OnEvent(NetworkEvent* e) override;
+			void OnEvent(HostLobbyConnectEvent* e) override;
+			void OnEvent(ClientLobbyConnectEvent* e) override;
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 

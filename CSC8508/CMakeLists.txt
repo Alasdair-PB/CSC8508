@@ -1,5 +1,5 @@
 set(PROJECT_NAME CSC8508)
-
+set(EXE_NAME "CSC8505_Game")
 file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB Legacy_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Legacy/*")
@@ -188,6 +188,9 @@ else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES
 		INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
 	)
+	set_target_properties(${PROJECT_NAME} PROPERTIES 
+		OUTPUT_NAME ${EXE_NAME})
+
 endif()
 ################################################################################
 # Compile definitions
@@ -413,5 +416,15 @@ if(USE_VULKAN)
 
     add_dependencies(${PROJECT_NAME} SHADER_FILES)
 endif()
+
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Copying EOS DLL to: $<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${EOS_DIR}/Bin/EOSSDK-Win64-Shipping.dll"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/EOSSDK-Win64-Shipping.dll"
+    COMMENT "Copying EOS DLL to output directory"
+)
+
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT CSC8508)

@@ -43,19 +43,39 @@ namespace NCL {
 				std::string buttonName;
 				ImVec2 size;
 				CSC8508::PushdownState::PushdownResult UpdateElement()override { 
-					if (ImGui::Button(buttonName.c_str(), size)) { return func(); }
+					if (ImGui::Button(buttonName.c_str(), ImVec2(size.x * Window::GetWindow()->GetScreenSize().x, size.y * Window::GetWindow()->GetScreenSize().y))) { return func(); }
 					return CSC8508::PushdownState::PushdownResult::NoChange;
 				}
 
 			};
 
 			class SliderElement : public UIElement {
-				float& val;
+			public:
+				void SetName(std::string n) {
+					sliderName = n;
+				}
+				void SetVal(float& v) {
+					val = v;
+				}
+				void SetMax(float max) {
+					valMax = max;
+				}
+				void SetMin(float min) {
+					valMin = min;
+				}
+				void SetFunc(std::function<CSC8508::PushdownState::PushdownResult(float)> f) {
+					func = f;
+				}
+				CSC8508::PushdownState::PushdownResult UpdateElement()override {
+					ImGui::SliderFloat(sliderName.c_str(), &val, valMin, valMax, "%.0f");
+					return func(val);
+				}
+			protected:
+				std::string sliderName;
+				float val;
 				float valMax;
 				float valMin;
-				CSC8508::PushdownState::PushdownResult UpdateElement()override {
-					return CSC8508::PushdownState::PushdownResult::NoChange;
-				}
+				std::function<CSC8508::PushdownState::PushdownResult(float)> func;
 			};
 
 			class TextElement : public UIElement {
@@ -73,11 +93,15 @@ namespace NCL {
 
 			void OnAwake() { return; }
 
-			CSC8508::PushdownState::PushdownResult Draw(float dt) {
-				ImGui::SetNextWindowPos(pos);
-				ImGui::SetNextWindowSize(size);
+			CSC8508::PushdownState::PushdownResult Draw() {
+				winWidth = Window::GetWindow()->GetScreenSize().x;
+				winHeight = Window::GetWindow()->GetScreenSize().y;
+
+				ImGui::SetNextWindowPos(ImVec2(pos.x * winWidth, pos.y * winHeight));
+				ImGui::SetNextWindowSize(ImVec2(size.x * winWidth, size.y * winHeight));
 				bool open = true;
 				ImGui::Begin(winName.c_str(), &open, flags);
+				ImGui::SetWindowFontScale(fontScale);
 
 				CSC8508::PushdownState::PushdownResult result = CSC8508::PushdownState::PushdownResult::NoChange;
 				for (auto const& element : elements) {
@@ -85,7 +109,7 @@ namespace NCL {
 					if (result != CSC8508::PushdownState::PushdownResult::NoChange) {
 						return result;
 					}
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + elementsOffset);
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + elementsOffset * winHeight);
 				}
 				ImGui::End();
 				return CSC8508::PushdownState::PushdownResult::NoChange;
@@ -100,7 +124,16 @@ namespace NCL {
 				elements.push_back(buttonElem);
 			}
 
-			void PushSliderElement(float& val, float valMax, float valMin) {}
+			void PushSliderElement(std::string name, float& val, float valMax, float valMin, 
+				std::function<CSC8508::PushdownState::PushdownResult(float)> func) {
+				SliderElement* sliderElem = new SliderElement;
+				sliderElem->SetName(name);
+				sliderElem->SetVal(val);
+				sliderElem->SetMax(valMax);
+				sliderElem->SetMin(valMin);
+				sliderElem->SetFunc(func);
+				elements.push_back(sliderElem);
+			}
 
 			void PushTextElement(std::string text) {}
 
@@ -122,6 +155,8 @@ namespace NCL {
 			std::string winName;
 			float elementsOffset;
 			ImGuiWindowFlags flags;
+			int winWidth = Window::GetWindow()->GetScreenSize().x;
+			int winHeight = Window::GetWindow()->GetScreenSize().y;
 		};
 	}
 }

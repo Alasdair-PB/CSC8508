@@ -19,13 +19,6 @@ namespace NCL {
 				static UISystem* GetInstance() { return instance; }
 				static void Shutdown() { if (instance) { delete instance; } }
 
-				void UpdateFramerate(float delta) { dt = delta; }
-
-				void SetWinSize(int width, int height) {
-					winWidth = width;
-					winHeight = height;
-				}
-
 				virtual void StartFrame() = 0;
 				virtual void EndFrame() = 0;
 
@@ -42,14 +35,6 @@ namespace NCL {
 				virtual ~UISystem();
 
 				static UISystem* instance;
-
-				float dt = 60;
-				int health = 50;
-
-				int winWidth = 0;
-				int winHeight = 0;
-
-				enum menuOptions { none, startOffline, startServer, StartClient };
 			};
 		}
 	}

@@ -33,7 +33,7 @@ void UISystem::EndFrame() {
 
 void UISystem::RenderFrame() {
 	for (const auto& element : elementStacks) {
-		element.second->Draw(dt);
+		element.second->Draw();
 	}
 }
 

@@ -230,18 +230,6 @@ namespace NCL::CSC8508 {
 		/// <param name="tag">The queried tag</param>
 		/// <returns>True if the tag is found otherwise returns false</returns>
 		bool HasTag(Tags::Tag tag);
-
-		/// <summary>
-		/// Sets the name of this GameObject
-		/// </summary>
-		/// <param name="name">The name GameObject name</param>
-		void SetName(std::string name) { this->name = name; }
-
-		/// <summary>
-		/// Get the name of this GameObject
-		/// </summary>
-		/// <returns>The name of this GameObject</returns>
-		std::string GetName() { return name; }
 		
 		/// <summary>
 		/// Call function func on all Child GameObjects of this GameObject
@@ -272,7 +260,6 @@ namespace NCL::CSC8508 {
 		bool isEnabled;
 		const bool isStatic;
 		int worldID;
-		std::string name;
 
 		Transform transform;
 		RenderObject* renderObject;
@@ -281,9 +268,8 @@ namespace NCL::CSC8508 {
 		vector<GameObject*> children;
 
 		Layers::LayerID	layerID;
-		Tags::Tag tag; 		
-		size_t GetNameHash(GameObject* child);
-
+		Tags::Tag tag;
+		vector<Tags::Tag> tags;
 		void GetGameObjData(GameObjDataStruct& saveInfo);
 		void GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
 		void GetChildData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);

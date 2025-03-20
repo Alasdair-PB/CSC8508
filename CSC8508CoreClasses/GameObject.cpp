@@ -16,7 +16,7 @@ AddComponentEvent::AddComponentEvent(GameObject& gameObject, size_t entry) : gam
 GameObject& AddComponentEvent::GetGameObject() { return gameObject; }
 size_t AddComponentEvent::GetEntry() { return entry; }
 
-GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nullptr), name("") {
+GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nullptr) {
 	worldID = -1;
 	isEnabled = true;
 	layerID = Layers::LayerID::Default;
@@ -32,11 +32,11 @@ GameObject::~GameObject() {
 
 struct GameObject::GameObjDataStruct : public ISerializedData {
 	GameObjDataStruct() : isEnabled(true), orientation(Quaternion()), position(Vector3()), scale(Vector3(1,1,1)), colour(Vector4()),
-		meshPointer(0), texturePointer(0), shaderPointer(0), name("") { }
+		meshPointer(0), texturePointer(0), shaderPointer(0), namePointer(0) { }
 	GameObjDataStruct(bool isEnabled, Quaternion orientation, Vector3 position, Vector3 scale, 
-		Vector4 colour, size_t meshPointer, size_t texturePointer, size_t shaderPointer, std::string name) :
+		Vector4 colour, size_t meshPointer, size_t texturePointer, size_t shaderPointer, size_t namePointer, vector<Tags::Tag> tags) :
 		isEnabled(isEnabled), orientation(orientation), position(position), scale(scale), 
-		colour(colour), texturePointer(texturePointer), meshPointer(meshPointer), shaderPointer(shaderPointer), name(name) {}
+		colour(colour), texturePointer(texturePointer), meshPointer(meshPointer), shaderPointer(shaderPointer), namePointer(namePointer), tags(tags) {}
 
 	bool isEnabled;
 	Quaternion orientation;
@@ -47,9 +47,10 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	size_t meshPointer;
 	size_t texturePointer;
 	size_t shaderPointer;
-	std::string name;
+	size_t namePointer;
 
 	std::vector<size_t> childrenPointers;
+	std::vector<Tags::Tag> tags;
 	std::vector<std::pair<size_t, size_t>> componentPointers;
 
 	static auto GetSerializedFields() {
@@ -61,9 +62,10 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 			SERIALIZED_FIELD(GameObjDataStruct, colour),
 			SERIALIZED_FIELD(GameObjDataStruct, meshPointer),
 			SERIALIZED_FIELD(GameObjDataStruct, texturePointer),
-			SERIALIZED_FIELD(GameObjDataStruct, name),
+			SERIALIZED_FIELD(GameObjDataStruct, namePointer),
 			SERIALIZED_FIELD(GameObjDataStruct, shaderPointer),
 			SERIALIZED_FIELD(GameObjDataStruct, childrenPointers),
+			SERIALIZED_FIELD(GameObjDataStruct, tags),
 			SERIALIZED_FIELD(GameObjDataStruct, componentPointers)
 		);
 	}
@@ -186,12 +188,12 @@ void GameObject::OrderComponentsByDependencies() {
 void GameObject::GetGameObjData(GameObjDataStruct& saveInfo) {
 	saveInfo = renderObject == nullptr ?
 		GameObjDataStruct(isEnabled, transform.GetLocalOrientation(), transform.GetLocalPosition(), transform.GetLocalScale(),
-			Vector4(), 0, 0, 0, name) :
+			Vector4(), 0, 0, 0, 0, tags) :
 		GameObjDataStruct(isEnabled, transform.GetLocalOrientation(), transform.GetLocalPosition(), transform.GetLocalScale(),
 			renderObject->GetColour(),
 			MaterialManager::GetMeshPointer(renderObject->GetMesh()),
 			MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture()),
-			MaterialManager::GetShaderPointer(renderObject->GetShader()), name);
+			MaterialManager::GetShaderPointer(renderObject->GetShader()), 0, tags);
 }
 
 void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart) {
@@ -203,10 +205,6 @@ void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string asse
 		));
 		*allocationStart = nextMemoryLocation;
 	}
-}
-
-size_t GameObject::GetNameHash(GameObject* obj) {
-	return SaveManager::MurmurHash3_64((obj->name).c_str(), (obj->name).length());
 }
 
 void GameObject::GetChildData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart) {

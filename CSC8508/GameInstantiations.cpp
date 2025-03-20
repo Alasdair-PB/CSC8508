@@ -203,8 +203,10 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	SphereVolume* volume = new SphereVolume(radius);
 	Mesh* sphereMesh = MaterialManager::GetMesh("sphere");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-	BoundsComponent* bounds = sphere->AddComponent<BoundsComponent>((CollisionVolume*)volume);
+	Shader* basicShader = MaterialManager::GetShader("basic");	
+
+	PhysicsComponent* phys = sphere->AddComponent<PhysicsComponent>();
+	BoundsComponent* bounds = sphere->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	bounds->SetBoundingVolume((CollisionVolume*)volume);
 	sphere->GetTransform().SetScale(sphereSize).SetPosition(position);
@@ -213,6 +215,8 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
+	phys->SetInitType(PhysicsComponent::Sphere);
+
 	if (addToWorld) world->AddGameObject(sphere);
 	return sphere;
 }

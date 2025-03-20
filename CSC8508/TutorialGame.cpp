@@ -59,29 +59,14 @@ void TestSaveByType() {
 }
 
 GameObject* TutorialGame::CreateChildInstance(Vector3 offset, bool isStatic) {
-	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, 0, false);
-	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-
-	phys->SetInitType(PhysicsComponent::Sphere);
-	phys->SetPhysicsObject(new PhysicsObject(&myObjectToSave->GetTransform()));
-	isStatic ? phys->GetPhysicsObject()->SetInverseMass(0) : phys->GetPhysicsObject()->SetInverseMass(10);
-	phys->GetPhysicsObject()->InitSphereInertia();
-	myObjectToSave->TryGetComponent<BoundsComponent>()->SetPhysicsComponent(phys);
+	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, isStatic ? 0 : 10, false);
 	return myObjectToSave;
 }
 
 void TutorialGame::TestSaveGameObject(std::string assetPath) {
 
-	Vector3 position = Vector3(90 + 5, 22, -50);
-	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, false);
-	PhysicsComponent* phys = myObjectToSaveA->AddComponent<PhysicsComponent>();	
-	myObjectToSaveA->TryGetComponent<BoundsComponent>()->SetPhysicsComponent(phys);
-
-	phys->SetInitType(PhysicsComponent::Sphere);
-	phys->SetPhysicsObject(new PhysicsObject(&myObjectToSaveA->GetTransform()));
-	phys->GetPhysicsObject()->SetInverseMass(10);
-	phys->GetPhysicsObject()->InitSphereInertia();
-
+	Vector3 position = Vector3(90 + 10, 22, -50);
+	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, 10.0f, false);
 	GameObject* child = CreateChildInstance(Vector3(5, 0, 0), false);
 	child->AddChild(CreateChildInstance(Vector3(5, 0, 0), true));
 
@@ -99,8 +84,8 @@ void TutorialGame::TestLoadGameObject(std::string assetPath) {
 
 void TutorialGame::TestSave() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	//TestSaveByType();
-	//TestSaveGameObject(gameObjectPath);
+	TestSaveByType();
+	TestSaveGameObject(gameObjectPath);
 	TestLoadGameObject(gameObjectPath);
 }
 
@@ -237,6 +222,7 @@ void TutorialGame::InitWorld()
 	//TestSave();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
+
 	//AddSphereToWorld(Vector3(93, 22, -50), 100.0f); //PS5
 	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }

@@ -143,11 +143,16 @@ namespace NCL::CSC8508
 		}
 	
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override {
-			std::cout << "Reading full packet" << std::endl;
 			int newStateId = 0; 			
 			FullPacket p = ((FullPacket&) ifp);		
 
-			if (!UpdateFullStateHistory<TransformNetworkState, FullPacket>(p, &newStateId)) return false;
+			if (!UpdateFullStateHistory<TransformNetworkState, FullPacket>(p, &newStateId)) {
+				return false;
+				std::cout << "returning false from incorrect history" << std::endl;
+			}
+			
+			std::cout << "Reading full packet" << std::endl;
+
 			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;
 			((TransformNetworkState*)lastFullState)->stateID = newStateId;

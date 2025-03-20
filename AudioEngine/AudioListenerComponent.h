@@ -65,8 +65,9 @@ public:
 	/**
 	* Start Microphone recording of selected input device
 	*/
-	void RecordMic() {
-		FMOD_RESULT result = fSystem->recordStart(inputDeviceIndex, micInput, true);
+	FMOD_RESULT RecordMic() {
+		return fSystem->recordStart(inputDeviceIndex, micInput, true);
+
 	}
 
 	/**
@@ -99,23 +100,6 @@ public:
 	#pragma region Encoding VOIP Pipeline
 
 	/**
-	* Encodes a PCM sample buffer to an Opus frame.
-	* Each frame contains 960 samples (20ms at 48kHz).
-	* @return std::vector<unsigned char> (encoded Opus frame)
-	* @param std::vector<short>& (PCM data to encode)
-	*/
-	std::vector<unsigned char> EncodeOpusFrame(std::vector<short>& pcmData);
-
-	/**
-	* Streams PCM data from the microphone input to the Opus encoder.
-	*/
-	void StreamEncodeMic();
-
-	void UpdateAudioEncode() {
-		StreamEncodeMic();
-	}
-
-	/**
 	* Convert packet to fixed size array
 	* @return unsigned char* (array of packet data)
 	* @param std::vector<unsigned char>& (packet data)
@@ -132,26 +116,20 @@ public:
 
 	#pragma endregion
 
-	std::vector<short> DecodeOpusFrame(std::vector<unsigned char>& encodedPacket);
+	#pragma region Decoding VOIP Pipeline
 
-	/**
-	* Initialise the persistent sound object for continuous playback.
-	*/
-	void InitPersistentSound();
 
-	/**
-	* Update the persistent sound buffer with the latest PCM data.
-	* @param std::vector<unsigned char>& (encoded Opus packet)
-	*/
-	void DecodePersistentPlayback(std::vector<unsigned char>& encodedPacket);
-
+	// OLD Decode Update Loop
+	/*
 	void UpdateAudioDecode() {
 		if (encodedPacketQueue != nullptr && !encodedPacketQueue->empty()) {
 			std::vector<unsigned char> packet = encodedPacketQueue->front();
 			encodedPacketQueue->pop_front();  // Process oldest frame first
-			DecodePersistentPlayback(packet);
+			DecodePersistentPlayback(PacketToArray(packet));
 		}
-	}
+	}*/
+
+	#pragma endregion
 
 
 	#pragma region Input/Output Device Management
@@ -220,7 +198,7 @@ public:
 	#pragma endregion
 
 
-private:
+	protected:
 
 	// Listner id - always 0
 	int fIndex = 0;
@@ -234,20 +212,6 @@ private:
 	FMOD::Sound* micInput;
 
 
-	////Encoding/Decoding////
-	OpusEncoder* encoder;
-
-	std::deque<std::vector<unsigned char>>* encodedPacketQueue;
-
-
-
-	OpusDecoder* decoder;
-
-	FMOD::Sound* persistentSound = nullptr;
-	FMOD::Channel* persistentChannel = nullptr;
-	unsigned int persistentBufferSize = sampleRate / 2; // 0.5 second
-	unsigned int currentWritePos = 0; // in samples
-	/////////////////////////
 
 
 	FMOD_VECTOR fForward;

@@ -98,20 +98,6 @@ public:
 		return volume;
 	}
 
-	std::deque<std::vector<unsigned char>>& GetEncodedPacketQueue() {
-		return encodedPacketQueue;
-	}
-
-	
-	void StartEncodeThread(AudioListenerComponent* listener);
-
-	void StopEncodeThread();
-
-	
-	void StartDecodeThread(AudioSourceComponent* source);
-
-	void StopDecodeThread();
-
 private:
     AudioEngine();
     ~AudioEngine();
@@ -129,13 +115,6 @@ private:
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
 
-	std::deque<std::vector<unsigned char>> encodedPacketQueue;
-
-	std::atomic<bool> encodeThreadRunning;
-	std::atomic<bool> decodeThreadRunning;
-
-	std::thread encodeThread;
-	std::thread decodeThread;
 	
 };
 

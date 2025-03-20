@@ -143,6 +143,7 @@ namespace NCL::CSC8508
 		}
 	
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override {
+			std::cout << "Reading full packet" << std::endl;
 			int newStateId = 0; 			
 			FullPacket p = ((FullPacket&) ifp);		
 

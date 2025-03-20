@@ -19,8 +19,6 @@ namespace NCL {
 				static UISystem* GetInstance() { return instance; }
 				static void Shutdown() { if (instance) { delete instance; } }
 
-				int GetMenuOption() { return menuOption; }
-
 				void UpdateFramerate(float delta) { dt = delta; }
 
 				void SetWinSize(int width, int height) {
@@ -33,19 +31,11 @@ namespace NCL {
 
 				void RenderFrame();
 
-				/*void PushNewStack(UIElementsGroup group, std::string name) {
-					
-				}*/
+				void PushNewStack(UIElementsGroup* group, std::string name);
 
 				void RemoveStack(std::string name);
 
-				std::unordered_map<std::string, CSC8508::PushdownMachine>elementStacks;
-
-				void DisplayWindow(int window);
-				void HideWindow(int window);
-				void DrawWindows();
-
-				enum uiElements { framerate, mainMenu, audioSliders, healthbar };
+				std::unordered_map<std::string, UIElementsGroup*>elementStacks;
 
 			protected:
 				UISystem();
@@ -53,15 +43,12 @@ namespace NCL {
 
 				static UISystem* instance;
 
-				/*CSC8508::PushdownMachine* uiMachine = nullptr;*/
-
 				float dt = 60;
 				int health = 50;
 
 				int winWidth = 0;
 				int winHeight = 0;
 
-				int menuOption = 0;
 				enum menuOptions { none, startOffline, startServer, StartClient };
 			};
 		}

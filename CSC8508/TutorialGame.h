@@ -17,6 +17,7 @@
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
 #include "FramerateUI.h"
+#include "MainMenuUI.h"
 
 
 using std::vector;
@@ -87,6 +88,9 @@ namespace NCL {
 
 			GameObject* objClosest = nullptr;
 			UI::UISystem* uiSystem;
+
+			UI::FramerateUI* framerate = new UI::FramerateUI;
+			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 
 			float framerateDelay = 0;
 		};

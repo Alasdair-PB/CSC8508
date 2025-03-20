@@ -10,12 +10,12 @@ namespace NCL {
 			FramerateUI();
 			~FramerateUI();
 
-			CSC8508::PushdownState::PushdownResult OnElementsRender(float dt);
+			void UpdateFramerate(float delta) { dt = delta; }
 
-			/*void Draw(float dt, int winWidth, int winHeight);*/
+			UIElementsGroup* frameUI = new UIElementsGroup(ImVec2(50, 50), ImVec2(120, 50), 1.0f, "Framerate");
 
 		protected:
-			float dt = 0;
+			float dt = 60;
 		};
 	}
 }

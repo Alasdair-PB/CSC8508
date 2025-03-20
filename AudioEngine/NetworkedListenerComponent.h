@@ -14,6 +14,7 @@ namespace NCL::CSC8508 {
 
 	struct EncodedAudioPacket : INetworkPacket {
 		unsigned char* encodedFrame;
+		size_t packetSize;
 		uint32_t historyStamp;
 
 		EncodedAudioPacket() {
@@ -81,11 +82,12 @@ namespace NCL::CSC8508 {
 
 		#pragma region Encode Packets
 
-		std::vector<unsigned char> EncodeOpusFrame(std::vector<short>& pcmData) {
+		std::pair<std::vector<unsigned char>, size_t> EncodeOpusFrame(std::vector<short>& pcmData) {
 			std::vector<unsigned char> opusFrame;
 
 			std::vector<unsigned char> tempBuffer(4096); // ensures buffer is large enough for any frame
 			int frameSize = 960;
+			size_t totalEncodeSize = 0;
 
 			// Ensure PCM data is always a multiple of 960 samples
 			if (pcmData.size() % frameSize != 0) {
@@ -98,13 +100,14 @@ namespace NCL::CSC8508 {
 				// if encoding successful, append the encoded frame to the output buffer
 				if (encodedBytes > 0) {
 					opusFrame.insert(opusFrame.end(), tempBuffer.begin(), tempBuffer.begin() + encodedBytes);
+					totalEncodeSize += encodedBytes;
 					//std::cout << "[DEBUG] EncodeOpusFrame() Encoded " << encodedBytes << " bytes." << std::endl;
 				}
 				else {
 					// std::cerr << "[ERROR] EncodeOpusFrame() Error Encoding PCM Data" << std::endl;
 				}
 			}
-			return opusFrame;
+			return { opusFrame, totalEncodeSize };
 		}
 
 		void StreamEncodeMic() {
@@ -157,9 +160,9 @@ namespace NCL::CSC8508 {
 			if (pcmData.size() > samplesToProcess) {
 				pcmData.resize(samplesToProcess);
 			}
-			std::vector<unsigned char> encodedPacket = EncodeOpusFrame(pcmData);
-			if (!encodedPacket.empty()) {
-				exportPacketQueue.push_back(encodedPacket);
+			std::pair<std::vector<unsigned char>, size_t> encodedPair = EncodeOpusFrame(pcmData);
+			if (!encodedPair.first.empty()) {
+				exportPacketQueue.push_back(encodedPair);
 			}
 
 			// Update last position
@@ -172,16 +175,22 @@ namespace NCL::CSC8508 {
 
 		void UpdatePacketSend() {
 			if (exportPacketQueue.empty()) return;
-			SendEncodedAudioPacket(PacketToArray(exportPacketQueue.front()));
+			SendEncodedAudioPacket(exportPacketQueue.front());
 			std::cout << "Sent Packet ID: " << objectID << std::endl;
 			exportPacketQueue.pop_front();
 		}
 
-		void SendEncodedAudioPacket(unsigned char* encodedPacket) {
+		void SendEncodedAudioPacket(std::pair<std::vector<unsigned char>, size_t> encodedPair) {
 			EncodedAudioPacket* packet = new EncodedAudioPacket();
-			packet->encodedFrame = encodedPacket;
+
+			packet->encodedFrame = new unsigned char[encodedPair.first.size()];
+			std::copy(encodedPair.first.begin(), encodedPair.first.end(), packet->encodedFrame);
+
 			packet->historyStamp = sendHistoryCounter;
+			packet->packetSize = encodedPair.second;
 			SendEventPacket(packet);
+			
+			delete packet->encodedFrame;
 			delete packet;
 			sendHistoryCounter++;
 		}
@@ -216,12 +225,12 @@ namespace NCL::CSC8508 {
 		void UpdateNetworkedDecode() {
 			uint32_t nextIndex = recieveHistoryCounter % bufferSize;
 
-			if (audioPacketQueue[nextIndex] == nullptr ||
+			if (audioPacketQueue[nextIndex]->encodedFrame == nullptr ||
 				audioPacketQueue[nextIndex]->historyStamp < recieveHistoryCounter) {
 				std::cout << "Inserting Silence" << std::endl;
 				InsertSilence(nextIndex);
 			}
-			DecodePersistentPlayback(audioPacketQueue[nextIndex]->encodedFrame);
+			DecodePersistentPlayback(audioPacketQueue[nextIndex]);
 			recieveHistoryCounter++;
 			audioPacketQueue[nextIndex] = nullptr;
 		}
@@ -244,9 +253,13 @@ namespace NCL::CSC8508 {
 		}
 
 
-		std::vector<short> DecodeOpusFrame(unsigned char* encodedPacket) {
+		std::vector<short> DecodeOpusFrame(EncodedAudioPacket* encodedPacket) {
 			std::vector<short> pcmFrame(960);
-			int decodedSamples = opus_decode(decoder, encodedPacket, sizeof(encodedPacket), pcmFrame.data(), pcmFrame.size(), 0);
+
+			unsigned char* packetData = encodedPacket->encodedFrame;
+			size_t frameSize = encodedPacket->packetSize;
+
+			int decodedSamples = opus_decode(decoder, packetData, frameSize, pcmFrame.data(), pcmFrame.size(), 0);
 
 			std::cout << "[DEBUG] UpdatePersistentPlayback() Decoded " << decodedSamples << " samples." << std::endl;
 
@@ -263,7 +276,7 @@ namespace NCL::CSC8508 {
 
 		}
 
-		void DecodePersistentPlayback(unsigned char* encodedPacket) {
+		void DecodePersistentPlayback(EncodedAudioPacket* encodedPacket) {
 
 			if (!persistentSound) return;
 
@@ -395,7 +408,7 @@ namespace NCL::CSC8508 {
 		bool encodeThreadRunning;
 		std::thread encodeThread;
 
-		std::deque<std::vector<unsigned char>> exportPacketQueue;
+		std::deque<std::pair<std::vector<unsigned char>, size_t>> exportPacketQueue;
 
 		// Send Data
 		uint32_t sendHistoryCounter = 0;

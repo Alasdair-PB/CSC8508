@@ -74,18 +74,14 @@ void GameWorld::LoadCameraInfo(float nearPlane, float farPlane, float pitch, flo
 
 void GameWorld::Load(std::string assetPath, size_t allocationStart) {
 	WorldSaveData loadedSaveData = ISerializedData::LoadISerializable<WorldSaveData>(assetPath, allocationStart);
-
 	LoadCameraInfo(loadedSaveData.nearPlane, loadedSaveData.farPlane, 
 		loadedSaveData.pitch, loadedSaveData.yaw, loadedSaveData.position);
-	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
-		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
-		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
 
+	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
 		GameObject* object = new GameObject();
 		object->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
 		AddGameObject(object);
 	}
-	std::cout << loadedSaveData.nearPlane << std::endl;
 }
 
 size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
@@ -98,6 +94,9 @@ size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
 	WorldSaveData saveInfo(0.1f, 500.0f, -15.0f, 315.0f, Vector3(-60, 40, 60));
 
 	for (GameObject* gameObject : gameObjects) {
+		if (gameObject->HasParent())
+			continue;
+
 		size_t nextMemoryLocation = gameObject->Save(assetPath, allocationStart);
 		std::string typeName = SaveManager::Demangle(typeid(*gameObject).name());
 
@@ -123,11 +122,8 @@ void GameWorld::AddGameObject(GameObject* o) {
 	auto bounds = o->TryGetComponent<BoundsComponent>();
 	auto phys = o->TryGetComponent<PhysicsComponent>();
 
-	if (bounds)
-		boundsComponents.emplace_back(bounds);
-
-	if (phys) 
-		physicsComponents.emplace_back(phys);
+	if (bounds) boundsComponents.emplace_back(bounds);
+	if (phys) physicsComponents.emplace_back(phys);
 
 	auto newComponents = o->GetAllComponents();
 
@@ -135,6 +131,9 @@ void GameWorld::AddGameObject(GameObject* o) {
 		this->components.push_back(component);
 		component->InvokeOnAwake();
 	}
+
+	for (GameObject* child : o->GetChildren())
+		AddGameObject(child);
 	o->InvokeOnAwake();
 }
 

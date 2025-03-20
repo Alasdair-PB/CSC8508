@@ -38,7 +38,5 @@ size_t IComponent::Save(std::string assetPath, size_t* allocationStart)
 }
 
 void IComponent::Load(std::string assetPath, size_t allocationStart){
-
 	ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(assetPath, allocationStart);
-	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
 }

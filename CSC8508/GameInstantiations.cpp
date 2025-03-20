@@ -6,6 +6,8 @@
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
+#include "AnimationComponent.h"
+#include "MeshAnimation.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -123,9 +125,15 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	float inverseMass = 0.5f;
 
 	GameObject* player = new GameObject();
+	GameObject* sphereB = AddSphereToWorld(Vector3(0,5,0), 1, 0);
+	
+	player->AddChild(sphereB);
+
+
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
 	Shader* basicShader = MaterialManager::GetShader("basic");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
 
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
@@ -154,9 +162,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetLayerID(Layers::LayerID::Player);
 	player->SetTag(Tags::Player);
 
-	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, nullptr, basicShader));
-	player->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
-
+	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, basicTex, basicShader));
 	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -175,7 +181,6 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	Texture* basicTex = MaterialManager::GetTexture("basic");
 	Shader* basicShader = MaterialManager::GetShader("basic");
 
-
 	PhysicsComponent* phys = floor->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = floor->AddComponent<BoundsComponent>((CollisionVolume*) volume, phys);
 
@@ -191,31 +196,56 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	return floor;
 }
 
-GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass)
+GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool addToWorld)
 {
 	GameObject* sphere = new GameObject();
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
 	Mesh* sphereMesh = MaterialManager::GetMesh("sphere");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-
+	Shader* basicShader = MaterialManager::GetShader("basic");	
 
 	PhysicsComponent* phys = sphere->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = sphere->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	bounds->SetBoundingVolume((CollisionVolume*)volume);
 	sphere->GetTransform().SetScale(sphereSize).SetPosition(position);
-
 	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
+
 	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform()));
+	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
+	phys->GetPhysicsObject()->InitSphereInertia();
+	phys->SetInitType(PhysicsComponent::Sphere);
+
+	if (addToWorld) world->AddGameObject(sphere);
+	return sphere;
+}
+
+GameObject* TutorialGame::AddRoleTToWorld(const Vector3& position, float inverseMass)
+{	
+	GameObject* roleT = new GameObject();
+	Vector3 size = Vector3(10.0f, 10.0f, 10.0f);
+	CapsuleVolume* volume = new CapsuleVolume(4.0f, 2.5f);
+	Mesh* roleTMesh = MaterialManager::GetMesh("Role_T");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
+	Shader* animShader = MaterialManager::GetShader("anim");
+
+	PhysicsComponent* phys = roleT->AddComponent<PhysicsComponent>();
+	BoundsComponent* bounds = roleT->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+
+	bounds->SetBoundingVolume((CollisionVolume*)volume);
+	roleT->GetTransform().SetScale(size).SetPosition(position);
+
+	roleT->SetRenderObject(new RenderObject(&roleT->GetTransform(), roleTMesh, basicTex, animShader));
+	phys->SetPhysicsObject(new PhysicsObject(&roleT->GetTransform()));
+	roleT->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Role_T.anm"));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
 	phys->GetPhysicsObject()->SetRestitution(0.5f);
 
-	world->AddGameObject(sphere);
-	return sphere;
+	world->AddGameObject(roleT);
+	return roleT;
 }
 
 GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {

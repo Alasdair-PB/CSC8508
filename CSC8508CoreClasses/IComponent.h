@@ -83,6 +83,15 @@ namespace NCL::CSC8508
 		}
 
 		/// <summary>
+		/// Query for dependent types of this IComponent
+		/// </summary>
+		/// <returns>A unordered set of types this component is dependent on</returns>
+		virtual std::unordered_set<std::type_index>& GetDependentTypes() const {
+			static std::unordered_set<std::type_index> types = {};
+			return types;
+		}
+
+		/// <summary>
 		/// Query if this IComponent is derived from a type matching type_info
 		/// </summary>
 		/// <param name="typeInfo">The type info of the queried type</param>

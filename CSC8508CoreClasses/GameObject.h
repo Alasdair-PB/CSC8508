@@ -42,7 +42,11 @@ namespace NCL::CSC8508 {
 		/// </summary>
 		/// <param name="isEnabled">The new enabled state of this GameObject</param>
 		/// <returns></returns>
-		void SetEnabled(bool isEnabled) { this->isEnabled = isEnabled;  }
+		void SetEnabled(bool isEnabled) { 
+			this->isEnabled = isEnabled;
+			OperateOnChildren([&](GameObject* object) {
+				object->SetEnabled(isEnabled);});
+		}
 
 		/// <summary>
 		/// Query if this GameObject is static
@@ -144,13 +148,19 @@ namespace NCL::CSC8508 {
 		}
 
 		/// <summary>
+		/// Get children set as references to this GameObject
+		/// </summary>
+		/// <returns>A vector of all children of this GameObject</returns>
+		vector<GameObject*> GetChildren() { return children; }
+
+		/// <summary>
 		/// Returns a pointer to a attatched GameObject if the component
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
 		template <typename T>
 			requires std::is_base_of_v<IComponent, T>
-		T* TryGetComponent() {
+		T* TryGetComponent() const {
 			for (IComponent* component : components) {
 				if (T* casted = dynamic_cast<T*>(component))
 					return casted;
@@ -178,20 +188,6 @@ namespace NCL::CSC8508 {
 		size_t Save(std::string assetPath, size_t* = nullptr) override;
 
 		/// <summary>
-		/// Loads the save data as new components
-		/// </summary>
-		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
-		/// <param name="assetPath">The path to the asset file</param>
-		void LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath);
-
-		/// <summary>
-		/// Loads the save data into exisiting components
-		/// </summary>
-		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
-		/// <param name="assetPath">The path to the asset file</param>
-		void LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath);
-
-		/// <summary>
 		/// Loads GameObject specific Data into this GameObject
 		/// </summary>
 		/// <param name="loadedSaveData">The loaded data used to set this GameObject's properties to the loaded data</param>
@@ -204,16 +200,23 @@ namespace NCL::CSC8508 {
 		void AddChild(GameObject* child);
 
 		/// <summary>
+		/// Check if a GameObject is referenced as a child by this GameObject
+		/// </summary>
+		/// <param name="child">The child GameObject to check</param>
+		/// <returns>true if this GameObject contains a reference to child in their children, otherwise returns false</returns>
+		bool HasChild(GameObject* child);
+
+		/// <summary>
+		/// Removes a child GameObject from this GameObject
+		/// </summary>
+		/// <param name="child">The removed child GameObject</param>
+		void RemoveChild(GameObject*child);
+
+		/// <summary>
 		/// Return the Parent Gameobject of this GameObject otherwise return nullptr
 		/// </summary>
 		/// <returns>The parent gameobject if one exists otherwise returnn nullptr</returns>
 		GameObject* TryGetParent();
-
-		/// <summary>
-		/// Sets the Parent of this GameObject
-		/// </summary>
-		/// <param name="parent">The new parent of this GameObject</param>
-		void SetParent(GameObject* parent);
 
 		/// <summary>
 		/// Checks if this GameObject has a parent otherwise false
@@ -227,6 +230,12 @@ namespace NCL::CSC8508 {
 		/// <param name="tag">The queried tag</param>
 		/// <returns>True if the tag is found otherwise returns false</returns>
 		bool HasTag(Tags::Tag tag);
+		
+		/// <summary>
+		/// Call function func on all Child GameObjects of this GameObject
+		/// </summary>
+		/// <param name="func">A reference to any function that takes parameter GameObject*</param>
+		void OperateOnChildren(std::function<void(GameObject*)> func);
 
 		/// <summary>
 		/// Query if this GameObject has a component of type T attatched
@@ -234,7 +243,13 @@ namespace NCL::CSC8508 {
 		/// <typeparam name="T">The type of the queried Component</typeparam>
 		/// <param name="type">The queried Component</param>
 		/// <returns>True if a component of type T is attatched to this GameObject otherwise returns false</returns>
-		template <typename T> bool HasComponent(T type);
+		template <typename T> bool HasComponent(T type) {
+			for (IComponent* component : components) {
+				if (T* casted = dynamic_cast<T*>(component))
+					return true;
+			}
+			return false;
+		}
 
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
@@ -250,9 +265,65 @@ namespace NCL::CSC8508 {
 		RenderObject* renderObject;
 		GameObject* parent;
 		vector<IComponent*> components; 
+		vector<GameObject*> children;
 
 		Layers::LayerID	layerID;
-		Tags::Tag tag; 
+		Tags::Tag tag;
+		vector<Tags::Tag> tags;
+		void GetGameObjData(GameObjDataStruct& saveInfo);
+		void GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
+		void GetChildData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);
+
+		/// <summary>
+		/// Orders Components to ensure an IComponents is saved after another IComponents it may depend on. 
+		/// Called before saving GameObjects so loading can be done without Errors
+		/// </summary>
+		void OrderComponentsByDependencies();
+
+		void InitializeComponentMaps(
+			std::unordered_map<IComponent*, int>& inDegree,
+			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+			std::unordered_map<std::type_index, IComponent*>& typeToComponent);
+
+		bool HasNoDependencies(const std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies) const;
+
+		void BuildDependencyGraph(
+			std::unordered_map<IComponent*, int>& inDegree,
+			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+			const std::unordered_map<std::type_index, IComponent*>& typeToComponent);
+
+		bool TopologicalSort(
+			std::unordered_map<IComponent*, int>& inDegree,
+			std::unordered_map<IComponent*, std::unordered_set<std::type_index>>& dependencies,
+			const std::unordered_map<std::type_index, IComponent*>& typeToComponent,
+			std::vector<IComponent*>& sortedComponents);
+
+		/// <summary>
+		/// Sets the Parent of this GameObject
+		/// </summary>
+		/// <param name="parent">The new parent of this GameObject</param>
+		void SetParent(GameObject* newParent);
+
+		/// <summary>
+		/// Loads the save data as new components
+		/// </summary>
+		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
+		/// <param name="assetPath">The path to the asset file</param>
+		void LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath);
+
+		/// <summary>
+		/// Loads the save data into exisiting components
+		/// </summary>
+		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
+		/// <param name="assetPath">The path to the asset file</param>
+		void LoadInto(GameObjDataStruct& loadedSaveData, std::string assetPath);
+
+		/// <summary>
+		/// Loads Child GameObjects as children
+		/// </summary>
+		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
+		/// <param name="assetPath">The path to the asset file</param>
+		void LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath);
 	};
 
 	/// <summary>
@@ -267,6 +338,8 @@ namespace NCL::CSC8508 {
 	protected:
 		GameObject& gameObject;
 		size_t entry;
+
+
 	};
 
 }

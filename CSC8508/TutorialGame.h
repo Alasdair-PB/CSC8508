@@ -43,14 +43,18 @@ namespace NCL {
 			void UpdateObjectSelectMode(float dt);
 			bool SelectObject();
 
-			void MoveSelectedObject();
-			void LockedObjectMovement();
 
+			void TestSaveGameObject(std::string assetPath);
+			void TestLoadGameObject(std::string assetPath);
+			void SaveWorld(std::string assetPath);
+			void LoadWorld(std::string assetPath);
+			void TestSave();
 			void UpdateUI();
 
+			GameObject* CreateChildInstance(Vector3 offset, bool isStatic);
 			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool addToWorld = true);
 			GameObject* AddRoleTToWorld(const Vector3& position, float inverseMass = 10.0f); // Anim
-			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			GameObject* AddNavMeshToWorld(const Vector3& position, Vector3 dimensions);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);

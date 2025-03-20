@@ -125,9 +125,15 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	float inverseMass = 0.5f;
 
 	GameObject* player = new GameObject();
+	GameObject* sphereB = AddSphereToWorld(Vector3(0,5,0), 1, 0);
+	
+	player->AddChild(sphereB);
+
+
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
 	Shader* basicShader = MaterialManager::GetShader("basic");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
 
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
@@ -156,9 +162,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetLayerID(Layers::LayerID::Player);
 	player->SetTag(Tags::Player);
 
-	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, nullptr, basicShader));
-	player->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
-
+	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, basicTex, basicShader));
 	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -192,30 +196,28 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
 	return floor;
 }
 
-GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass)
+GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool addToWorld)
 {
 	GameObject* sphere = new GameObject();
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
 	Mesh* sphereMesh = MaterialManager::GetMesh("sphere");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-
+	Shader* basicShader = MaterialManager::GetShader("basic");	
 
 	PhysicsComponent* phys = sphere->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = sphere->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	bounds->SetBoundingVolume((CollisionVolume*)volume);
 	sphere->GetTransform().SetScale(sphereSize).SetPosition(position);
-
 	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform()));
 
+	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
-	//phys->GetPhysicsObject()->SetRestitution(0.5f);
+	phys->SetInitType(PhysicsComponent::Sphere);
 
-	world->AddGameObject(sphere);
+	if (addToWorld) world->AddGameObject(sphere);
 	return sphere;
 }
 

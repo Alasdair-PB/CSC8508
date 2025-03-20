@@ -1,5 +1,5 @@
 set(PROJECT_NAME CSC8508)
-
+set(EXE_NAME "CSC8505_Game")
 file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB Legacy_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Legacy/*")
@@ -188,6 +188,9 @@ else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES
 		INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
 	)
+	set_target_properties(${PROJECT_NAME} PROPERTIES 
+		OUTPUT_NAME ${EXE_NAME})
+
 endif()
 ################################################################################
 # Compile definitions

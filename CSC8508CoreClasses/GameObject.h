@@ -229,7 +229,7 @@ namespace NCL::CSC8508 {
 		/// </summary>
 		/// <param name="tag">The queried tag</param>
 		/// <returns>True if the tag is found otherwise returns false</returns>
-		bool HasTag(Tags::Tag tag);
+		bool HasTag(Tags::Tag tag) const { return true; }
 		
 		/// <summary>
 		/// Call function func on all Child GameObjects of this GameObject
@@ -321,72 +321,6 @@ namespace NCL::CSC8508 {
 		/// <summary>
 		/// Loads Child GameObjects as children
 		/// </summary>
-		/// <param name="loadedSaveData">The loaded data used to set this GameObject's properties to the loaded data</param>
-		void LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData);
-
-		/// <summary>
-		/// Add a child GameObject to this GameObject
-		/// </summary>
-		/// <param name="child">The new child GameObject</param>
-		void AddChild(GameObject* child);
-
-		/// <summary>
-		/// Return the Parent Gameobject of this GameObject otherwise return nullptr
-		/// </summary>
-		/// <returns>The parent gameobject if one exists otherwise returnn nullptr</returns>
-		GameObject* TryGetParent();
-
-		/// <summary>
-		/// Sets the Parent of this GameObject
-		/// </summary>
-		/// <param name="parent">The new parent of this GameObject</param>
-		void SetParent(GameObject* parent);
-
-		/// <summary>
-		/// Checks if this GameObject has a parent otherwise false
-		/// </summary>
-		/// <returns>true if this GameObject has a parent otherwise false</returns>
-		bool HasParent();
-		
-		/// <summary>
-		/// Check if this GameObject has a tag that matches the param tag
-		/// </summary>
-		/// <param name="tag">The queried tag</param>
-		/// <returns>True if the tag is found otherwise returns false</returns>
-		bool HasTag(Tags::Tag tag);
-
-		/// <summary>
-		/// Query if this GameObject has a component of type T attatched
-		/// </summary>
-		/// <typeparam name="T">The type of the queried Component</typeparam>
-		/// <param name="type">The queried Component</param>
-		/// <returns>True if a component of type T is attatched to this GameObject otherwise returns false</returns>
-		template <typename T> bool HasComponent(T type);
-
-		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
-		Layers::LayerID GetLayerID() const {return layerID; }
-		void SetTag(Tags::Tag newTag) {  tag = newTag;}
-		Tags::Tag GetTag() const { return tag;}
-		bool HasTag(Tags::Tag tag) const { return false; }
-
-	protected:
-		virtual void OnAwake() {}
-		virtual void Update(float deltaTime) {}
-		virtual void EarlyUpdate(float deltaTime) {}
-		virtual void OnEnable() {}
-		virtual void OnDisable() {}
-
-		bool isEnabled;
-		const bool isStatic;
-		int worldID;
-
-		Transform transform;
-		RenderObject* renderObject;
-		GameObject* parent;
-		vector<IComponent*> components; 
-
-		Layers::LayerID	layerID;
-		Tags::Tag tag; 
 		/// <param name="loadedSaveData">The loaded GaemObject save data </param>
 		/// <param name="assetPath">The path to the asset file</param>
 		void LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath);

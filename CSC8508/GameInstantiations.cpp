@@ -4,6 +4,7 @@
 #include "INetworkComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
+#include "StaminaComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
 #include "AnimationComponent.h"
@@ -138,7 +139,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
+	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100);
 	int componentIdCount = 0;
 
 	if (spawnData)

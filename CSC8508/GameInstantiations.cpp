@@ -130,16 +130,18 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	
 	player->AddChild(sphereB);
 
-
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
 	Shader* basicShader = MaterialManager::GetShader("basic");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
 
+	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
+	pc->SetBindingDash(KeyCodes::SHIFT, stamina);
+	pc->SetBindingJump(KeyCodes::SPACE, stamina);
+
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100);
 	int componentIdCount = 0;
 
 	if (spawnData)

@@ -7,6 +7,7 @@
 
 #include "Ray.h"
 #include "EventListener.h"
+#include "EventManager.h"
 
 #include "Window.h"
 #include "CollisionDetection.h"
@@ -20,27 +21,22 @@ namespace NCL {
             PlayerComponent(GameObject& gameObject);
             ~PlayerComponent();
 
-            void SetBindingJump(uint32_t j) {
+            void SetBindingJump(uint32_t j, StaminaComponent* component) {
                 onJumpBinding = j;
-                if (staminaComponent) {
-                    staminaComponent->SetStaminaAction(j, jumpStamCost);
-                }
+                if (component) component->SetStaminaAction(j, jumpStamCost);
             }
 
-            void SetBindingDash(uint32_t d) {
+            void SetBindingDash(uint32_t d, StaminaComponent* component) {
                 onDashBinding = d;
-                if (staminaComponent) {
-                    staminaComponent->SetStaminaAction(d, dashTickStam);
-                }
+                if (component) component->SetStaminaAction(d, dashTickStam);
             }
 
             void SetBindingPickUp(uint32_t p) {
                 onItemPickUpBinding = p;
             }
 
-
             void OnEvent(InputButtonEvent* buttonEvent) override {
-                if (buttonEvent->owner.GetWorldID() != GetGameObject().GetWorldID()) { return; }
+                if (&buttonEvent->owner != &GetGameObject()) { return; }
                 inputStack.push(buttonEvent->buttonId);
             }
 
@@ -61,11 +57,13 @@ namespace NCL {
             {
                 physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
                 inputComponent = GetGameObject().TryGetComponent<InputComponent>();
-                staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();   //Need to write stamina component
+                staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();
+
+                EventManager::RegisterListener<InputButtonEvent>(this);
+                EventManager::RegisterListener<CollisionEvent>(this);
 
                 if (physicsComponent)
                     physicsObj = physicsComponent->GetPhysicsObject();
-
             }
 
             void OnJump() {
@@ -76,50 +74,25 @@ namespace NCL {
             }
 
             void OnDashInput() {
-                isDashing = true;
-                staminaComponent->PerformActionIfAble(onDashBinding);
+                if (staminaComponent->PerformActionIfAble(onDashBinding))             
+                    isDashing = true;
             }
 
             void OnJumpInput() {
-                if (isJumping || !isGrounded) {
-                    return;
-                }
+                if (isJumping || !isGrounded) return;
                 if (staminaComponent->PerformActionIfAble(onJumpBinding)) {
                     isJumping = true;
                     physicsObj->AddForce(Vector3(0, jumpForce, 0));
                 }
             }
             
-            void onItemPickUp() {
+            void OnItemPickUp() {
                 std::cout << "pick up item" << "\n";
             }
 
-            /**
-             * Function invoked each frame.
-             * @param deltaTime Time since last frame
-             */
-            void Update(float deltaTime) override
-            {
-                if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
-                    return;
-
+            void OnPlayerMove() {
                 if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
                     return;
-
-                while (!inputStack.empty()) {
-                    if (inputStack.top() == onDashBinding) {
-                        OnDashInput();
-                    }
-                    else if (inputStack.top() == onJumpBinding) {
-                            OnJumpInput();
-                    }
-                    else if (inputStack.top() == onItemPickUpBinding) {
-                        onItemPickUp();
-                    }
-                    inputStack.pop();
-                }
-
-                OnJump();
 
                 Vector3 dir;
                 Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
@@ -131,9 +104,33 @@ namespace NCL {
                 dir = offsetRotation * dir;
 
 
-                physicsObj->AddForce(dir * speed * (isDashing ? dashMultiplier: 1.0f));
+                physicsObj->AddForce(dir * speed * (isDashing ? dashMultiplier : 1.0f));
                 physicsObj->RotateTowardsVelocity();
+            }
 
+            void CheckInputStack() {
+                while (!inputStack.empty()) {
+                    if (inputStack.top() == onDashBinding)
+                        OnDashInput();
+                    else if (inputStack.top() == onJumpBinding)
+                        OnJumpInput();
+                    else if (inputStack.top() == onItemPickUpBinding)
+                        OnItemPickUp();
+                    inputStack.pop();
+                }
+            }
+
+            /**
+             * Function invoked each frame.
+             * @param deltaTime Time since last frame
+             */
+            void Update(float deltaTime) override
+            {
+                if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
+                    return;
+                CheckInputStack();
+                OnJump();
+                OnPlayerMove();
                 isDashing = false;
                 isGrounded = false;
             }
@@ -141,7 +138,7 @@ namespace NCL {
         protected:
             float speed = 15.0f;
             float dashMultiplier = 1.5f;
-            float jumpForce = 15.0f;
+            float jumpForce = 1500.0f;
   
             InputComponent* inputComponent = nullptr;
             StaminaComponent* staminaComponent = nullptr;

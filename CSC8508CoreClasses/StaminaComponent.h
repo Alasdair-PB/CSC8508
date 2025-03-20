@@ -8,14 +8,15 @@ namespace NCL {
 
         class StaminaComponent : public IComponent {
         public:
-            StaminaComponent(GameObject& gameObject, float initStam, float maxStam): IComponent(gameObject) {
-                maxStamina = std::max(1.0f, maxStam);
-                stamina = std::min(initStam, maxStamina);
+            StaminaComponent(GameObject& gameObject, float initStam, float maxStam, float sRegen): IComponent(gameObject) {
+                this->maxStamina = std::max(1.0f, maxStam);
+                this->stamina = std::min(initStam, maxStamina);
+                this->sRegen = std::max(1.0f, sRegen);
             }
             ~StaminaComponent() = default;
 
             void Update(float dt)override {
-                stamina = std::min(stamina + sRegen * dt, maxStamina);
+                stamina = std::min(stamina + (sRegen * dt), maxStamina);
             }
 
             void IncreaseStamina(float regen) {
@@ -30,8 +31,11 @@ namespace NCL {
             }
 
             bool CanPerformAction(uint32_t a) {
-                if (!staminaActionMap.contains(a)) { return false; }
-                if (stamina - staminaActionMap[a] < 0.0f) { return false; }
+                if (staminaActionMap.find(a) == staminaActionMap.end()) { return false; }
+                if (stamina - staminaActionMap[a] < 0.0f) {
+                    std::cout << "no stamina::" <<std::endl;
+                    return false; 
+                }
                 return true;
             }
 

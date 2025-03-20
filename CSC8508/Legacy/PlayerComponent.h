@@ -46,7 +46,6 @@ namespace NCL {
 
             void OnEvent(CollisionEvent* collisionEvent) override
             {
-                auto x = collisionEvent->object2;
                 bool hasTag = (collisionEvent->object1.HasTag(Tags::Ground) && &collisionEvent->object2 == &GetGameObject()) ||
                     (collisionEvent->object2.HasTag(Tags::Ground) && &collisionEvent->object1 == &GetGameObject());
                 if (hasTag) {
@@ -92,7 +91,7 @@ namespace NCL {
             }
             
             void onItemPickUp() {
-
+                std::cout << "pick up item" << "\n";
             }
 
             /**
@@ -101,7 +100,7 @@ namespace NCL {
              */
             void Update(float deltaTime) override
             {
-                if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr)
+                if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
                     return;
 
                 if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
@@ -137,7 +136,6 @@ namespace NCL {
 
                 isDashing = false;
                 isGrounded = false;
-                inputStack.empty();
             }
  
         protected:

@@ -15,14 +15,15 @@ namespace NCL {
 		typedef std::function<void()> StartServer;
 		typedef std::function<void()> StartOffline;
 		typedef std::function<void()> StartEOS;
-
+		typedef std::function<void()> StartEOSLobbyCreation;
+		typedef std::function<void()> StartEOSLobbySearch;
 
 		class MainMenu {
 
 		public:			
 			typedef std::function<void(bool state)> SetPauseGame;
 
-			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS);
+			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch);
 			~MainMenu();
 			void Update(float dt);
 
@@ -33,6 +34,8 @@ namespace NCL {
 			StartServer startServer;
 			StartOffline startOffline;
 			StartEOS startEOS;
+			StartEOSLobbyCreation startEOSLobbyCreation;
+			StartEOSLobbySearch startEOSLobbySearch;
 
 		protected:
 			PushdownMachine* machine = nullptr;
@@ -43,10 +46,11 @@ namespace NCL {
 			void OnStateAwakeUnpause() { setPause(false); }
 
 			PushdownState::PushdownResult IntroScreenOnUpdate(float dt, PushdownState** newState);
+			PushdownState::PushdownResult LobbyScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult GameScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult PauseScreenOnUpdate(float dt, PushdownState** newState);
 
-			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, hostRoomOpt, joinRoomOpt };
+			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, eosOption, hostLobby, joinLobby, lobby }; //Relates to menuOptions in MainMenu.h
 			int menuOption = 0;
 		};
 	}

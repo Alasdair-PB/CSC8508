@@ -34,7 +34,7 @@ namespace NCL {
 			TutorialGame();
 			~TutorialGame();
 			virtual void UpdateGame(float dt);
-
+			EOSInitialisationManager eosManager;
 		protected:
 			void InitialiseAssets();
 			void InitWorld();
@@ -78,6 +78,8 @@ namespace NCL {
 			MainMenu* mainMenu = nullptr;
 			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset = Vector3(0, 14, 20);
+			
+
 
 			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;

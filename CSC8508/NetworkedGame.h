@@ -39,6 +39,10 @@ namespace NCL {
 
 			void HostGame();
 
+			void EOSLobbyCreation();
+
+			void EOSLobbySearch();
+
 			void UpdateGame(float dt) override;
 
 			void SpawnPlayerClient(int ownerId, int objectId, Prefab prefab);
@@ -61,6 +65,10 @@ namespace NCL {
 			void StartServerCallBack();
 			void StartOfflineCallBack();
 			void StartEOSCallBack();
+
+			void StartEOSLobbyCreationCallBack();
+
+			void StartEOSLobbySearchCallBack();
 
 			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastOwnedObjects(bool deltaFrame);

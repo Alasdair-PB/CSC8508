@@ -42,7 +42,10 @@ struct SpawnPacket : public GamePacket {
 void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
-void NetworkedGame::StartEOSCallBack() { HostGame(); };
+void NetworkedGame::StartEOSCallBack() { HostGame(); }
+void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
+void NetworkedGame::StartEOSLobbySearchCallBack() { EOSLobbySearch(); }
+
 
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
 void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
@@ -62,9 +65,10 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
 		[&]() -> void { this->StartOfflineCallBack(); },
-		[&]() -> void { this->StartEOSCallBack(); }
+		[&]() -> void { this->StartEOSCallBack(); },
+		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
+		[&]() -> void { this->StartEOSLobbySearchCallBack(); }
 	);
-
 
 	NetworkBase::Initialise();
 	timeToNextPacket  = 0.0f;
@@ -113,6 +117,27 @@ void NetworkedGame::HostGame()
 	eosManager = new EOSInitialisationManager();
 	// Start EOS authentication
 	eosManager->StartEOS();
+}
+
+void NetworkedGame::EOSLobbyCreation()
+{
+	std::cout << "[NetworkedGame] Creating EOS lobby..." << std::endl;
+
+	if (!eosManager)
+		eosManager = new EOSInitialisationManager();
+
+	std::cout << "[NetworkedGame] EOS lobby created successfully." << std::endl;
+}
+
+void NetworkedGame::EOSLobbySearch()
+{
+
+	std::cout << "[NetworkedGame] Searching for EOS lobbies..." << std::endl;
+
+	if (!eosManager)
+		eosManager = new EOSInitialisationManager();
+
+	std::cout << "[NetworkedGame] EOS lobby search completed." << std::endl;
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

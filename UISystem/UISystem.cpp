@@ -8,6 +8,7 @@
 
 #include "imgui.h"
 #include <filesystem>
+#include <iostream>
 
 using namespace NCL;
 using namespace UI;
@@ -54,7 +55,11 @@ void UISystem::DrawWindows() {
 			FramerateUI().Draw(dt);
 		}
 		if (i == mainMenu) {
-			menuOption = MainMenuUI().Draw();
+			menuOption = MainMenuUI().DrawMainMenu();
+		}
+		if (i == lobbyMenu)
+		{
+			menuOption = MainMenuUI().DrawLobbyMenu();
 		}
 		if (i == audioSliders) {
 			AudioSliders().Draw();

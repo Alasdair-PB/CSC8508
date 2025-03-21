@@ -13,7 +13,8 @@ MainMenuUI::~MainMenuUI() {
 
 }
 
-int MainMenuUI::Draw() {
+int MainMenuUI::DrawMainMenu() {
+
 	ImGui::SetNextWindowPos(ImVec2(80, 480));
 	ImGui::SetNextWindowSize(ImVec2(600, 500));
 	bool open = true;
@@ -32,7 +33,24 @@ int MainMenuUI::Draw() {
 	}
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
 	if (ImGui::Button("Host Lobby", ImVec2(600, 50))) {
-		menuOption = hostRoom;
+		menuOption = eosOption;
+	}
+	ImGui::End();
+	return menuOption;
+}
+
+int MainMenuUI::DrawLobbyMenu() {
+	ImGui::SetNextWindowPos(ImVec2(80, 480));
+	ImGui::SetNextWindowSize(ImVec2(600, 500));
+	bool open = true;
+	ImGui::Begin("Lobby Menu", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowFontScale(2);
+	if (ImGui::Button("Create Lobby", ImVec2(600, 50))) {
+		menuOption = hostLobby;
+	}
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50);
+	if (ImGui::Button("Join Lobby", ImVec2(600, 50))) {
+		menuOption = joinLobby;
 	}
 	ImGui::End();
 	return menuOption;

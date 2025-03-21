@@ -21,7 +21,7 @@ namespace NCL {
 			}
 		};
 
-		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS)
+		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
@@ -82,34 +82,61 @@ namespace NCL {
 		PushdownState::PushdownResult MainMenu::IntroScreenOnUpdate(float dt, PushdownState** newState)
 		{
 			Debug::Print("Main Menu", Vector2(5, 85));
-			/*Debug::Print(" C->Start as client", Vector2(5, 65));
-			Debug::Print("V->Start as server", Vector2(5, 55));
-			Debug::Print("B->Start Offline", Vector2(5, 45));*/
 
 			if (menuOption == startClientOpt) {
+				std::cout << "Start Client Pressed";
 				setPause(false);
 				startClient();
-				return PushdownState::PushdownResult::Pop;
+				return PushdownState::Pop;
 			}
 			if (menuOption == startServerOpt) {
 				setPause(false);
 				startServer();
-				return PushdownState::PushdownResult::Pop;
+				return PushdownState::Pop;
 			}
 			if (menuOption == startOfflineOpt) {
 				setPause(false);
 				startOffline();
-				return PushdownState::PushdownResult::Pop;
+				return PushdownState::Pop;
 			}
-			if (menuOption == hostRoomOpt)
-			{
-				setPause(false);
-				std::cout << "Here";
+			if (menuOption == eosOption) {
 				startEOS();
-				return PushdownState::PushdownResult::Pop;
+				*newState = new OverlayScreen(
+					[&]() -> void { this->OnStateAwakePause(); },
+					[&](float dt, PushdownState** newState) -> PushdownState::PushdownResult {
+						return this->LobbyScreenOnUpdate(dt, newState);
+					}
+				);
+				return PushdownState::Push;
 			}
-			return PushdownState::PushdownResult::NoChange;
+			return PushdownState::NoChange;
 		}
+
+		PushdownState::PushdownResult MainMenu::LobbyScreenOnUpdate(float dt, PushdownState** newState)
+		{
+			Debug::Print("Duplicate Main Menu", Vector2(5, 85));
+
+			if (menuOption == hostLobby) {
+				std::cout << "Duplicate Pressed";
+				setPause(false);
+				startEOSLobbyCreation();
+				return PushdownState::Pop;
+			}
+			if (menuOption == joinLobby) {
+				setPause(false);
+				startServer();
+				return PushdownState::Pop;
+			}
+			return PushdownState::NoChange;
+		}
+
+
+		PushdownState::PushdownResult LobbyScreenOnUpdate(float dt, PushdownState** newState) {
+			Debug::Print("Waiting for players...", Vector2(5, 80));
+
+			return PushdownState::NoChange;
+		}
+
 
 		MainMenu::~MainMenu() {
 			delete activeController;

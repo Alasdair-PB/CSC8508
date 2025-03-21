@@ -188,11 +188,11 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
 	//delete x;
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	//world->Save(assetPath);
-	world->Load(assetPath);
+	world->Save(assetPath);
+	//world->Load(assetPath);
 }
 
 bool TutorialGame::SelectObject() {
@@ -232,10 +232,19 @@ void TutorialGame::UpdateUI() {
 		framerateDelay = 0;
 	}
 
-	if (uiSystem->GetMenuOption() != 0) {
+	// This is going to be set to 4 when clicked into host room
+	// This is the value that the menu options equates to
+	if (uiSystem->GetMenuOption() != 0 && uiSystem->GetMenuOption() != 4) {
 		mainMenu->SetOption(uiSystem->GetMenuOption());
 		uiSystem->HideWindow(uiSystem->mainMenu);
 		uiSystem->HideWindow(uiSystem->audioSliders);
+	}
+	if (uiSystem->GetMenuOption() == 4)
+	{
+		mainMenu->SetOption(uiSystem->GetMenuOption());
+		uiSystem->HideWindow(uiSystem->mainMenu);
+		uiSystem->DisplayWindow(uiSystem->lobbyMenu);
+		
 	}
 
 	uiSystem->DrawWindows();

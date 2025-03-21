@@ -39,7 +39,7 @@ namespace NCL {
 			void HideWindow(int window);
 			void DrawWindows();
 
-			enum uiElements { framerate, mainMenu, audioSliders, healthbar };
+			enum uiElements { framerate, mainMenu, lobbyMenu, audioSliders, healthbar };
 
 		protected:
 			HWND uiWindow;
@@ -48,7 +48,7 @@ namespace NCL {
 			int health = 50;
 
 			int menuOption = 0;
-			enum menuOptions { none, startOffline, startServer, StartClient };
+			enum menuOptions { none, startOffline, startServer, StartClient, hostRoom };
 		};
 	}
 }

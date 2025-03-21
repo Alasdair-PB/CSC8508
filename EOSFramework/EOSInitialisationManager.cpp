@@ -44,7 +44,6 @@ void EOSInitialisationManager::StartEOS() {
     PlatformHandle = EOS_Platform_Create(&PlatformOptions);
 
     running = true;
-    //updateThread = std::thread(&EOSInitialisationManager::RunUpdateLoop, this);
 
     std::cout << "Platform Handle set";
 
@@ -64,6 +63,7 @@ void EOSInitialisationManager::StartEOS() {
 // Logs the user in anonymously with their authorised Epic Online Services account
 void EOSInitialisationManager::LoginAnonymous() {
     std::cout << "[LoginAnonymous] Attempting login with PersistentAuth..." << std::endl;
+
 
     EOS_HAuth AuthHandle = EOS_Platform_GetAuthInterface(PlatformHandle);
 
@@ -89,7 +89,6 @@ void EOSInitialisationManager::RunUpdateLoop()
         if (PlatformHandle) {
             EOS_Platform_Tick(PlatformHandle);
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Avoid excessive CPU usage
     }
 }
 
@@ -241,6 +240,8 @@ void EOSInitialisationManager::OnConnectLoginComplete(const EOS_Connect_LoginCal
                 << EOS_EResult_ToString(res) << std::endl;
         }
 
+        instance->running = false;
+
         // Calls the authentication complete callback
         if (instance->authCompleteCallback) {
             instance->authCompleteCallback();
@@ -275,7 +276,7 @@ void EOSInitialisationManager::OnCreateUserComplete(const EOS_Connect_CreateUser
 
     // Retrieves the EOSInitialisationManager instance
     EOSInitialisationManager* instance = static_cast<EOSInitialisationManager*>(Data->ClientData);
-    instance->running = false;
+
     if (!instance) {
         std::cerr << "[ERROR] ClientData is null in OnCreateUserComplete!" << std::endl;
         return;
@@ -306,6 +307,8 @@ void EOSInitialisationManager::OnCreateUserComplete(const EOS_Connect_CreateUser
                 << EOS_EResult_ToString(res) << std::endl;
         }
 
+        instance->running = false;
+
         // Calls the authentication complete callback if it is set
         if (instance->authCompleteCallback) {
             instance->authCompleteCallback();
@@ -316,14 +319,6 @@ void EOSInitialisationManager::OnCreateUserComplete(const EOS_Connect_CreateUser
     }
 
 
-}
-
-void EOSInitialisationManager::Tick() {
-    if (PlatformHandle) {
-        std::cout << "Platform handle valie";
-        EOS_Platform_Tick(PlatformHandle);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Avoid CPU overuse
-    }
 }
 
 // Returns the EOS platform handle

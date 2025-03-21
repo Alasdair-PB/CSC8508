@@ -206,10 +206,7 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	RayCollision collision;
 
 	for (auto& i : boundsComponents) {
-		if (!i->GetBoundingVolume()) 
-			continue;
-		if (i == ignoreThis) 
-			continue;
+		if (!i->IsEnabled() || !i->GetBoundingVolume() || i == ignoreThis) continue;
 		bool toContinue = false;
 
 		if (ignoreLayers != nullptr) {

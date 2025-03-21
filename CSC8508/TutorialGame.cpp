@@ -78,7 +78,8 @@ void TutorialGame::TestSaveGameObject(std::string assetPath) {
 void TutorialGame::TestLoadGameObject(std::string assetPath) {
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(assetPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(2, 0, 2));
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
+	//myObjectToLoad->SetEnabled(false);
 	world->AddGameObject(myObjectToLoad);
 }
 

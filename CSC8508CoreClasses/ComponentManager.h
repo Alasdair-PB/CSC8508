@@ -53,9 +53,8 @@ namespace NCL::CSC8508 {
             requires std::is_base_of_v<IComponent, T>
         static void OperateOnContents(std::function<void(T*)> func) {
             auto [buffer, count] = GetComponentsIterator<T>();
-            for (size_t i = 0; i < count; ++i) {
+            for (size_t i = 0; i < count; ++i)
                 func(&buffer[i]);
-            }
         }
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace NCL::CSC8508 {
                 T* buffer = dynamic_cast<T*>(GetComponentsBuffer<Types>());
                 if (buffer) {
                     size_t count = componentCount<Types>;
-                    for (size_t i = 0; i < count; ++i) 
+                    for (size_t i = 0; i < count; ++i)
                         func(&buffer[i]);
                 }
             }()), ...); 
@@ -98,7 +97,7 @@ namespace NCL::CSC8508 {
         /// </summary>
         /// <param name="func"> the function that operates on each component in the buffer of type IComponent.</param>
         static void OperateOnAllIComponentBufferOperators(std::function<void(IComponent*)> func) {
-            for (Action<IComponent>* myAction : IComponentBufferOperators) 
+            for (Action<IComponent>* myAction : IComponentBufferOperators)
                 (*myAction)(func);
         }
 

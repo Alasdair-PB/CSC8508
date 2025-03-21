@@ -111,6 +111,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
+	uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);

@@ -3,22 +3,29 @@
 #include "TutorialGame.h"
 #include "NetworkedGame.h"
 
-using namespace NCL;
-using namespace CSC8508;
-
-#ifdef USE_PS5
-#include "./PS5/GameTechAGCRenderer.h"
-#include "PS5Window.h"
-#else
-#include "Window.h"
-#include "GameTechRenderer.h"
-#endif // USE_PS5
-
 #include <chrono>
 #include <thread>
 #include <sstream>
 #include <functional>
 #include <cstdlib>
+
+#ifdef USE_PS5
+#include "./PS5/GameTechAGCRenderer.h"
+#include "PS5Window.h"
+using namespace NCL;
+using namespace PS5;
+
+size_t sceUserMainThreadStackSize = 2 * 1024 * 1024;
+extern const char sceUserMainThreadName[] = "TeamProjectGameMain";
+int sceUserMainThreadPriority = SCE_KERNEL_PRIO_FIFO_DEFAULT;
+size_t sceLibcHeapSize = 256 * 1024 * 1024;
+
+#else
+#include "Window.h"
+#include "GameTechRenderer.h"
+using namespace NCL;
+using namespace CSC8508;
+#endif // USE_PS5
 
 void UpdateWindow(Window* w, NetworkedGame* g)
 {

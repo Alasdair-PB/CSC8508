@@ -25,6 +25,7 @@ namespace NCL {
 			sce::Agc::DrawCommandBuffer* dcb;
 			PS5::MemoryAllocator allocator;
 
+			ImGui_PS::ControlData controlData;
 		
 		};
 	}

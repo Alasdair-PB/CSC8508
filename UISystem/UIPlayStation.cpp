@@ -1,6 +1,7 @@
 #ifdef USE_PS5
 #include "UIPlayStation.h"
 #include "../PS5Core/PS5MemoryAllocator.h"
+#include "../PS5Core/AGCRenderer.h"
 
 using namespace NCL;
 using namespace UI;
@@ -16,16 +17,20 @@ UIPlayStation::UIPlayStation(sce::Agc::DrawCommandBuffer* dcb, PS5::MemoryAlloca
     const ImGui_PS::ReleaseFunc rf = [](void*, void*) {
         return;
         };
-
+	
     ImGui_PS::initialize(allocator, af, rf, numCx);
+	controlData.hasGamePad = true;
+	controlData.enableNavigation = true;
 }
 
 UIPlayStation::~UIPlayStation() {
+	ImGui_PS::shutdown();
 	//ImGui_ImplOpenGL3_Shutdown();
 	//ImGui_ImplWin32_Shutdown();
 }
 
 void UIPlayStation::StartFrame() {
+	ImGui_PS::newFrame(SCREENWIDTH, SCREENHEIGHT, controlData);
 	//ImGui_ImplOpenGL3_NewFrame();
 	//ImGui_ImplWin32_NewFrame();
 	UISystem::StartFrame();

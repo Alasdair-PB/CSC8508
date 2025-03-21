@@ -97,6 +97,8 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world) : AGCRenderer(*Window
 			sce::Agc::Core::Sampler::FilterMode::kPoint		//minificaction
 		)
 		.setMipFilterMode(sce::Agc::Core::Sampler::MipFilterMode::kPoint);
+	
+	InitialiseImGui();
 }
 
 GameTechAGCRenderer::~GameTechAGCRenderer()	{
@@ -445,9 +447,6 @@ void GameTechAGCRenderer::UpdateDebugData() {
 
 void GameTechAGCRenderer::InitialiseImGui() {
 	UI::UIPlayStation::Initialize(&frameContext->m_dcb, &allocator, SWAPCOUNT);
-
-
-
 }
 
 void GameTechAGCRenderer::DisplayRenderPass() {

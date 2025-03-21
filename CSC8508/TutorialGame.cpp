@@ -108,10 +108,9 @@ void TutorialGame::InitialiseGame() {
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 
-	uiSystem->DisplayWindow(uiSystem->framerate);
-	uiSystem->DisplayWindow(uiSystem->audioSliders);
-	uiSystem->DisplayWindow(uiSystem->mainMenu);
-	uiSystem->DisplayWindow(uiSystem->healthbar);
+	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
+	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -193,7 +192,6 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 void TutorialGame::UpdateGame(float dt)
 {
 	UpdateUI();
-
 	mainMenu->Update(dt);
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
@@ -260,17 +258,18 @@ void TutorialGame::UpdateUI() {
 	framerateDelay += 1;
 
 	if (framerateDelay > 10) {
-		uiSystem->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
+		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
 	}
 
-	if (uiSystem->GetMenuOption() != 0) {
-		mainMenu->SetOption(uiSystem->GetMenuOption());
-		uiSystem->HideWindow(uiSystem->mainMenu);
-		uiSystem->HideWindow(uiSystem->audioSliders);
+	if (mainMenuUI->GetMenuOption() != 0) {
+		mainMenu->SetOption(mainMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 
-	uiSystem->DrawWindows();
+	uiSystem->RenderFrame();
 }
 
 

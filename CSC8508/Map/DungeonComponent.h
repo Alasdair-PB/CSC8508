@@ -7,16 +7,19 @@
 
 #include <utility>
 
+#include "DoorLocation.h"
 #include "IComponent.h"
-#include "RoomComponent.h"
 
 using namespace NCL::CSC8508;
+
+class RoomComponent;
+class RoomPrefab;
 
 class DungeonComponent final : public IComponent {
 public:
     explicit DungeonComponent(GameObject& gameObject) : IComponent(gameObject) { }
 
-    DungeonComponent(GameObject& gameObject, RoomPrefab::DoorLocation entrancePosition)
+    DungeonComponent(GameObject& gameObject, DoorLocation entrancePosition)
         : IComponent(gameObject), entrancePosition(std::move(entrancePosition)) { }
 
     /**
@@ -27,7 +30,7 @@ public:
     [[nodiscard]] unsigned int GetSeed() const { return seed; }
 
 private:
-    RoomPrefab::DoorLocation entrancePosition = RoomPrefab::DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));
+    DoorLocation entrancePosition = DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));
 
     unsigned int seed = 14; // TODO: This needs to be smarter
 
@@ -37,7 +40,7 @@ private:
      * @param doorLocation Attempted world-space DoorLocation
      * @return RoomComponent if successful, NULLPTR if not
      */
-    RoomComponent* TryGenerateRoom(RoomPrefab const& prefab, RoomPrefab::DoorLocation const& doorLocation);
+    RoomComponent* TryGenerateRoom(RoomPrefab const& prefab, DoorLocation const& doorLocation);
 };
 
 #endif //DUNGEONCOMPONENT_H

@@ -21,7 +21,7 @@ using namespace NCL::Rendering;
  */
 class RoomComponent final : public IComponent {
 public:
-    explicit RoomComponent(RoomPrefab* prefab, DungeonComponent* dungeon, GameObject& gameObject)
+    explicit RoomComponent(GameObject& gameObject, RoomPrefab* prefab, DungeonComponent* dungeon)
         : IComponent(gameObject), prefab(prefab), dungeon(dungeon) {
         std::srand(dungeon->GetSeed());
     }

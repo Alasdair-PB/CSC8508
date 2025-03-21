@@ -13,8 +13,7 @@ RoomComponent* RoomComponent::GenerateNew() {
     // 1: Pick a random prefab and create the game object for it
     auto* roomB = new GameObject();
     RoomPrefab* prefab = RoomManager::GetRandom();
-    auto* component = new RoomComponent(prefab, dungeon, *roomB);
-    roomB->AddComponent<RoomComponent>(component);
+    auto* component = roomB->AddComponent<RoomComponent>(prefab, dungeon);
 
     // 2: Check for space against potential door positions
     for (RoomPrefab::DoorLocation aDoorLoc : this->prefab->GetDoorLocations()) {

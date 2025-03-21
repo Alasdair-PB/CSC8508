@@ -3,13 +3,14 @@
 //
 
 #include "DungeonComponent.h"
+#include "RoomPrefab.h"
 
 void DungeonComponent::Generate() {
 
 }
 
 
-RoomComponent* DungeonComponent::TryGenerateRoom(RoomPrefab const& prefab, RoomPrefab::DoorLocation const& doorLocation) {
+RoomComponent* DungeonComponent::TryGenerateRoom(RoomPrefab const& prefab, DoorLocation const& doorLocation) {
 
     // Make a new GameObject as a copy of the prefab's RoomObject
     auto attemptedRoom = new GameObject(prefab.GetRoomObject());

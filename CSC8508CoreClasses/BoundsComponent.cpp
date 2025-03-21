@@ -18,7 +18,7 @@ BoundsComponent::BoundsComponent(GameObject& gameObject, CollisionVolume* collis
 
 BoundsComponent::~BoundsComponent() { delete boundingVolume; }
 
-bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize){
+bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) {
 	if (!boundingVolume) {
 		return false;
 	}

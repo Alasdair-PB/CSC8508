@@ -29,7 +29,7 @@ namespace NCL::CSC8508
 		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		const PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
 
-		bool GetBroadphaseAABB(Vector3& outsize) const;
+		bool GetBroadphaseAABB(Vector3& outsize);
 		void UpdateBroadphaseAABB();
 		void SetPhysicsComponent(PhysicsComponent* physicsComponent) { this->physicsComponent = physicsComponent; }
 

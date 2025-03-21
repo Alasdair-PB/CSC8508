@@ -26,8 +26,6 @@ namespace NCL {
 
 			void SetOption(int option) { menuOption = option; }
 
-			void SetOption(int option) { menuOption = option; }
-
 			SetPauseGame setPause;
 			StartClient startClient;
 			StartServer startServer;

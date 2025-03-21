@@ -65,13 +65,13 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+		auto GetSerializedFields() const;
 
 	protected:
 		CollisionVolume* boundingVolume;
 		PhysicsComponent* physicsComponent;
 		Vector3 broadphaseAABB;
 		vector<Layers::LayerID> ignoreLayers;
-
 		Vector3 GetBoundsScale();
 	};
 }

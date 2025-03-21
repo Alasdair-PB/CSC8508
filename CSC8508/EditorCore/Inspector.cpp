@@ -1,6 +1,8 @@
 #include "Inspector.h"
 #include "IComponent.h"
-
+#include <iostream>
+#include <tuple>
+#include <string>
 
 Inspector::Inspector(){
 	inspectorBar = new UIElementsGroup(
@@ -29,6 +31,7 @@ Inspector::~Inspector() { delete inspectorBar; delete transformInfo; }
 
 void Inspector::RenderIComponents() {
 	for (IComponent* component : componentsList) {
-		//component->GetType();
+		component->GetName();
+		auto fields = component->IComponent::GetSerializedFields(component);
 	}
 }

@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "GameObject.h"
 #include <unordered_set>
+#include <tuple>
 
 namespace NCL::CSC8508 
 {
@@ -114,6 +115,15 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+
+		/// <summary>
+		/// Pure virtual function to get the serialized values in an IComponent for the Inspector
+		/// </summary>
+		/// <returns>A tuple of serialized fields</returns>
+		template <typename T>
+		static void* GetSerializedFields(const T& instance) {
+			return instance->GetSerializedFields();
+		}
 
 
 		/// <summary>

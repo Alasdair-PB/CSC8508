@@ -11,6 +11,9 @@
 #include "MaterialManager.h"
 #include "OrientationConstraint.h"
 #include "Assets.h"
+#include "PhysicsComponent.h"
+#include "BoundsComponent.h"
+
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -45,7 +48,6 @@ void TestSaveByType() {
 	std::string structPath = GetAssetPath("struct_data.pfab");
 	std::string enumPath = GetAssetPath("enum_data.pfab");
 
-
 	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
 	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
@@ -56,17 +58,35 @@ void TestSaveByType() {
 	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;
 }
 
-void TestSaveGameObject() {
-	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	GameObject* myObjectToSave = new GameObject();
-	PhysicsComponent* phys = myObjectToSave->AddComponent<PhysicsComponent>();
-	myObjectToSave->Save(gameObjectPath);
-	myObjectToSave->Load(gameObjectPath);
+GameObject* TutorialGame::CreateChildInstance(Vector3 offset, bool isStatic) {
+	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, isStatic ? 0 : 10, false);
+	return myObjectToSave;
 }
 
-void TestSave() {
+void TutorialGame::TestSaveGameObject(std::string assetPath) {
+
+	Vector3 position = Vector3(90 + 10, 22, -50);
+	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, 10.0f, false);
+	GameObject* child = CreateChildInstance(Vector3(5, 0, 0), false);
+	child->AddChild(CreateChildInstance(Vector3(5, 0, 0), true));
+
+	myObjectToSaveA->AddChild(child);
+	myObjectToSaveA->Save(assetPath);
+	world->AddGameObject(myObjectToSaveA);	
+}
+
+void TutorialGame::TestLoadGameObject(std::string assetPath) {
+	GameObject* myObjectToLoad = new GameObject();
+	myObjectToLoad->Load(assetPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(2, 0, 2));
+	world->AddGameObject(myObjectToLoad);
+}
+
+void TutorialGame::TestSave() {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	TestSaveByType();
-	TestSaveGameObject();
+	TestSaveGameObject(gameObjectPath);
+	TestLoadGameObject(gameObjectPath);
 }
 
 void LoadControllerMappings(Controller* controller)
@@ -75,6 +95,9 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapAxis(2, "Forward");
 	controller->MapAxis(3, "XLook");
 	controller->MapAxis(4, "YLook");
+	controller->MapButton(KeyCodes::SHIFT, "Dash");
+	controller->MapButton(KeyCodes::SPACE, "Jump");
+
 }
 
 void TutorialGame::InitialiseGame() {
@@ -88,14 +111,12 @@ void TutorialGame::InitialiseGame() {
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 
-	uiSystem->DisplayWindow(uiSystem->framerate);
-	uiSystem->DisplayWindow(uiSystem->audioSliders);
-	uiSystem->DisplayWindow(uiSystem->mainMenu);
-	uiSystem->DisplayWindow(uiSystem->healthbar);
+	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
+	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
-	//TestSave();
 }
 
 TutorialGame::TutorialGame()
@@ -103,7 +124,7 @@ TutorialGame::TutorialGame()
 	world = new GameWorld();
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
-	controller = *w->GetController()
+	controller = w->GetController();
 	renderer = new GameTechAGCRenderer(*world);
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
@@ -126,8 +147,10 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
 	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
+	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
+	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
 
 	lockedObject = nullptr;
 	InitWorld();
@@ -172,7 +195,6 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 void TutorialGame::UpdateGame(float dt)
 {
 	UpdateUI();
-
 	mainMenu->Update(dt);
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
@@ -182,15 +204,28 @@ void TutorialGame::UpdateGame(float dt)
 	physics->Update(dt);
 }
 
+void TutorialGame::LoadWorld(std::string assetPath) {
+	world->Load(assetPath);
+}
+
+void TutorialGame::SaveWorld(std::string assetPath) {
+	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+	delete x;
+	world->Save(assetPath);
+}
+
+const bool load = true;
+
 void TutorialGame::InitWorld() 
 {
 	world->ClearAndErase();
 	physics->Clear();
-	//auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-	//delete x;
+	//TestSave();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	//world->Save(assetPath);
-	world->Load(assetPath);
+	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
+
+	//AddSphereToWorld(Vector3(93, 22, -50), 100.0f); //PS5
+	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }
 
 bool TutorialGame::SelectObject() {
@@ -226,17 +261,18 @@ void TutorialGame::UpdateUI() {
 	framerateDelay += 1;
 
 	if (framerateDelay > 10) {
-		uiSystem->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
+		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
 	}
 
-	if (uiSystem->GetMenuOption() != 0) {
-		mainMenu->SetOption(uiSystem->GetMenuOption());
-		uiSystem->HideWindow(uiSystem->mainMenu);
-		uiSystem->HideWindow(uiSystem->audioSliders);
+	if (mainMenuUI->GetMenuOption() != 0) {
+		mainMenu->SetOption(mainMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 
-	uiSystem->DrawWindows();
+	uiSystem->RenderFrame();
 }
 
 

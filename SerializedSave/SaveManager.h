@@ -13,7 +13,6 @@ namespace NCL::CSC8508 {
 
     class SaveManager final {
     public:
-
         /// <summary>
         /// A hash function that returns a unique Id designed for 64 bit architecture
         /// </summary>
@@ -33,10 +32,14 @@ namespace NCL::CSC8508 {
             return h;
         }
 
-
         template <typename T>
         static size_t UniqueTypeHash() {
             std::string typeName = typeid(T).name();
+            return MurmurHash3_64(typeName.c_str(), typeName.size());
+        }
+
+        static size_t UniqueTypeHash(auto var) {
+            std::string typeName = typeid(var).name();
             return MurmurHash3_64(typeName.c_str(), typeName.size());
         }
 
@@ -52,112 +55,11 @@ namespace NCL::CSC8508 {
         template <typename T> struct is_container<T, std::void_t<
             typename T::value_type, decltype(std::declval<T>().size()), decltype(std::declval<T>().data())>> : std::true_type {};
 
+        template <typename T, template <typename, typename> class Template>
+        struct is_specialization : std::false_type {};
 
-        template <typename T>
-        static void SerializeContainer(const T& container, std::vector<uint8_t>& data, uint8_t*& dataPtr, uint32_t containerSize) {
-            std::memcpy(dataPtr, container.data(), containerSize * sizeof(typename T::value_type));
-            dataPtr += containerSize * sizeof(typename T::value_type);
-        }
-
-        static void SerializeContainer(const std::vector<size_t>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
-            for (const auto& value : container) {
-                std::memcpy(dataPtr, &value, sizeof(value));
-                dataPtr += sizeof(value);
-            }
-        }
-
-        static void SerializeContainer(const std::vector<std::pair<size_t, std::size_t>>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
-            for (const auto& value : container) {
-                std::memcpy(dataPtr, &value.first, sizeof(value.first));
-                dataPtr += sizeof(value.first);
-                std::memcpy(dataPtr, &value.second, sizeof(value.second));
-                dataPtr += sizeof(value.second);
-            }
-        }
-
-        static void SerializeContainer(const std::vector<std::string>& container, std::vector<char>& data, uint8_t*& dataPtr, uint32_t containerSize) {
-            for (const auto& str : container) {
-                uint32_t strLength = str.size();
-                std::memcpy(dataPtr, &strLength, sizeof(strLength));
-                dataPtr += sizeof(strLength);
-                std::memcpy(dataPtr, str.data(), strLength);
-                dataPtr += strLength;
-            }
-        }
-
-        /// <summary>
-        /// Creates gameData that allows data Types to saved and reinterpreted by the SaveManager
-        /// </summary>
-        /// <typeparam name="T">The type to be saved</typeparam>
-        /// <typeparam name="...Members">The members in the Type if Type T is a container</typeparam>
-        /// <param name="value">The value to be saved as a GameData Asset</param>
-        /// <param name="...members">The member values of type T if Type T is a container. Can be called without members present. </param>
-        /// <returns></returns>
-        template <typename T, typename... Members>
-        static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
-            GameData item;
-            item.typeHash = UniqueTypeHash<T>();
-            item.dataSize = 0;
-
-            ([&] {
-                const auto& container = value.*members;
-
-                if constexpr (std::is_trivially_copyable_v<typename std::decay_t<decltype(container)>>) 
-                    item.dataSize += sizeof(container);
-                else {
-                    item.dataSize += sizeof(uint32_t);
-                    if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
-                        for (const auto& str : container) {
-                            item.dataSize += sizeof(uint32_t);
-                            item.dataSize += str.size();
-                        }
-                    }
-                    else
-                        item.dataSize += container.size() * sizeof(typename std::decay_t<decltype(container)>::value_type);
-                }
-                }(), ...);
-
-            item.data.resize(item.dataSize);
-            uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
-
-            ([&] {
-                const auto& container = value.*members;
-
-                if constexpr (std::is_trivially_copyable_v<typename std::decay_t<decltype(container)>>) {
-                    std::memcpy(dataPtr, &container, sizeof(container));
-                    dataPtr += sizeof(container);
-                }
-                else {
-                    uint32_t containerSize = container.size();
-                    std::memcpy(dataPtr, &containerSize, sizeof(containerSize));
-                    dataPtr += sizeof(containerSize);
-
-                    SerializeContainer(container, item.data, dataPtr, containerSize);
-                }
-                }(), ...);
-
-            return item;
-        }
-
-        template <typename T>
-        static GameData CreateSaveDataAsset(const T& value) {
-            GameData item;
-            item.typeHash = UniqueTypeHash<T>();
-
-            if constexpr (is_container<T>::value) {
-                item.dataSize = sizeof(uint32_t) + value.size() * sizeof(typename T::value_type);
-                item.data.resize(item.dataSize);
-                uint32_t containerSize = value.size();
-                std::memcpy(item.data.data(), &containerSize, sizeof(containerSize));
-                std::memcpy(item.data.data() + sizeof(containerSize), value.data(), containerSize * sizeof(typename T::value_type));
-            }
-            else {
-                item.dataSize = sizeof(value);
-                item.data.resize(item.dataSize);
-                std::memcpy(item.data.data(), &value, item.dataSize);
-            }
-            return item;
-        }
+        template <typename T1, typename T2, template <typename, typename> class Template>
+        struct is_specialization<Template<T1, T2>, Template> : std::true_type {};
 
         const static uint32_t fileExtension = 0x70666162; // "pfab"
         const static uint32_t endConst = 0x454E4453; // "ends"
@@ -285,7 +187,6 @@ namespace NCL::CSC8508 {
                 std::cerr << "Error: Missing end marker. File may be corrupted!" << std::endl;
                 return false;
             }
-
             if (checksum != (magic ^ version))
                 std::cerr << "Warning: Checksum mismatch. File may be corrupted!" << std::endl;
 
@@ -293,85 +194,217 @@ namespace NCL::CSC8508 {
             return true;
         }
 
-        template <typename T>
-        static T LoadMember(GameData loadedData) {
-            T container;
-            if constexpr (std::is_trivially_copyable_v<T>) {
-                std::memcpy(&container, loadedData.data.data(), sizeof(T));
-                return container;
-            }
-            else if constexpr (is_container<T>::value) {
-                uint32_t size;
-                std::memcpy(&size, loadedData.data.data(), sizeof(size));
-                container.resize(size);
-                std::memcpy(container.data(), loadedData.data.data() + sizeof(size), size * sizeof(typename T::value_type));
-                return container;
-            }
-            else {
-                static_assert(sizeof(T) == -1, "Unsupported type for deserialization");
-                return container;
-            }
-        }
-
+        /// <summary>
+        /// Loads data as Type T from GameData saved in a assetfile
+        /// </summary>
+        /// <typeparam name="T">The type GameData will be loaded as</typeparam>
+        /// <typeparam name="...Members">The type of members within Type T members will be loaded as, can be left empty</typeparam>
+        /// <param name="assetPath">The path to the save asset</param>
+        /// <param name="allocationStart">The offet within the GameData file to begin loading from</param>
+        /// <param name="...members">The members within Type T members will be loaded as</param>
+        /// <returns>The loaded data as type T</returns>
         template <typename T, typename... Members>
         static T LoadMyData(const std::string& assetPath, const size_t allocationStart = 0, Members T::*... members) {
             GameData loadedData;
-            if (!LoadGameData(assetPath, loadedData, allocationStart)) std::cerr<< "Failed to load game data" <<std::endl;
+            if (!LoadGameData(assetPath, loadedData, allocationStart)) std::cerr << "Failed to load game data" << std::endl;
             if (loadedData.typeHash != UniqueTypeHash<T>()) std::cerr << "Type mismatch in game data" << std::endl;
             T loadedStruct;
+            size_t offset = 0;
 
-            if constexpr (sizeof...(members) == 0) 
-                return LoadMember<T>(loadedData);
+            if constexpr (sizeof...(members) == 0)
+                return LoadMember<T>(loadedData, offset);
             else {
-                size_t offset = 0;
                 ([&] {
                     auto& container = loadedStruct.*members;
-
-                    if constexpr (std::is_trivially_copyable_v<typename std::decay_t<decltype(container)>>) {
-                        std::memcpy(&container, loadedData.data.data() + offset, sizeof(container));
-                        offset += sizeof(container);
-                        return container;
-                    }
-                    else {                    
-                        uint32_t containerSize;
-                        std::memcpy(&containerSize, loadedData.data.data() + offset, sizeof(containerSize));
-                        offset += sizeof(containerSize);
-                        container.resize(containerSize);
-
-                        if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::string>) {
-                            for (auto& str : container) {
-                                uint32_t strLength;
-                                std::memcpy(&strLength, loadedData.data.data() + offset, sizeof(strLength));
-                                offset += sizeof(strLength);
-
-                                str.resize(strLength);
-                                std::memcpy(str.data(), loadedData.data.data() + offset, strLength);
-                                offset += strLength;
-                            }
-                        }
-                        else if constexpr (std::is_same_v<typename std::decay_t<decltype(container)>::value_type, std::pair<size_t, std::type_info>>) {
-                            for (auto& p : container) {
-                                std::memcpy(&p.first, loadedData.data.data() + offset, sizeof(p.first));
-                                offset += sizeof(p.first);
-
-                                uint32_t typeNameLength;
-                                std::memcpy(&typeNameLength, loadedData.data.data() + offset, sizeof(typeNameLength));
-                                offset += sizeof(typeNameLength);
-
-                                std::string typeName(typeNameLength, '\0');
-                                std::memcpy(typeName.data(), loadedData.data.data() + offset, typeNameLength);
-                                offset += typeNameLength;
-                                p.second = typeid(typeName);
-                            }
-                        }
-                        else {
-                            std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type));
-                            offset += containerSize * sizeof(typename std::decay_t<decltype(container)>::value_type);
-                        }
-                    }
-                    }(), ...);
+                    container = LoadMember<typename std::decay_t<decltype(container)>>(loadedData, offset);
+                }(), ...);
             }
             return loadedStruct;
+        }
+
+       /// <summary>
+       /// Creates gameData that allows data Types to saved and reinterpreted by the SaveManager
+       /// </summary>
+       /// <typeparam name="T">The type to be saved</typeparam>
+       /// <typeparam name="...Members">The members in the Type if Type T is a container</typeparam>
+       /// <param name="value">The value to be saved as a GameData Asset</param>
+       /// <param name="...members">The member values of type T if Type T is a container. Can be called without members present. </param>
+       /// <returns></returns>
+        template <typename T, typename... Members>
+        static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
+            GameData item;
+            item.typeHash = UniqueTypeHash<T>();
+            item.dataSize = 0;
+
+            if constexpr (sizeof...(members) == 0)
+                return ResizeAndSaveMember(value, item);
+            else {
+                ([&] {
+                    const auto& container = value.*members; 
+                    CalculateSize(container, item);
+                }(), ...);
+
+                item.data.resize(item.dataSize);
+                uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
+
+                ([&] {
+                   const auto& container = value.*members;
+                   SaveMember(container, item, dataPtr);
+                   }(), ...);
+                return item;
+            }
+        }
+
+        /// <summary>
+        /// Resize the char array in GameData to save data into and then save the data
+        /// </summary>
+        /// <typeparam name="T">The type of the saved value</typeparam>
+        /// <param name="value">The Type value to be saved</param>
+        /// <param name="item">The saved data to be filled</param>
+        /// <returns>The saved data struct</returns>
+        template <typename T>
+        static GameData ResizeAndSaveMember(const T& value, GameData& item) {
+            CalculateSize<T>(value, item);
+            item.data.resize(item.dataSize);
+            uint8_t* dataPtr = reinterpret_cast<uint8_t*>(item.data.data());
+            SaveMember<T>(value, item, dataPtr);
+            return item;
+        }
+
+        /// <summary>
+        /// Resize the char array in GameData to save data into
+        /// </summary>
+        /// <typeparam name="T">The type of the saved value</typeparam>
+        /// <param name="container">The Type value to be saved</param>
+        /// <param name="item">The saved data to be filled</param>
+        template <typename T>
+        static void CalculateSize(const T& container, GameData& item) {
+            if constexpr (std::is_same_v<T, std::string>) {
+                item.dataSize += sizeof(uint32_t);
+                item.dataSize += container.size();
+            }
+            else if constexpr (is_specialization<T, std::pair>::value) {
+                using FirstType = typename T::first_type;
+                using SecondType = typename T::second_type;
+                CalculateSize(container.first, item);
+                CalculateSize(container.second, item);
+            }
+            else if constexpr (is_container<T>::value) {
+                item.dataSize += sizeof(uint32_t);
+                using ValueType = typename T::value_type;
+
+                //if constexpr (std::is_trivially_copyable_v<ValueType> && !is_specialization<ValueType, std::pair>::value)
+                //    item.dataSize += container.size() * sizeof(ValueType);
+                //else {
+                    for (const auto& val : container)
+                        CalculateSize(val, item);
+               // }
+            }
+            else if constexpr (std::is_trivially_copyable_v<T>) 
+                item.dataSize += sizeof(T);
+            else 
+                static_assert(sizeof(T) == -1, "Unsupported type for serialization");
+        }
+
+        /// <summary>
+        /// Saves type T into GameData by checking T against container types
+        /// </summary>
+        /// <typeparam name="T">The type of the saved value</typeparam>
+        /// <param name="container">The Type value to be saved</param>
+        /// <param name="item">The item to save this value into</param>
+        /// <param name="dataPtr">The offset in memory from the last saved value</param>
+        template <typename T>
+        static void SaveMember(const T& container, GameData& item, uint8_t*& dataPtr) {
+            if constexpr (is_specialization<T, std::pair>::value) {
+                using FirstType = typename T::first_type;
+                using SecondType = typename T::second_type;
+
+                SaveMember(container.first, item, dataPtr);
+                SaveMember(container.second, item, dataPtr);
+            }
+            else if constexpr (std::is_same_v<T, std::string>) {
+                uint32_t strLength = container.size();
+                std::memcpy(dataPtr, &strLength, sizeof(strLength));
+                dataPtr += sizeof(strLength);
+
+                std::memcpy(dataPtr, container.data(), strLength);
+                dataPtr += strLength;
+            } 
+            else if constexpr (is_container<T>::value) {
+                uint32_t containerSize = container.size();
+                std::memcpy(dataPtr, &containerSize, sizeof(containerSize));
+                dataPtr += sizeof(containerSize);
+
+                //if constexpr (std::is_trivially_copyable_v<typename T::value_type>) {
+                //    std::memcpy(dataPtr, container.data(), containerSize * sizeof(typename T::value_type));
+                //    dataPtr += containerSize * sizeof(typename T::value_type);
+                //}
+                //else {
+                    for (const auto& p : container)
+                        SaveMember(p, item, dataPtr);
+               // }
+            }
+            else if constexpr (std::is_trivially_copyable_v<T>) {
+                std::memcpy(dataPtr, &container, sizeof(container));
+                dataPtr += sizeof(container);
+            }
+            else {
+                static_assert(sizeof(T) == -1, "Unsupported type for serialization");
+            }
+        }
+
+        /// <summary>
+        /// Copies GameData into Type T by checking T against container types
+        /// </summary>
+        /// <typeparam name="T">The type of the saved value to be read</typeparam>
+        /// <param name="GameData">The data to be loaded</param>
+        /// <param name="offset">The offset in memory from the last saved value</param>
+        /// <returns>The value loaded from memory as type T</returns>
+        template <typename T>
+        static T LoadMember(GameData loadedData, size_t& offset) {
+            T container;
+
+            if constexpr (is_specialization<T, std::pair>::value) {
+                using FirstType = typename T::first_type;
+                using SecondType = typename T::second_type;
+
+                FirstType first = LoadMember<FirstType>(loadedData, offset);
+                SecondType second = LoadMember<SecondType>(loadedData, offset);
+                container = { first, second };
+            } 
+            else if constexpr (std::is_same_v<T, std::string>) {
+                uint32_t strLength;
+                std::memcpy(&strLength, loadedData.data.data() + offset, sizeof(strLength));
+                offset += sizeof(strLength);
+
+                container.resize(strLength);
+                std::memcpy(container.data(), loadedData.data.data() + offset, strLength);
+                offset += strLength;
+            }
+            else if constexpr (is_container<T>::value) {
+                uint32_t containerSize = container.size();
+                std::memcpy(&containerSize, loadedData.data.data() + offset, sizeof(containerSize));
+                offset += sizeof(containerSize);
+                container.resize(containerSize);
+
+                using ValueType = typename T::value_type;
+                //if (!std::is_trivially_copyable_v<ValueType> || is_specialization<ValueType, std::pair>::value) {
+                for (size_t i = 0; i < containerSize; ++i)
+                    container[i] = LoadMember<ValueType>(loadedData, offset);
+                //}
+                //else {               
+                //    std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(ValueType));
+                //    offset += containerSize * sizeof(ValueType);
+                //}
+            }
+            else if constexpr (std::is_trivially_copyable_v<T>) {
+                std::memcpy(&container, loadedData.data.data() + offset, sizeof(container));
+                offset += sizeof(container);
+            }
+            else {
+                static_assert(sizeof(T) == -1, "Unsupported type for deserialization");
+            }
+            return container;
         }
 
     private:

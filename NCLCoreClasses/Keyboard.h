@@ -168,6 +168,11 @@ namespace NCL {
 		bool KeyDown(KeyCodes::Type key) const {
 			return keyStates[key];
 		}
+
+		bool KeyDown(uint32_t key) const {
+			return keyStates[key];
+		}
+
 		//Has this key been held down for multiple frames?
 		bool KeyHeld(KeyCodes::Type key) const {
 			if (KeyDown(key) && holdStates[key]) {

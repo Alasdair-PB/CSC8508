@@ -209,9 +209,11 @@ void PhysicsSystem::ImpulseResolveCollision(BoundsComponent& a, BoundsComponent&
 
 	if (totalMass == 0) 
 		return; 
+	if (physA->GetInverseMass() != 0)
+		transformA.SetPosition(transformA.GetLocalPosition() - (p.normal * p.penetration * (physA->GetInverseMass() / totalMass)));
 
-	transformA.SetPosition(transformA.GetPosition() - (p.normal * p.penetration * (physA->GetInverseMass() / totalMass)));
-	transformB.SetPosition(transformB.GetPosition() + (p.normal * p.penetration * (physB->GetInverseMass() / totalMass)));
+	if (physB->GetInverseMass() != 0)
+		transformB.SetPosition(transformB.GetLocalPosition() + (p.normal * p.penetration * (physB->GetInverseMass() / totalMass)));
 
 	Vector3 relativeA = p.localA;
 	Vector3 relativeB = p.localB;
@@ -301,9 +303,8 @@ void PhysicsSystem::IntegrateAccel(float dt)
 
 	for (auto i = first; i != last; ++i) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
-		if (object == nullptr) {
+		if (object == nullptr)
 			continue; 
-		}
 		float inverseMass = object->GetInverseMass();
 
 		Vector3 linearVel = object->GetLinearVelocity();
@@ -341,9 +342,12 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 		if (object == nullptr) 
 			continue;
 
+		if (object->GetInverseMass() == 0)
+			continue;
+
 		Transform& transform = (*i)->GetGameObject().GetTransform();
 
-		Vector3 position = transform.GetPosition();
+		Vector3 position = transform.GetLocalPosition();
 		Vector3 linearVel = object->GetLinearVelocity();
 		position += linearVel * dt;
 		transform.SetPosition(position);

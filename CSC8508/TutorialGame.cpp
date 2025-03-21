@@ -16,6 +16,7 @@
 #include "../PS5Starter/GameTechAGCRenderer.h"
 #include "../PS5Core/PS5Window.h"
 #include "../PS5Core/PS5Controller.h"
+#include "../UISystem/UIPlayStation.h"
 #else
 #include "GameTechRenderer.h"
 #include "KeyboardMouseController.h"
@@ -108,6 +109,8 @@ TutorialGame::TutorialGame()
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	controller = w->GetController();
 	renderer = new GameTechAGCRenderer(*world);
+	UI::UIPlayStation::GetInstance()->SetPadHandle(static_cast<NCL::PS5::PS5Controller*>(controller)->GetHandle());
+	UI::UIPlayStation::GetInstance()->InitMouse(static_cast<NCL::PS5::PS5Controller*>(controller)->GetUserId());
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
 #ifdef USEVULKAN
@@ -175,7 +178,7 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 void TutorialGame::UpdateGame(float dt)
 {
 	UpdateUI();
-	//mainMenu->Update(dt);
+	mainMenu->Update(dt);
 	renderer->Render();
 	
 	Debug::UpdateRenderables(dt);
@@ -195,7 +198,7 @@ void TutorialGame::InitWorld()
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//world->Save(assetPath);
-	//world->Load(assetPath);
+	world->Load(assetPath);
 }
 
 bool TutorialGame::SelectObject() {

@@ -2,6 +2,7 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"
+#include "../AudioEngine/AudioSourceComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
 #include "CameraComponent.h"
@@ -130,6 +131,10 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+	AudioSourceComponent* audio_src = player->AddComponent<AudioSourceComponent>(ChannelGroupType::SFX);
+	audio_src->LoadSound("salamalekum-don-pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
+	audio_src->PlaySound("salamalekum-don-pollo");
+	//audio_src->randomSounds(5);
 
 	int componentIdCount = 0;
 

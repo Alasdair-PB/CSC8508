@@ -3,6 +3,7 @@
 #include "../PS5Core/PS5MemoryAllocator.h"
 #include "../PS5Core/AGCRenderer.h"
 
+
 using namespace NCL;
 using namespace UI;
 
@@ -19,21 +20,27 @@ UIPlayStation::UIPlayStation(sce::Agc::DrawCommandBuffer* dcb, PS5::MemoryAlloca
         };
 	
     ImGui_PS::initialize(allocator, af, rf, numCx);
-	controlData.hasGamePad = true;
-	controlData.enableNavigation = true;
+
 }
 
 UIPlayStation::~UIPlayStation() {
 	ImGui_PS::shutdown();
-	//ImGui_ImplOpenGL3_Shutdown();
-	//ImGui_ImplWin32_Shutdown();
+	sceSysmoduleUnloadModule(mouseModule);
 }
 
 void UIPlayStation::StartFrame() {
+	ImGui_PS::ControlData controlData;
+	controlData.drawCursor = true;
+
+	ScePadData data;
+	int ret = scePadReadState(padHandle, &data);
+	ret = sceMouseRead(mouse_handle, mdata, 1);
+	
+	ImGui_PS::translate(&data, ImGui_PS::PadUsage_Navigation, mdata, lastMousePosition, &controlData); //INPUTS
+
 	ImGui_PS::newFrame(SCREENWIDTH, SCREENHEIGHT, controlData);
-	//ImGui_ImplOpenGL3_NewFrame();
-	//ImGui_ImplWin32_NewFrame();
 	UISystem::StartFrame();
+	lastMousePosition = ImGui::GetIO().MousePos;
 }
 
 void UIPlayStation::EndFrame() {
@@ -41,6 +48,18 @@ void UIPlayStation::EndFrame() {
 	ImGui_PS::renderDrawData(*dcb, ImGui::GetDrawData());
 }
 
+void UIPlayStation::InitMouse(SceUserServiceUserId id) {
+	mouseModule = sceSysmoduleLoadModule(SCE_SYSMODULE_MOUSE);
+	SCE_AGC_ASSERT(mouseModule == SCE_OK);
 
+	int ret = sceMouseInit();
+	SCE_AGC_ASSERT(ret == SCE_OK);
+
+	mouse_handle = sceMouseOpen(id, SCE_MOUSE_PORT_TYPE_STANDARD, 0, nullptr);
+
+	lastMousePosition = ImVec2(
+		float(SCREENWIDTH / 2) / 1080,
+		float(SCREENHEIGHT / 2) / 1920);
+}
 
 #endif // USE_PS5

@@ -52,6 +52,21 @@ if(PS5)
 else()
 	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechAGCRenderer.h)
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechAGCRenderer.cpp)
+
+	if (Editor)
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/TutorialGame.h)
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/NetworkedGame.h)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/NetworkedGame.cpp)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/TutorialGame.cpp)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameInstantiations.cpp)
+	else()
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.h)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.cpp)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameInstantiations.cpp)
+		file(GLOB_RECURSE files_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/EditorCore/*")
+		list(REMOVE_ITEM Header_Files ${files_to_remove})
+		list(REMOVE_ITEM Source_Files ${files_to_remove})
+	endif()
 	
 	set(ALL_FILES
     ${Header_Files}

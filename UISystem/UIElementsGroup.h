@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "../CSC8508CoreClasses/PushdownMachine.h"
 #include "../CSC8508CoreClasses/PushdownState.h"
+#include <iostream>
 
 namespace NCL {
 	namespace UI {
@@ -11,7 +12,7 @@ namespace NCL {
 
 			class UIElement {
 			public:
-				std::string name;
+				std::string elemenetName = "";
 				virtual CSC8508::PushdownState::PushdownResult UpdateElement() {
 					return CSC8508::PushdownState::PushdownResult::NoChange;
 				};
@@ -46,7 +47,6 @@ namespace NCL {
 					if (ImGui::Button(buttonName.c_str(), ImVec2(size.x * Window::GetWindow()->GetScreenSize().x, size.y * Window::GetWindow()->GetScreenSize().y))) { return func(); }
 					return CSC8508::PushdownState::PushdownResult::NoChange;
 				}
-
 			};
 
 			class SliderElement : public UIElement {
@@ -82,6 +82,35 @@ namespace NCL {
 				CSC8508::PushdownState::PushdownResult UpdateElement()override {
 					return CSC8508::PushdownState::PushdownResult::NoChange;
 				}
+			};
+
+			class VectorElement : public UIElement {
+			public:
+				VectorElement(Vector3* vector, float scale): 
+					vector(vector), scale(scale) {}
+
+				CSC8508::PushdownState::PushdownResult UpdateElement() override {
+					if (!vector) return CSC8508::PushdownState::PushdownResult::NoChange;
+					float x = vector->x;
+					float y = vector->y;
+					float z = vector->z;
+					ImGui::Text("Position");
+					ImGui::PushItemWidth(scale);
+					ImGui::InputFloat("X", &x, 0.1f, 1.0f, "%.2f");
+					ImGui::SameLine();
+					ImGui::InputFloat("Y", &y, 0.1f, 1.0f, "%.2f");
+					ImGui::SameLine();
+					ImGui::InputFloat("Z", &z, 0.1f, 1.0f, "%.2f");
+					ImGui::PopItemWidth();
+					vector->x = x;
+					vector->y = y;
+					vector->z = z;
+
+					return CSC8508::PushdownState::PushdownResult::NoChange;
+				}
+			protected:
+				Vector3* vector;
+				float scale;
 			};
 
 			std::vector<UIElement*> elements;
@@ -133,6 +162,12 @@ namespace NCL {
 				sliderElem->SetMin(valMin);
 				sliderElem->SetFunc(func);
 				elements.push_back(sliderElem);
+			}
+
+			void PushVectorElement(Vector3* value, float scale){
+				VectorElement* vectorElem = new VectorElement(value, scale * winWidth);
+				elements.push_back(vectorElem);
+
 			}
 
 			void PushTextElement(std::string text) {}

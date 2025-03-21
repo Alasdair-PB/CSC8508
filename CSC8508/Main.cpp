@@ -1,7 +1,11 @@
 #include "Debug.h"
 
+#if EDITOR
+#include "EditorGame.h"
+#else 
 #include "TutorialGame.h"
 #include "NetworkedGame.h"
+#endif
 
 using namespace NCL;
 using namespace CSC8508;
@@ -20,7 +24,11 @@ using namespace CSC8508;
 #include <functional>
 #include <cstdlib>
 
+#if EDITOR
+void UpdateWindow(Window* w, EditorGame* g)
+#else 
 void UpdateWindow(Window* w, NetworkedGame* g)
+#endif
 {
 	float dt = w->GetTimer().GetTimeDeltaSeconds();
 	w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
@@ -66,7 +74,11 @@ int main(int argc, char** argv)
 	w->LockMouseToWindow(true);
 	w->GetTimer().GetTimeDeltaSeconds();
 
+#if EDITOR
+	EditorGame* g = new EditorGame();
+#else 
 	NetworkedGame* g = new NetworkedGame();
+#endif
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{

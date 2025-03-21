@@ -10,10 +10,22 @@
 #include "Debug.h"
 #include <Transform.h>
 #include "Camera.h"
+#include <opus/opus.h>
+#include <fmod.hpp>
+#include <fmod_errors.h>
+#include <queue>
+#include <deque>
+#include <algorithm>
+#include <vector>
+#include <cstring>
+#include <iostream>
+#include <mutex>
 
 using namespace NCL;
 using namespace NCL::Maths;
 using namespace NCL::CSC8508;
+
+
 
 /**
 * Listener class for audio engine
@@ -25,6 +37,12 @@ public:
 
 	AudioListenerComponent(GameObject& gameObject, PerspectiveCamera& camera);
 
+
+	/**
+	*
+	*/
+	void OnAwake() override;
+
 	/**
 	* Update position vectors of listener for use by FMOD
 	* @param deltaTime
@@ -35,12 +53,19 @@ public:
 
 	void SetPlayerOrientation();
 
+
+	#pragma region FMOD Recording
+
+	/**
+	* Init microphone sound object
+	*/
+	void InitMicSound();
+
 	/**
 	* Start Microphone recording of selected input device
 	*/
 	void RecordMic() {
 		FMOD_RESULT result = fSystem->recordStart(inputDeviceIndex, micInput, true);
-		std::cout << "Recording Result: " << result << std::endl;
 	}
 
 	/**
@@ -68,6 +93,53 @@ public:
 		return micInput;
 	}
 
+	#pragma endregion
+
+	#pragma region Encoding VOIP Pipeline
+
+	/**
+	* Encodes a PCM sample buffer to an Opus frame.
+	* Each frame contains 960 samples (20ms at 48kHz).
+	* @return std::vector<unsigned char> (encoded Opus frame)
+	* @param std::vector<short>& (PCM data to encode)
+	*/
+	std::vector<unsigned char> EncodeOpusFrame(std::vector<short>& pcmData);
+
+	/**
+	* Streams PCM data from the microphone input to the Opus encoder.
+	*/
+	void StreamEncodeMic();
+
+	void UpdateAudioEncode() {
+		StreamEncodeMic();
+	}
+
+
+	#pragma endregion
+
+	std::vector<short> DecodeOpusFrame(std::vector<unsigned char>& encodedPacket);
+
+	/**
+	* Initialise the persistent sound object for continuous playback.
+	*/
+	void InitPersistentSound();
+
+	/**
+	* Update the persistent sound buffer with the latest PCM data.
+	* @param std::vector<unsigned char>& (encoded Opus packet)
+	*/
+	void DecodePersistentPlayback(std::vector<unsigned char>& encodedPacket);
+
+	void UpdateAudioDecode() {
+		if (encodedPacketQueue != nullptr && !encodedPacketQueue->empty()) {
+			std::vector<unsigned char> packet = encodedPacketQueue->front();
+			encodedPacketQueue->pop_front();  // Process oldest frame first
+			DecodePersistentPlayback(packet);
+		}
+	}
+
+
+	#pragma region Input/Output Device Management
 	/**
 	* Update input device list
 	* Removes output loopback devices
@@ -79,6 +151,7 @@ public:
 	* @return std::map<int, std::string> 
 	*/
 	std::map<int, std::string> GetInputDeviceList() {
+		UpdateInputList();
 		return inputDeviceList;
 	}
 
@@ -99,6 +172,7 @@ public:
 	*/
 
 	std::map<int, std::string> GetOutputDeviceList() {
+		UpdateOutputList();
 		return outputDeviceList;
 	}
 
@@ -128,15 +202,13 @@ public:
 		outputDeviceIndex = index;
 	}
 
+	#pragma endregion
+
+
 private:
 
 	// Listner id - always 0
 	int fIndex = 0;
-
-	FMOD_VECTOR fForward;
-	FMOD_VECTOR fUp;
-
-	FMOD::Sound* micInput;
 
 	std::map<int, std::string> inputDeviceList;
 	int inputDeviceIndex;
@@ -144,6 +216,31 @@ private:
 	std::map<int, std::string> outputDeviceList;
 	int outputDeviceIndex;
 
+	FMOD::Sound* micInput;
+
+
+	////Encoding/Decoding////
+	OpusEncoder* encoder;
+
+	std::deque<std::vector<unsigned char>>* encodedPacketQueue;
+
+
+
+	OpusDecoder* decoder;
+
+	FMOD::Sound* persistentSound = nullptr;
+	FMOD::Channel* persistentChannel = nullptr;
+	unsigned int persistentBufferSize = sampleRate / 2; // 0.5 second
+	unsigned int currentWritePos = 0; // in samples
+	/////////////////////////
+
+
+	FMOD_VECTOR fForward;
+	FMOD_VECTOR fUp;
+
 	PerspectiveCamera* camera;
+
+
+	~AudioListenerComponent();
 
 };

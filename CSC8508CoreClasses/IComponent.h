@@ -16,8 +16,10 @@ namespace NCL::CSC8508
 	public:
 
 		IComponent(GameObject& gameObject) : gameObject(gameObject), enabled(true) {}
-
 		virtual ~IComponent() = default;
+		
+		static const char* Name() { return "Base";}
+		virtual const char* GetName() const { return Name();}
 
 		/**
 		 * Function invoked after the object and components have been instantiated.
@@ -79,6 +81,15 @@ namespace NCL::CSC8508
 		/// <returns>A set of type_indexes of IComponents that are marked as derived from this IComponent</returns>
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const {
 			static std::unordered_set<std::type_index> types = { std::type_index(typeid(IComponent)) };
+			return types;
+		}
+
+		/// <summary>
+		/// Query for dependent types of this IComponent
+		/// </summary>
+		/// <returns>A unordered set of types this component is dependent on</returns>
+		virtual std::unordered_set<std::type_index>& GetDependentTypes() const {
+			static std::unordered_set<std::type_index> types = {};
 			return types;
 		}
 

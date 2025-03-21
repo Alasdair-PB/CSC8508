@@ -21,8 +21,6 @@ namespace NCL {
 			Texture* LoadTexture(const std::string& name);
 			Shader* LoadShader(const std::string& vertex, const std::string& fragment);
 
-			UI::UISystem* GetUI() override { return uiSystem; };
-
 		protected:
 			void NewRenderLines();
 			void NewRenderText();
@@ -45,7 +43,8 @@ namespace NCL {
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
-			vector<const RenderObject*> activeObjects;
+
+			vector<const GameObject*> activeObjects;
 
 			OGLShader* debugShader;
 			OGLShader* skyboxShader;
@@ -79,8 +78,6 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
-
-			UI::UISystem* uiSystem;
 		};
 	}
 }

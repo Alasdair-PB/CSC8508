@@ -50,7 +50,7 @@ struct  GameWorld::WorldSaveData : ISerializedData {
 	float pitch;
 	float yaw;
 	Vector3 position;
-	std::vector<std::pair<size_t, size_t>> gameObjectPointers;
+	std::vector<size_t> gameObjectPointers;
 
 	static auto GetSerializedFields() {
 		return std::make_tuple(
@@ -74,18 +74,14 @@ void GameWorld::LoadCameraInfo(float nearPlane, float farPlane, float pitch, flo
 
 void GameWorld::Load(std::string assetPath, size_t allocationStart) {
 	WorldSaveData loadedSaveData = ISerializedData::LoadISerializable<WorldSaveData>(assetPath, allocationStart);
-
 	LoadCameraInfo(loadedSaveData.nearPlane, loadedSaveData.farPlane, 
 		loadedSaveData.pitch, loadedSaveData.yaw, loadedSaveData.position);
-	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
-		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
-		std::cout << loadedSaveData.gameObjectPointers[i].first << std::endl;
 
+	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
 		GameObject* object = new GameObject();
-		object->Load(assetPath, loadedSaveData.gameObjectPointers[i].first);
+		object->Load(assetPath, loadedSaveData.gameObjectPointers[i]);
 		AddGameObject(object);
 	}
-	std::cout << loadedSaveData.nearPlane << std::endl;
 }
 
 size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
@@ -98,11 +94,11 @@ size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
 	WorldSaveData saveInfo(0.1f, 500.0f, -15.0f, 315.0f, Vector3(-60, 40, 60));
 
 	for (GameObject* gameObject : gameObjects) {
+		if (gameObject->HasParent())
+			continue;
+
 		size_t nextMemoryLocation = gameObject->Save(assetPath, allocationStart);
-		saveInfo.gameObjectPointers.push_back(std::make_pair(
-			*allocationStart,
-			SaveManager::MurmurHash3_64(typeid(*gameObject).name(), std::strlen(typeid(*gameObject).name()))
-		));
+		saveInfo.gameObjectPointers.push_back(*allocationStart);
 		*allocationStart = nextMemoryLocation;
 	}
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<WorldSaveData>(saveInfo);
@@ -121,11 +117,8 @@ void GameWorld::AddGameObject(GameObject* o) {
 	auto bounds = o->TryGetComponent<BoundsComponent>();
 	auto phys = o->TryGetComponent<PhysicsComponent>();
 
-	if (bounds)
-		boundsComponents.emplace_back(bounds);
-
-	if (phys) 
-		physicsComponents.emplace_back(phys);
+	if (bounds) boundsComponents.emplace_back(bounds);
+	if (phys) physicsComponents.emplace_back(phys);
 
 	auto newComponents = o->GetAllComponents();
 
@@ -133,6 +126,9 @@ void GameWorld::AddGameObject(GameObject* o) {
 		this->components.push_back(component);
 		component->InvokeOnAwake();
 	}
+
+	for (GameObject* child : o->GetChildren())
+		AddGameObject(child);
 	o->InvokeOnAwake();
 }
 
@@ -210,10 +206,7 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 	RayCollision collision;
 
 	for (auto& i : boundsComponents) {
-		if (!i->GetBoundingVolume()) 
-			continue;
-		if (i == ignoreThis) 
-			continue;
+		if (!i->IsEnabled() || !i->GetBoundingVolume() || i == ignoreThis) continue;
 		bool toContinue = false;
 
 		if (ignoreLayers != nullptr) {

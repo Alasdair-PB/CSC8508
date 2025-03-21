@@ -126,6 +126,7 @@ namespace NCL {
 			struct SkinningJob {
 				RenderObject* object;
 				uint32_t outputIndex;
+				/* Animation struct should have RenderObject* and animation data */
 			};
 
 			FrameData* allFrames;
@@ -172,7 +173,7 @@ namespace NCL {
 			sce::Agc::CxRenderTarget			screenTarget;
 			NCL::PS5::AGCTexture*				screenTex; //ptr into bindless array
 
-			std::vector<SkinningJob> frameJobs;
+			std::vector<SkinningJob> frameJobs; 
 		};
 	}
 }

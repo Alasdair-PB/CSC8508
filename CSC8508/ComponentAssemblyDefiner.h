@@ -22,17 +22,21 @@ namespace NCL {
                     AddComponent(e->GetEntry(), e->GetGameObject());
                 }
             protected:
-                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Damageable };
+                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable };
                 std::unordered_map<size_t, ComponentMapId> componentMap;
                 bool AddComponent(size_t t, GameObject& object);
+
                 /// <summary>
                 /// Initializes the IComponent type map of type T as a hash for IComponents type paired with their corresponding enum
                 /// </summary>
                 /// <typeparam name="T">The type corresponding to the component Id</typeparam>
                 /// <param name="id">The enum to assigned to this IComponent's type map</param>
                 template<typename T>
+                requires std::is_base_of_v<IComponent, T>
                 void SetHash(ComponentMapId id) {
-                    componentMap[SaveManager::MurmurHash3_64(typeid(T).name(), std::strlen(typeid(T).name()))] = id;
+                    std::string name = T::Name();
+                    size_t hashId = SaveManager::MurmurHash3_64(name.c_str(), name.size());
+                    componentMap[hashId] = id;
                 }
             };
     }

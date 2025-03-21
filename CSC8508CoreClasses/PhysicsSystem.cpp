@@ -145,6 +145,7 @@ void PhysicsSystem::UpdateObjectAABBs() {
 	std::vector<BoundsComponent*>::const_iterator last;
 	gameWorld.GetBoundsIterators(first, last);
 	for (auto i = first; i != last; ++i) {
+		if (!(*i)->IsEnabled()) continue;
 		(*i)->UpdateBroadphaseAABB();
 	}
 }
@@ -155,11 +156,11 @@ void PhysicsSystem::BasicCollisionDetection() {
 	gameWorld.GetBoundsIterators(first, last);
 
 	for (auto i = first; i != last; ++i) {
-		if ((*i)->GetPhysicsComponent() == nullptr) {
+		if ((*i)->GetPhysicsComponent() == nullptr || !(*i)->IsEnabled()) {
 			continue;
 		}
 		for (auto j = i + 1; j != last; ++j) {
-			if ((*j)->GetPhysicsComponent() == nullptr) {
+			if ((*j)->GetPhysicsComponent() == nullptr || !(*i)->IsEnabled()) {
 				continue;
 			}
 			CollisionDetection::CollisionInfo info;
@@ -209,9 +210,11 @@ void PhysicsSystem::ImpulseResolveCollision(BoundsComponent& a, BoundsComponent&
 
 	if (totalMass == 0) 
 		return; 
+	if (physA->GetInverseMass() != 0)
+		transformA.SetPosition(transformA.GetLocalPosition() - (p.normal * p.penetration * (physA->GetInverseMass() / totalMass)));
 
-	transformA.SetPosition(transformA.GetPosition() - (p.normal * p.penetration * (physA->GetInverseMass() / totalMass)));
-	transformB.SetPosition(transformB.GetPosition() + (p.normal * p.penetration * (physB->GetInverseMass() / totalMass)));
+	if (physB->GetInverseMass() != 0)
+		transformB.SetPosition(transformB.GetLocalPosition() + (p.normal * p.penetration * (physB->GetInverseMass() / totalMass)));
 
 	Vector3 relativeA = p.localA;
 	Vector3 relativeB = p.localB;
@@ -259,7 +262,7 @@ void PhysicsSystem::BroadPhase() {
 
 	for (auto i = first; i != last; ++i) {
 		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes)) {
+		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
 			continue;
 		}
 		Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
@@ -301,9 +304,8 @@ void PhysicsSystem::IntegrateAccel(float dt)
 
 	for (auto i = first; i != last; ++i) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
-		if (object == nullptr) {
+		if (object == nullptr || !(*i)->IsEnabled())
 			continue; 
-		}
 		float inverseMass = object->GetInverseMass();
 
 		Vector3 linearVel = object->GetLinearVelocity();
@@ -338,12 +340,15 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 	for (auto i = first; i != last; ++i) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
 
-		if (object == nullptr) 
+		if (object == nullptr || !(*i)->IsEnabled()) 
+			continue;
+
+		if (object->GetInverseMass() == 0)
 			continue;
 
 		Transform& transform = (*i)->GetGameObject().GetTransform();
 
-		Vector3 position = transform.GetPosition();
+		Vector3 position = transform.GetLocalPosition();
 		Vector3 linearVel = object->GetLinearVelocity();
 		position += linearVel * dt;
 		transform.SetPosition(position);
@@ -372,7 +377,7 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 void PhysicsSystem::ClearForces() {
 	ComponentManager::OperateOnBufferContents<PhysicsComponent>(
 		[](PhysicsComponent* o) {
-			if (o->GetPhysicsObject())
+			if (o->IsEnabled() && o->GetPhysicsObject())
 				o->GetPhysicsObject()->ClearForces();
 		}
 	);

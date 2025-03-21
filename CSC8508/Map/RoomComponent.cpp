@@ -9,10 +9,18 @@
 
 RoomComponent* RoomComponent::GenerateNew() {
     // 1: Pick a random prefab
+    auto* roomB = new GameObject();
     RoomPrefab* prefab = RoomManager::GetRandom();
 
     // 2: Check for space against potential door positions
-    for (Vector3 dp : doorLocations) {
+    for (RoomPrefab::DoorLocation dp : this->prefab->GetDoorLocations()) {
+        for (RoomPrefab::DoorLocation newDoorLoc : prefab->GetDoorLocations()) {
+            Quaternion quat = Quaternion::VectorsToQuaternion(newDoorLoc.pos, dp.pos);
+            prefab->GetRoomObject()->GetTransform().SetOrientation(quat);
+            prefab->GetRoomObject()->GetTransform().SetPosition(
+                GetGameObject().GetTransform().GetPosition() // TODO: Not done
+                );
+        }
         // TODO: If is valid
     }
 

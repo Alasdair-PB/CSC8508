@@ -52,7 +52,7 @@ namespace NCL::CSC8508
 		* Function gets the GameObject this component is attatched to.
 		* @return the GameObject this component is attatched to.
 		*/
-		GameObject& GetGameObject();
+		GameObject& GetGameObject() const;
 
 		/**
 		* Function Gets the enabled state of the component.

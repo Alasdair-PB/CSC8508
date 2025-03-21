@@ -27,6 +27,7 @@ public:
 
     [[nodiscard]] GameObject* GetRoomObject() const { return roomObject; }
     [[nodiscard]] NCL::AABBVolume GetEncasingVolume() const;
+    [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return possibleDoorLocations; }
 
 protected:
     GameObject* roomObject;

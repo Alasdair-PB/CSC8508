@@ -12,7 +12,6 @@
 
 using namespace NCL::CSC8508;
 
-class RoomComponent;
 class RoomPrefab;
 
 class DungeonComponent final : public IComponent {
@@ -34,13 +33,13 @@ private:
 
     unsigned int seed = 14; // TODO: This needs to be smarter
 
-    /**
-     * Attempts to generate an attempted prefab room at a door location
-     * @param prefab Attempted RoomPrefab
-     * @param doorLocation Attempted world-space DoorLocation
-     * @return RoomComponent if successful, NULLPTR if not
-     */
-    RoomComponent* TryGenerateRoom(RoomPrefab const& prefab, DoorLocation const& doorLocation);
+    // /**
+    //  * Attempts to generate an attempted prefab room at a door location
+    //  * @param prefab Attempted RoomPrefab
+    //  * @param doorLocation Attempted world-space DoorLocation
+    //  * @return RoomComponent if successful, NULLPTR if not
+    //  */
+    // RoomComponent* TryGenerateRoom(RoomPrefab const& prefab, DoorLocation const& doorLocation);
 };
 
 #endif //DUNGEONCOMPONENT_H

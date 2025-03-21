@@ -5,9 +5,8 @@
 #ifndef ROOMPREFAB_H
 #define ROOMPREFAB_H
 #include "AABBVolume.h"
-#include "Axis.h"
-#include "GameObject.h"
 #include "NavigationMesh.h"
+#include "BoundsComponent.h"
 
 using namespace NCL::CSC8508;
 

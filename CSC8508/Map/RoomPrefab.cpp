@@ -3,9 +3,8 @@
 //
 
 #include "RoomPrefab.h"
-
+#include "GameObject.h"
 #include "Axis.h"
-#include "BoundsComponent.h"
 
 NCL::AABBVolume RoomPrefab::GetEncasingVolume() const {
     auto min = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);

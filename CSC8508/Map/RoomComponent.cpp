@@ -4,6 +4,8 @@
 
 #include "RoomComponent.h"
 
+#include "INetworkDeltaComponent.h" // Needed to use GameObject::AddComponent<>()
+
 #include "CollisionDetection.h"
 #include "RoomManager.h"
 
@@ -13,7 +15,7 @@ RoomComponent* RoomComponent::GenerateNew() {
     // 1: Pick a random prefab and create the game object for it
     auto* roomB = new GameObject();
     RoomPrefab* prefab = RoomManager::GetRandom();
-    auto* component = roomB->AddComponent<RoomComponent>(prefab, dungeon);
+    auto* component = roomB->AddComponent<RoomComponent>(prefab);
 
     // 2: Check for space against potential door positions
     for (RoomPrefab::DoorLocation aDoorLoc : this->prefab->GetDoorLocations()) {
@@ -31,13 +33,13 @@ RoomComponent* RoomComponent::GenerateNew() {
 
             // Check if collides
             auto info = NCL::CollisionDetection::CollisionInfo();
-            if (!NCL::CollisionDetection::ObjectIntersection(&GetGameObject(), &dungeon->GetGameObject(), info)) {
+             if (!NCL::CollisionDetection::ObjectIntersection(&GetGameObject(), GetDungeon(), info)) {
 
-                // Success // TODO: Double check this is everything that needs doing
-                this->nextDoorRooms.push_back(component);
-                component->GetNextDoorRooms().push_back(this);
-                dungeon->GetGameObject().AddChild(roomB);
-            }
+                 // Success (no collision) // TODO: Double check this is everything that needs doing
+                 this->nextDoorRooms.push_back(component);
+                 component->GetNextDoorRooms().push_back(this);
+                 GetDungeon()->AddChild(roomB);
+             }
 
             // TODO: Repeat if failed, try random doors and random prefabs
         }

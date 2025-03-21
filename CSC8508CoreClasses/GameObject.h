@@ -229,7 +229,7 @@ namespace NCL::CSC8508 {
 		/// </summary>
 		/// <param name="tag">The queried tag</param>
 		/// <returns>True if the tag is found otherwise returns false</returns>
-		bool HasTag(Tags::Tag tag);
+		bool HasTag(Tags::Tag tag) const { return true; }
 		
 		/// <summary>
 		/// Call function func on all Child GameObjects of this GameObject

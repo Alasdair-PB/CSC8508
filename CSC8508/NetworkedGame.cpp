@@ -46,9 +46,6 @@ void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vect
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
 void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
 
-/*NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
-: TutorialGame(gameWorld, renderer) {*/
-
 NetworkedGame::NetworkedGame()	{
 	EventManager::RegisterListener<NetworkEvent>(this);
 	EventManager::RegisterListener<ClientConnectedEvent>(this);
@@ -122,7 +119,7 @@ void NetworkedGame::UpdateGame(float dt)
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
 		UpdatePackets(dt);
-		timeToNextPacket += 1.0f / 20.0f; 
+		timeToNextPacket += 1.0f; // 1.0f / 20.0f;
 	}
 
 	if (thisServer) 

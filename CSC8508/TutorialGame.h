@@ -16,8 +16,6 @@
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
-#include "FramerateUI.h"
-#include "MainMenuUI.h"
 
 
 using std::vector;
@@ -98,6 +96,7 @@ namespace NCL {
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
 			UI::Healthbar* healthbar = new UI::Healthbar;
+			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 
 			float framerateDelay = 0;
 		};

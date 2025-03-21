@@ -143,6 +143,32 @@ bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& w
 	return false;
 }
 
+
+void GetChildBoundsComponent(GameObject* gameObject, std::vector<BoundsComponent*>& out) {
+	for (GameObject* c : gameObject->GetChildren()) {
+		if (auto* boundsComponent = c->TryGetComponent<BoundsComponent>()) out.push_back(boundsComponent);
+		GetChildBoundsComponent(c, out);
+	}
+}
+
+
+bool CollisionDetection::ObjectIntersection(GameObject* gameObjectA, GameObject* gameObjectB, CollisionInfo& collisionInfo) {
+
+	// Gather all bounds components that need checking
+	std::vector<BoundsComponent*> aBounds, bBounds;
+	if (auto* aBoundsComponent = gameObjectA->TryGetComponent<BoundsComponent>()) aBounds.push_back(aBoundsComponent);
+	if (auto* bBoundsComponent = gameObjectB->TryGetComponent<BoundsComponent>()) bBounds.push_back(bBoundsComponent);
+	GetChildBoundsComponent(gameObjectA, aBounds);
+	GetChildBoundsComponent(gameObjectB, bBounds);
+
+	// Check for collision
+	for (BoundsComponent* a : aBounds) for (BoundsComponent* b : bBounds) {
+		if (ObjectIntersection(a, b, collisionInfo)) return true;
+	}
+	return false;
+}
+
+
 bool CollisionDetection::ObjectIntersection(BoundsComponent* a, BoundsComponent* b, CollisionInfo& collisionInfo) {
 	const CollisionVolume* volA = a->GetBoundingVolume();
 	const CollisionVolume* volB = b->GetBoundingVolume();

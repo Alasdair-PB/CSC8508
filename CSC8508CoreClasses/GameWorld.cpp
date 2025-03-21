@@ -150,13 +150,6 @@ void GameWorld::GetPhysicsIterators(
 	last = physicsComponents.end();
 }
 
-void GameWorld::GetINetIterators(
-	INetIterator& first,
-	INetIterator& last) const {
-
-	first = networkComponents.begin();
-	last = networkComponents.end();
-}
 
 void GameWorld::GetBoundsIterators(
 	BoundsIterator& first,

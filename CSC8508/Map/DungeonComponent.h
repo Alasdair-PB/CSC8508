@@ -5,6 +5,8 @@
 #ifndef DUNGEONCOMPONENT_H
 #define DUNGEONCOMPONENT_H
 
+#include <utility>
+
 #include "IComponent.h"
 #include "RoomComponent.h"
 
@@ -14,18 +16,20 @@ class DungeonComponent final : public IComponent {
 public:
     explicit DungeonComponent(GameObject& gameObject) : IComponent(gameObject) { }
 
-    DungeonComponent(GameObject& gameObject, RoomPrefab::DoorLocation const& entrancePosition)
-        : IComponent(gameObject), entrancePosition(entrancePosition) { }
+    DungeonComponent(GameObject& gameObject, RoomPrefab::DoorLocation entrancePosition)
+        : IComponent(gameObject), entrancePosition(std::move(entrancePosition)) { }
 
     /**
      * Procedurally generates rooms to fill the dungeon
      */
     void Generate();
 
-private:
-    std::vector<GameObject*> rooms; // TODO: Maybe replace with RoomComponent? Whichever becomes more helpful
+    [[nodiscard]] unsigned int GetSeed() const { return seed; }
 
+private:
     RoomPrefab::DoorLocation entrancePosition = RoomPrefab::DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));
+
+    unsigned int seed = 14; // TODO: This needs to be smarter
 
     /**
      * Attempts to generate an attempted prefab room at a door location

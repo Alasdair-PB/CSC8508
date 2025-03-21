@@ -7,6 +7,7 @@
 
 #define MAX_ITEM_SPAWN_LOCATIONS 5
 
+#include "DungeonComponent.h"
 #include "IComponent.h"
 #include "Mesh.h"
 #include "NavigationMesh.h"
@@ -20,15 +21,20 @@ using namespace NCL::Rendering;
  */
 class RoomComponent final : public IComponent {
 public:
-    explicit RoomComponent(RoomPrefab* prefab, GameObject& gameObject) : IComponent(gameObject), prefab(prefab) {
-        std::srand(static_cast<unsigned>(std::time(nullptr)));
+    explicit RoomComponent(RoomPrefab* prefab, DungeonComponent* dungeon, GameObject& gameObject)
+        : IComponent(gameObject), prefab(prefab), dungeon(dungeon) {
+        std::srand(dungeon->GetSeed());
     }
 
     RoomComponent* GenerateNew();
 
+    [[nodiscard]] std::vector<RoomComponent*> GetNextDoorRooms() const { return nextDoorRooms; }
+
 private:
     RoomPrefab* prefab;
+    DungeonComponent* dungeon;
     std::vector<Vector3> doorLocations = std::vector<Vector3>();
+    std::vector<RoomComponent*> nextDoorRooms = std::vector<RoomComponent*>();
 };
 
 #endif //ROOMCOMPONENT_H

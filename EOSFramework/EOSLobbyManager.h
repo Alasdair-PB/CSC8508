@@ -9,12 +9,16 @@
 
 class EOSLobbyManager {
 public:
+
+    EOSLobbyManager(EOSInitialisationManager& eosManager);
+    ~EOSLobbyManager();
     EOS_HLobby GetLobbyHandle() const;
     void CreateLobby();
+    void RunUpdateLoop();
     EOS_HLobby LobbyHandle = nullptr;
-    char LobbyId[256];
+    char LobbyId[256] = {};
 private:
-
+    bool running = false;
 
     static void OnLobbyCreated(const EOS_Lobby_CreateLobbyCallbackInfo* Data);
     static void OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Data);

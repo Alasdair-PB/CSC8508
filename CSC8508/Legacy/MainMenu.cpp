@@ -28,6 +28,8 @@ namespace NCL {
 			this->startServer = startServer;
 			this->startOffline = startOffline;
 			this->startEOS = startEOS;
+			this->startEOSLobbyCreation = startEOSLobbyCreation;
+			this->startEOSLobbySearch = startEOSLobbySearch;
 
 			machine = new PushdownMachine(new OverlayScreen(
 				[&]() -> void { this->OnStateAwake(); },
@@ -120,13 +122,26 @@ namespace NCL {
 				std::cout << "Duplicate Pressed";
 				setPause(false);
 				startEOSLobbyCreation();
-				return PushdownState::Pop;
+
+				*newState = new OverlayScreen(
+					[&]() -> void { this->OnStateAwakePause(); },
+					[&](float dt, PushdownState** newState) -> PushdownState::PushdownResult {
+						return this->LobbyDetailsOnUpdate(dt, newState);
+					}
+				);
+				return PushdownState::Push;
 			}
 			if (menuOption == joinLobby) {
 				setPause(false);
 				startServer();
 				return PushdownState::Pop;
 			}
+			return PushdownState::NoChange;
+		}
+
+		PushdownState::PushdownResult MainMenu::LobbyDetailsOnUpdate(float dt, PushdownState** newState)
+		{
+			Debug::Print("Lobby Details", Vector2(5, 85));
 			return PushdownState::NoChange;
 		}
 

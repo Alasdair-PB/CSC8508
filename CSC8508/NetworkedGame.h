@@ -3,6 +3,7 @@
 #include "NetworkBase.h"
 #include "NetworkObject.h"
 #include "EventListener.h"
+#include <EOSLobbyManager.h>
 
 namespace NCL {
 	namespace CSC8508 {
@@ -84,6 +85,7 @@ namespace NCL {
 			GameClient* thisClient;
 
 			EOSInitialisationManager* eosManager = nullptr;
+			EOSLobbyManager* eosLobbyManager = nullptr;
 
 			float timeToNextPacket;
 			int packetsToSnapshot;

@@ -11,6 +11,7 @@ namespace NCL {
 
 			int DrawMainMenu();
 			int DrawLobbyMenu();
+			int DrawLobbyDetails();
 
 			int GetMenuOption() {
 				return menuOption;
@@ -18,7 +19,7 @@ namespace NCL {
 
 		protected:
 			int menuOption = 0;
-			enum menuOptions { none, startOffline, startServer, StartClient, eosOption, hostLobby, joinLobby, lobby }; //Relates to menuOptions in MainMenu.h
+			enum menuOptions { none, startOffline, startServer, StartClient, eosOption, hostLobby, joinLobby, lobby, startLobbyGame }; //Relates to menuOptions in MainMenu.h
 		};
 	}
 }

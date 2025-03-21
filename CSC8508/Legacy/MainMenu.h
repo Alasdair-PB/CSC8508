@@ -49,8 +49,9 @@ namespace NCL {
 			PushdownState::PushdownResult LobbyScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult GameScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult PauseScreenOnUpdate(float dt, PushdownState** newState);
+			PushdownState::PushdownResult LobbyDetailsOnUpdate(float dt, PushdownState** newState);
 
-			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, eosOption, hostLobby, joinLobby, lobby }; //Relates to menuOptions in MainMenu.h
+			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, eosOption, hostLobby, joinLobby, startLobbyGame }; //Relates to menuOptions in MainMenu.h
 			int menuOption = 0;
 		};
 	}

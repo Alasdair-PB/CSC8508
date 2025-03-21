@@ -39,7 +39,7 @@ namespace NCL {
 			void HideWindow(int window);
 			void DrawWindows();
 
-			enum uiElements { framerate, mainMenu, lobbyMenu, audioSliders, healthbar };
+			enum uiElements { framerate, mainMenu, lobbyMenu, lobbyDetails, audioSliders, healthbar };
 
 		protected:
 			HWND uiWindow;

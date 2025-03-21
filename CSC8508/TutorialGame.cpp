@@ -234,6 +234,9 @@ void TutorialGame::UpdateUI() {
 
 	// This is going to be set to 4 when clicked into host room
 	// This is the value that the menu options equates to
+
+	std::cout << uiSystem->GetMenuOption();
+
 	if (uiSystem->GetMenuOption() != 0 && uiSystem->GetMenuOption() != 4) {
 		mainMenu->SetOption(uiSystem->GetMenuOption());
 		uiSystem->HideWindow(uiSystem->mainMenu);
@@ -245,6 +248,13 @@ void TutorialGame::UpdateUI() {
 		uiSystem->HideWindow(uiSystem->mainMenu);
 		uiSystem->DisplayWindow(uiSystem->lobbyMenu);
 		
+	}
+	if (uiSystem->GetMenuOption() == 5)
+	{
+		mainMenu->SetOption(uiSystem->GetMenuOption());
+		uiSystem->HideWindow(uiSystem->lobbyMenu);
+		uiSystem->DisplayWindow(uiSystem->lobbyDetails);
+
 	}
 
 	uiSystem->DrawWindows();

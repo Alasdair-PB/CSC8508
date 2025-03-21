@@ -55,3 +55,16 @@ int MainMenuUI::DrawLobbyMenu() {
 	ImGui::End();
 	return menuOption;
 }
+
+int MainMenuUI::DrawLobbyDetails() {
+	ImGui::SetNextWindowPos(ImVec2(80, 480));
+	ImGui::SetNextWindowSize(ImVec2(600, 500));
+	bool open = true;
+	ImGui::Begin("Lobby Menu", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowFontScale(2);
+	if (ImGui::Button("Start", ImVec2(600, 50))) {
+		menuOption = startLobbyGame;
+	}
+	ImGui::End();
+	return menuOption;
+}

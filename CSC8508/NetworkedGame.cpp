@@ -121,12 +121,9 @@ void NetworkedGame::HostGame()
 
 void NetworkedGame::EOSLobbyCreation()
 {
-	std::cout << "[NetworkedGame] Creating EOS lobby..." << std::endl;
-
-	if (!eosManager)
-		eosManager = new EOSInitialisationManager();
-
-	std::cout << "[NetworkedGame] EOS lobby created successfully." << std::endl;
+	eosLobbyManager = new EOSLobbyManager(*eosManager);
+	eosLobbyManager->CreateLobby();
+	
 }
 
 void NetworkedGame::EOSLobbySearch()

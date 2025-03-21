@@ -61,6 +61,10 @@ void UISystem::DrawWindows() {
 		{
 			menuOption = MainMenuUI().DrawLobbyMenu();
 		}
+		if (i == lobbyDetails)
+		{
+			menuOption = MainMenuUI().DrawLobbyDetails();
+		}
 		if (i == audioSliders) {
 			AudioSliders().Draw();
 		}

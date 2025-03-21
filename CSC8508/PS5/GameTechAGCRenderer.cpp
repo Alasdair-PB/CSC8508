@@ -162,6 +162,8 @@ void GameTechAGCRenderer::RenderFrame() {
 	currentFrame->textVertCount		= 0;
 	currentFrame->lineVertCount		= 0;
 
+	UI::UIPlayStation::GetInstance()->UpdateDCB(&frameContext->m_dcb);
+
 	//Step 1: Write the frame's constant data to the buffer
 	WriteRenderPassConstants();
 	//Step 2: Walk the object list and build up the object set and required buffer memory
@@ -178,6 +180,7 @@ void GameTechAGCRenderer::RenderFrame() {
 	UpdateDebugData();
 	RenderDebugLines();
 	RenderDebugText();	
+	UI::UIPlayStation::GetInstance()->EndFrame();
 	//Step 8: Draw the main scene render target to the screen with a compute shader
 	DisplayRenderPass(); //Puts our scene on screen, uses a compute
 	
@@ -446,7 +449,7 @@ void GameTechAGCRenderer::UpdateDebugData() {
 }
 
 void GameTechAGCRenderer::InitialiseImGui() {
-	UI::UIPlayStation::Initialize(&frameContext->m_dcb, &allocator, SWAPCOUNT);
+	UI::UIPlayStation::Initialize(&frameContexts[currentSwap].m_dcb, &allocator, SWAPCOUNT);
 }
 
 void GameTechAGCRenderer::DisplayRenderPass() {

@@ -175,9 +175,9 @@ void TutorialGame::UpdateObjectSelectMode(float dt) {
 void TutorialGame::UpdateGame(float dt)
 {
 	UpdateUI();
-
-	mainMenu->Update(dt);
+	//mainMenu->Update(dt);
 	renderer->Render();
+	
 	Debug::UpdateRenderables(dt);
 
 	world->UpdateWorld(dt);
@@ -242,6 +242,7 @@ void TutorialGame::UpdateUI() {
 	}
 
 	uiSystem->DrawWindows();
+
 }
 
 

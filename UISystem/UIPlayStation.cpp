@@ -38,7 +38,9 @@ void UIPlayStation::StartFrame() {
 
 void UIPlayStation::EndFrame() {
 	UISystem::EndFrame();
-	//ImGui_PS::renderDrawData(dcb, ImGui::GetDrawData());
+	ImGui_PS::renderDrawData(*dcb, ImGui::GetDrawData());
 }
+
+
 
 #endif // USE_PS5

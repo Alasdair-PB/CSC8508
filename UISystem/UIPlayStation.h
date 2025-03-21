@@ -15,6 +15,9 @@ namespace NCL {
 				instance = (instance == nullptr) ? new UIPlayStation(dcb, allocator, numCx) : instance;
 			}
 
+			void UpdateDCB(sce::Agc::DrawCommandBuffer* dcb) {
+				this->dcb = dcb;
+			}
 			void StartFrame() override;
 			void EndFrame() override;
 

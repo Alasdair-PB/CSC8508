@@ -7,7 +7,9 @@
 
 #include <fmod.hpp>
 #include <map>
-
+#ifdef USE_PS5
+#include <kernel.h>
+#endif
 
 /**
 * Type of Channel Group
@@ -110,6 +112,12 @@ private:
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
 	
+	#ifdef USE_PS5	
+	SceKernelModule	libfmodHandle;
+	SceKernelModule	libfmodLHandle;
+
+	#endif // USE_PS5
+
 };
 
 #endif

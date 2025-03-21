@@ -7,6 +7,17 @@
 #include <iostream>
 
 AudioEngine::AudioEngine() : audioSystem(nullptr) {
+	#ifdef USE_PS5
+	std::string s_libraryPath = "/app0/sce_module/";
+	int loaded;
+	char* path = (char*)s_libraryPath.append("libfmod.prx").c_str();
+	libfmodHandle = sceKernelLoadStartModule(path, 0, NULL, 0, NULL, &loaded);
+
+	path = (char*)s_libraryPath.append("libfmodL.prx").c_str();
+	libfmodLHandle = sceKernelLoadStartModule(path, 0, NULL, 0, NULL, &loaded);
+	#endif // USE_PS5
+
+
     FMOD::System_Create(&audioSystem);
 	// Set FMOD to use a right-handed coordinate system
 	audioSystem->init(512, FMOD_INIT_3D_RIGHTHANDED, nullptr);
@@ -27,6 +38,15 @@ AudioEngine::AudioEngine() : audioSystem(nullptr) {
 
 AudioEngine::~AudioEngine() {
 	Shutdown();
+	
+	#ifdef USE_PS5
+	
+	int unloaded;
+	unloaded = sceKernelStopUnloadModule(libfmodHandle, 0, NULL, 0, NULL, NULL);
+	unloaded = sceKernelStopUnloadModule(libfmodLHandle, 0, NULL, 0, NULL, NULL);
+
+	#endif // USE_PS5
+
 }
 
 AudioEngine& AudioEngine::Instance() {

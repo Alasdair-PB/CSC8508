@@ -267,6 +267,7 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 

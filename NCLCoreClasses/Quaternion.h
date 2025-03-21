@@ -45,6 +45,14 @@ namespace NCL::Maths {
 		static Quaternion EulerAnglesToQuaternion(float pitch, float yaw, float roll);
 		static Quaternion AxisAngleToQuaterion(const Vector3& vector, float degrees);
 
+		/**
+		 * Determines the quaternion orientation used to translate one vector to another
+		 * @param fromVector Vector3 that the returned Quaternion can be applied to in order to reach toVector
+		 * @param toVector Vector3 produced from applying returned Quaternion to fromVector
+		 * @return Quaternion
+		 */
+		static Quaternion VectorsToQuaternion(Vector3 const& fromVector, Vector3 const& toVector);
+
 		inline bool  operator ==(const Quaternion &from)	const {
 			if (x != from.x || y != from.y || z != from.z || w != from.w) {
 				return false;

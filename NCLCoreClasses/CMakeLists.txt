@@ -24,6 +24,7 @@ set(Maths
     "Maths.cpp"
     "Maths.h"
 
+	"Axis.h"
     "Plane.cpp"
     "Plane.h"
 	"Frustum.cpp"

@@ -20,11 +20,12 @@ namespace NCL::CSC8508
 	public:
 
 		BoundsComponent(GameObject& gameObject, CollisionVolume* collisionVolume, PhysicsComponent* physicsComponent = nullptr);
+
 		~BoundsComponent();
 
 		void SetBoundingVolume(CollisionVolume* vol) { boundingVolume = vol;}
 
-		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}		
+		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}
 		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		const PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
 
@@ -57,7 +58,7 @@ namespace NCL::CSC8508
 		virtual void Load(std::string assetPath, size_t allocationStart) override;
 #
 		/// <summary>
-		/// Saves the PhysicsComponent data into the assetPath file. 
+		/// Saves the PhysicsComponent data into the assetPath file.
 		/// </summary>
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>

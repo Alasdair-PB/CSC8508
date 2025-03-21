@@ -78,7 +78,8 @@ void TutorialGame::TestSaveGameObject(std::string assetPath) {
 void TutorialGame::TestLoadGameObject(std::string assetPath) {
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(assetPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(2, 0, 2));
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
+	//myObjectToLoad->SetEnabled(false);
 	world->AddGameObject(myObjectToLoad);
 }
 
@@ -86,7 +87,7 @@ void TutorialGame::TestSave() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	TestSaveByType();
 	TestSaveGameObject(gameObjectPath);
-	TestLoadGameObject(gameObjectPath);
+	//TestLoadGameObject(gameObjectPath);
 }
 
 void LoadControllerMappings(Controller* controller)
@@ -114,6 +115,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
+	uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -222,9 +224,8 @@ void TutorialGame::InitWorld()
 	physics->Clear();
 	//TestSave();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
-
-	//AddSphereToWorld(Vector3(93, 22, -50), 100.0f); //PS5
+	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);
+	LoadWorld(assetPath);
 	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }
 
@@ -269,6 +270,7 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 

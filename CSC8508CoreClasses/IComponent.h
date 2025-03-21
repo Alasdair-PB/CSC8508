@@ -16,8 +16,10 @@ namespace NCL::CSC8508
 	public:
 
 		IComponent(GameObject& gameObject) : gameObject(gameObject), enabled(true) {}
-
 		virtual ~IComponent() = default;
+		
+		static const char* Name() { return "Base";}
+		virtual const char* GetName() const { return Name();}
 
 		/**
 		 * Function invoked after the object and components have been instantiated.

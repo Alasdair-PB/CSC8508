@@ -32,22 +32,10 @@ namespace NCL::CSC8508 {
             return h;
         }
 
-        template <typename T>
-        static size_t UniqueTypeHash() {
-            std::string typeName = typeid(T).name();
-            return MurmurHash3_64(typeName.c_str(), typeName.size());
-        }
-
-        static size_t UniqueTypeHash(auto var) {
-            std::string typeName = typeid(var).name();
-            return MurmurHash3_64(typeName.c_str(), typeName.size());
-        }
-
         struct GameData {
-            std::size_t typeHash;
             uint32_t dataSize;
             std::vector<char> data;
-            GameData() : typeHash(UniqueTypeHash<void>()), dataSize(0) {}
+            GameData() : dataSize(0) {}
         };
 
         template <typename T, typename = void> struct is_container : std::false_type {};
@@ -128,7 +116,6 @@ namespace NCL::CSC8508 {
 
             file.write(reinterpret_cast<char*>(&magic), sizeof(magic));
             file.write(reinterpret_cast<char*>(&version), sizeof(version));
-            file.write(reinterpret_cast<const char*>(&gameData.typeHash), sizeof(gameData.typeHash));
             file.write(reinterpret_cast<const char*>(&gameData.dataSize), sizeof(gameData.dataSize));
             file.write(gameData.data.data(), gameData.dataSize);
 
@@ -172,10 +159,7 @@ namespace NCL::CSC8508 {
                 std::cerr << "Error: Invalid file format!" << std::endl;
                 return false;
             }
-
-            file.read(reinterpret_cast<char*>(&gameData.typeHash), sizeof(gameData.typeHash));
             file.read(reinterpret_cast<char*>(&gameData.dataSize), sizeof(gameData.dataSize));
-
             uint32_t checksum;
             gameData.data.resize(gameData.dataSize);
             file.read(gameData.data.data(), gameData.dataSize);
@@ -207,7 +191,6 @@ namespace NCL::CSC8508 {
         static T LoadMyData(const std::string& assetPath, const size_t allocationStart = 0, Members T::*... members) {
             GameData loadedData;
             if (!LoadGameData(assetPath, loadedData, allocationStart)) std::cerr << "Failed to load game data" << std::endl;
-            if (loadedData.typeHash != UniqueTypeHash<T>()) std::cerr << "Type mismatch in game data" << std::endl;
             T loadedStruct;
             size_t offset = 0;
 
@@ -233,7 +216,6 @@ namespace NCL::CSC8508 {
         template <typename T, typename... Members>
         static GameData CreateSaveDataAsset(const T& value, Members T::*... members) {
             GameData item;
-            item.typeHash = UniqueTypeHash<T>();
             item.dataSize = 0;
 
             if constexpr (sizeof...(members) == 0)

@@ -9,7 +9,7 @@
 #include "IComponent.h"
 #include "CollisionVolume.h"
 #include "PhysicsComponent.h"
-#include "GameObject.h" // Just for layers namespace
+#include "GameObject.h"
 
 using std::vector;
 
@@ -21,6 +21,9 @@ namespace NCL::CSC8508
 
 		BoundsComponent(GameObject& gameObject, CollisionVolume* collisionVolume, PhysicsComponent* physicsComponent = nullptr);
 		~BoundsComponent();
+
+		static const char* Name() { return "Bounds"; }
+		const char* GetName() const override { return Name(); }
 
 		void SetBoundingVolume(CollisionVolume* vol) { boundingVolume = vol;}
 

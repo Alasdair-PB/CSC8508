@@ -30,6 +30,7 @@ namespace NCL {
 			void SetMainMenuOption(int option) { mainMenuOption = option; } // Change this for each menu
 			void SetEOSMenuOption(int option) { eosMenuOption = option; } // Change this for each menu
 
+
 			SetPauseGame setPause;
 			StartClient startClient;
 			StartServer startServer;

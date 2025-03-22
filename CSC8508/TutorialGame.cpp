@@ -266,8 +266,6 @@ void TutorialGame::UpdateUI() {
 		framerateDelay = 0;
 	}
 
-	std::cout << mainMenuUI->GetMenuOption();
-
 	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() == 0)
 	{
 		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
@@ -275,13 +273,23 @@ void TutorialGame::UpdateUI() {
 		uiSystem->RemoveStack("Audio Sliders");
 		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu");
 	}
+
+	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("EOS Menu");
+		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
+	}
+	/*
 	if (mainMenuUI->GetMenuOption() != 0) {
-		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption()); // Change this for relevant menu
+		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption()); // This is to create the lobby
+		eosLobbyMenuUI->SetLobbyOwner();
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
 		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
+	*/
 
 	uiSystem->RenderFrame();
 }

@@ -115,6 +115,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
+	uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -265,20 +266,12 @@ void TutorialGame::UpdateUI() {
 		framerateDelay = 0;
 	}
 
-	std::cout << mainMenuUI->GetMenuOption();
-	
-	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() == 0)
-	{
-		mainMenu->SetOption(mainMenuUI->GetMenuOption());
-		uiSystem->RemoveStack("Main Menu");
-		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu"); // Actual object -> Declaration
-	}
 	if (mainMenuUI->GetMenuOption() != 0) {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar"); // Actual object -> Declaration
+		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 
 	uiSystem->RenderFrame();

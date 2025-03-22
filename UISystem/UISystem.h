@@ -8,6 +8,7 @@
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
 #include "Healthbar.h"
+#include "LobbySearch.h"
 #include <list>
 
 namespace NCL {

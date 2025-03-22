@@ -5,21 +5,21 @@
 namespace NCL {
 	namespace UI {
 
-		class MainMenuUI {
+		class EOSMenuUI {
 		public:
-			MainMenuUI();
-			~MainMenuUI();
+			EOSMenuUI();
+			~EOSMenuUI();
 
 			int GetMenuOption() {
 				return menuOption;
 			}
 
-			UIElementsGroup* menuUI = new UIElementsGroup(ImVec2(0.1f, 0.5f), ImVec2(1, 1), 2.0f, "MainMenu", 0.05f,
+			UIElementsGroup* eosMenuUI = new UIElementsGroup(ImVec2(0.1f, 0.5f), ImVec2(1, 1), 2.0f, "EOSMenu", 0.05f,
 				ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 
 		protected:
 			int menuOption = none;
-			enum menuOptions { none, startOffline, startServer, startClient, startEOS };
+			enum menuOptions { none, hostLobby, joinLobby };
 		};
 	}
 }

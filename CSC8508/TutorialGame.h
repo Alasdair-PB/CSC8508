@@ -18,6 +18,7 @@
 #include "UIElementsGroup.h"
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
+#include "EOSMenuUI.h"
 
 
 using std::vector;
@@ -98,6 +99,7 @@ namespace NCL {
 
 			UI::FramerateUI* framerate = new UI::FramerateUI;
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
+			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
 			UI::Healthbar* healthbar = new UI::Healthbar;
 

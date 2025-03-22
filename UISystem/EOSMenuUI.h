@@ -18,8 +18,8 @@ namespace NCL {
 				ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 
 		protected:
-			int menuOption = none;
-			enum menuOptions { none, hostLobby, joinLobby };
+			int menuOption = eosNone;
+			enum menuOptions { eosNone, hostLobby, joinLobby };
 		};
 	}
 }

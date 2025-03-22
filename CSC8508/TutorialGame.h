@@ -19,6 +19,7 @@
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
 #include "EOSMenuUI.h"
+#include "LobbySearch.h"
 
 
 using std::vector;
@@ -102,6 +103,7 @@ namespace NCL {
 			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
 			UI::Healthbar* healthbar = new UI::Healthbar;
+			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 
 			float framerateDelay = 0;
 		};

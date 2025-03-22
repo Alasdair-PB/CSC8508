@@ -85,23 +85,23 @@ namespace NCL {
 		{
 			Debug::Print("Main Menu", Vector2(5, 85));
 
-			if (menuOption == startClientOpt) {
+			if (mainMenuOption == startClientOpt) {
 				std::cout << "Start Client Pressed";
 				setPause(false);
 				startClient();
 				return PushdownState::Pop;
 			}
-			if (menuOption == startServerOpt) {
+			if (mainMenuOption == startServerOpt) {
 				setPause(false);
 				startServer();
 				return PushdownState::Pop;
 			}
-			if (menuOption == startOfflineOpt) {
+			if (mainMenuOption == startOfflineOpt) {
 				setPause(false);
 				startOffline();
 				return PushdownState::Pop;
 			}
-			if (menuOption == eosOption) {
+			if (mainMenuOption == eosOption) {
 				startEOS();
 				*newState = new OverlayScreen(
 					[&]() -> void { this->OnStateAwakePause(); },
@@ -118,7 +118,7 @@ namespace NCL {
 		{
 			Debug::Print("Duplicate Main Menu", Vector2(5, 85));
 
-			if (menuOption == hostLobby) {
+			if (eosMenuOption == hostLobby) {
 				std::cout << "Duplicate Pressed";
 				setPause(false);
 				startEOSLobbyCreation();
@@ -131,7 +131,7 @@ namespace NCL {
 				);
 				return PushdownState::Push;
 			}
-			if (menuOption == joinLobby) {
+			if (eosMenuOption == joinLobby) {
 				setPause(false);
 				startServer();
 				return PushdownState::Pop;

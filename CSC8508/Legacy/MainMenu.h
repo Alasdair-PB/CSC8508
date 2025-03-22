@@ -27,7 +27,8 @@ namespace NCL {
 			~MainMenu();
 			void Update(float dt);
 
-			void SetOption(int option) { menuOption = option; }
+			void SetMainMenuOption(int option) { mainMenuOption = option; } // Change this for each menu
+			void SetEOSMenuOption(int option) { eosMenuOption = option; } // Change this for each menu
 
 			SetPauseGame setPause;
 			StartClient startClient;
@@ -51,8 +52,11 @@ namespace NCL {
 			PushdownState::PushdownResult PauseScreenOnUpdate(float dt, PushdownState** newState);
 			PushdownState::PushdownResult LobbyDetailsOnUpdate(float dt, PushdownState** newState);
 
-			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, eosOption, hostLobby, joinLobby, startLobbyGame }; //Relates to menuOptions in MainMenu.h
-			int menuOption = 0;
+			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, eosOption }; //Relates to menuOptions in MainMenu.h
+			int mainMenuOption = 0;
+			
+			enum eosMenuOptions { eosNone, hostLobby, joinLobby }; //Relates to menuOptions in MainMenu.h
+			int eosMenuOption = 0;
 		};
 	}
 }

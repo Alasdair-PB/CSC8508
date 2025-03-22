@@ -266,8 +266,17 @@ void TutorialGame::UpdateUI() {
 		framerateDelay = 0;
 	}
 
+	std::cout << mainMenuUI->GetMenuOption();
+
+	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() == 0)
+	{
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu");
+	}
 	if (mainMenuUI->GetMenuOption() != 0) {
-		mainMenu->SetOption(mainMenuUI->GetMenuOption());
+		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption()); // Change this for relevant menu
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
 		uiSystem->RemoveStack("Lobby Search Field");

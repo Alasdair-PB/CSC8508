@@ -8,7 +8,7 @@ namespace NCL {
 
 		class EOSLobbyMenuUI {
 		public:
-			EOSLobbyMenuUI(bool lobbyOwner);
+			EOSLobbyMenuUI(bool lobbyOwner, const std::string& ip, const std::string& lobbyID, int playerCount);
 			~EOSLobbyMenuUI();
 
 			int GetMenuOption() {

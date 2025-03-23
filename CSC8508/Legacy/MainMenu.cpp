@@ -21,7 +21,17 @@ namespace NCL {
 			}
 		};
 
-		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch, StartEOSLobbyUpdate startEOSLobbyUpdate)
+		MainMenu::MainMenu(SetPauseGame setPauseFunc,
+			StartClient startClient,
+			StartServer startServer,
+			StartOffline startOffline,
+			StartEOS startEOS,
+			StartEOSLobbyCreation startEOSLobbyCreation,
+			StartEOSLobbySearch startEOSLobbySearch,
+			StartEOSLobbyUpdate startEOSLobbyUpdate,
+			GetStringFunc getOwnerIP,
+			GetStringFunc getLobbyID,
+			GetIntFunc getPlayerCount)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
@@ -31,6 +41,10 @@ namespace NCL {
 			this->startEOSLobbyCreation = startEOSLobbyCreation;
 			this->startEOSLobbySearch = startEOSLobbySearch;
 			this->startEOSLobbyUpdate = startEOSLobbyUpdate;
+
+			getOwnerIPFunc = getOwnerIP;
+			getLobbyIDFunc = getLobbyID;
+			getPlayerCountFunc = getPlayerCount;
 
 			machine = new PushdownMachine(new OverlayScreen(
 				[&]() -> void { this->OnStateAwake(); },
@@ -154,6 +168,16 @@ namespace NCL {
 			{
 				startEOSLobbyUpdate();
 				lobbyUpdateTimer = 0.0f; // Reset the timer
+
+				std::string ip = getOwnerIPFunc();
+				std::string id = getLobbyIDFunc();
+				int count = getPlayerCountFunc();
+
+				std::cout << "***" << std::endl;
+				std::cout << "IP: " << ip << std::endl;
+				std::cout << "Lobby ID: " << id << std::endl;
+				std::cout << "Players: " << std::to_string(count) << std::endl;
+				std::cout << "***" << std::endl;
 			}
 
 			return PushdownState::NoChange;

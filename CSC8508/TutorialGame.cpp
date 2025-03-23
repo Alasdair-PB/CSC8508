@@ -23,6 +23,7 @@
 #include "GameTechRenderer.h"
 #include "KeyboardMouseController.h"
 #endif // USE_PS5
+#include <EOSLobbyFunctions.h>
 
 
 using namespace NCL;
@@ -260,6 +261,8 @@ void TutorialGame::UpdateUI() {
 	uiSystem->StartFrame();
 	framerateDelay += 1;
 
+
+
 	if (framerateDelay > 10) {
 		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
@@ -276,22 +279,32 @@ void TutorialGame::UpdateUI() {
 
 	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0)
 	{
-		if (eosMenuUI->GetMenuOption() == 1)
-		{
-			eosLobbyMenuUI = new UI::EOSLobbyMenuUI(true);
-		}
-		else
-		{
-			eosLobbyMenuUI = new UI::EOSLobbyMenuUI(false);
-		}
+		// Get lobby info from mainMenu
+		std::string ip = mainMenu->getOwnerIPFunc();
+		std::string lobbyID = mainMenu->getLobbyIDFunc();
+		int playerCount = mainMenu->getPlayerCountFunc();
 
+		// Determine if user is lobby owner
+		bool isLobbyOwner = eosMenuUI->GetMenuOption() == 1;
+
+		// Create EOS Lobby UI with extra data
+		eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount);
+
+		/*
+		// Debug output to console
+		std::cout << "---------" << std::endl;
+		std::cout << "IP: " << ip << std::endl;
+		std::cout << "ID: " << lobbyID << std::endl;
+		std::cout << "Players: " << playerCount << std::endl;
+		std::cout << "---------" << std::endl;
+		*/
+
+		// Update UI stack
 		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->RemoveStack("EOS Menu");
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 	}
-
-
 
 
 	uiSystem->RenderFrame();

@@ -4,11 +4,9 @@
 using namespace NCL;
 using namespace UI;
 
-// Needs to add EOS Menu too
-EOSLobbyMenuUI::EOSLobbyMenuUI(bool lobbyOwner) {
+EOSLobbyMenuUI::EOSLobbyMenuUI(bool lobbyOwner, const std::string& ip, const std::string& lobbyID, int playerCount) {
 	if (lobbyOwner)
 	{
-		std::cout << "Lobby Owner in IF";
 		std::function<CSC8508::PushdownState::PushdownResult()> funcA = [this]() -> CSC8508::PushdownState::PushdownResult {
 			eosLobbyMenuOption = startGame;
 			return CSC8508::PushdownState::PushdownResult::NoChange;
@@ -16,7 +14,20 @@ EOSLobbyMenuUI::EOSLobbyMenuUI(bool lobbyOwner) {
 
 		eosLobbyMenuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Game", funcA);
 	}
+
+	// Display IP as static label
+	std::string ipLabel = "IP: " + ip;
+	eosLobbyMenuUI->PushButtonElement(ImVec2(0.4f, 0.05f), ipLabel, nullptr);
+
+	// Display Lobby ID as static label
+	std::string idLabel = "Lobby ID: " + lobbyID;
+	eosLobbyMenuUI->PushButtonElement(ImVec2(0.4f, 0.05f), idLabel, nullptr);
+
+	// Display Player Count as static label
+	std::string playersLabel = "Players: " + std::to_string(playerCount);
+	eosLobbyMenuUI->PushButtonElement(ImVec2(0.4f, 0.05f), playersLabel, nullptr);
 }
+
 
 EOSLobbyMenuUI::~EOSLobbyMenuUI() {
 	delete eosLobbyMenuUI;

@@ -6,7 +6,7 @@
 #include "Debug.h"
 #include "Controller.h"
 #include <EOSInitialisationManager.h>
-
+#include <functional>
 
 namespace NCL {
 	namespace CSC8508 {
@@ -19,12 +19,26 @@ namespace NCL {
 		typedef std::function<void()> StartEOSLobbySearch;
 		typedef std::function<void()> StartEOSLobbyUpdate;
 
+		using GetStringFunc = std::function<std::string()>;
+		using GetIntFunc = std::function<int()>;
+
 		class MainMenu {
 
 		public:			
 			typedef std::function<void(bool state)> SetPauseGame;
 
-			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch, StartEOSLobbyUpdate startEOSLobbyUpdate);
+			MainMenu(SetPauseGame setPauseFunc,
+				StartClient startClient,
+				StartServer startServer,
+				StartOffline startOffline,
+				StartEOS startEOS,
+				StartEOSLobbyCreation startEOSLobbyCreation,
+				StartEOSLobbySearch startEOSLobbySearch,
+				StartEOSLobbyUpdate startEOSLobbyUpdate,
+				GetStringFunc getOwnerIP,
+				GetStringFunc getLobbyID,
+				GetIntFunc getPlayerCount);
+
 			~MainMenu();
 			void Update(float dt);
 
@@ -41,6 +55,10 @@ namespace NCL {
 			StartEOSLobbyCreation startEOSLobbyCreation;
 			StartEOSLobbySearch startEOSLobbySearch;
 			StartEOSLobbyUpdate startEOSLobbyUpdate;
+
+			GetStringFunc getOwnerIPFunc;
+			GetStringFunc getLobbyIDFunc;
+			GetIntFunc getPlayerCountFunc;
 
 		protected:
 			PushdownMachine* machine = nullptr;

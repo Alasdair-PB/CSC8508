@@ -67,7 +67,10 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> void { this->StartEOSCallBack(); },
 		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
 		[&]() -> void { this->StartEOSLobbySearchCallBack(); },
-		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); }
+		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); },
+		[&]() -> std::string { return this->GetOwnerIP(); },
+		[&]() -> std::string { return this->GetLobbyID(); },
+		[&]() -> int { return this->GetPlayerCount(); }
 	);
 
 	NetworkBase::Initialise();
@@ -90,7 +93,7 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-	std::cout << "startinmg"<<std::endl;
+	std::cout << "starting"<<std::endl;
 	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 
@@ -133,6 +136,12 @@ void NetworkedGame::EOSLobbySearchFunc()
 void NetworkedGame::EOSLobbyDetailsUpdate()
 {
 	eosLobbyFunctions->UpdateLobbyDetails();
+
+	/*
+	std::cout << "Owner IP: " << eosLobbyFunctions->ownerIP << std::endl;
+	std::cout << "Lobby ID: " << eosLobbyFunctions->lobbyID << std::endl;
+	std::cout << "Player Count: " << eosLobbyFunctions->playerCount << std::endl;
+	*/
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

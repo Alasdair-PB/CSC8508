@@ -22,14 +22,14 @@ public:
     static void OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data);
     void UpdateLobbyDetails();
     void RunUpdateLoop();
+    std::string ownerIP;  // Store the Owner IP as a string
+    std::string lobbyID;
+    int playerCount = 0;
 private:
     std::atomic<bool> running; // Flag to control the update loop
     EOSInitialisationManager& eosInitManager;
     EOSLobbySearch& eosSearchManager;
 
-    std::string ownerIP;  // Store the Owner IP as a string
-    std::string lobbyID;
-    int playerCount = 0;
 
     bool hasStartedClientCallback = false; // Ensure it only runs once
 };

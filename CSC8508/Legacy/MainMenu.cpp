@@ -21,7 +21,7 @@ namespace NCL {
 			}
 		};
 
-		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch)
+		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch, StartEOSLobbyUpdate startEOSLobbyUpdate)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
@@ -30,6 +30,7 @@ namespace NCL {
 			this->startEOS = startEOS;
 			this->startEOSLobbyCreation = startEOSLobbyCreation;
 			this->startEOSLobbySearch = startEOSLobbySearch;
+			this->startEOSLobbyUpdate = startEOSLobbyUpdate;
 
 			machine = new PushdownMachine(new OverlayScreen(
 				[&]() -> void { this->OnStateAwake(); },
@@ -119,7 +120,6 @@ namespace NCL {
 			Debug::Print("Duplicate Main Menu", Vector2(5, 85));
 
 			if (eosMenuOption == hostLobby) {
-				std::cout << "Duplicate Pressed";
 				setPause(false);
 				startEOSLobbyCreation();
 
@@ -132,7 +132,6 @@ namespace NCL {
 				return PushdownState::Push;
 			}
 			if (eosMenuOption == joinLobby) {
-				std::cout << "Duplicate Pressed";
 				setPause(false);
 				startEOSLobbySearch();
 
@@ -149,7 +148,14 @@ namespace NCL {
 
 		PushdownState::PushdownResult MainMenu::LobbyDetailsOnUpdate(float dt, PushdownState** newState)
 		{
-			Debug::Print("Lobby Details", Vector2(5, 85));
+			lobbyUpdateTimer += dt;
+
+			if (lobbyUpdateTimer >= updateInterval)
+			{
+				startEOSLobbyUpdate();
+				lobbyUpdateTimer = 0.0f; // Reset the timer
+			}
+
 			return PushdownState::NoChange;
 		}
 

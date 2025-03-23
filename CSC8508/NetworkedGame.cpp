@@ -45,6 +45,8 @@ void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vect
 void NetworkedGame::StartEOSCallBack() { HostGame(); }
 void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
 void NetworkedGame::StartEOSLobbySearchCallBack() { EOSLobbySearchFunc(); }
+void NetworkedGame::StartEOSLobbyUpdateCallBack() { EOSLobbyDetailsUpdate(); }
+
 
 
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
@@ -64,7 +66,8 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> void { this->StartOfflineCallBack(); },
 		[&]() -> void { this->StartEOSCallBack(); },
 		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
-		[&]() -> void { this->StartEOSLobbySearchCallBack(); }
+		[&]() -> void { this->StartEOSLobbySearchCallBack(); },
+		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); }
 	);
 
 	NetworkBase::Initialise();
@@ -108,31 +111,28 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 
 void NetworkedGame::HostGame()
 {
-	std::cout << "[NetworkedGame] Starting EOS authentication for hosting a game..." << std::endl;
-
-	// Create EOSInitialisationManager instance
-	eosManager = new EOSInitialisationManager();
-	// Start EOS authentication
 	eosManager->StartEOS();
 }
 
 void NetworkedGame::EOSLobbyCreation()
 {
-	eosLobbyManager = new EOSLobbyManager(*eosManager);
 	eosLobbyManager->CreateLobby();
-	
+	eosLobbySearch->CreateLobbySearch(eosLobbyManager->LobbyId); // Change this to take in input from input box
+
+	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
 }
 
 void NetworkedGame::EOSLobbySearchFunc()
 {
-	eosLobbySearch = new EOSLobbySearch(*eosManager);
-	eosLobbySearch->CreateLobbySearch("79742f895cbd4ec495988fb52aca7785");
-
-	std::cout << "Here";
+	eosLobbySearch->CreateLobbySearch("b4786c9bd62c4d409a4c400e27258b3b"); // Change this to take in input from input box
 
 	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
 	eosLobbyFunctions->JoinLobby();
+}
 
+void NetworkedGame::EOSLobbyDetailsUpdate()
+{
+	eosLobbyFunctions->UpdateLobbyDetails();
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

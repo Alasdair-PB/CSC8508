@@ -46,6 +46,8 @@ namespace NCL {
 
 			void EOSLobbySearchFunc();
 
+			void EOSLobbyDetailsUpdate();
+
 			void UpdateGame(float dt) override;
 
 			void SpawnPlayerClient(int ownerId, int objectId, Prefab prefab);
@@ -73,6 +75,8 @@ namespace NCL {
 
 			void StartEOSLobbySearchCallBack();
 
+			void StartEOSLobbyUpdateCallBack();
+
 			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastOwnedObjects(bool deltaFrame);
 
@@ -86,9 +90,9 @@ namespace NCL {
 			GameServer* thisServer;
 			GameClient* thisClient;
 
-			EOSInitialisationManager* eosManager = nullptr;
-			EOSLobbyManager* eosLobbyManager = nullptr;
-			EOSLobbySearch* eosLobbySearch = nullptr;
+			EOSInitialisationManager* eosManager = new EOSInitialisationManager();
+			EOSLobbyManager* eosLobbyManager = new EOSLobbyManager(*eosManager);
+			EOSLobbySearch* eosLobbySearch = new EOSLobbySearch(*eosManager);
 			EOSLobbyFunctions* eosLobbyFunctions = nullptr;
 
 			float timeToNextPacket;

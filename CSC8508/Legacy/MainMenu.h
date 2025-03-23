@@ -17,19 +17,21 @@ namespace NCL {
 		typedef std::function<void()> StartEOS;
 		typedef std::function<void()> StartEOSLobbyCreation;
 		typedef std::function<void()> StartEOSLobbySearch;
+		typedef std::function<void()> StartEOSLobbyUpdate;
 
 		class MainMenu {
 
 		public:			
 			typedef std::function<void(bool state)> SetPauseGame;
 
-			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch);
+			MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline, StartEOS startEOS, StartEOSLobbyCreation startEOSLobbyCreation, StartEOSLobbySearch startEOSLobbySearch, StartEOSLobbyUpdate startEOSLobbyUpdate);
 			~MainMenu();
 			void Update(float dt);
 
 			void SetMainMenuOption(int option) { mainMenuOption = option; } // Change this for each menu
 			void SetEOSMenuOption(int option) { eosMenuOption = option; } // Change this for each menu
-
+			float lobbyUpdateTimer = 0.0f;
+			const float updateInterval = 10.0f; // 3 seconds
 
 			SetPauseGame setPause;
 			StartClient startClient;
@@ -38,6 +40,7 @@ namespace NCL {
 			StartEOS startEOS;
 			StartEOSLobbyCreation startEOSLobbyCreation;
 			StartEOSLobbySearch startEOSLobbySearch;
+			StartEOSLobbyUpdate startEOSLobbyUpdate;
 
 		protected:
 			PushdownMachine* machine = nullptr;

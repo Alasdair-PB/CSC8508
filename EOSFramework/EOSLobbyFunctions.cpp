@@ -69,9 +69,6 @@ if (Data->ResultCode == EOS_EResult::EOS_Success) {
 
         EOSLobbyFunctions* self = static_cast<EOSLobbyFunctions*>(Data->ClientData); // Cast back to instance
         self->running = false;
-        // Calls UpdateLobbyDetails to refresh lobby information after joining
-        self->UpdateLobbyDetails();
-
     }
     else {
         std::cerr << "[ERROR] Failed to join lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
@@ -114,189 +111,182 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
     // Stores users EOS IDs along with their IP addresses
     std::unordered_map<std::string, std::string> collectedIPs; 
 
-    // This loop continuously updates lobby information
-    while (true) {
-        EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
+    EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
 
-        // Ensures a valid lobby details handle is available
-        if (!LobbyDetailsHandle)
+    // Ensures a valid lobby details handle is available
+    if (!LobbyDetailsHandle)
+    {
+        std::cerr << "Error: Invalid lobby details handle." << std::endl;
+        return;
+    }
+
+    // Retrieves lobby information
+    EOS_LobbyDetails_CopyInfoOptions copyInfoOptions = {};
+    copyInfoOptions.ApiVersion = EOS_LOBBYDETAILS_COPYINFO_API_LATEST;
+
+    EOS_LobbyDetails_Info* lobbyInfo = nullptr;
+    EOS_EResult result = EOS_LobbyDetails_CopyInfo(LobbyDetailsHandle, &copyInfoOptions, &lobbyInfo);
+
+    if (result != EOS_EResult::EOS_Success || !lobbyInfo)
+    {
+        std::cerr << "Error: Failed to copy lobby info." << std::endl;
+        return;
+    }
+
+    std::cout << "Lobby ID: " << lobbyInfo->LobbyId << std::endl;
+    lobbyID = lobbyInfo->LobbyId;
+    std::cout << "Max Members: " << lobbyInfo->MaxMembers << std::endl;
+
+    // Retrieves the lobby owner ID as a string
+    char ownerUserIdString[EOS_PRODUCTUSERID_MAX_LENGTH + 1] = { 0 };
+    int32_t bufferSize = sizeof(ownerUserIdString);
+    bool isOwner = false;
+
+    if (EOS_ProductUserId_ToString(lobbyInfo->LobbyOwnerUserId, ownerUserIdString, &bufferSize) == EOS_EResult::EOS_Success) {
+        std::cout << "Lobby owner: " << ownerUserIdString << std::endl;
+    }
+    else {
+        std::cerr << "Failed to convert LobbyOwnerUserId to string!" << std::endl;
+    }
+
+    // Retrieves the local user ID
+    EOS_ProductUserId localUserId = eosInitManager.GetLocalUserId();
+    char localUserStr[EOS_PRODUCTUSERID_MAX_LENGTH + 1] = {};
+    bufferSize = EOS_PRODUCTUSERID_MAX_LENGTH + 1;
+
+    if (EOS_ProductUserId_IsValid(localUserId))
+    {
+        EOS_EResult localToStringResult = EOS_ProductUserId_ToString(localUserId, localUserStr, &bufferSize);
+        if (localToStringResult == EOS_EResult::EOS_Success)
         {
-            std::cerr << "Error: Invalid lobby details handle." << std::endl;
-            return;
-        }
+            std::cout << "You (Local User): " << localUserStr << std::endl;
 
-        // Clears the console screen
-        system("CLS");
-
-        // Retrieves lobby information
-        EOS_LobbyDetails_CopyInfoOptions copyInfoOptions = {};
-        copyInfoOptions.ApiVersion = EOS_LOBBYDETAILS_COPYINFO_API_LATEST;
-
-        EOS_LobbyDetails_Info* lobbyInfo = nullptr;
-        EOS_EResult result = EOS_LobbyDetails_CopyInfo(LobbyDetailsHandle, &copyInfoOptions, &lobbyInfo);
-
-        if (result != EOS_EResult::EOS_Success || !lobbyInfo)
-        {
-            std::cerr << "Error: Failed to copy lobby info." << std::endl;
-            return;
-        }
-
-        std::cout << "Lobby ID: " << lobbyInfo->LobbyId << std::endl;
-        std::cout << "Max Members: " << lobbyInfo->MaxMembers << std::endl;
-
-        // Retrieves the lobby owner ID as a string
-        char ownerUserIdString[EOS_PRODUCTUSERID_MAX_LENGTH + 1] = { 0 };
-        int32_t bufferSize = sizeof(ownerUserIdString);
-        bool isOwner = false;
-
-        if (EOS_ProductUserId_ToString(lobbyInfo->LobbyOwnerUserId, ownerUserIdString, &bufferSize) == EOS_EResult::EOS_Success) {
-            std::cout << "Lobby owner: " << ownerUserIdString << std::endl;
-        }
-        else {
-            std::cerr << "Failed to convert LobbyOwnerUserId to string!" << std::endl;
-        }
-
-        // Retrieves the local user ID
-        EOS_ProductUserId localUserId = eosInitManager.GetLocalUserId();
-        char localUserStr[EOS_PRODUCTUSERID_MAX_LENGTH + 1] = {};
-        bufferSize = EOS_PRODUCTUSERID_MAX_LENGTH + 1;
-
-        if (EOS_ProductUserId_IsValid(localUserId))
-        {
-            EOS_EResult localToStringResult = EOS_ProductUserId_ToString(localUserId, localUserStr, &bufferSize);
-            if (localToStringResult == EOS_EResult::EOS_Success)
-            {
-                std::cout << "You (Local User): " << localUserStr << std::endl;
-
-                // Determines if the local user is the owner
-                if (strcmp(localUserStr, ownerUserIdString) == 0) {
-                    isOwner = true;
-                }
-            }
-            else
-            {
-                std::cerr << "Error: Failed to convert Local User ID to string. Error code: "
-                    << static_cast<int>(localToStringResult) << std::endl;
+            // Determines if the local user is the owner
+            if (strcmp(localUserStr, ownerUserIdString) == 0) {
+                isOwner = true;
             }
         }
         else
         {
-            std::cerr << "Error: Invalid Local User ID. Check EOS authentication." << std::endl;
+            std::cerr << "Error: Failed to convert Local User ID to string. Error code: "
+                << static_cast<int>(localToStringResult) << std::endl;
         }
+    }
+    else
+    {
+        std::cerr << "Error: Invalid Local User ID. Check EOS authentication." << std::endl;
+    }
 
-        // Retrieve the number of attributes
-        EOS_LobbyDetails_GetAttributeCountOptions attributeCountOptions = {};
-        attributeCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETATTRIBUTECOUNT_API_LATEST;
-        int32_t attributeCount = EOS_LobbyDetails_GetAttributeCount(LobbyDetailsHandle, &attributeCountOptions);
+    // Retrieve the number of attributes
+    EOS_LobbyDetails_GetAttributeCountOptions attributeCountOptions = {};
+    attributeCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETATTRIBUTECOUNT_API_LATEST;
+    int32_t attributeCount = EOS_LobbyDetails_GetAttributeCount(LobbyDetailsHandle, &attributeCountOptions);
 
-        // Ensure there is at least one attribute
-        if (attributeCount > 0) {
-            // Copy the first attribute (which is always OWNER_IP)
-            EOS_LobbyDetails_CopyAttributeByIndexOptions attributeByIndexOptions = {};
-            attributeByIndexOptions.ApiVersion = EOS_LOBBYDETAILS_COPYATTRIBUTEBYINDEX_API_LATEST;
-            attributeByIndexOptions.AttrIndex = 0;  // Always retrieve the first attribute
+    // Ensure there is at least one attribute
+    if (attributeCount > 0) {
+        // Copy the first attribute (which is always OWNER_IP)
+        EOS_LobbyDetails_CopyAttributeByIndexOptions attributeByIndexOptions = {};
+        attributeByIndexOptions.ApiVersion = EOS_LOBBYDETAILS_COPYATTRIBUTEBYINDEX_API_LATEST;
+        attributeByIndexOptions.AttrIndex = 0;  // Always retrieve the first attribute
 
-            EOS_Lobby_Attribute* attribute = nullptr;
-            EOS_EResult result = EOS_LobbyDetails_CopyAttributeByIndex(LobbyDetailsHandle, &attributeByIndexOptions, &attribute);
+        EOS_Lobby_Attribute* attribute = nullptr;
+        EOS_EResult result = EOS_LobbyDetails_CopyAttributeByIndex(LobbyDetailsHandle, &attributeByIndexOptions, &attribute);
 
-            if (result == EOS_EResult::EOS_Success && attribute) {
-                // Ensure the attribute key is OWNER_IP
-                if (std::string(attribute->Data->Key) == "OWNER_IP" && attribute->Data->ValueType == EOS_EAttributeType::EOS_AT_STRING) {
-                    // Store the OWNER_IP in the class variable
-                    ownerIP = attribute->Data->Value.AsUtf8;
-                    std::cout << "OWNER_IP stored successfully!" << std::endl;
-                }
-                else {
-                    std::cerr << "Error: First attribute is not OWNER_IP!" << std::endl;
-                }
-
-                // Free allocated memory for attribute
-                EOS_Lobby_Attribute_Release(attribute);
+        if (result == EOS_EResult::EOS_Success && attribute) {
+            // Ensure the attribute key is OWNER_IP
+            if (std::string(attribute->Data->Key) == "OWNER_IP" && attribute->Data->ValueType == EOS_EAttributeType::EOS_AT_STRING) {
+                // Store the OWNER_IP in the class variable
+                ownerIP = attribute->Data->Value.AsUtf8;
+                std::cout << "OWNER_IP stored successfully!" << std::endl;
             }
             else {
-                std::cerr << "Error: Failed to retrieve OWNER_IP attribute." << std::endl;
+                std::cerr << "Error: First attribute is not OWNER_IP!" << std::endl;
             }
+
+            // Free allocated memory for attribute
+            EOS_Lobby_Attribute_Release(attribute);
         }
         else {
-            std::cerr << "Error: No attributes found in the lobby." << std::endl;
+            std::cerr << "Error: Failed to retrieve OWNER_IP attribute." << std::endl;
         }
-
-        int ip1, ip2, ip3, ip4;
-        if (sscanf_s(ownerIP.c_str(), "%d.%d.%d.%d", &ip1, &ip2, &ip3, &ip4) == 4) {
-            std::cout << "IP Segments: " << ip1 << ", " << ip2 << ", " << ip3 << ", " << ip4 << std::endl;
-        }
-        else {
-            std::cerr << "Error: Invalid IP format!" << std::endl;
-        }
-
-        // Retrieves the number of members in the lobby
-        EOS_LobbyDetails_GetMemberCountOptions memberCountOptions = {};
-        memberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;
-
-        int32_t memberCount = EOS_LobbyDetails_GetMemberCount(LobbyDetailsHandle, &memberCountOptions);
-        std::cout << "Other Members Count: " << (memberCount > 1 ? memberCount - 1 : 0) << std::endl;
-
-        std::vector<EOS_ProductUserId> otherUsers;
-
-        if (memberCount > 1)
-        {
-            for (int32_t i = 0; i < memberCount; ++i)
-            {
-                // Retrieves each member's ID
-                EOS_LobbyDetails_GetMemberByIndexOptions memberByIndexOptions = {};
-                memberByIndexOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERBYINDEX_API_LATEST;
-                memberByIndexOptions.MemberIndex = i;
-
-                EOS_ProductUserId memberId = EOS_LobbyDetails_GetMemberByIndex(LobbyDetailsHandle, &memberByIndexOptions);
-                char memberStr[EOS_PRODUCTUSERID_MAX_LENGTH] = {};
-                bufferSize = sizeof(memberStr);
-
-                if (!EOS_ProductUserId_IsValid(memberId))
-                {
-                    std::cerr << "Error: Invalid ProductUserId retrieved for member " << i + 1 << std::endl;
-                    continue;
-                }
-
-                EOS_EResult toStringResult = EOS_ProductUserId_ToString(memberId, memberStr, &bufferSize);
-                if (toStringResult == EOS_EResult::EOS_Success)
-                {
-                    std::cout << "Member " << i << ": " << memberStr << std::endl;
-
-                    // Store other user IDs for P2P communication
-                    if (strcmp(localUserStr, memberStr) != 0) {
-                        otherUsers.push_back(memberId);
-                    }
-                }
-                else
-                {
-                    std::cerr << "Error: Failed to convert ProductUserId to string. Error code: " << static_cast<int>(toStringResult) << std::endl;
-                }
-            }
-        }
-
-        // Wait until all expected IPs have been received
-        std::cout << "Waiting to collect all members' IP addresses..." << std::endl;
-
-        std::cout << "All IP addresses received successfully!\n";
-        for (const auto& entry : collectedIPs) {
-            std::cout << "User " << entry.first << " -> IP: " << entry.second << "\n";
-        }
-
-        // Now all users have all IPs, and the game can proceed.
-        if (isOwner)
-        {
-            std::cout << "Press 'P' to start the game..." << std::endl;
-            char input;
-            std::cin >> input;
-            if (input == 'P' || input == 'p') {
-                std::cout << "Game starting..." << std::endl;
-            }
-
-            /*
-            * This should be when the server starts sending the packets to the users
-            */
-
-        }
-        eosSearchManager.CreateLobbySearch(lobbyInfo->LobbyId);
     }
+    else {
+        std::cerr << "Error: No attributes found in the lobby." << std::endl;
+    }
+
+    int ip1, ip2, ip3, ip4;
+    if (sscanf_s(ownerIP.c_str(), "%d.%d.%d.%d", &ip1, &ip2, &ip3, &ip4) == 4) {
+        std::cout << "IP Segments: " << ip1 << ", " << ip2 << ", " << ip3 << ", " << ip4 << std::endl;
+    }
+    else {
+        std::cerr << "Error: Invalid IP format!" << std::endl;
+    }
+
+    // Retrieves the number of members in the lobby
+    EOS_LobbyDetails_GetMemberCountOptions memberCountOptions = {};
+    memberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;
+
+    int32_t playerCount = EOS_LobbyDetails_GetMemberCount(LobbyDetailsHandle, &memberCountOptions);
+    std::cout << "Other Members Count: " << (playerCount > 1 ? playerCount - 1 : 0) << std::endl;
+
+    std::vector<EOS_ProductUserId> otherUsers;
+
+    if (playerCount > 1)
+    {
+        for (int32_t i = 0; i < playerCount; ++i)
+        {
+            // Retrieves each member's ID
+            EOS_LobbyDetails_GetMemberByIndexOptions memberByIndexOptions = {};
+            memberByIndexOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERBYINDEX_API_LATEST;
+            memberByIndexOptions.MemberIndex = i;
+
+            EOS_ProductUserId memberId = EOS_LobbyDetails_GetMemberByIndex(LobbyDetailsHandle, &memberByIndexOptions);
+            char memberStr[EOS_PRODUCTUSERID_MAX_LENGTH] = {};
+            bufferSize = sizeof(memberStr);
+
+            if (!EOS_ProductUserId_IsValid(memberId))
+            {
+                std::cerr << "Error: Invalid ProductUserId retrieved for member " << i + 1 << std::endl;
+                continue;
+            }
+
+            EOS_EResult toStringResult = EOS_ProductUserId_ToString(memberId, memberStr, &bufferSize);
+            if (toStringResult == EOS_EResult::EOS_Success)
+            {
+                std::cout << "Member " << i << ": " << memberStr << std::endl;
+
+                // Store other user IDs for P2P communication
+                if (strcmp(localUserStr, memberStr) != 0) {
+                    otherUsers.push_back(memberId);
+                }
+            }
+            else
+            {
+                std::cerr << "Error: Failed to convert ProductUserId to string. Error code: " << static_cast<int>(toStringResult) << std::endl;
+            }
+        }
+    }
+
+    // Wait until all expected IPs have been received
+    std::cout << "Waiting to collect all members' IP addresses..." << std::endl;
+
+    std::cout << "All IP addresses received successfully!\n";
+    for (const auto& entry : collectedIPs) {
+        std::cout << "User " << entry.first << " -> IP: " << entry.second << "\n";
+    }
+
+    /*
+    // Now all users have all IPs, and the game can proceed.
+    if (isOwner)
+    {
+        std::cout << "Press 'P' to start the game..." << std::endl;
+        char input;
+        std::cin >> input;
+        if (input == 'P' || input == 'p') {
+            std::cout << "Game starting..." << std::endl;
+        }
+    }
+    */
+    eosSearchManager.CreateLobbySearch(lobbyInfo->LobbyId);
+
 }

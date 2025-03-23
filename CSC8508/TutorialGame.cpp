@@ -291,6 +291,9 @@ void TutorialGame::UpdateUI() {
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 	}
 
+
+
+
 	uiSystem->RenderFrame();
 }
 

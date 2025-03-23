@@ -4,6 +4,14 @@
 #include "EOSLobbySearch.h"
 #include <unordered_map>
 
+EOSLobbyFunctions::EOSLobbyFunctions(EOSInitialisationManager& initManager, EOSLobbyManager& lobbyManager, EOSLobbySearch& lobbySearch)
+    : eosInitManager(initManager), eosManager(lobbyManager), eosSearchManager(lobbySearch) {
+}
+
+// Destructor
+EOSLobbyFunctions::~EOSLobbyFunctions() {
+}
+
 // Attempts to join a lobby
 void EOSLobbyFunctions::JoinLobby() {
     /*

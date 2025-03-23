@@ -132,16 +132,23 @@ namespace NCL {
 				return PushdownState::Push;
 			}
 			if (eosMenuOption == joinLobby) {
+				std::cout << "Duplicate Pressed";
 				setPause(false);
-				startServer();
-				return PushdownState::Pop;
+				startEOSLobbySearch();
+
+				*newState = new OverlayScreen(
+					[&]() -> void { this->OnStateAwakePause(); },
+					[&](float dt, PushdownState** newState) -> PushdownState::PushdownResult {
+						return this->LobbyDetailsOnUpdate(dt, newState);
+					}
+				);
+				return PushdownState::Push;
 			}
 			return PushdownState::NoChange;
 		}
 
 		PushdownState::PushdownResult MainMenu::LobbyDetailsOnUpdate(float dt, PushdownState** newState)
 		{
-			std::cout << "Lobby Details Scene";
 			Debug::Print("Lobby Details", Vector2(5, 85));
 			return PushdownState::NoChange;
 		}

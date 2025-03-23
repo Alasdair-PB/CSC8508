@@ -115,7 +115,6 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -269,6 +268,7 @@ void TutorialGame::UpdateUI() {
 	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() == 0)
 	{
 		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
+		uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
 		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu");
@@ -276,10 +276,25 @@ void TutorialGame::UpdateUI() {
 
 	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0)
 	{
+		if (eosMenuUI->GetMenuOption() == 1)
+		{
+			eosLobbyMenuUI = new UI::EOSLobbyMenuUI(true);
+		}
+		else
+		{
+			eosLobbyMenuUI = new UI::EOSLobbyMenuUI(false);
+		}
+
+		std::cout << "Success";
+
 		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->RemoveStack("EOS Menu");
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 	}
+
+
+
 	/*
 	if (mainMenuUI->GetMenuOption() != 0) {
 		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption()); // This is to create the lobby

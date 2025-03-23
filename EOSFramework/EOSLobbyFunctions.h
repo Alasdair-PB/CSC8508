@@ -12,9 +12,8 @@
 
 class EOSLobbyFunctions {
 public:
-    EOSLobbyFunctions(EOSInitialisationManager& initManager, EOSLobbyManager& lobbyManager, EOSLobbySearch& lobbySearch)
-        : eosInitManager(initManager), eosManager(lobbyManager), eosSearchManager(lobbySearch) {
-    }
+    EOSLobbyFunctions(EOSInitialisationManager& initManager, EOSLobbyManager& lobbyManager, EOSLobbySearch& lobbySearch);
+    ~EOSLobbyFunctions();
 
     void JoinLobby();
     void LeaveLobby();

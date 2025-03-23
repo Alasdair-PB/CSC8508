@@ -2,6 +2,16 @@
 #include "EOSLobbyManager.h"
 #include "EOSLobbyFunctions.h"
 
+EOSLobbySearch::EOSLobbySearch(EOSInitialisationManager& initManager)
+    : eosInitManager(initManager) {
+    std::cout << "[EOSLobbySearch] Constructor called. Initializing state..." << std::endl;
+
+}
+
+EOSLobbySearch::~EOSLobbySearch() {
+    std::cout << "[EOSLobbySearch] Destructor called. Releasing handles..." << std::endl;
+}
+
 // Initiates a lobby search for a specified target lobby ID
 void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
     std::cout << "[CreateLobbySearch] Attempting to create a lobby search..." << std::endl;
@@ -18,10 +28,10 @@ void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
         return;
     }
 
-    eosLobbyManager.LobbyHandle = EOS_Platform_GetLobbyInterface(eosInitManager.GetPlatformHandle());
+    LobbyHandle = EOS_Platform_GetLobbyInterface(eosInitManager.GetPlatformHandle());
 
     // Ensures that the lobby interface is initialised properly
-    if (!eosLobbyManager.LobbyHandle) {
+    if (!LobbyHandle) {
         std::cerr << "[ERROR] LobbyHandle is NULL. Lobby interface might not be initialized." << std::endl;
         return;
     }
@@ -32,7 +42,7 @@ void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
     SearchOptions.MaxResults = 10;
 
     // Creates a new lobby search request
-    EOS_EResult Result = EOS_Lobby_CreateLobbySearch(eosLobbyManager.LobbyHandle, &SearchOptions, &LobbySearchHandle);
+    EOS_EResult Result = EOS_Lobby_CreateLobbySearch(LobbyHandle, &SearchOptions, &LobbySearchHandle);
 
     // Checks if the lobby search was successfully created
     if (Result == EOS_EResult::EOS_Success) {
@@ -52,11 +62,8 @@ void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
         FindOptions.ApiVersion = EOS_LOBBYSEARCH_FIND_API_LATEST;
         FindOptions.LocalUserId = eosInitManager.GetLocalUserId();
 
-        // Reset the flag before searching
-        searchComplete = false;
-
         // Initiates the lobby search process
-        EOS_LobbySearch_Find(LobbySearchHandle, &FindOptions, nullptr, OnFindLobbiesComplete);
+        EOS_LobbySearch_Find(LobbySearchHandle, &FindOptions, this, OnFindLobbiesComplete);
     }
     else {
         std::cerr << "[ERROR] Failed to create lobby search. Error: " << EOS_EResult_ToString(Result) << std::endl;
@@ -64,8 +71,22 @@ void EOSLobbySearch::CreateLobbySearch(const char* TargetLobbyId) {
 
     std::cout << "[CreateLobbySearch] Search completed. Proceeding with lobby details retrieval." << std::endl;
 
-    searchComplete = true;
+    running = true;
+
+    RunUpdateLoop();
+
 }
+
+// New function to keep updating EOS
+void EOSLobbySearch::RunUpdateLoop()
+{
+    while (running) {
+        if (eosInitManager.PlatformHandle) {
+            EOS_Platform_Tick(eosInitManager.PlatformHandle);
+        }
+    }
+}
+
 
 // Callback function for handling the results of the lobby search
 void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInfo* Data) {
@@ -80,11 +101,8 @@ void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInf
         EOS_LobbySearch_GetSearchResultCountOptions CountOptions = {};
         CountOptions.ApiVersion = EOS_LOBBYSEARCH_GETSEARCHRESULTCOUNT_API_LATEST;
 
-        // Retrieves the lobby search handle
-        EOS_HLobbySearch LobbySearchHandle = LobbySearchHandle;
-
         // Gets the number of lobbies found in the search
-        numResults = EOS_LobbySearch_GetSearchResultCount(LobbySearchHandle, &CountOptions);
+        numResults = EOS_LobbySearch_GetSearchResultCount(self->LobbySearchHandle, &CountOptions);
 
         std::cerr << "[OnFindLobbiesComplete] Found " << numResults << " lobbies.\n";
 
@@ -100,7 +118,7 @@ void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInf
         CopyOptions.LobbyIndex = 0;
 
         // Attempts to copy the lobby search result
-        EOS_EResult Result = EOS_LobbySearch_CopySearchResultByIndex(LobbySearchHandle, &CopyOptions, &self->LobbyDetailsHandle);
+        EOS_EResult Result = EOS_LobbySearch_CopySearchResultByIndex(self->LobbySearchHandle, &CopyOptions, &self->LobbyDetailsHandle);
 
         // Adds a brief delay to ensure proper retrieval
         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -171,8 +189,9 @@ void EOSLobbySearch::OnFindLobbiesComplete(const EOS_LobbySearch_FindCallbackInf
         std::cerr << "[OnFindLobbiesComplete] Lobby search failed. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
     }
 
-    self->searchComplete = true;
     std::cout << "Search complete" << std::endl;
+
+    self->running = false;
 }
 
 // Returns the current lobby search handle

@@ -3,7 +3,8 @@
 #include "NetworkBase.h"
 #include "NetworkObject.h"
 #include "EventListener.h"
-#include <EOSLobbyManager.h>
+#include "EOSLobbyManager.h"
+#include "EOSLobbySearch.h"
 
 namespace NCL {
 	namespace CSC8508 {
@@ -42,7 +43,7 @@ namespace NCL {
 
 			void EOSLobbyCreation();
 
-			void EOSLobbySearch();
+			void EOSLobbySearchFunc();
 
 			void UpdateGame(float dt) override;
 
@@ -86,6 +87,7 @@ namespace NCL {
 
 			EOSInitialisationManager* eosManager = nullptr;
 			EOSLobbyManager* eosLobbyManager = nullptr;
+			EOSLobbySearch* eosLobbySearch = nullptr;
 
 			float timeToNextPacket;
 			int packetsToSnapshot;

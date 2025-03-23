@@ -44,7 +44,7 @@ void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 void NetworkedGame::StartEOSCallBack() { HostGame(); }
 void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
-void NetworkedGame::StartEOSLobbySearchCallBack() { EOSLobbySearch(); }
+void NetworkedGame::StartEOSLobbySearchCallBack() { EOSLobbySearchFunc(); }
 
 
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
@@ -123,15 +123,10 @@ void NetworkedGame::EOSLobbyCreation()
 	
 }
 
-void NetworkedGame::EOSLobbySearch()
+void NetworkedGame::EOSLobbySearchFunc()
 {
-
-	std::cout << "[NetworkedGame] Searching for EOS lobbies..." << std::endl;
-
-	if (!eosManager)
-		eosManager = new EOSInitialisationManager();
-
-	std::cout << "[NetworkedGame] EOS lobby search completed." << std::endl;
+	eosLobbySearch = new EOSLobbySearch(*eosManager);
+	eosLobbySearch->CreateLobbySearch("5fc5588cf16043e3bb9595fe85fe9630");
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

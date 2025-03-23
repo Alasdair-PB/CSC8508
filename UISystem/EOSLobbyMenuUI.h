@@ -8,13 +8,8 @@ namespace NCL {
 
 		class EOSLobbyMenuUI {
 		public:
-			EOSLobbyMenuUI();
+			EOSLobbyMenuUI(bool lobbyOwner);
 			~EOSLobbyMenuUI();
-
-			void SetLobbyOwner()
-			{
-				lobbyOwner = true;
-			};
 
 			int GetMenuOption() {
 				return eosLobbyMenuOption;
@@ -24,8 +19,8 @@ namespace NCL {
 				ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 
 		protected:
+
 			int eosLobbyMenuOption = eosNone;
-			bool lobbyOwner = false;
 
 			enum menuOptions { eosNone, startGame };
 		};

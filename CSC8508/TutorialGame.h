@@ -102,7 +102,7 @@ namespace NCL {
 			UI::FramerateUI* framerate = new UI::FramerateUI;
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;
-			UI::EOSLobbyMenuUI* eosLobbyMenuUI = new UI::EOSLobbyMenuUI;
+			UI::EOSLobbyMenuUI* eosLobbyMenuUI = nullptr;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
 			UI::Healthbar* healthbar = new UI::Healthbar;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;

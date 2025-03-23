@@ -30,13 +30,12 @@ UIPlayStation::~UIPlayStation() {
 
 void UIPlayStation::StartFrame() {
 	ImGui_PS::ControlData controlData;
-	controlData.drawCursor = true;
 
 	ScePadData data;
 	int ret = scePadReadState(padHandle, &data);
 	ret = sceMouseRead(mouse_handle, mdata, 1);
 	
-	ImGui_PS::translate(&data, ImGui_PS::PadUsage_MouseEmulation, mdata->connected ? mdata : nullptr, lastMousePosition, &controlData); //INPUTS
+	ImGui_PS::translate(&data, ImGui_PS::PadUsage_Navigation, mdata->connected ? mdata : nullptr, lastMousePosition, &controlData); //INPUTS
 
 	ImGui_PS::newFrame(SCREENWIDTH, SCREENHEIGHT, controlData);
 	UISystem::StartFrame();

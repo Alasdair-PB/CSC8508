@@ -285,26 +285,11 @@ void TutorialGame::UpdateUI() {
 			eosLobbyMenuUI = new UI::EOSLobbyMenuUI(false);
 		}
 
-		std::cout << "Success";
-
 		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->RemoveStack("EOS Menu");
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 	}
-
-
-
-	/*
-	if (mainMenuUI->GetMenuOption() != 0) {
-		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption()); // This is to create the lobby
-		eosLobbyMenuUI->SetLobbyOwner();
-		uiSystem->RemoveStack("Main Menu");
-		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->RemoveStack("Lobby Search Field");
-		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
-	}
-	*/
 
 	uiSystem->RenderFrame();
 }

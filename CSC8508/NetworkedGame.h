@@ -5,6 +5,7 @@
 #include "EventListener.h"
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
+#include "EOSLobbyFunctions.h"
 
 namespace NCL {
 	namespace CSC8508 {
@@ -88,6 +89,7 @@ namespace NCL {
 			EOSInitialisationManager* eosManager = nullptr;
 			EOSLobbyManager* eosLobbyManager = nullptr;
 			EOSLobbySearch* eosLobbySearch = nullptr;
+			EOSLobbyFunctions* eosLobbyFunctions = nullptr;
 
 			float timeToNextPacket;
 			int packetsToSnapshot;

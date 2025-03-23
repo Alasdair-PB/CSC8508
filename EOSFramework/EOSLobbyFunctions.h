@@ -9,10 +9,11 @@
 #include "EOSInitialisationManager.h"
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
+#include <thread>
 
 class EOSLobbyFunctions {
 public:
-    EOSLobbyFunctions(EOSInitialisationManager& initManager, EOSLobbyManager& lobbyManager, EOSLobbySearch& lobbySearch);
+    EOSLobbyFunctions(EOSInitialisationManager& initManager, EOSLobbySearch& lobbySearch);
     ~EOSLobbyFunctions();
 
     void JoinLobby();
@@ -20,12 +21,13 @@ public:
     static void OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackInfo* Data);
     static void OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data);
     void UpdateLobbyDetails();
+    void RunUpdateLoop();
 
     std::string GetOwnerID() const { return ownerIP; }
 
 private:
+    std::atomic<bool> running; // Flag to control the update loop
     EOSInitialisationManager& eosInitManager;
-    EOSLobbyManager& eosManager;
     EOSLobbySearch& eosSearchManager;
 
     std::string ownerIP;  // Store the Owner IP as a string

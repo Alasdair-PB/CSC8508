@@ -126,7 +126,13 @@ void NetworkedGame::EOSLobbyCreation()
 void NetworkedGame::EOSLobbySearchFunc()
 {
 	eosLobbySearch = new EOSLobbySearch(*eosManager);
-	eosLobbySearch->CreateLobbySearch("5fc5588cf16043e3bb9595fe85fe9630");
+	eosLobbySearch->CreateLobbySearch("79742f895cbd4ec495988fb52aca7785");
+
+	std::cout << "Here";
+
+	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
+	eosLobbyFunctions->JoinLobby();
+
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

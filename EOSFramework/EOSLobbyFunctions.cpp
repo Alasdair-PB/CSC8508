@@ -4,8 +4,8 @@
 #include "EOSLobbySearch.h"
 #include <unordered_map>
 
-EOSLobbyFunctions::EOSLobbyFunctions(EOSInitialisationManager& initManager, EOSLobbyManager& lobbyManager, EOSLobbySearch& lobbySearch)
-    : eosInitManager(initManager), eosManager(lobbyManager), eosSearchManager(lobbySearch) {
+EOSLobbyFunctions::EOSLobbyFunctions(EOSInitialisationManager& initManager, EOSLobbySearch& lobbySearch)
+    : eosInitManager(initManager), eosSearchManager(lobbySearch) {
 }
 
 // Destructor
@@ -14,21 +14,6 @@ EOSLobbyFunctions::~EOSLobbyFunctions() {
 
 // Attempts to join a lobby
 void EOSLobbyFunctions::JoinLobby() {
-    /*
-    // Retrieves the local user's EOS ProductUserId and platform handle from the initialisation manager
-    EOSInitialisationManager& eosInitManager = EOSInitialisationManager::GetInstance();
-    EOS_ProductUserId LocalUserId = eosInitManager.GetLocalUserId();
-    EOS_HPlatform PlatformHandle = eosInitManager.GetPlatformHandle();
-
-    // Gets the EOS lobby handle from the lobby manager
-    EOSLobbyManager& eosManager = EOSLobbyManager::GetInstance();
-    EOS_HLobby LobbyHandle = eosManager.GetLobbyHandle();
-
-    // Gets the handle for the specific lobby details to join
-    EOSLobbySearch& eosSearchManager = EOSLobbySearch::GetInstance();
-    EOS_HLobbyDetails LobbyDetailsHandle = eosSearchManager.GetLobbyDetailsHandle();
-    */
-
     // Ensures that the LocalUserId is valid before attempting to join the lobby
     if (eosInitManager.LocalUserId == nullptr) {
         std::cerr << "[ERROR] LocalUserId is null, cannot join lobby\n";
@@ -42,7 +27,7 @@ void EOSLobbyFunctions::JoinLobby() {
     }
 
     // Ensures that a valid lobby handle is available
-    if (eosManager.LobbyHandle == nullptr) {
+    if (eosSearchManager.LobbyHandle == nullptr) {
         std::cerr << "[ERROR] Invalid LobbyHandle before JoinLobby()\n";
         return;
     }
@@ -58,7 +43,23 @@ void EOSLobbyFunctions::JoinLobby() {
     JoinOptions.RTCRoomJoinActionType = EOS_ELobbyRTCRoomJoinActionType::EOS_LRRJAT_AutomaticJoin;
 
     // Initiates the lobby join request
-    EOS_Lobby_JoinLobby(eosManager.LobbyHandle, &JoinOptions, nullptr, EOSLobbyFunctions::OnJoinLobbyComplete);
+    EOS_Lobby_JoinLobby(eosSearchManager.LobbyHandle, &JoinOptions, this, EOSLobbyFunctions::OnJoinLobbyComplete);
+
+    running = true;
+
+    RunUpdateLoop();
+
+}
+
+
+// New function to keep updating EOS
+void EOSLobbyFunctions::RunUpdateLoop()
+{
+    while (running) {
+        if (eosInitManager.PlatformHandle) {
+            EOS_Platform_Tick(eosInitManager.PlatformHandle);
+        }
+    }
 }
 
 // Callback function triggered when the attempt to join a lobby completes
@@ -67,13 +68,17 @@ if (Data->ResultCode == EOS_EResult::EOS_Success) {
         std::cout << "[OnJoinLobbyComplete] Successfully joined lobby.\n";
 
         EOSLobbyFunctions* self = static_cast<EOSLobbyFunctions*>(Data->ClientData); // Cast back to instance
-
+        self->running = false;
         // Calls UpdateLobbyDetails to refresh lobby information after joining
         self->UpdateLobbyDetails();
+
     }
     else {
         std::cerr << "[ERROR] Failed to join lobby. Error: " << EOS_EResult_ToString(Data->ResultCode) << std::endl;
     }
+
+   
+
 }
 
 // Attempts to leave a lobby
@@ -85,7 +90,7 @@ void EOSLobbyFunctions::LeaveLobby() {
     LeaveOptions.LobbyId = "8b04b581a080487c98ee5ee27338e65b";
 
     // Initiates the request to leave the lobby
-    EOS_Lobby_LeaveLobby(eosManager.LobbyHandle, &LeaveOptions, nullptr, OnLeaveLobbyComplete);
+    EOS_Lobby_LeaveLobby(eosSearchManager.LobbyHandle, &LeaveOptions, nullptr, OnLeaveLobbyComplete);
 }
 
 // Callback function triggered when the attempt to leave a lobby completes

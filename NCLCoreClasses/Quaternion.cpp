@@ -5,6 +5,8 @@ Use as you see fit!
 
 Comments and queries to: richard-gordon.davison AT ncl.ac.uk
 https://research.ncl.ac.uk/game/
+
+Additional contributions: Alfie
 */
 #include "Quaternion.h"
 #include "Maths.h"
@@ -232,8 +234,9 @@ Quaternion Quaternion::VectorsToQuaternion(Vector3 const& fromVector, Vector3 co
 	// 3: Find the angle of rotation
 	float const dot = Vector::Dot(from, to);
 
-	// If the orientation is 180 degrees, Quaternions don't work properly so the maths has to be doctored accordingly:
+	// If the orientation is exactly 180 degrees, Quaternions don't work properly so the maths has to be doctored accordingly:
 	if (fabs(dot + 1.0f) < FLT_EPSILON) {
+		// Get an arbitrary axis to re-orientate around that's not parallel
 		axis = Vector::Cross(from, Vector3(1.0f, 0.0f, 0.0f));
 		if (Vector::Length(axis) == 0.0f) axis = Vector::Cross(from, Vector3(0.0f, 1.0f, 0.0f));
 		axis = Vector::Normalise(axis);

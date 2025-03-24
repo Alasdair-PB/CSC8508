@@ -282,24 +282,29 @@ void TutorialGame::UpdateUI() {
 		uiSystem->RemoveStack("Audio Sliders");
 	}
 
-	// sort this bit out
 	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0)
 	{
+
+		
+		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->RemoveStack("EOS Menu");
+
 		std::string ip = mainMenu->getOwnerIPFunc();
 		std::string lobbyID = mainMenu->getLobbyIDFunc();
 		int playerCount = mainMenu->getPlayerCountFunc();
 
 		bool isLobbyOwner = eosMenuUI->GetMenuOption() == 1;
 
-		if (!eosLobbyMenuUI)
+		if (lobbyID != "")
 		{
-			eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount);
+			if (!eosLobbyMenuCreated)
+			{
+				eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount);
+				eosLobbyMenuCreated = true;
+			}
+			uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 		}
-
-		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
-		uiSystem->RemoveStack("Lobby Search Field");
-		uiSystem->RemoveStack("EOS Menu");
-		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 	}
 
 	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)

@@ -179,7 +179,7 @@ namespace NCL {
 		PushdownState::PushdownResult MainMenu::LobbyDetailsOnUpdate(float dt, PushdownState** newState)
 		{
 			lobbyUpdateTimer += dt;
-
+			std::cout << "Lobby Details On Update " << std::endl;
 			if (lobbyUpdateTimer >= updateInterval)
 			{
 				startEOSLobbyUpdate();

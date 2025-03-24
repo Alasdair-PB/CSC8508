@@ -2,18 +2,45 @@
 #include "IComponent.h"
 #include "GameWorld.h"
 
+#include "ComponentManager.h"
+
 namespace NCL {
     namespace CSC8508 {
 
         class SightComponent : public IComponent {
         public:
-            SightComponent(GameObject& g):worldInstance(GameWorld::Instance()), IComponent(g) {
-
+            SightComponent(GameObject& g) :worldInstance(GameWorld::Instance()), IComponent(g) {
+                playerVisible = false;
             }
             ~SightComponent();
 
-            template<typename t>GameObject* GetClosestVisibleTarget(float maxRange) {
+            template<typename T>requires std::is_base_of_v<IComponent, T> GameObject* GetClosestVisibleTarget(float maxRange, Vector3 rayOffset) {
 
+                Ray ray;
+                RayCollision* closestCollision;
+                GameObject* closetsGamObj;
+                float closestDist = -1.0f;
+                Vector3 position = GetGameObject().GetTransform().GetPosition();
+
+
+                ComponentManager::OperateOnBufferContents<T>(
+                    [](T* o) {
+                        if (!(o->IsEnabled()))
+                            return;
+                        Vector3 oPositon = o->GetGameObject().GetTransform().GetPosition();
+                        Vector3 objToTarget = (oPositon - position);
+                        auto len = Vector::Length(objToTarget);
+                        if (len > maxRange && (len < closestDist || closestDist == -1.0f)) {
+
+                            BoundsComponent* bounds = GetGameObject().TryGetComponent<BoundsComponent>();
+                            if (worldInstance.Raycast(ray,closestCollision, true, bounds)) {
+                                closestDist = len;
+                                closetsGamObj = o->GetGameObject();// Might need to be & or *
+                            }
+                        }
+
+                    }
+                );
             }
 
             void OnAwake() override {
@@ -22,6 +49,11 @@ namespace NCL {
 
         protected:
             GameWorld& worldInstance;
+            
+            
+            bool playerVisible;
+            float playerDis = 0.0f;
+
         };
     }
 }

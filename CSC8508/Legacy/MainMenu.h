@@ -16,7 +16,7 @@ namespace NCL {
 		typedef std::function<void()> StartOffline;
 		typedef std::function<void()> StartEOS;
 		typedef std::function<void()> StartEOSLobbyCreation;
-		typedef std::function<void()> StartEOSLobbySearch;
+		typedef std::function<void(std::string)> StartEOSLobbySearch;
 		typedef std::function<void()> StartEOSLobbyUpdate;
 
 		using GetStringFunc = std::function<std::string()>;

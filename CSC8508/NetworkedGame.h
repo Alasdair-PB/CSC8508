@@ -48,7 +48,8 @@ namespace NCL {
 
 			void EOSLobbyCreation();
 
-			void EOSLobbySearchFunc();
+			void EOSLobbySearchFunc(const std::string& lobbyID);
+
 
 			void EOSLobbyDetailsUpdate();
 
@@ -77,7 +78,7 @@ namespace NCL {
 
 			void StartEOSLobbyCreationCallBack();
 
-			void StartEOSLobbySearchCallBack();
+			void StartEOSLobbySearchCallBack(const std::string& lobbyID);
 
 			void StartEOSLobbyUpdateCallBack();
 

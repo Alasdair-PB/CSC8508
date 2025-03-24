@@ -147,7 +147,7 @@ namespace NCL {
 			}
 			if (eosMenuOption == joinLobby) {
 				setPause(false);
-				startEOSLobbySearch();
+				startEOSLobbySearch(lobbyCodeInput);
 
 				*newState = new OverlayScreen(
 					[&]() -> void { this->OnStateAwakePause(); },

@@ -83,6 +83,98 @@ public:
     */
     void Shutdown();
 
+	#pragma region Input/Output Device Management
+	/**
+	* Update input device list
+	* Removes output loopback devices
+	*/
+	void UpdateInputList();
+
+	/**
+	* Get List of input devices
+	* @return std::map<int, std::string>
+	*/
+	std::map<int, std::string> GetInputDeviceList() {
+		UpdateInputList();
+		return inputDeviceList;
+	}
+
+	/**
+	* Print input device list
+	* [Used for debugging]
+	*/
+	void PrintInputList();
+
+	/**
+	* Update output Device List
+	*/
+	void UpdateOutputList();
+
+	/**
+	* Get List of output devices
+	* @return std::map<int, std::string>
+	*/
+
+	std::map<int, std::string> GetOutputDeviceList() {
+		UpdateOutputList();
+		return outputDeviceList;
+	}
+
+	/**
+	* Print output device list
+	* [Used for debugging]
+	*/
+	void PrintOutputList();
+	
+	/**
+	* Get current input device index
+	* @return int index of input device
+	*/
+	int GetInputDeviceIndex() {
+		return inputDeviceIndex;
+	}
+
+	/**
+	* Set input device index
+	* Ensures FMOD uses the intended input device
+	*/
+	void SetInputDeviceIndex(int index) {
+		if (IsRecording()) {
+			StopRecording();
+		}
+		inputDeviceIndex = index;
+	}
+
+	/**
+	* Get current output device index
+	* @return int index of output device
+	*/
+	int GetOutputDeviceIndex() {
+		return outputDeviceIndex;
+	}
+
+	/**
+	* Set output device index
+	* Ensures FMOD uses the intended output device
+	*/
+	void SetOutputDeviceIndex(int index) {
+		outputDeviceIndex = index;
+	}
+
+	/**
+	* Checks if current input device is recording
+	*/
+	bool IsRecording();
+
+	/**
+	* Stop Microphone recording of selected input device
+	*/
+	void StopRecording() {
+		audioSystem->recordStop(inputDeviceIndex);
+	}
+
+	#pragma endregion
+
 	/**
 	* Get pointer to a channel group
 	* @return FMOD Channel Group
@@ -160,6 +252,11 @@ private:
 
     FMOD::System* audioSystem;
 
+	std::map<int, std::string> inputDeviceList;
+	int inputDeviceIndex;
+
+	std::map<int, std::string> outputDeviceList;
+	int outputDeviceIndex;
 
 	std::map<ChannelGroupType, FMOD::ChannelGroup*> channelGroups;
 

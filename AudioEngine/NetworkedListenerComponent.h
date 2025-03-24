@@ -40,17 +40,6 @@ namespace NCL::CSC8508 {
 
 		~NetworkedListenerComponent() = default;
 
-		/*
-		CloseEncoder(encoder);
-		CloseDecoder(decoder);
-		if (IsRecording()) {
-			StopRecording();
-		}
-		if (persistentSound) {
-			persistentSound->release();
-		}
-		*/
-
 
 		void OnAwake() override {
 		
@@ -190,7 +179,7 @@ namespace NCL::CSC8508 {
 		void SendEncodedAudioPacket(std::pair<std::vector<unsigned char>, size_t> encodedPair) {
 			EncodedAudioPacket* packet = new EncodedAudioPacket();
 
-			std::cout << "Packet Size: " << encodedPair.second << "/" << MAXFRAMESIZE << std::endl;
+			//std::cout << "Packet Size: " << encodedPair.second << "/" << MAXFRAMESIZE << std::endl;
 			
 
 			if (encodedPair.first.empty() or packet->packetSize <= 0) {
@@ -249,7 +238,7 @@ namespace NCL::CSC8508 {
 		void UpdateNetworkedDecode() {
 			uint32_t nextIndex = recieveHistoryCounter % bufferSize;
 
-			//std::cout << "Next Index: " << nextIndex << "/" << bufferSize << std::endl;
+			std::cout << "Next Index: " << nextIndex << "/" << bufferSize << std::endl;
 
 			RecievedAudioPacket* packet = nullptr;
 
@@ -405,7 +394,7 @@ namespace NCL::CSC8508 {
 					nextUpdateTime += std::chrono::milliseconds(20);
 
 					// Call audio encoding if mic is recording
-					if (IsRecording()) {
+					if (audioEngine->IsRecording()) {
 						SendEncodedAudioPacket(StreamEncodeMic());
 					}
 

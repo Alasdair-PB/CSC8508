@@ -13,11 +13,6 @@ using namespace CSC8508;
 
 AudioListenerComponent::AudioListenerComponent(GameObject& gameObject, PerspectiveCamera& camera) : AudioObject(gameObject) {
 
-	// Set devices to system default
-	inputDeviceIndex = 0;
-	outputDeviceIndex = 0;
-
-
 	this->camera = &camera;
 	// Comment out for where you want the up and forward vectors to be updated from for testing
 	SetCamOrientation();
@@ -88,8 +83,8 @@ void AudioListenerComponent::InitMicSound() {
 
 void AudioListenerComponent::ToggleRecording() {
 	
-	if (IsRecording()) {
-		StopRecording();
+	if (audioEngine->IsRecording()) {
+		audioEngine->StopRecording();
 		// std::cout << "Recording Stopped" << std::endl;
 	}
 	else {
@@ -98,66 +93,7 @@ void AudioListenerComponent::ToggleRecording() {
 	}
 }
 
-bool AudioListenerComponent::IsRecording() {
-	bool isRecording;
-	FMOD_RESULT result = fSystem->isRecording(0, &isRecording);
-	if (result != FMOD_OK) {
-		// std::cerr << "Error: " << FMOD_ErrorString(result) << std::endl;
-		return false;
-	}
-
-	return isRecording;
-}
-#pragma endregion
-
-#pragma region Input/Output Device Management
-
-void AudioListenerComponent::UpdateInputList() {
-	int numDrivers = 0;
-	fSystem->getRecordNumDrivers(&numDrivers, nullptr);
-
-	inputDeviceList.clear();
-
-	for (int i = 0; i < numDrivers; i++) {
-		char name[256];
-		FMOD_RESULT result = fSystem->getRecordDriverInfo(i, name, sizeof(name), nullptr, nullptr, nullptr, nullptr, nullptr);
-		if (result == FMOD_OK && !strstr(name, "[loopback]")) {
-			inputDeviceList.insert({i, name});
-		}
-	}
-
-}
-
-void AudioListenerComponent::PrintInputList() {
-	UpdateInputList();
-	for (auto& device : inputDeviceList) {
-		// std::cout << "Device: " << device.first << " - " << device.second << std::endl;
-	}
-}
-
-void AudioListenerComponent::UpdateOutputList() {
-	int numOutputDrivers = 0;
-	fSystem->getNumDrivers(&numOutputDrivers);  // Only counts output (playback) devices
-
-	outputDeviceList.clear();  // Clear previous list
-
-	for (int i = 0; i < numOutputDrivers; i++) {
-		char name[256];
-
-		// This API only provides playback devices
-		FMOD_RESULT result = fSystem->getDriverInfo(i, name, sizeof(name), nullptr, nullptr, nullptr, nullptr);
-
-		if (result == FMOD_OK) {
-			outputDeviceList.insert({ i, name });  // Store playback devices
-		}
-	}
-}
-
-void AudioListenerComponent::PrintOutputList() {
-	UpdateOutputList();
-	for (auto& device : outputDeviceList) {
-		std::cout << "Device: " << device.first << " - " << device.second << std::endl;
-	}
-}
 
 #pragma endregion
+
+

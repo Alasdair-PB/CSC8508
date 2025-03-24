@@ -59,6 +59,70 @@ void AudioEngine::Shutdown() {
     }
 }
 
+#pragma region Input/Output Device Management
+
+void AudioEngine::UpdateInputList() {
+	int numDrivers = 0;
+	audioSystem->getRecordNumDrivers(&numDrivers, nullptr);
+
+	inputDeviceList.clear();
+
+	for (int i = 0; i < numDrivers; i++) {
+		char name[256];
+		FMOD_RESULT result = audioSystem->getRecordDriverInfo(i, name, sizeof(name), nullptr, nullptr, nullptr, nullptr, nullptr);
+		if (result == FMOD_OK && !strstr(name, "[loopback]")) {
+			inputDeviceList.insert({ i, name });
+		}
+	}
+
+}
+
+void AudioEngine::PrintInputList() {
+	UpdateInputList();
+	for (auto& device : inputDeviceList) {
+		// std::cout << "Device: " << device.first << " - " << device.second << std::endl;
+	}
+}
+
+void AudioEngine::UpdateOutputList() {
+	int numOutputDrivers = 0;
+	audioSystem->getNumDrivers(&numOutputDrivers);  // Only counts output (playback) devices
+
+	outputDeviceList.clear();  // Clear previous list
+
+	for (int i = 0; i < numOutputDrivers; i++) {
+		char name[256];
+
+		// This API only provides playback devices
+		FMOD_RESULT result = audioSystem->getDriverInfo(i, name, sizeof(name), nullptr, nullptr, nullptr, nullptr);
+
+		if (result == FMOD_OK) {
+			outputDeviceList.insert({ i, name });  // Store playback devices
+		}
+	}
+}
+
+void AudioEngine::PrintOutputList() {
+	UpdateOutputList();
+	for (auto& device : outputDeviceList) {
+		std::cout << "Device: " << device.first << " - " << device.second << std::endl;
+	}
+}
+
+bool AudioEngine::IsRecording() {
+	bool isRecording;
+	FMOD_RESULT result = audioSystem->isRecording(0, &isRecording);
+	if (result != FMOD_OK) {
+		// std::cerr << "Error: " << FMOD_ErrorString(result) << std::endl;
+		return false;
+	}
+
+	return isRecording;
+}
+
+#pragma endregion
+
+
 FMOD::ChannelGroup* AudioEngine::CreateChannelGroups(ChannelGroupType type, const char* name) {
 	FMOD::ChannelGroup* group;
 	if (audioSystem->createChannelGroup(name, &group) == FMOD_OK) {

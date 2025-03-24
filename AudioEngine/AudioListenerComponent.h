@@ -66,21 +66,12 @@ public:
 	* Start Microphone recording of selected input device
 	*/
 	FMOD_RESULT RecordMic() {
-		return fSystem->recordStart(inputDeviceIndex, micInput, true);
-
+		return fSystem->recordStart(audioEngine->GetInputDeviceIndex(), micInput, true);
 	}
 
-	/**
-	* Stop Microphone recording of selected input device
-	*/
-	void StopRecording() {
-		fSystem->recordStop(inputDeviceIndex);
-	}
+	
 
-	/**
-	* Checks if current input device is recording
-	*/
-	bool IsRecording();
+	
 
 	/**
 	* Toggle recording of microphone input
@@ -132,82 +123,12 @@ public:
 	#pragma endregion
 
 
-	#pragma region Input/Output Device Management
-	/**
-	* Update input device list
-	* Removes output loopback devices
-	*/
-	void UpdateInputList();
-
-	/**
-	* Get List of input devices
-	* @return std::map<int, std::string> 
-	*/
-	std::map<int, std::string> GetInputDeviceList() {
-		UpdateInputList();
-		return inputDeviceList;
-	}
-
-	/**
-	* Print input device list
-	* [Used for debugging]
-	*/
-	void PrintInputList();
-
-	/**
-	* Update output Device List
-	*/
-	void UpdateOutputList();
-
-	/**
-	* Get List of output devices
-	* @return std::map<int, std::string>
-	*/
-
-	std::map<int, std::string> GetOutputDeviceList() {
-		UpdateOutputList();
-		return outputDeviceList;
-	}
-
-	/**
-	* Print output device list
-	* [Used for debugging]
-	*/
-	void PrintOutputList();
-
-	/**
-	* Set input device index
-	* Ensures FMOD uses the intended input device
-	*/
-	void SetInputDeviceIndex(int index) {
-		if (IsRecording()) {
-			StopRecording();
-		}
-		inputDeviceIndex = index;
-	}
-
-
-	/**
-	* Set output device index
-	* Ensures FMOD uses the intended output device
-	*/
-	void SetOutputDeviceIndex(int index) {
-		outputDeviceIndex = index;
-	}
-
-	#pragma endregion
-
 
 	protected:
 
 	// Listner id - always 0
 	int fIndex = 0;
 
-	std::map<int, std::string> inputDeviceList;
-	int inputDeviceIndex;
-
-	std::map<int, std::string> outputDeviceList;
-	int outputDeviceIndex;
 
 	FMOD::Sound* micInput;
 

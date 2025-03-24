@@ -41,6 +41,7 @@ namespace NCL {
 
                     }
                 );
+                //Need to add ending to sight test here
             }
 
             void OnAwake() override {

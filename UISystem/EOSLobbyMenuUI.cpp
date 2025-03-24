@@ -8,7 +8,8 @@ EOSLobbyMenuUI::EOSLobbyMenuUI(bool lobbyOwner, const std::string& ip, const std
 	if (lobbyOwner)
 	{
 		std::function<CSC8508::PushdownState::PushdownResult()> funcA = [this]() -> CSC8508::PushdownState::PushdownResult {
-			eosLobbyMenuOption = startGame;
+			menuOption = startGame;
+			std::cout << "[EOSLobbyMenuUI.cpp] Button Press Received";
 			return CSC8508::PushdownState::PushdownResult::NoChange;
 			};
 

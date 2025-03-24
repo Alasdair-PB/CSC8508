@@ -12,7 +12,7 @@ namespace NCL {
 			~EOSLobbyMenuUI();
 
 			int GetMenuOption() {
-				return eosLobbyMenuOption;
+				return menuOption;
 			}
 
 			UIElementsGroup* eosLobbyMenuUI = new UIElementsGroup(ImVec2(0.1f, 0.5f), ImVec2(1, 1), 2.0f, "EOSLobbyMenu", 0.05f,
@@ -20,9 +20,9 @@ namespace NCL {
 
 		protected:
 
-			int eosLobbyMenuOption = eosNone;
+			int menuOption = eosLobbyNone;
 
-			enum menuOptions { eosNone, startGame };
+			enum menuOptions { eosLobbyNone, startGame };
 		};
 	}
 }

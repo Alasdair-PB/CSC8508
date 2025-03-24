@@ -167,17 +167,11 @@ namespace NCL {
 			if (lobbyUpdateTimer >= updateInterval)
 			{
 				startEOSLobbyUpdate();
-				lobbyUpdateTimer = 0.0f; // Reset the timer
+				lobbyUpdateTimer = 0.0f;
 
 				std::string ip = getOwnerIPFunc();
 				std::string id = getLobbyIDFunc();
 				int count = getPlayerCountFunc();
-
-				std::cout << "***" << std::endl;
-				std::cout << "IP: " << ip << std::endl;
-				std::cout << "Lobby ID: " << id << std::endl;
-				std::cout << "Players: " << std::to_string(count) << std::endl;
-				std::cout << "***" << std::endl;
 			}
 
 			return PushdownState::NoChange;

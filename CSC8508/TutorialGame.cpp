@@ -275,37 +275,30 @@ void TutorialGame::UpdateUI() {
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
 		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu");
+		mainMenu->lobbyCodeInput = lobbySearchField->GetInputText();
 	}
 
 	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0)
 	{
-		// Get lobby info from mainMenu
 		std::string ip = mainMenu->getOwnerIPFunc();
 		std::string lobbyID = mainMenu->getLobbyIDFunc();
 		int playerCount = mainMenu->getPlayerCountFunc();
 
-		// Determine if user is lobby owner
 		bool isLobbyOwner = eosMenuUI->GetMenuOption() == 1;
 
-		// Create EOS Lobby UI with extra data
 		eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount);
 
-		/*
-		// Debug output to console
-		std::cout << "---------" << std::endl;
-		std::cout << "IP: " << ip << std::endl;
-		std::cout << "ID: " << lobbyID << std::endl;
-		std::cout << "Players: " << playerCount << std::endl;
-		std::cout << "---------" << std::endl;
-		*/
-
-		// Update UI stack
 		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->RemoveStack("EOS Menu");
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 	}
 
+	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Lobby Search Field");
+	}
 
 	uiSystem->RenderFrame();
 }

@@ -68,6 +68,7 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
 		[&]() -> void { this->StartEOSLobbySearchCallBack(); },
 		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); },
+
 		[&]() -> std::string { return this->GetOwnerIP(); },
 		[&]() -> std::string { return this->GetLobbyID(); },
 		[&]() -> int { return this->GetPlayerCount(); }
@@ -120,14 +121,14 @@ void NetworkedGame::HostGame()
 void NetworkedGame::EOSLobbyCreation()
 {
 	eosLobbyManager->CreateLobby();
-	eosLobbySearch->CreateLobbySearch(eosLobbyManager->LobbyId); // Change this to take in input from input box
+	eosLobbySearch->CreateLobbySearch(eosLobbyManager->LobbyId);
 
 	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
 }
 
 void NetworkedGame::EOSLobbySearchFunc()
 {
-	eosLobbySearch->CreateLobbySearch("b4786c9bd62c4d409a4c400e27258b3b"); // Change this to take in input from input box
+	eosLobbySearch->CreateLobbySearch("95bb68f3c732461f8b3d365db812e65e"); // Change this to take in input from input box
 
 	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
 	eosLobbyFunctions->JoinLobby();
@@ -136,12 +137,6 @@ void NetworkedGame::EOSLobbySearchFunc()
 void NetworkedGame::EOSLobbyDetailsUpdate()
 {
 	eosLobbyFunctions->UpdateLobbyDetails();
-
-	/*
-	std::cout << "Owner IP: " << eosLobbyFunctions->ownerIP << std::endl;
-	std::cout << "Lobby ID: " << eosLobbyFunctions->lobbyID << std::endl;
-	std::cout << "Player Count: " << eosLobbyFunctions->playerCount << std::endl;
-	*/
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

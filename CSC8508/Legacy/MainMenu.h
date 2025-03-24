@@ -44,6 +44,8 @@ namespace NCL {
 
 			void SetMainMenuOption(int option) { mainMenuOption = option; } // Change this for each menu
 			void SetEOSMenuOption(int option) { eosMenuOption = option; } // Change this for each menu
+			void SetEOSLobbyOption(int option) { eosLobbyOption = option; } // Change this for each menu
+
 			float lobbyUpdateTimer = 0.0f;
 			const float updateInterval = 10.0f; // 3 seconds
 
@@ -59,6 +61,8 @@ namespace NCL {
 			GetStringFunc getOwnerIPFunc;
 			GetStringFunc getLobbyIDFunc;
 			GetIntFunc getPlayerCountFunc;
+
+			std::string lobbyCodeInput;
 
 		protected:
 			PushdownMachine* machine = nullptr;
@@ -79,6 +83,9 @@ namespace NCL {
 			
 			enum eosMenuOptions { eosNone, hostLobby, joinLobby }; //Relates to menuOptions in MainMenu.h
 			int eosMenuOption = 0;
+
+			enum eosLobbyOptions {eosLobbyNone, startGame};
+			int eosLobbyOption = 0;
 		};
 	}
 }

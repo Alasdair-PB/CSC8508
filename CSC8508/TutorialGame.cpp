@@ -115,7 +115,8 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
+	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -168,6 +169,13 @@ TutorialGame::~TutorialGame()
 	delete world;
 	delete controller;
 	delete navMesh;
+
+	delete framerate;
+	delete mainMenuUI;
+	delete audioSliders;
+	delete healthbar;
+	delete lobbySearchField;
+	delete inventoryUI;
 }
 
 void TutorialGame::UpdateObjectSelectMode(float dt) {
@@ -270,7 +278,7 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->RemoveStack("Inventory");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 

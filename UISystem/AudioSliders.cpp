@@ -1,5 +1,6 @@
 #include "AudioSliders.h"
 #include <filesystem>        
+#include <iostream>
 
 using namespace NCL;
 using namespace UI;
@@ -42,10 +43,22 @@ AudioSliders::AudioSliders() {
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 		};
 
+	std::function<CSC8508::PushdownState::PushdownResult()> deviceFunc = [this]() -> CSC8508::PushdownState::PushdownResult {
+		/*ImGui::BeginCombo("Audio Device", " ");
+		for (int i; i < 4; i++) {
+
+		}
+		ImGui::EndCombo();*/
+		ImGui::Combo("Audio Device", &audioDevice, "Device1\0Device2\0Device3\0Device4\0\0");
+		return CSC8508::PushdownState::PushdownResult::NoChange;
+		};
+
+
 	audioSlidersUI->PushSliderElement("Master Volume", masterVolume, 100, 0, masterFunc);
 	audioSlidersUI->PushSliderElement("Music Volume", musicVolume, 100, 0, musicFunc);
 	audioSlidersUI->PushSliderElement("SFX Volume", sfxVolume, 100, 0, sfxFunc);
 	audioSlidersUI->PushSliderElement("Chat Volume", voiceVolume, 100, 0, voiceFunc);
+	audioSlidersUI->PushVoidElement(deviceFunc);
 }
 
 AudioSliders::~AudioSliders() {

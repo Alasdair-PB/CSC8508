@@ -18,6 +18,8 @@ namespace NCL {
 			float sfxVolume = 100;
 			float voiceVolume = 100;
 
+			int audioDevice = 0;
+
 			AudioEngine* audioEngine;
 		};
 	}

@@ -86,6 +86,7 @@ public:
 	#pragma region FMOD Sound Loading
 
 	/**
+	* [No longer used as audio engine stores all sounds]
 	* Load sound from file
 	* Different modes include FMOD_3D, FMOD_2D, FMOD_DEFAULT, FMOD_LOOP_NORMAL
 	* FMOD_3D is defualt for spacial audio
@@ -115,7 +116,9 @@ public:
 		return true;
 	}
 
-
+	void setSoundCollection(std::map<std::string, FMOD::Sound*> sounds) {
+		fSoundCol = sounds;
+	}
 
 	/**
 	* Play created sound
@@ -169,14 +172,28 @@ public:
 
 	/**
 	* Cycle through sounds in collection
+	* @param delay between sounds
+	* @return true if successfully cycled through all sounds
 	*/
-	void CycleSounds();
+	bool CycleSounds(float delay) {
+		for (auto& sound : fSoundCol) {
+			PlaySound(sound.first.c_str());
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)(delay * 1000))); //TODO - Find a way to 
+		}
+		return true;
+	}
 
 
 	/**
-	* Play random sound from collection using specified delay
+	* Play random sound from collection
+	* @return sound played status (true if successful)
 	*/
-	void RandomSounds(int delay);
+	bool RandomSound() {
+		int randomIndex = rand() % fSoundCol.size();
+		auto it = fSoundCol.begin();
+		std::advance(it, randomIndex);
+		return PlaySound(it->first.c_str());
+	}
 
 	/**
 	* Stop Playback

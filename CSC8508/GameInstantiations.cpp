@@ -150,14 +150,18 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		listenerComp->RecordMic();
 
 
+		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
+		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+
+
 		if (spawnData->clientOwned) {
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 	}
 		else {
-			// Add audio source component if player is not client owned
-			AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
+			// Add persistent sound to player if not client owned
 			listenerComp->SetPersistentSound(sourceComp->GetPersistentSound());
 		}
+
 	}
 	else {
 		InputComponent* input = player->AddComponent<InputComponent>(controller);

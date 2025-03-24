@@ -12,16 +12,24 @@
 
 namespace NCL::CSC8508 {
 
+	const size_t MAXFRAMESIZE = 960;
 	struct EncodedAudioPacket : INetworkPacket {
-		unsigned char* encodedFrame;
+		unsigned char encodedFrame[MAXFRAMESIZE];
 		size_t packetSize;
 		uint32_t historyStamp;
 
 		EncodedAudioPacket() {
 			type = Component_Event;
+			historyStamp = 0;
 			packetSubType = None;
 			size = sizeof(EncodedAudioPacket) - sizeof(GamePacket);
 		}
+	};
+
+	struct RecievedAudioPacket {
+		uint32_t historyStamp;
+		size_t packetSize;
+		unsigned char* encodedFrame;
 	};
 
 	class NetworkedListenerComponent : public AudioListenerComponent, public INetworkComponent {
@@ -49,8 +57,9 @@ namespace NCL::CSC8508 {
 			if (clientOwned) {
 				// Initialise Encoding Pipeline
 				InitMicSound();
-				RecordMic();
 				encoder = OpenEncoder();
+
+				RecordMic();
 
 				encodeThreadRunning = true;
 				StartNetworkedEncodeThread();
@@ -66,7 +75,7 @@ namespace NCL::CSC8508 {
 		void Update(float deltaTime) override {
 			dt = deltaTime;
 			// Send packets as they are encoded
-			if(clientOwned)UpdatePacketSend();
+			//if(clientOwned)UpdatePacketSend();
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -110,7 +119,7 @@ namespace NCL::CSC8508 {
 			return { opusFrame, totalEncodeSize };
 		}
 
-		void StreamEncodeMic() {
+		std::pair<std::vector<unsigned char>, size_t> StreamEncodeMic() {
 			static unsigned int lastPos = 0;
 			unsigned int recordPos = 0;
 			unsigned int frameSize = 960; // 20ms at 48kHz
@@ -128,7 +137,7 @@ namespace NCL::CSC8508 {
 
 			// Calculate the number of complete frames available
 			unsigned int completeFrames = availableSamples / frameSize;
-			if (completeFrames == 0) return;
+			if (completeFrames == 0) return std::make_pair(std::vector<unsigned char>(), 0);
 
 			// Calculate the number of samples to process
 			unsigned int samplesToProcess = completeFrames * frameSize;
@@ -137,7 +146,7 @@ namespace NCL::CSC8508 {
 			PCMBufferLock lock = LockSound(micInput, lastPos * sizeof(short), samplesToProcess * sizeof(short));
 			if (lock.result != FMOD_OK) {
 				std::cerr << "[ERROR] micInput lock: " << FMOD_ErrorString(lock.result) << std::endl;
-				return;
+				return std::make_pair(std::vector<unsigned char>(), 0);
 			}
 
 			// init pcmData vector
@@ -160,13 +169,18 @@ namespace NCL::CSC8508 {
 			if (pcmData.size() > samplesToProcess) {
 				pcmData.resize(samplesToProcess);
 			}
-			std::pair<std::vector<unsigned char>, size_t> encodedPair = EncodeOpusFrame(pcmData);
-			if (!encodedPair.first.empty()) {
-				exportPacketQueue.push_back(encodedPair);
-			}
 
 			// Update last position
 			lastPos = (lastPos + samplesToProcess) % sampleRate;
+
+			std::pair<std::vector<unsigned char>, size_t> encodedPair = EncodeOpusFrame(pcmData);
+			if (!encodedPair.first.empty()) {
+				return encodedPair;
+			}
+			else {
+				return std::make_pair(std::vector<unsigned char>(), 0);
+			}
+
 		}
 
 #pragma endregion
@@ -175,6 +189,13 @@ namespace NCL::CSC8508 {
 
 		void UpdatePacketSend() {
 			if (exportPacketQueue.empty()) return;
+
+			//check if first packet is valid
+			if (exportPacketQueue.front().first.empty()) {
+				exportPacketQueue.pop_front();
+				return;
+			}
+
 			SendEncodedAudioPacket(exportPacketQueue.front());
 			std::cout << "Sent Packet ID: " << objectID << std::endl;
 			exportPacketQueue.pop_front();
@@ -182,15 +203,17 @@ namespace NCL::CSC8508 {
 
 		void SendEncodedAudioPacket(std::pair<std::vector<unsigned char>, size_t> encodedPair) {
 			EncodedAudioPacket* packet = new EncodedAudioPacket();
+			if (encodedPair.first.empty() or packet->packetSize <= 0) {
+				delete packet;
+				return;
+			}
 
-			packet->encodedFrame = new unsigned char[encodedPair.first.size()];
 			std::copy(encodedPair.first.begin(), encodedPair.first.end(), packet->encodedFrame);
 
 			packet->historyStamp = sendHistoryCounter;
 			packet->packetSize = encodedPair.second;
 			SendEventPacket(packet);
-			
-			delete packet->encodedFrame;
+	
 			delete packet;
 			sendHistoryCounter++;
 		}
@@ -202,12 +225,33 @@ namespace NCL::CSC8508 {
 		// Recieves an audio packet from the network of the same object id
 		bool ReadEventPacket(INetworkPacket& p) override {
 			if (p.packetSubType == None) {
-				// if first packet set playbackStartTime to current time + jitterDelays
-				if (audioPacketQueue.empty()) { playbackStartTime = dt + jitterDelayMS; }
 
 				EncodedAudioPacket* packet = (EncodedAudioPacket*)&p;
+				if (packet->encodedFrame == NULL) return false;
+
+
+				{
+					std::lock_guard<std::mutex> lock(audioQueueMutex);
+					if (audioPacketQueue.empty()) { // if first packet set playbackStartTime to current time + jitterDelays
+						playbackStartTime = dt + jitterDelayMS;
+					}
+				}
+
 				size_t index = packet->historyStamp % bufferSize;
-				audioPacketQueue[index] = packet;
+
+				RecievedAudioPacket* recieved = new RecievedAudioPacket();
+				recieved->historyStamp = packet->historyStamp;
+				recieved->packetSize = packet->packetSize;
+
+
+				recieved->encodedFrame = new unsigned char[packet->packetSize];
+				std::copy(packet->encodedFrame, packet->encodedFrame + packet->packetSize, recieved->encodedFrame);
+
+				{
+					std::lock_guard<std::mutex> lock(audioQueueMutex);
+					audioPacketQueue[index] = recieved;
+				}
+
 				std::cout << "Recieved Packet ID: " << packet->ownerID << std::endl;
 				return true;
 			}
@@ -224,15 +268,28 @@ namespace NCL::CSC8508 {
 
 		void UpdateNetworkedDecode() {
 			uint32_t nextIndex = recieveHistoryCounter % bufferSize;
+			RecievedAudioPacket* packet = nullptr;
 
-			if (audioPacketQueue[nextIndex]->encodedFrame == nullptr ||
-				audioPacketQueue[nextIndex]->historyStamp < recieveHistoryCounter) {
-				std::cout << "Inserting Silence" << std::endl;
-				InsertSilence(nextIndex);
+			{
+				std::lock_guard<std::mutex> lock(audioQueueMutex);
+				packet = audioPacketQueue[nextIndex];
 			}
-			DecodePersistentPlayback(audioPacketQueue[nextIndex]);
-			recieveHistoryCounter++;
-			audioPacketQueue[nextIndex] = nullptr;
+
+
+			if (packet == nullptr ||
+				packet->historyStamp < recieveHistoryCounter) {
+				std::cout << "Inserting Silence" << std::endl;
+				//InsertSilence(nextIndex);
+			}
+			else {
+				DecodePersistentPlayback(audioPacketQueue[nextIndex]);
+				recieveHistoryCounter++;
+			}
+
+			{
+				std::lock_guard<std::mutex> lock(audioQueueMutex);
+				audioPacketQueue[nextIndex] = nullptr;
+			}
 		}
 		
 
@@ -241,19 +298,20 @@ namespace NCL::CSC8508 {
 		*/
 		void InsertSilence(size_t index) {
 
-			EncodedAudioPacket* silentPacket = new EncodedAudioPacket();
+			RecievedAudioPacket* silentPacket = new RecievedAudioPacket();
 			
 			silentPacket->encodedFrame = new unsigned char[1];
 			silentPacket->encodedFrame[0] = 0;
 
 			silentPacket->historyStamp = recieveHistoryCounter;
+			silentPacket->packetSize = 1;
 
 			audioPacketQueue[index] = silentPacket;
 
 		}
 
 
-		std::vector<short> DecodeOpusFrame(EncodedAudioPacket* encodedPacket) {
+		std::vector<short> DecodeOpusFrame(RecievedAudioPacket* encodedPacket) {
 			std::vector<short> pcmFrame(960);
 
 			unsigned char* packetData = encodedPacket->encodedFrame;
@@ -276,7 +334,7 @@ namespace NCL::CSC8508 {
 
 		}
 
-		void DecodePersistentPlayback(EncodedAudioPacket* encodedPacket) {
+		void DecodePersistentPlayback(RecievedAudioPacket* encodedPacket) {
 
 			if (!persistentSound) return;
 
@@ -356,7 +414,7 @@ namespace NCL::CSC8508 {
 
 					// Call audio encoding if mic is recording
 					if (IsRecording()) {
-						StreamEncodeMic();
+						SendEncodedAudioPacket(StreamEncodeMic());
 					}
 
 					// Sleep until the next scheduled update time
@@ -401,6 +459,8 @@ namespace NCL::CSC8508 {
 	private:
 		uint32_t dt = 0;
 
+		std::mutex audioQueueMutex;
+
 	protected:
 
 		/////////////Encoding///////////////
@@ -421,7 +481,7 @@ namespace NCL::CSC8508 {
 
 
 		const size_t bufferSize = 64;
-		std::vector<EncodedAudioPacket*> audioPacketQueue{ bufferSize, nullptr };
+		std::vector<RecievedAudioPacket*> audioPacketQueue{ bufferSize, nullptr };
 
 		// Recieve Data
 		uint32_t recieveHistoryCounter = 0;

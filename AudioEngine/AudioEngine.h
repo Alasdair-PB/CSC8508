@@ -5,11 +5,18 @@
 #ifndef AUDIOENGINE_H
 #define AUDIOENGINE_H
 
+#ifndef ASSETROOTLOCATION
+#define ASSETROOTLOCATION "../Assets/"
+#endif
+
 #include <fmod.hpp>
 #include <map>
 #include <deque>
 #include <vector>
 #include <thread>
+#include <string>
+#include <filesystem>
+#include <iostream>
 
 class AudioListenerComponent;
 class AudioSourceComponent;
@@ -27,6 +34,14 @@ enum class ChannelGroupType {
 	MUSIC,
 	CHAT,
 	MASTER
+};
+
+enum class EntitySoundGroup {
+	PLAYER,
+	ENEMY,
+	ENVIRONMENT,
+	WEAPON,
+	ITEM,
 };
 
 
@@ -98,6 +113,47 @@ public:
 		return volume;
 	}
 
+
+	/**
+	* Loads all sounds from specified directory into a map
+	* @return true if successful
+	* @param directory path (inside Assets/Audio/)
+	* @param entity sound group
+	*/
+	bool LoadSoundDirectory(const char* directory, EntitySoundGroup group);
+
+	/**
+	* Initialise all sound assets into sound groups
+	*/
+	void LoadSoundAssets() {
+		LoadSoundDirectory("player", EntitySoundGroup::PLAYER);
+		LoadSoundDirectory("enemy", EntitySoundGroup::ENEMY);
+		LoadSoundDirectory("environment", EntitySoundGroup::ENVIRONMENT);
+		LoadSoundDirectory("weapon", EntitySoundGroup::WEAPON);
+		LoadSoundDirectory("item", EntitySoundGroup::ITEM);
+	}
+
+	/**
+	* Prints all sounds in a specific entity sound group
+	* - For debugging purposes
+	*/
+	void printSoundsInGroup(EntitySoundGroup group) {
+		std::map<std::string, FMOD::Sound*> sounds = soundGroups[group];
+		for (auto& sound : sounds) {
+			std::cout << sound.first << std::endl;
+		}
+	}
+
+	/**
+	* Get fmod sound map for specific entity sound group
+	* @return map of fmod sounds
+	* @param entity sound group
+	*/
+	std::map<std::string, FMOD::Sound*>* GetSoundGroup(EntitySoundGroup group) {
+		return &soundGroups[group];
+	}
+
+
 private:
     AudioEngine();
     ~AudioEngine();
@@ -115,7 +171,18 @@ private:
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
 
-	
+	std::string soundDir;
+
+	std::map<std::string, FMOD::Sound*> playerSounds;
+	std::map<std::string, FMOD::Sound*> enemySounds;
+	std::map<std::string, FMOD::Sound*> environmentSounds;
+	std::map<std::string, FMOD::Sound*> weaponSounds;
+	std::map<std::string, FMOD::Sound*> itemSounds;
+
+	std::map<EntitySoundGroup, std::map<std::string, FMOD::Sound*>> soundGroups;
+
+	float minDistance = 0.5f;
+	float maxDistance = 500.0f;
 };
 
 #endif

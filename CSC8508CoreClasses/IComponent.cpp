@@ -18,6 +18,17 @@ void IComponent::SetEnabled(bool enabled) {
 	this->enabled = enabled;
 }
 
+struct ComponentDataStruct : public ISerializedData {
+	ComponentDataStruct() : enabled(1) {}
+	ComponentDataStruct(bool enabled) : enabled(enabled) {}
+	bool enabled;
+
+	static auto GetSerializedFields() {
+		return std::make_tuple(
+			SERIALIZED_FIELD(ComponentDataStruct, enabled)
+		);
+	}
+};
 
 size_t IComponent::Save(std::string assetPath, size_t* allocationStart)
 {

@@ -94,6 +94,8 @@ namespace NCL::CSC8508
 			return types;
 		}
 
+		struct ComponentDataStruct;
+
 		/// <summary>
 		/// Query if this IComponent is derived from a type matching type_info
 		/// </summary>
@@ -115,28 +117,6 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
-
-		struct ComponentDataStruct : public ISerializedData {
-			ComponentDataStruct() : enabled(1) {}
-			ComponentDataStruct(bool enabled) : enabled(enabled) {}
-			bool enabled;
-
-			static auto GetSerializedFields() {
-				return std::make_tuple(
-					SERIALIZED_FIELD(ComponentDataStruct, enabled)
-				);
-			}
-		};
-
-		auto GetDerivedSerializedFields() const {
-			return ComponentDataStruct::GetSerializedFields();
-		}
-
-		template <typename T>
-		static auto GetSerializedFields(const T* instance) {
-			return instance->GetDerivedSerializedFields();
-		}
-
 	protected:
 		virtual void OnAwake() {}
 		virtual void Update(float deltaTime) {}

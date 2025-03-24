@@ -128,12 +128,17 @@ set(Components
     "BoundsComponent.cpp"
     "StateComponent.cpp"
     "StateComponent.h"
+    "StaminaComponent.h"
+    "StaminaComponent.cpp"
+    "AnimationComponent.cpp"
+    "AnimationComponent.h"
 )
 source_group("Components" FILES ${Components})
 
 set(NetworkComponents
     "InputNetworkComponent.h"
     "TransformNetworkComponent.h"
+    "FullTransformNetworkComponent.h"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 

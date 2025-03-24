@@ -20,7 +20,7 @@ void Controller::MapButtonAnalogue(uint32_t axis, const std::string& name) {
 	analogueMappings.insert({ name, axis });
 }
 
-float	Controller::GetNamedAxis(const std::string& axis) const {
+float Controller::GetNamedAxis(const std::string& axis) const {
 	auto a = axisMappings.find(axis);
 	if (a != axisMappings.end()) {
 		return GetAxis(a->second);
@@ -28,7 +28,7 @@ float	Controller::GetNamedAxis(const std::string& axis) const {
 	return 0.0f;
 }
 
-float	Controller::GetNamedButtonAnalogue(const std::string& button) const {
+float Controller::GetNamedButtonAnalogue(const std::string& button) const {
 	auto a = analogueMappings.find(button);
 	if (a != analogueMappings.end()) {
 		return GetButtonAnalogue(a->second);
@@ -36,7 +36,7 @@ float	Controller::GetNamedButtonAnalogue(const std::string& button) const {
 	return 0.0f;
 }
 
-bool	Controller::GetNamedButton(const std::string& button) const {
+bool Controller::GetNamedButton(const std::string& button) const {
 	auto a = buttonMappings.find(button);
 	if (a != buttonMappings.end()) {
 		return GetButton(a->second);

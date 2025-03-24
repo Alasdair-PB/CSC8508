@@ -1,0 +1,1 @@
+#include "StaminaComponent.h"

@@ -31,27 +31,16 @@ void UISystem::EndFrame() {
 	ImGui::EndFrame();
 }
 
-void UISystem::DisplayWindow(int window) {
-	uiList.push_back(window);
-}
-
-void UISystem::HideWindow(int window) {
-	uiList.remove(window);
-}
-
-void UISystem::DrawWindows() {
-	for (auto const& i : uiList) {
-		if (i == framerate) {
-			FramerateUI().Draw(dt);
-		}
-		if (i == mainMenu) {
-			menuOption = MainMenuUI().Draw();
-		}
-		if (i == audioSliders) {
-			AudioSliders().Draw();
-		}
-		if (i == healthbar) {
-			Healthbar().Draw(health);
-		}
+void UISystem::RenderFrame() {
+	for (const auto& element : elementStacks) {
+		element.second->Draw();
 	}
+}
+
+void UISystem::PushNewStack(UIElementsGroup* group, std::string name) {
+	elementStacks[name] = group;
+}
+
+void UISystem::RemoveStack(std::string name) {
+	elementStacks.erase(name);
 }

@@ -42,20 +42,23 @@ float	KeyboardMouseController::GetAxis(uint32_t axis) const {
 	else if (axis == YAxisMouse) {
 		return mouse.GetRelativePosition().y;
 	}
-
 	return 0.0f;
 }
 
-float	KeyboardMouseController::GetButtonAnalogue(uint32_t button) const {
+float KeyboardMouseController::GetButtonAnalogue(uint32_t button) const {
 	return GetButton(button);
 }
 
-bool	KeyboardMouseController::GetButton(uint32_t button)  const {
+bool KeyboardMouseController::GetBoundButton(uint32_t button)  const {
+	return keyboard.KeyDown(button);
+}
+
+bool KeyboardMouseController::GetButton(uint32_t button)  const {
 	if (button == LeftMouseButton) {
 		return mouse.ButtonDown(NCL::MouseButtons::Left);
 	}
 	if (button == RightMouseButton) {
 		return mouse.ButtonDown(NCL::MouseButtons::Right);
 	}
-	return 0.0f;
+	return false;
 }

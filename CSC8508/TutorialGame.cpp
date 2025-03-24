@@ -292,19 +292,13 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->RemoveStack("EOS Menu");
-		
-	}
-	// Lobby View
-	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() == 0)
-	{
-		std::cout << "Successful Menu Traversal";
-
-		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
+		
 	}
 
 	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)
 	{
+		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("EOS Lobby Menu");
 	}
 

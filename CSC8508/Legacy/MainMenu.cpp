@@ -174,10 +174,13 @@ namespace NCL {
 				int count = getPlayerCountFunc();
 			}
 
+			std::cout << eosLobbyOption;
+
 			if (eosLobbyOption == startGame)
 			{
-				std::cout << "[MainMenu.cpp] Press success";
 				setPause(false);
+				std::cout << "[MainMenu.cpp] Press success";
+				
 
 			}
 

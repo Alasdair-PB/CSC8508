@@ -23,6 +23,7 @@ add_library(AudioEngine STATIC
     AudioListenerComponent.h
     AudioListenerComponent.cpp
     AudioSourceComponent.h
+    NetworkedListenerComponent.h
 )
 
 # Include directories

@@ -50,7 +50,7 @@ void TestSaveByType() {
 	std::string enumPath = GetAssetPath("enum_data.pfab");
 
 
-	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	/*SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
 	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
 	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;

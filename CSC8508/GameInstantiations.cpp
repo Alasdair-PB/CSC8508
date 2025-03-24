@@ -145,8 +145,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	/*AudioSourceComponent * audio_src = player->AddComponent<AudioSourceComponent>(ChannelGroupType::SFX);
-	audio_src->LoadSound("salamalekum-don-pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
-	audio_src->PlaySound("salamalekum-don-pollo");
+	audio_src->LoadSound("pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
+	audio_src->PlaySound("pollo");
 	audio_src->randomSounds(5);*/
 
 	int componentIdCount = 0;

@@ -8,12 +8,22 @@ EOSLobbyMenuUI::EOSLobbyMenuUI(bool lobbyOwner, const std::string& ip, const std
 	if (lobbyOwner)
 	{
 		std::function<CSC8508::PushdownState::PushdownResult()> funcA = [this]() -> CSC8508::PushdownState::PushdownResult {
-			menuOption = startGame;
+			menuOption = startGameAsHost;
 			std::cout << "[EOSLobbyMenuUI.cpp] Button Press Received";
 			return CSC8508::PushdownState::PushdownResult::NoChange;
 			};
 
 		eosLobbyMenuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Game", funcA);
+	}
+	else
+	{
+		std::function<CSC8508::PushdownState::PushdownResult()> funcB = [this]() -> CSC8508::PushdownState::PushdownResult {
+			menuOption = startGameAsJoin;
+			std::cout << "[EOSLobbyMenuUI.cpp] Button Press Received";
+			return CSC8508::PushdownState::PushdownResult::NoChange;
+			};
+
+		eosLobbyMenuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Game", funcB);
 	}
 
 	// Display IP as static label

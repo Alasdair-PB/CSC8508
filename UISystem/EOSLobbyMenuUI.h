@@ -22,7 +22,7 @@ namespace NCL {
 
 			int menuOption = eosLobbyNone;
 
-			enum menuOptions { eosLobbyNone, startGame };
+			enum menuOptions { eosLobbyNone, startGameAsHost, startGameAsJoin };
 		};
 	}
 }

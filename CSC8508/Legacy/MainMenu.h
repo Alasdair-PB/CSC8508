@@ -19,6 +19,7 @@ namespace NCL {
 		typedef std::function<void(std::string)> StartEOSLobbySearch;
 		typedef std::function<void()> StartEOSLobbyUpdate;
 		typedef std::function<void()> EOSStartAsHost;
+		typedef std::function<void()> EOSStartAsJoin;
 
 		using GetStringFunc = std::function<std::string()>;
 		using GetIntFunc = std::function<int()>;
@@ -39,7 +40,8 @@ namespace NCL {
 				GetStringFunc getOwnerIP,
 				GetStringFunc getLobbyID,
 				GetIntFunc getPlayerCount,
-				EOSStartAsHost eosStartAsHost);
+				EOSStartAsHost eosStartAsHost,
+				EOSStartAsHost eosStartAsJoin);
 
 			~MainMenu();
 			void Update(float dt);
@@ -48,7 +50,7 @@ namespace NCL {
 			void SetEOSMenuOption(int option) { eosMenuOption = option; } // Change this for each menu
 			void SetEOSLobbyOption(int option) { eosLobbyOption = option; } // Change this for each menu
 
-			float lobbyUpdateTimer = 0.0f;
+			float lobbyUpdateTimer = 10.0f;
 			const float updateInterval = 10.0f; // 3 seconds
 
 			SetPauseGame setPause;
@@ -60,6 +62,7 @@ namespace NCL {
 			StartEOSLobbySearch startEOSLobbySearch;
 			StartEOSLobbyUpdate startEOSLobbyUpdate;
 			EOSStartAsHost EOSStartAsHostFunc;
+			EOSStartAsJoin EOSStartAsJoinFunc;
 
 			GetStringFunc getOwnerIPFunc;
 			GetStringFunc getLobbyIDFunc;
@@ -87,7 +90,7 @@ namespace NCL {
 			enum eosMenuOptions { eosNone, hostLobby, joinLobby }; //Relates to menuOptions in MainMenu.h
 			int eosMenuOption = 0;
 
-			enum eosLobbyOptions {eosLobbyNone, startGame};
+			enum eosLobbyOptions {eosLobbyNone, startGameAsHost, startGameAsJoin};
 			int eosLobbyOption = 0;
 		};
 	}

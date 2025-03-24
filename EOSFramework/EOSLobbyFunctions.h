@@ -22,7 +22,7 @@ public:
     static void OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data);
     void UpdateLobbyDetails();
     void RunUpdateLoop();
-    std::string ownerIP;  // Store the Owner IP as a string
+    std::string ownerIP; 
     std::string lobbyID;
     int playerCount = 0;
 private:

@@ -32,7 +32,8 @@ namespace NCL {
 			GetStringFunc getOwnerIP,
 			GetStringFunc getLobbyID,
 			GetIntFunc getPlayerCount, 
-			EOSStartAsHost eosStartAsHost)
+			EOSStartAsHost eosStartAsHost,
+			EOSStartAsHost eosStartAsJoin)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
@@ -46,6 +47,7 @@ namespace NCL {
 			getLobbyIDFunc = getLobbyID;
 			getPlayerCountFunc = getPlayerCount;
 			this->EOSStartAsHostFunc = eosStartAsHost;
+			this->EOSStartAsJoinFunc = eosStartAsJoin;
 
 			
 
@@ -175,13 +177,24 @@ namespace NCL {
 				std::string ip = getOwnerIPFunc();
 				std::string id = getLobbyIDFunc();
 				int count = getPlayerCountFunc();
+
+				std::cout << "Lobby Update Triggered:" << std::endl;
+				std::cout << "Owner IP: " << ip << std::endl;
+				std::cout << "Lobby ID: " << id << std::endl;
+				std::cout << "Player Count: " << count << std::endl;
 			}
 
-			if (eosLobbyOption == startGame)
+
+			if (eosLobbyOption == startGameAsHost)
 			{
 				setPause(false);
-				// Need function here to start lobby
-
+				EOSStartAsHostFunc();
+			}
+			
+			if (eosLobbyOption == startGameAsJoin)
+			{
+				setPause(false);
+				EOSStartAsJoinFunc();
 			}
 
 			return PushdownState::NoChange;
@@ -207,3 +220,4 @@ namespace NCL {
 		}
 	}
 }
+//bba5237d7bae4524baa5fdbe33345214

@@ -10,7 +10,6 @@
 #include "INetworkDeltaComponent.h"
 #include "ComponentManager.h"
 #include "EventManager.h"
-#include "GameObject.h"
 #include "GameClient.h"
 
 

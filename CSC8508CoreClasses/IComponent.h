@@ -94,6 +94,9 @@ namespace NCL::CSC8508
 			return types;
 		}
 
+		/// <summary>
+		/// IComponent Save data struct definition
+		/// </summary>
 		struct ComponentDataStruct;
 
 		/// <summary>

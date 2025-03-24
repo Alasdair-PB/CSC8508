@@ -18,7 +18,7 @@ void IComponent::SetEnabled(bool enabled) {
 	this->enabled = enabled;
 }
 
-struct ComponentDataStruct : public ISerializedData {
+struct IComponent::ComponentDataStruct : public ISerializedData {
 	ComponentDataStruct() : enabled(1) {}
 	ComponentDataStruct(bool enabled) : enabled(enabled) {}
 	bool enabled;

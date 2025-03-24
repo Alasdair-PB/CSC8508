@@ -266,7 +266,7 @@ void TutorialGame::UpdateUI() {
 		framerateDelay = 0;
 	}
 
-	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() == 0)
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() == 0)
 	{
 		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
 		uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
@@ -276,7 +276,14 @@ void TutorialGame::UpdateUI() {
 		mainMenu->lobbyCodeInput = lobbySearchField->GetInputText();
 	}
 
-	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0)
+	if (mainMenuUI->GetMenuOption() != 0 && mainMenuUI->GetMenuOption() != 4)
+	{
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+	}
+
+	// sort this bit out
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0)
 	{
 		std::string ip = mainMenu->getOwnerIPFunc();
 		std::string lobbyID = mainMenu->getLobbyIDFunc();
@@ -295,7 +302,7 @@ void TutorialGame::UpdateUI() {
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 	}
 
-	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)
 	{
 		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("EOS Lobby Menu");

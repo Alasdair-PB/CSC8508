@@ -26,6 +26,7 @@ public:
 	void RenderFocus() {
 		if (!focus) return;
 		focus->GetTransform().SetPosition(*transformInfo);
+		RenderIComponents();
 	}
 
 	void RenderIComponents();
@@ -43,6 +44,19 @@ private:
 	GameObject* focus;
 	Vector3* transformInfo;
 	vector<IComponent*> componentsList;
+
+	template <typename T, typename... Args>
+	void DebugSerializedFields(const T& instance, const std::tuple<Args...>& fields) {
+		std::apply([&](const auto&... fieldTuple) {
+			([&](const auto& entry) {
+				auto fieldName = std::get<0>(entry);
+				auto fieldPtr = std::get<1>(entry);
+
+				std::cout << fieldName << std::endl;
+
+				}(fieldTuple), ...);
+			}, fields);
+	}
 };
 
 

@@ -133,7 +133,7 @@ void BoundsComponent::LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 
 	boundingVolume->isTrigger = isTrigger;
 }
 
-auto BoundsComponent::GetSerializedFields() const {
+auto BoundsComponent::GetDerivedSerializedFields() const {
 	return BoundsComponentDataStruct::GetSerializedFields();
 }
 

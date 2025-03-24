@@ -37,7 +37,7 @@ struct PhysicsComponent::PhysicsComponentDataStruct : public ISerializedData {
 	}
 };
 
-auto PhysicsComponent::GetSerializedFields() const {
+auto PhysicsComponent::GetDerivedSerializedFields() const {
 	return PhysicsComponentDataStruct::GetSerializedFields();
 }
 

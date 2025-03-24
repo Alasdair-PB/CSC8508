@@ -116,20 +116,26 @@ namespace NCL::CSC8508
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
 
-		/// <summary>
-		/// Pure virtual function to get the serialized values in an IComponent for the Inspector
-		/// </summary>
-		/// <returns>A tuple of serialized fields</returns>
-		template <typename T>
-		static void* GetSerializedFields(const T& instance) {
-			return instance->GetSerializedFields();
+		struct ComponentDataStruct : public ISerializedData {
+			ComponentDataStruct() : enabled(1) {}
+			ComponentDataStruct(bool enabled) : enabled(enabled) {}
+			bool enabled;
+
+			static auto GetSerializedFields() {
+				return std::make_tuple(
+					SERIALIZED_FIELD(ComponentDataStruct, enabled)
+				);
+			}
+		};
+
+		auto GetDerivedSerializedFields() const {
+			return ComponentDataStruct::GetSerializedFields();
 		}
 
-
-		/// <summary>
-		/// IComponent Save data struct definition
-		/// </summary>
-		struct ComponentDataStruct;
+		template <typename T>
+		static auto GetSerializedFields(const T* instance) {
+			return instance->GetDerivedSerializedFields();
+		}
 
 	protected:
 		virtual void OnAwake() {}

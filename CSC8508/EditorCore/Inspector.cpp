@@ -30,8 +30,10 @@ Inspector::Inspector(){
 Inspector::~Inspector() { delete inspectorBar; delete transformInfo; }
 
 void Inspector::RenderIComponents() {
-	for (IComponent* component : componentsList) {
-		component->GetName();
+	if (!focus) return;
+
+	for (IComponent* component : focus->GetAllComponents()) {
 		auto fields = component->IComponent::GetSerializedFields(component);
+		DebugSerializedFields(*component, fields);
 	}
 }

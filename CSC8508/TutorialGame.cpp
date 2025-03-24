@@ -293,7 +293,6 @@ void TutorialGame::UpdateUI() {
 		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->RemoveStack("EOS Menu");
 		uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
-		
 	}
 
 	if (mainMenuUI->GetMenuOption() != 0 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)

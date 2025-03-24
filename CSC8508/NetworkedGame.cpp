@@ -44,9 +44,8 @@ void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 void NetworkedGame::StartEOSCallBack() { HostGame(); }
 void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
-void NetworkedGame::StartEOSLobbySearchCallBack(const std::string& lobbyID) {EOSLobbySearchFunc(lobbyID);
-}
-
+void NetworkedGame::StartEOSLobbySearchCallBack(const std::string& lobbyID) {EOSLobbySearchFunc(lobbyID);}
+void NetworkedGame::StartAsHostCallBack() {EOSStartAsHost();}
 void NetworkedGame::StartEOSLobbyUpdateCallBack() { EOSLobbyDetailsUpdate(); }
 
 
@@ -69,11 +68,12 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> void { this->StartEOSCallBack(); },
 		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
 		[&](std::string id) -> void { this->StartEOSLobbySearchCallBack(id); },
-		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); },
+		[&]() -> void { this->EOSStartAsHost(); },
 
 		[&]() -> std::string { return this->GetOwnerIP(); },
 		[&]() -> std::string { return this->GetLobbyID(); },
-		[&]() -> int { return this->GetPlayerCount(); }
+		[&]() -> int { return this->GetPlayerCount(); },
+		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); }
 	);
 
 	NetworkBase::Initialise();
@@ -130,11 +130,6 @@ void NetworkedGame::EOSLobbyCreation()
 
 void NetworkedGame::EOSLobbySearchFunc(const std::string& lobbyID)
 {
-
-	std::cout << "//////////";
-	std::cout << "Lobby Handle Input: " << lobbyID;
-	std::cout << "//////////";
-
 	eosLobbySearch->CreateLobbySearch(lobbyID.c_str()); // <-- convert std::string to const char*
 
 	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
@@ -142,6 +137,11 @@ void NetworkedGame::EOSLobbySearchFunc(const std::string& lobbyID)
 }
 
 void NetworkedGame::EOSLobbyDetailsUpdate()
+{
+	eosLobbyFunctions->UpdateLobbyDetails();
+}
+
+void NetworkedGame::EOSStartAsHost()
 {
 	eosLobbyFunctions->UpdateLobbyDetails();
 }

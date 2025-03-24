@@ -18,6 +18,7 @@ namespace NCL {
 		typedef std::function<void()> StartEOSLobbyCreation;
 		typedef std::function<void(std::string)> StartEOSLobbySearch;
 		typedef std::function<void()> StartEOSLobbyUpdate;
+		typedef std::function<void()> EOSStartAsHost;
 
 		using GetStringFunc = std::function<std::string()>;
 		using GetIntFunc = std::function<int()>;
@@ -37,7 +38,8 @@ namespace NCL {
 				StartEOSLobbyUpdate startEOSLobbyUpdate,
 				GetStringFunc getOwnerIP,
 				GetStringFunc getLobbyID,
-				GetIntFunc getPlayerCount);
+				GetIntFunc getPlayerCount,
+				EOSStartAsHost eosStartAsHost);
 
 			~MainMenu();
 			void Update(float dt);
@@ -57,6 +59,7 @@ namespace NCL {
 			StartEOSLobbyCreation startEOSLobbyCreation;
 			StartEOSLobbySearch startEOSLobbySearch;
 			StartEOSLobbyUpdate startEOSLobbyUpdate;
+			EOSStartAsHost EOSStartAsHostFunc;
 
 			GetStringFunc getOwnerIPFunc;
 			GetStringFunc getLobbyIDFunc;

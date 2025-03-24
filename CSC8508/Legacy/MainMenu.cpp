@@ -31,7 +31,8 @@ namespace NCL {
 			StartEOSLobbyUpdate startEOSLobbyUpdate,
 			GetStringFunc getOwnerIP,
 			GetStringFunc getLobbyID,
-			GetIntFunc getPlayerCount)
+			GetIntFunc getPlayerCount, 
+			EOSStartAsHost eosStartAsHost)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
@@ -41,10 +42,13 @@ namespace NCL {
 			this->startEOSLobbyCreation = startEOSLobbyCreation;
 			this->startEOSLobbySearch = startEOSLobbySearch;
 			this->startEOSLobbyUpdate = startEOSLobbyUpdate;
+			this->EOSStartAsHostFunc = eosStartAsHost;
 
 			getOwnerIPFunc = getOwnerIP;
 			getLobbyIDFunc = getLobbyID;
 			getPlayerCountFunc = getPlayerCount;
+
+			
 
 			machine = new PushdownMachine(new OverlayScreen(
 				[&]() -> void { this->OnStateAwake(); },
@@ -174,13 +178,10 @@ namespace NCL {
 				int count = getPlayerCountFunc();
 			}
 
-			std::cout << eosLobbyOption;
-
 			if (eosLobbyOption == startGame)
 			{
 				setPause(false);
-				std::cout << "[MainMenu.cpp] Press success";
-				
+				// Need function here to start lobby
 
 			}
 

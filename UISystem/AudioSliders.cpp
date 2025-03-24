@@ -44,12 +44,42 @@ AudioSliders::AudioSliders() {
 		};
 
 	std::function<CSC8508::PushdownState::PushdownResult()> deviceFunc = [this]() -> CSC8508::PushdownState::PushdownResult {
-		/*ImGui::BeginCombo("Audio Device", " ");
-		for (int i; i < 4; i++) {
+		inputDevice = audioEngine->GetInputDeviceIndex();
+		if (ImGui::BeginCombo("Input Device", audioEngine->GetInputDeviceList()[inputDevice].data()))
+		{
+			for (int i = 0; i < audioEngine->GetInputDeviceList().size(); i++)
+			{
+				const bool is_selected = (inputDevice == i);
+				if (ImGui::Selectable(audioEngine->GetInputDeviceList()[i].data(), is_selected)) {
+					inputDevice = i;
+				}
 
+				if (is_selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
 		}
-		ImGui::EndCombo();*/
-		ImGui::Combo("Audio Device", &audioDevice, "Device1\0Device2\0Device3\0Device4\0\0");
+		audioEngine->SetInputDeviceIndex(inputDevice);
+
+		outputDevice = audioEngine->GetOutputDeviceIndex();
+		if (ImGui::BeginCombo("Output Device", audioEngine->GetOutputDeviceList()[outputDevice].data()))
+		{
+			for (int i = 0; i < audioEngine->GetOutputDeviceList().size(); i++)
+			{
+				const bool is_selected = (outputDevice == i);
+				if (ImGui::Selectable(audioEngine->GetOutputDeviceList()[i].data(), is_selected)) {
+					outputDevice = i;
+				}
+
+				if (is_selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		audioEngine->SetOutputDeviceIndex(outputDevice);
+
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 		};
 

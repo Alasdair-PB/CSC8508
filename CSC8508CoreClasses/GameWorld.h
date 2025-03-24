@@ -80,7 +80,7 @@ namespace NCL {
 				return worldStateCounter;
 			}
 
-
+			int GetGameObjectCount() const { return gameObjects.size(); }
 			struct WorldSaveData;
 
 			size_t Save(std::string assetPath, size_t* allocationStart = 0);

@@ -77,3 +77,22 @@ target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/libfmodL_stub_weak.a)
 
 message(STATUS "FMOD Library File: ${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
 endif()
+
+# Set Opus Install Path
+set(OPUS_SOURCE_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source")
+set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
+
+
+# Include Opus headers from the install folder.
+target_include_directories(AudioEngine PRIVATE "${OPUS_INSTALL_PATH}/include")
+
+
+# Bypass any configuration-time file check (using SKIP_OPUS_CHECK)
+# and link directly against the imported target (OpusLib) defined in the top-level file.
+if(NOT SKIP_OPUS_CHECK)
+    set(SKIP_OPUS_CHECK TRUE)
+endif()
+
+target_link_libraries(AudioEngine PRIVATE OpusLib)
+
+

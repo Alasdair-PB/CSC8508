@@ -10,6 +10,8 @@
 #ifdef USE_PS5
 #include <kernel.h>
 #endif
+#include <deque>
+#include <vector>
 
 /**
 * Type of Channel Group
@@ -94,6 +96,10 @@ public:
 		return volume;
 	}
 
+	std::deque<std::vector<unsigned char>>& GetEncodedPacketQueue() {
+		return encodedPacketQueue;
+	}
+
 
 private:
     AudioEngine();
@@ -111,6 +117,8 @@ private:
 	FMOD::ChannelGroup* voiceGroup;
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
+
+	std::deque<std::vector<unsigned char>> encodedPacketQueue;
 	
 	#ifdef USE_PS5	
 	SceKernelModule	libfmodHandle;

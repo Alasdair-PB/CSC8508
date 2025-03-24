@@ -3,6 +3,7 @@
 #include "RenderObject.h"
 #include "Camera.h"
 #include "TextureLoader.h"
+#include "AnimationComponent.h"
 #include "MshLoader.h"
 
 #include <windows.h>
@@ -140,6 +141,7 @@ void GameTechRenderer::StartUI() {
 	NCL::Win32Code::Win32Window* w32 = static_cast<NCL::Win32Code::Win32Window*>(w);
 	UI::UIWindows::Initialize(w32->GetHandle());
 }
+
 void GameTechRenderer::RenderFrame() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_STENCIL_TEST);
@@ -175,9 +177,12 @@ void GameTechRenderer::BuildObjectList() {
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
 			if (o->IsEnabled()) {
-				const RenderObject* g = o->GetRenderObject();
+				RenderObject* g = o->GetRenderObject();
 				if (g) {
-					activeObjects.emplace_back(g);
+					Vector3 dir = g->GetTransform()->GetPosition() - gameWorld.GetMainCamera().GetPosition();
+					g->SetCameraDistance(Vector::Dot(dir, dir));
+
+					activeObjects.emplace_back(o);
 				}
 			}
 		}
@@ -185,7 +190,14 @@ void GameTechRenderer::BuildObjectList() {
 }
 
 void GameTechRenderer::SortObjectList() {
-
+	std::sort(activeObjects.begin(), activeObjects.end(),
+		[](const GameObject* a, const GameObject* b) {
+			RenderObject* ra = a->GetRenderObject(); RenderObject* rb = b->GetRenderObject();
+			if (ra->GetShader() != rb->GetShader()) {
+				return ra->GetShader() < rb->GetShader();
+			}
+			return RenderObject::CompareByCameraDistance(ra, rb);
+		});
 }
 
 void GameTechRenderer::RenderShadowMap() {
@@ -206,7 +218,8 @@ void GameTechRenderer::RenderShadowMap() {
 
 	shadowMatrix = biasMatrix * mvMatrix; //we'll use this one later on
 
-	for (const auto&i : activeObjects) {
+	for (const auto&o : activeObjects) {
+		const auto& i = o->GetRenderObject();
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		Matrix4 mvpMatrix	= mvMatrix * modelMatrix;
 		glUniformMatrix4fv(mvpLocation, 1, false, (float*)&mvpMatrix);
@@ -260,6 +273,7 @@ void GameTechRenderer::RenderCamera() {
 	int viewLocation	= 0;
 	int modelLocation	= 0;
 	int colourLocation  = 0;
+	int jointLocation = 0;
 	int hasVColLocation = 0;
 	int hasTexLocation  = 0;
 	int shadowLocation  = 0;
@@ -267,14 +281,14 @@ void GameTechRenderer::RenderCamera() {
 	int lightPosLocation	= 0;
 	int lightColourLocation = 0;
 	int lightRadiusLocation = 0;
-
 	int cameraLocation = 0;
 
 	//TODO - PUT IN FUNCTION
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, shadowTex);
 
-	for (const auto&i : activeObjects) {
+	for (const GameObject* o : activeObjects) {
+		const RenderObject* i = o->GetRenderObject();
 		OGLShader* shader = (OGLShader*)(*i).GetShader();
 		UseShader(*shader);
 
@@ -290,6 +304,7 @@ void GameTechRenderer::RenderCamera() {
 			colourLocation  = glGetUniformLocation(shader->GetProgramID(), "objectColour");
 			hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
 			hasTexLocation  = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
+			jointLocation = glGetUniformLocation(shader->GetProgramID(), "joints");
 
 			lightPosLocation	= glGetUniformLocation(shader->GetProgramID(), "lightPos");
 			lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
@@ -321,6 +336,11 @@ void GameTechRenderer::RenderCamera() {
 
 		Vector4 colour = i->GetColour();
 		glUniform4fv(colourLocation, 1, &colour.x);
+
+		AnimationComponent* a = o->TryGetComponent<AnimationComponent>();
+		if (a) {
+			glUniformMatrix4fv(jointLocation, a->GetSkeleton().size(), false, (float*)a->GetSkeleton().data());
+		}
 
 		glUniform1i(hasVColLocation, !(*i).GetMesh()->GetColourData().empty());
 
@@ -550,3 +570,45 @@ void GameTechRenderer::SetDebugLineBufferSizes(size_t newVertCount) {
 		glBindVertexArray(0);
 	}
 }
+
+/*void GameTechRenderer::DrawSkinned(SceneNode* n) {
+	modelMatrix = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale()) * n->GetRotation();
+	UpdateShaderMatrices();
+	SetShaderLight(*light);
+
+	glUniform1i(glGetUniformLocation(shaderVec[SKINNING_SHADER]->GetProgram(), "diffuseTex"), 0);
+	glUniform1i(glGetUniformLocation(shader->GetProgram(), "bumpTex"), 1);
+	glUniform1i(glGetUniformLocation(shader->GetProgram(), "metallicRoughTex"), 2);
+	glUniform1i(glGetUniformLocation(shader->GetProgram(), "shadowTex"), 3);
+
+	while (frameTime < 0.0f) {
+		currentFrame = (currentFrame + 1) % n->GetAnim()->GetFrameCount();
+		frameTime += 1.0f / n->GetAnim()->GetFrameRate();
+	}
+
+	std::vector<Matrix4> frameMatrices;
+
+	const Matrix4* invBindPose = n->GetMesh()->GetInverseBindPose();
+	const Matrix4* frameData = n->GetAnim()->GetJointData(currentFrame);
+
+	for (unsigned int i = 0; i < n->GetMesh()->GetJointCount(); ++i) {
+		frameMatrices.emplace_back(frameData[i] * invBindPose[i]);
+	}
+
+	int j = glGetUniformLocation(shaderVec[SKINNING_SHADER]->GetProgram(), "joints");
+	glUniformMatrix4fv(j, frameMatrices.size(), GL_FALSE, (float*)frameMatrices.data());
+
+	for (int i = 0; i < n->GetMesh()->GetSubMeshCount(); ++i) {
+		MeshMaterialEntry* matEntry = n->GetMaterial()->GetMaterialForLayer(i);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, matEntry->textures["Diffuse"]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, matEntry->textures["Bump"]);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, matEntry->textures["Metallic"]);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, shadowTex);
+		n->GetMesh()->DrawSubMesh(i);
+	}
+}*/

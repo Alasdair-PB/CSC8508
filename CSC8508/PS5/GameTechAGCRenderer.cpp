@@ -4,6 +4,7 @@
 #include "RenderObject.h"
 #include "Camera.h"
 #include "TextureLoader.h"
+#include "AnimationComponent.h"
 #include "MshLoader.h"
 #include "../PS5Core/AGCMesh.h"
 #include "../PS5Core/AGCTexture.h"
@@ -273,7 +274,7 @@ void GameTechAGCRenderer::GPUSkinningPass() {
 	sce::Agc::DispatchModifier modifier = skinningCompute->GetAGCPointer()->m_specials->m_dispatchModifier;
 
 	for (auto& i : frameJobs) {
-		NCL::PS5::AGCMesh* m = (AGCMesh*)i.object->GetMesh();
+		NCL::PS5::AGCMesh* m = (AGCMesh*)i.object->GetRenderObject()->GetMesh();
 
 		sce::Agc::Core::Buffer inputBuffers[6];
 
@@ -286,7 +287,7 @@ void GameTechAGCRenderer::GPUSkinningPass() {
 		}
 		char* offset = currentFrame->data.data;
 
-		std::vector<Matrix4>& skeleton = i.object->GetSkeleton();
+		std::vector<Matrix4>& skeleton = i.object->TryGetComponent<AnimationComponent>()->GetSkeleton();
 		currentFrame->data.WriteData(skeleton.data(), sizeof(Matrix4) * skeleton.size());
 
 		sce::Agc::Core::BufferSpec bufSpec;
@@ -589,7 +590,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 						}
 						state.index[1] = b->GetAssetID();
 
-						frameJobs.push_back({g, b->GetAssetID()});
+						frameJobs.push_back({o, b->GetAssetID()});
 					}
 					currentFrame->data.WriteData<ObjectState>(state);
 					currentFrame->debugLinesOffset += sizeof(ObjectState);

@@ -15,6 +15,7 @@
 #include <vector>
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
+#include "UIElementsGroup.h"
 
 
 using std::vector;
@@ -43,13 +44,18 @@ namespace NCL {
 			void UpdateObjectSelectMode(float dt);
 			bool SelectObject();
 
-			void MoveSelectedObject();
-			void LockedObjectMovement();
 
+			void TestSaveGameObject(std::string assetPath);
+			void TestLoadGameObject(std::string assetPath);
+			void SaveWorld(std::string assetPath);
+			void LoadWorld(std::string assetPath);
+			void TestSave();
 			void UpdateUI();
 
+			GameObject* CreateChildInstance(Vector3 offset, bool isStatic);
 			GameObject* AddFloorToWorld(const Vector3& position);
-			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
+			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool addToWorld = true);
+			GameObject* AddRoleTToWorld(const Vector3& position, float inverseMass = 10.0f); // Anim
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			GameObject* AddNavMeshToWorld(const Vector3& position, Vector3 dimensions);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
@@ -85,6 +91,12 @@ namespace NCL {
 
 			GameObject* objClosest = nullptr;
 			UI::UISystem* uiSystem;
+
+			UI::FramerateUI* framerate = new UI::FramerateUI;
+			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
+			UI::AudioSliders* audioSliders = new UI::AudioSliders;
+			UI::Healthbar* healthbar = new UI::Healthbar;
+			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 
 			float framerateDelay = 0;
 		};

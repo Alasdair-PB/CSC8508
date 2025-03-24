@@ -38,16 +38,13 @@ struct SpawnPacket : public GamePacket {
 	}
 };
 
-void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
+void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 
 
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
 void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
-
-/*NetworkedGame::NetworkedGame(GameWorld* gameWorld, GameTechRendererInterface* renderer)
-: TutorialGame(gameWorld, renderer) {*/
 
 NetworkedGame::NetworkedGame()	{
 	EventManager::RegisterListener<NetworkEvent>(this);
@@ -82,7 +79,7 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-
+	std::cout << "startinmg"<<std::endl;
 	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 
@@ -123,7 +120,7 @@ void NetworkedGame::UpdateGame(float dt)
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
 		UpdatePackets(dt);
-		timeToNextPacket += 1.0f / 20.0f; 
+		timeToNextPacket += 1.0f; // 1.0f / 20.0f;
 	}
 
 	if (thisServer) 

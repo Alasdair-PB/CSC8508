@@ -2,7 +2,6 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Mesh.h"
-#include "MeshAnimation.h"
 #include "Buffer.h"
 
 namespace NCL {
@@ -17,7 +16,6 @@ namespace NCL {
 		public:
 			RenderObject(Transform* inTransform, Mesh* inMesh, Texture* inTex, Shader* inShader) {
 				buffer = nullptr;
-				anim = nullptr;
 
 				transform = inTransform;
 				mesh = inMesh;
@@ -61,14 +59,12 @@ namespace NCL {
 
 			Vector4 GetColour() const {
 				return colour;
-			}
+			}	
 
-			void SetAnimation(MeshAnimation& inAnim);
-
-			void UpdateAnimation(float dt);
-
-			std::vector<Matrix4>& GetSkeleton() {
-				return skeleton;
+			float GetCameraDistance() const { return distanceFromCamera; }
+			void SetCameraDistance(float f) { distanceFromCamera = f; }
+			static const bool CompareByCameraDistance(const RenderObject* a, const RenderObject* b) {
+				return a->distanceFromCamera < b->distanceFromCamera;
 			}
 
 		protected:
@@ -77,13 +73,9 @@ namespace NCL {
 			Texture* texture;
 			Shader* shader;
 			Transform* transform;
-			Vector4			colour;
+			Vector4	colour;
 
-			MeshAnimation* anim;
-
-			std::vector<Matrix4> skeleton;
-			float	animTime = 0.0f;
-			int currentAnimFrame = 0;
+			float distanceFromCamera;
 		};
 	}
 }

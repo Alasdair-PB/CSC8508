@@ -127,7 +127,7 @@ namespace NCL {
 			};
 
 			struct SkinningJob {
-				RenderObject* object;
+				GameObject* object;
 				uint32_t outputIndex;
 			};
 

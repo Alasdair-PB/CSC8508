@@ -39,6 +39,8 @@ public:
 		return boundButtons;
 	}
 
+	virtual bool GetBoundButton(uint32_t keyId) const { return false; }
+
 	vector<uint32_t> GetBoundAnalogue() const {
 		vector<uint32_t> boundAnalogue;
 		for (auto binding : analogueMappings) {

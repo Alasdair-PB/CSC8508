@@ -2,50 +2,41 @@
 #include "../OpenGLRendering/OGLRenderer.h"
 #include "../AudioEngine/AudioEngine.h"
 #include "imgui.h"
+#include "../CSC8508CoreClasses/PushdownMachine.h"
+#include "../CSC8508CoreClasses/PushdownState.h"
 #include "AudioSliders.h"
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
 #include "Healthbar.h"
+#include "LobbySearch.h"
 #include <list>
 
 namespace NCL {
 	namespace UI {
-		class UISystem {
-			std::list<int> uiList;
+			class UISystem {
+				std::list<int> uiList;
 
-		public:
-			static UISystem* GetInstance() {return instance;}
-			static void Shutdown() { if (instance) { delete instance; } }
+			public:
+				static UISystem* GetInstance() { return instance; }
+				static void Shutdown() { if (instance) { delete instance; } }
 
-			int GetMenuOption() {return menuOption;}
+				virtual void StartFrame() = 0;
+				virtual void EndFrame() = 0;
 
-			void UpdateFramerate(float delta) {dt = delta;}
+				void RenderFrame();
 
-			virtual void StartFrame() = 0;
-			virtual void EndFrame() = 0;
+				void PushNewStack(UIElementsGroup* group, std::string name);
 
-			void UpdateHealth(int healthVal) {
-				health = healthVal;
-			}
+				void RemoveStack(std::string name);
 
-			void DisplayWindow(int window);
-			void HideWindow(int window);
-			void DrawWindows();
+				std::unordered_map<std::string, UIElementsGroup*>elementStacks;
 
-			enum uiElements { framerate, mainMenu, audioSliders, healthbar };
+			protected:
+				UISystem();
+				virtual ~UISystem();
 
-		protected:
-			UISystem();
-			virtual ~UISystem();
-
-			static UISystem* instance;
-
-			float dt = 0;
-			int health = 50;
-
-			int menuOption = 0;
-			enum menuOptions { none, startOffline, startServer, StartClient };
-		};
+				static UISystem* instance;
+			};
+		}
 	}
-}
 

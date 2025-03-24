@@ -33,7 +33,6 @@ void Inspector::RenderIComponents() {
 	if (!focus) return;
 
 	for (IComponent* component : focus->GetAllComponents()) {
-		auto fields = component->IComponent::GetSerializedFields(component);
-		DebugSerializedFields(*component, fields);
+
 	}
 }

@@ -113,7 +113,7 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual void Load(std::string assetPath, size_t allocationStart) override;
-#
+
 		/// <summary>
 		/// Saves the IComponent data into the assetPath file. 
 		/// </summary>

@@ -50,7 +50,7 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
 		virtual void Load(std::string assetPath, size_t allocationStart) override;
-#
+
 		/// <summary>
 		/// Saves the PhysicsComponent data into the assetPath file. 
 		/// </summary>

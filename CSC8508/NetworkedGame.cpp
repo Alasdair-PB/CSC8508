@@ -143,7 +143,15 @@ void NetworkedGame::EOSLobbyDetailsUpdate()
 
 void NetworkedGame::EOSStartAsHost()
 {
-	eosLobbyFunctions->UpdateLobbyDetails();
+	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
+	thisServer->RegisterPacketHandler(Received_State, this);
+	thisServer->RegisterPacketHandler(Spawn_Object, this);
+	thisServer->RegisterPacketHandler(Component_Event, this);
+
+	thisServer->RegisterPacketHandler(Delta_State, this);
+	thisServer->RegisterPacketHandler(Full_State, this);
+	std::cout << "starting" << std::endl;
+	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

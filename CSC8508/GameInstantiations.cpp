@@ -170,7 +170,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	}
 		else {
 			// Add persistent sound to player if not client owned
-			listenerComp->SetPersistentSound(sourceComp->GetPersistentSound());
+			listenerComp->SetPersistentSound(sourceComp->GetPersistentPair());
 		}
 
 	}

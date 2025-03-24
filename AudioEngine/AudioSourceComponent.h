@@ -231,8 +231,8 @@ public:
 
 	}
 
-	FMOD::Sound* GetPersistentSound() {
-		return persistentSound;
+	std::pair<FMOD::Sound*, FMOD::Channel*> GetPersistentPair() {
+		return std::make_pair(persistentSound, persistentChannel);
 	}
 
 

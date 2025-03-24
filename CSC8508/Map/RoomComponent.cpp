@@ -9,7 +9,7 @@
 #include "CollisionDetection.h"
 #include "DoorLocation.h"
 #include "RoomManager.h"
-#include "../Util.cpp"
+#include "../../CSC8508CoreClasses/Util.cpp"
 
 bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
 

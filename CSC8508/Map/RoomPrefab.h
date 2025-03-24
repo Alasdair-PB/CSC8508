@@ -4,6 +4,7 @@
 
 #ifndef ROOMPREFAB_H
 #define ROOMPREFAB_H
+
 #include "AABBVolume.h"
 #include "NavigationMesh.h"
 #include "BoundsComponent.h"
@@ -22,7 +23,7 @@ public:
 protected:
     GameObject* roomObject;
     NavigationMesh* navMesh;
-    std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>(); // TODO: Replace with more spatially efficient structure
+    std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>();
     std::vector<DoorLocation> possibleDoorLocations = std::vector<DoorLocation>();
 };
 

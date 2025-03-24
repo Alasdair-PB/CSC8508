@@ -3,6 +3,8 @@
 //
 
 #include "BoundsComponent.h"
+
+#include "Axis.h"
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -27,6 +29,28 @@ bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) {
 	return true;
 }
 
+Vector3 GetOBBBroadphaseAABB(Quaternion const& orientation, Vector3 const& halfDimensions) {
+	auto max = Vector3();
+
+	// Get all world-orientated vertices (not repositioned)
+	Vector3 array[8];
+	for (int i = 0; i < 8; i++) {
+		array[i] = orientation * (halfDimensions * Vector3(
+			i & 1 ? 1 : -1,
+			i & 2 ? 1 : -1,
+			i & 4 ? 1 : -1
+			));
+	}
+
+	// Check for max bounds
+	for (Vector3 c : array) {
+		for (Axis a = x; a <= z; a++) {
+			if (fabs(c[a]) > max[a]) max[a] = c[a];
+		}
+	}
+	return max;
+}
+
 void BoundsComponent::UpdateBroadphaseAABB() {
 	if (!boundingVolume) {
 		return;
@@ -39,11 +63,7 @@ void BoundsComponent::UpdateBroadphaseAABB() {
 		broadphaseAABB = Vector3(r, r, r);
 	}
 	else if (static_cast<int>(boundingVolume->type) == static_cast<int>(VolumeType::OBB)) {
-		std::cout << "Tried to get broadphase of OBB but it doesn't exist yet! Soz!\n";
-		/*Matrix3 mat = Quaternion::RotationMatrix<Matrix3>(transform.GetOrientation());
-		mat = Matrix::Absolute(mat);
-		Vector3 halfSizes = ((OBBVolume&)*boundingVolume).GetHalfDimensions();
-		broadphaseAABB = mat * halfSizes;*/
+		broadphaseAABB = GetOBBBroadphaseAABB(GetGameObject().GetTransform().GetOrientation(), ((OBBVolume&)*boundingVolume).GetHalfDimensions());
 	}
 }
 

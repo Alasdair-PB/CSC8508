@@ -9,7 +9,7 @@
 
 #include "INetworkDeltaComponent.h" // Needed to use GameObject::AddComponent<>()
 
-#include "../Util.cpp"
+#include "../../CSC8508CoreClasses/Util.cpp"
 
 void DungeonComponent::Generate(int const roomCount) const {
     // Generate the first room

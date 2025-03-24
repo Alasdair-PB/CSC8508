@@ -4,6 +4,9 @@
 //
 
 #include "CollisionDetection.h"
+
+#include <Util.cpp>
+
 #include "CollisionVolume.h"
 #include "AABBVolume.h"
 #include "Axis.h"
@@ -306,15 +309,15 @@ bool CollisionDetection::AABBIntersection(
 	return false;
 }
 
-void GetAllOBBVertices(Vector3 array[8], Transform const& worldTransform, Vector3 const& halfDimensions) {
-	for (int i = 0; i < 8; i++) {
-		array[i] = worldTransform.GetPosition() + worldTransform.GetOrientation() * (halfDimensions * Vector3(
-			i & 1 ? 1 : -1,
-			i & 2 ? 1 : -1,
-			i & 4 ? 1 : -1
-			));
-	}
-}
+// void GetAllOBBVertices(Vector3 array[8], Transform const& worldTransform, Vector3 const& halfDimensions) {
+// 	for (int i = 0; i < 8; i++) {
+// 		array[i] = worldTransform.GetPosition() + worldTransform.GetOrientation() * (halfDimensions * Vector3(
+// 			i & 1 ? 1 : -1,
+// 			i & 2 ? 1 : -1,
+// 			i & 4 ? 1 : -1
+// 			));
+// 	}
+// }
 
 bool CollisionDetection::OBBIntersection(
 	const OBBVolume& volumeA, const Transform& worldTransformA,
@@ -323,8 +326,8 @@ bool CollisionDetection::OBBIntersection(
 
 	// Get all vertices
 	Vector3 aVertices[8], bVertices[8];
-	GetAllOBBVertices(aVertices, worldTransformA, volumeA.GetHalfDimensions());
-	GetAllOBBVertices(bVertices, worldTransformB, volumeB.GetHalfDimensions());
+	Util::GetAllOBBVertices(aVertices, worldTransformA, volumeA.GetHalfDimensions());
+	Util::GetAllOBBVertices(bVertices, worldTransformB, volumeB.GetHalfDimensions());
 
 	// Translate vertices to be local to the opposite shape
 	for (int i = 0; i < 8; i++) {

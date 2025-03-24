@@ -10,8 +10,8 @@
 using namespace NCL::Maths;
 
 struct DoorLocation {
-    Vector3 const pos;
-    Vector3 const dir;
+    Vector3 pos;
+    Vector3 dir;
 
     DoorLocation(Vector3 const position, Vector3 const direction)
         : pos(position), dir(direction) { }

@@ -21,17 +21,23 @@ using namespace NCL::Rendering;
 class RoomComponent final : public IComponent {
 public:
      RoomComponent(GameObject& gameObject, RoomPrefab* prefab)
-        : IComponent(gameObject), prefab(prefab) {
-    }
+        : IComponent(gameObject), prefab(prefab) { }
 
-    RoomComponent* GenerateNew();
+     /**
+      * Attempts to find an appropriate place to attach the new room
+      * @param roomB New room's RoomComponent
+      * @return TRUE if successful (room's transform will be set appropriately), FALSE if couldn't fit anywhere
+      */
+     bool TryGenerateNewRoom(RoomComponent& roomB);
 
     [[nodiscard]] std::vector<RoomComponent*> GetNextDoorRooms() const { return nextDoorRooms; }
+
      /**
       * Gets the room's dungeon
       * @return Dungeon or NULLPTR if dungeon layout was not set up properly
       */
-     [[nodiscard]] GameObject* GetDungeon() const { return this->GetGameObject().TryGetParent(); }
+    [[nodiscard]] GameObject* GetDungeonGameObject() const { return this->GetGameObject().TryGetParent(); }
+    [[nodiscard]] RoomPrefab const& GetPrefab() const { return *prefab; }
 
 private:
     RoomPrefab* prefab;

@@ -7,21 +7,12 @@
 #include "AABBVolume.h"
 #include "NavigationMesh.h"
 #include "BoundsComponent.h"
+#include "DoorLocation.h"
 
 using namespace NCL::CSC8508;
 
 class RoomPrefab {
 public:
-
-    struct DoorLocation {
-        Vector3 const pos;
-        Vector3 const dir;
-
-        DoorLocation(Vector3 const position, Vector3 const direction)
-            : pos(position), dir(direction) { }
-    };
-
-
     RoomPrefab(GameObject* roomObject, NavigationMesh* navMesh) : roomObject(roomObject), navMesh(navMesh) { }
 
     [[nodiscard]] GameObject* GetRoomObject() const { return roomObject; }

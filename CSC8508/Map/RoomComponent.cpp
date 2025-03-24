@@ -4,49 +4,53 @@
 
 #include "RoomComponent.h"
 
-#include "INetworkDeltaComponent.h" // Needed to use GameObject::AddComponent<>()
+#include <random>
 
 #include "CollisionDetection.h"
+#include "DoorLocation.h"
 #include "RoomManager.h"
+#include "../Util.cpp"
 
-#include "../dungeon.h"
+bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
 
-RoomComponent* RoomComponent::GenerateNew() {
-    // 1: Pick a random prefab and create the game object for it
-    auto* roomB = new GameObject();
-    RoomPrefab* prefab = RoomManager::GetRandom();
-    auto* component = roomB->AddComponent<RoomComponent>(prefab);
+    // Randomly order door locations
+    auto const aDoorLocations = Util::RandomiseVector(this->prefab->GetDoorLocations());
+    auto const bDoorLocations = Util::RandomiseVector(roomB.GetPrefab().GetDoorLocations());
 
-    // 2: Check for space against potential door positions
-    for (RoomPrefab::DoorLocation aDoorLoc : this->prefab->GetDoorLocations()) {
-        for (RoomPrefab::DoorLocation bDoorLoc : prefab->GetDoorLocations()) {
+    // Keep checking each combination until it finds a valid room
+    Transform const& transformA = this->GetGameObject().GetTransform();
+    Transform& transformB = roomB.GetGameObject().GetTransform();
 
-            Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.pos, aDoorLoc.pos);
-            Transform& transformA = GetGameObject().GetTransform();
-            Transform& transformB = roomB->GetTransform();
-            transformB.SetOrientation(orientationDifference);
+    for (DoorLocation aDoorLoc : aDoorLocations) {
+        for (DoorLocation bDoorLoc : bDoorLocations) {
+
+            // Put the roomB GameObject in the test position
+            Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
+            transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
             transformB.SetPosition(
                 transformA.GetPosition()
                 + transformA.GetOrientation() * aDoorLoc.pos * transformA.GetScale()
                 - transformB.GetOrientation() * bDoorLoc.pos * transformB.GetScale()
                 );
 
-            // Check if collides
+            // Check if roomB's GameObject collides with any other object in the dungeon
             auto info = NCL::CollisionDetection::CollisionInfo();
-             if (!NCL::CollisionDetection::ObjectIntersection(&GetGameObject(), GetDungeon(), info)) {
+            if (!NCL::CollisionDetection::ObjectIntersection(&this->GetGameObject(), GetDungeonGameObject(), info)) {
 
-                 // Success (no collision) // TODO: Double check this is everything that needs doing
-                 this->nextDoorRooms.push_back(component);
-                 component->GetNextDoorRooms().push_back(this);
-                 GetDungeon()->AddChild(roomB);
-             }
+                // Success (no collision)
+                this->nextDoorRooms.push_back(&roomB);
+                roomB.GetNextDoorRooms().push_back(this);
+                GetDungeonGameObject()->AddChild(&roomB.GetGameObject());
+                return true;
+            }
 
-            // TODO: Repeat if failed, try random doors and random prefabs
+            // Else repeat until valid placement found
         }
     }
 
-    // 3: Randomly select a valid position
-
-    // 4: Spawn room in
-    return nullptr;
+    // If no combination is valid, reset transform and return false
+    transformB.SetOrientation(Quaternion());
+    transformB.SetPosition(Vector3());
+    return false;
 }
+

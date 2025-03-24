@@ -105,6 +105,12 @@ namespace NCL {
 		{
 			Debug::Print("Main Menu", Vector2(5, 85));
 
+			if (eosFlowFinished)
+			{
+				std::cout << "Popping Success";
+				return PushdownState::Pop;
+			}
+
 			if (mainMenuOption == startClientOpt) {
 				std::cout << "Start Client Pressed";
 				setPause(false);
@@ -137,6 +143,11 @@ namespace NCL {
 		PushdownState::PushdownResult MainMenu::LobbyScreenOnUpdate(float dt, PushdownState** newState)
 		{
 			Debug::Print("Duplicate Main Menu", Vector2(5, 85));
+
+			if (eosFlowFinished)
+			{
+				return PushdownState::Pop;
+			}
 
 			if (eosMenuOption == hostLobby) {
 				setPause(false);
@@ -189,12 +200,16 @@ namespace NCL {
 			{
 				setPause(false);
 				EOSStartAsHostFunc();
+				eosFlowFinished = true;
+				return PushdownState::Pop;
 			}
 			
 			if (eosLobbyOption == startGameAsJoin)
 			{
 				setPause(false);
 				EOSStartAsJoinFunc();
+				eosFlowFinished = true;
+				return PushdownState::Pop;
 			}
 
 			return PushdownState::NoChange;
@@ -220,4 +235,3 @@ namespace NCL {
 		}
 	}
 }
-//bba5237d7bae4524baa5fdbe33345214

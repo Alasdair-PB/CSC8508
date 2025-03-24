@@ -92,6 +92,9 @@ namespace NCL {
 
 			enum eosLobbyOptions {eosLobbyNone, startGameAsHost, startGameAsJoin};
 			int eosLobbyOption = 0;
+
+			bool eosFlowFinished = false;
 		};
 	}
 }
+//131d1484ab0f4b5ab5faed60cdfe0fd9

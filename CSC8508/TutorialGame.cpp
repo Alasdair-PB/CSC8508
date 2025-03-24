@@ -284,10 +284,9 @@ void TutorialGame::UpdateUI() {
 
 		bool isLobbyOwner = eosMenuUI->GetMenuOption() == 1;
 
-		if (eosLobbyMenuUI == nullptr)
-		{
-			eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount);
-		}
+
+		eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount);
+
 
 		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Lobby Search Field");

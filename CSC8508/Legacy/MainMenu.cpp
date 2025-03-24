@@ -42,11 +42,10 @@ namespace NCL {
 			this->startEOSLobbyCreation = startEOSLobbyCreation;
 			this->startEOSLobbySearch = startEOSLobbySearch;
 			this->startEOSLobbyUpdate = startEOSLobbyUpdate;
-			this->EOSStartAsHostFunc = eosStartAsHost;
-
 			getOwnerIPFunc = getOwnerIP;
 			getLobbyIDFunc = getLobbyID;
 			getPlayerCountFunc = getPlayerCount;
+			this->EOSStartAsHostFunc = eosStartAsHost;
 
 			
 

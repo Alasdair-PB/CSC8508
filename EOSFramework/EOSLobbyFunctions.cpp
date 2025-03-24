@@ -127,6 +127,8 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
     EOS_LobbyDetails_Info* lobbyInfo = nullptr;
     EOS_EResult result = EOS_LobbyDetails_CopyInfo(LobbyDetailsHandle, &copyInfoOptions, &lobbyInfo);
 
+    eosSearchManager.CreateLobbySearch(lobbyInfo->LobbyId);
+
     if (result != EOS_EResult::EOS_Success || !lobbyInfo)
     {
         std::cerr << "Error: Failed to copy lobby info." << std::endl;
@@ -275,18 +277,6 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
         std::cout << "User " << entry.first << " -> IP: " << entry.second << "\n";
     }
 
-    /*
-    // Now all users have all IPs, and the game can proceed.
-    if (isOwner)
-    {
-        std::cout << "Press 'P' to start the game..." << std::endl;
-        char input;
-        std::cin >> input;
-        if (input == 'P' || input == 'p') {
-            std::cout << "Game starting..." << std::endl;
-        }
-    }
-    */
-    eosSearchManager.CreateLobbySearch(lobbyInfo->LobbyId);
+    
 
 }

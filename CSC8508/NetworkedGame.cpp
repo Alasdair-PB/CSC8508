@@ -68,12 +68,12 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> void { this->StartEOSCallBack(); },
 		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
 		[&](std::string id) -> void { this->StartEOSLobbySearchCallBack(id); },
-		[&]() -> void { this->EOSStartAsHost(); },
-
+		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); },
 		[&]() -> std::string { return this->GetOwnerIP(); },
 		[&]() -> std::string { return this->GetLobbyID(); },
 		[&]() -> int { return this->GetPlayerCount(); },
-		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); }
+		[&]() -> void { this->StartAsHostCallBack(); }
+		
 	);
 
 	NetworkBase::Initialise();
@@ -150,7 +150,7 @@ void NetworkedGame::EOSStartAsHost()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-	std::cout << "starting" << std::endl;
+	std::cout << "starting here" << std::endl;
 	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 

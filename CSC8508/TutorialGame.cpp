@@ -42,6 +42,15 @@ void TutorialGame::TestLoadGameObject(std::string assetPath) {
 	world->AddGameObject(myObjectToLoad);
 }
 
+GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
+	GameObject* myObjectToLoad = new GameObject();
+	std::string pfabPath = GetAssetPath(assetPath);
+	myObjectToLoad->Load(pfabPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + offset);
+	world->AddGameObject(myObjectToLoad);
+	return myObjectToLoad;
+}
+
 void LoadControllerMappings(Controller* controller)
 {
 	controller->MapAxis(0, "Sidestep");
@@ -71,7 +80,8 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
+	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -106,7 +116,6 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
 	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
@@ -126,6 +135,13 @@ TutorialGame::~TutorialGame()
 	delete world;
 	delete controller;
 	delete navMesh;
+
+	delete framerate;
+	delete mainMenuUI;
+	delete audioSliders;
+	delete healthbar;
+	delete lobbySearchField;
+	delete inventoryUI;
 }
 
 void TutorialGame::UpdateObjectSelectMode(float dt) {
@@ -174,6 +190,10 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 
+	//TestSave();
+	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
+	LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 	AddRoleTToWorld(Vector3(90, 30, -52));
@@ -220,9 +240,10 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->RemoveStack("Inventory");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
+
 	uiSystem->RenderFrame();
 }
 

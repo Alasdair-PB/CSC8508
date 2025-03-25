@@ -86,6 +86,7 @@ namespace NCL {
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
 			UI::Healthbar* healthbar = new UI::Healthbar;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
+			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
 
 			float framerateDelay = 0;
 		};

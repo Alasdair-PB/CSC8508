@@ -8,7 +8,7 @@
 #include "EventListener.h"
 #include "EventManager.h"
 #include "CollisionDetection.h"
-#include "../InventoryNetworkManagerComponent.h"
+//#include "../InventoryNetworkManagerComponent.h"
 
 namespace NCL {
     namespace CSC8508 {
@@ -60,7 +60,7 @@ namespace NCL {
                 physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
                 inputComponent = GetGameObject().TryGetComponent<InputComponent>();
                 staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();
-                inventoryComponent = GetGameObject().TryGetComponent<InventoryManagerComponent>();
+               // inventoryComponent = GetGameObject().TryGetComponent<InventoryManagerComponent>();
                 sightComponent = GetGameObject().TryGetComponent<SightComponent>();
 
                 EventManager::RegisterListener<InputButtonEvent>(this);
@@ -106,22 +106,22 @@ namespace NCL {
            }
 
             void OnItemInteract() {
-                if (!inventoryComponent) return;
+                //if (!inventoryComponent) return;
 
-                if (!inventoryComponent->ItemInHand()) {
-                    inventoryComponent->DropItem();
-                    return;
-                }
+                //if (!inventoryComponent->ItemInHand()) {
+                //    inventoryComponent->DropItem();
+                //    return;
+                //}
 
                 Vector3 ray = Vector3(0, 1, 0);
                 Vector3 rayOffset = Vector3(0, 1, 0);
                 float visibleRange = 2.0f;
-                ItemComponent* item = sightComponent->CanSeeComponent<ItemComponent>(visibleRange,ray, rayOffset);
+                //ItemComponent* item = sightComponent->CanSeeComponent<ItemComponent>(visibleRange,ray, rayOffset);
 
-                if (item) {
-                    std::cout << "pick up item" << "\n";
-                    inventoryComponent->PushItemToInventory(item);
-                }
+                //if (item) {
+                //    std::cout << "pick up item" << "\n";
+                    //inventoryComponent->PushItemToInventory(item);
+                //}
             }
 
             void OnPlayerMove() {
@@ -181,7 +181,7 @@ namespace NCL {
             StaminaComponent* staminaComponent = nullptr;
             PhysicsComponent* physicsComponent = nullptr;
             PhysicsObject* physicsObj = nullptr;
-            InventoryManagerComponent* inventoryComponent = nullptr;
+           // InventoryManagerComponent* inventoryComponent = nullptr;
 
             uint32_t onJumpBinding;
             uint32_t onDashBinding;

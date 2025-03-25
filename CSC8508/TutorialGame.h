@@ -17,7 +17,6 @@
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
 
-
 using std::vector;
 
 namespace NCL {

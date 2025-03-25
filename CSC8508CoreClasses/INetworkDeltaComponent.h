@@ -5,11 +5,8 @@
 #ifndef INETWORKDELTACOMPONENT_H
 #define INETWORKDELTACOMPONENT_H
 
-#include "Transform.h"
 #include "IComponent.h"
 #include "NetworkBase.h"
-#include "Event.h"
-#include "EventManager.h"
 #include "INetworkComponent.h"
 using std::vector;
 

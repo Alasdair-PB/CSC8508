@@ -1,5 +1,5 @@
 #include "InventoryNetworkManagerComponent.h"
-#include "ComponentManager.h"
+//#include "ComponentManager.h"
 #include "../CSC8508CoreClasses/TransformNetworkComponent.h"
 using namespace NCL;
 using namespace CSC8508;
@@ -32,7 +32,7 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 				continue;
 
 			ItemComponent* itemDelta = nullptr;
-			ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
+			/*ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
 				[&lastInvFullState, &itemDelta, &i](TransformNetworkComponent* o) {
 					if (o->GetObjectID() == lastInvFullState->inventory[i]) {
 						ItemComponent* itemComponent = o->GetGameObject().TryGetComponent<ItemComponent>();
@@ -41,7 +41,7 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 						}
 					}
 				}
-			);
+			);*/
 
 			// Maybe for every inventory component drop the item if carried?
 			if (itemDelta != nullptr)

@@ -10,6 +10,7 @@
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
 #include "TransformNetworkComponent.h"
+//#include "SightComponent.h"
 //#include "InventoryNetworkManagerComponent.h"
 
 
@@ -39,7 +40,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	pc->SetBindingJump(KeyCodes::SPACE, stamina);
 	pc->SetBindingInteract(KeyCodes::E);
 
-	SightComponent* sight = player->AddComponent<SightComponent>();
+	//SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 

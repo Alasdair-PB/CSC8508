@@ -290,6 +290,7 @@ void TutorialGame::UpdateUI() {
 		uiSystem->RemoveStack("Inventory");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
+
 	uiSystem->RenderFrame();
 }
 

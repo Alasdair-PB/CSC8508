@@ -44,7 +44,7 @@ AudioSliders::AudioSliders() {
 		};
 
 	std::function<CSC8508::PushdownState::PushdownResult()> deviceFunc = [this]() -> CSC8508::PushdownState::PushdownResult {
-		inputDevice = audioEngine->GetInputDeviceIndex();
+		audioEngine->SetInputDeviceIndex(inputDevice);
 		if (ImGui::BeginCombo("Input Device", audioEngine->GetInputDeviceList()[inputDevice].data()))
 		{
 			for (int i = 0; i < audioEngine->GetInputDeviceList().size(); i++)
@@ -60,9 +60,8 @@ AudioSliders::AudioSliders() {
 			}
 			ImGui::EndCombo();
 		}
-		audioEngine->SetInputDeviceIndex(inputDevice);
 
-		outputDevice = audioEngine->GetOutputDeviceIndex();
+		audioEngine->SetOutputDeviceIndex(outputDevice);
 		if (ImGui::BeginCombo("Output Device", audioEngine->GetOutputDeviceList()[outputDevice].data()))
 		{
 			for (int i = 0; i < audioEngine->GetOutputDeviceList().size(); i++)
@@ -78,7 +77,6 @@ AudioSliders::AudioSliders() {
 			}
 			ImGui::EndCombo();
 		}
-		audioEngine->SetOutputDeviceIndex(outputDevice);
 
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 		};

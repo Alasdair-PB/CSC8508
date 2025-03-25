@@ -19,6 +19,9 @@ namespace NCL::PS5 {
 		float	GetAxis(uint32_t axis)	const override;
 		float	GetButtonAnalogue(uint32_t button) const override;
 		bool	GetButton(uint32_t button) const override;
+		
+		uint32_t GetHandle() const { return padHandle; }
+		SceUserServiceUserId GetUserId() const { return userId; }
 
 	protected:
 	private:
@@ -26,6 +29,7 @@ namespace NCL::PS5 {
 		static const int BUTTON_COUNT = 16;
 
 		uint32_t padHandle;
+		SceUserServiceUserId userId;
 		ScePadControllerInformation padInfo;
 
 		float	axes[AXIS_COUNT];

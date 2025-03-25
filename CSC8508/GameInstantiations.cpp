@@ -2,11 +2,15 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"
+#include "../AudioEngine/AudioSourceComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
 #include "StaminaComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
+#include "../AudioEngine/AudioListenerComponent.h"
+#include "../AudioEngine/NetworkedListenerComponent.h"
+#include "../AudioEngine/AudioSourceComponent.h"
 #include "AnimationComponent.h"
 #include "MeshAnimation.h"
 
@@ -143,6 +147,12 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+
+	/*AudioSourceComponent * audio_src = player->AddComponent<AudioSourceComponent>(ChannelGroupType::SFX);
+	audio_src->LoadSound("pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
+	audio_src->PlaySound("pollo");
+	audio_src->randomSounds(5);*/
+
 	int componentIdCount = 0;
 
 	if (spawnData)
@@ -153,13 +163,31 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+		
+		NetworkedListenerComponent* listenerComp = player->AddComponent<NetworkedListenerComponent>(
+			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+		listenerComp->RecordMic();
 
-		if (spawnData->clientOwned) 
+
+		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
+		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+
+
+		if (spawnData->clientOwned) {
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
+	}
+		else {
+			// Add persistent sound to player if not client owned
+			listenerComp->SetPersistentSound(sourceComp->GetPersistentPair());
+		}
+
 	}
 	else {
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
+
+		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
+		listenerComp->RecordMic();
 	}
 
 	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
@@ -173,6 +201,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	phys->GetPhysicsObject()->InitSphereInertia();
 
 	world->AddGameObject(player);
+
 	return player;
 }
 

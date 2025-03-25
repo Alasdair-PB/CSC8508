@@ -14,7 +14,7 @@ using namespace PS5;
 
 PS5Controller::PS5Controller(SceUserServiceUserId id) {
 	padHandle = scePadOpen(id, SCE_PAD_PORT_TYPE_STANDARD, 0, NULL);
-
+	userId = id;
 	scePadGetControllerInformation(padHandle, &padInfo);
 }
 

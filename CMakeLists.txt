@@ -170,12 +170,17 @@ else()
 	add_subdirectory(OpenGLRendering)
 endif()
 
+# Link Audio Engine
+if(NOT PS5)
 if(TARGET AudioEngine)
     add_dependencies(AudioEngine opus_build)
 endif()
 
 # Link FMOD
 target_link_libraries(AudioEngine PRIVATE "${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
+else()
+
+endif()
 target_link_libraries(CSC8508 PRIVATE AudioEngine)
 target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
 
@@ -183,7 +188,11 @@ target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
 target_link_libraries(AudioEngine PRIVATE ${OPUS_LIBRARY})
 
 # Link EOS Engine
+if(NOT PS5)
 target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")
+else()
+target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")
+endif()
 target_include_directories(CSC8508 PRIVATE "${EOS_DIR}/Include")
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT CSC8508)

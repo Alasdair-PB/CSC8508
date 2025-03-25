@@ -74,6 +74,7 @@ namespace NCL {
 			GameTechRendererInterface* renderer;
 #endif
 			PhysicsSystem* physics;
+			AudioEngine* audioEngine = nullptr;
 			GameWorld* world;
 			Controller* controller;
 

@@ -64,7 +64,6 @@ namespace NCL::CSC8508 {
 					}
 				}
 			}
-
 			fp->fullState.stateID = state->stateID;
 			if (clientOwned && state->stateID >= MAX_PACKETID)
 				state->stateID = 0;
@@ -120,6 +119,8 @@ namespace NCL::CSC8508 {
 							}
 						}
 					);
+
+					// Maybe for every inventory component drop the item if carried?
 
 					if (itemDelta != nullptr)
 						storedItems[i] = itemDelta;

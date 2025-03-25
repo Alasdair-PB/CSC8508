@@ -119,16 +119,13 @@ void GameWorld::AddGameObject(GameObject* o) {
 
 	if (bounds) boundsComponents.emplace_back(bounds);
 	if (phys) physicsComponents.emplace_back(phys);
-
 	auto newComponents = o->GetAllComponents();
 
-	for (IComponent* component : newComponents) {
-		this->components.push_back(component);
+	for (IComponent* component : newComponents)
 		component->InvokeOnAwake();
-	}
-
 	for (GameObject* child : o->GetChildren())
 		AddGameObject(child);
+
 	o->InvokeOnAwake();
 }
 

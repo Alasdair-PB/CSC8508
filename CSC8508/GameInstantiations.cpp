@@ -13,6 +13,8 @@
 #include "../AudioEngine/AudioSourceComponent.h"
 #include "AnimationComponent.h"
 #include "MeshAnimation.h"
+#include "InventoryManagerComponent.h"
+#include "InventoryNetworkManagerComponent.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -38,8 +40,10 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
+
 	pc->SetBindingDash(KeyCodes::SHIFT, stamina);
 	pc->SetBindingJump(KeyCodes::SPACE, stamina);
+	pc->SetBindingInteract(KeyCodes::E);
 
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
@@ -57,6 +61,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
 			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
+		InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2,
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 		
@@ -73,6 +80,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			listenerComp->SetPersistentSound(sourceComp->GetPersistentPair());
 	}
 	else {
+		InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2);
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 

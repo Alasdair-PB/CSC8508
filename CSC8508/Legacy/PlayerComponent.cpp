@@ -11,7 +11,8 @@ PlayerComponent::PlayerComponent(GameObject& gameObject) :
 	isJumping(false),
 	onDashBinding(0),
 	onJumpBinding(0),
-	onItemPickUpBinding(0)
+	onItemInteractBinding(0),
+	onInvScrollBinding(0)
 {
 
 }

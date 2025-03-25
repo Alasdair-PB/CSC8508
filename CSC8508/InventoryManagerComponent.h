@@ -27,6 +27,10 @@ namespace NCL::CSC8508 {
             return true;
         }
 
+        bool ItemInHand() {
+            return ItemAtScrollIndex();
+        }
+
         void Update(float deltaTime) override {
             if (!ItemAtScrollIndex()) return;
             Transform& objectTransform = storedItems[scrollIndex]->GetGameObject().GetTransform();
@@ -67,7 +71,7 @@ namespace NCL::CSC8508 {
         void Load(std::string assetPath, size_t allocationStart) override;
         size_t Save(std::string assetPath, size_t* allocationStart) override;
 
-    private:
+    protected:
         std::vector<ItemComponent*> storedItems;
         int maxItemStorage;
         int scrollIndex = 0;

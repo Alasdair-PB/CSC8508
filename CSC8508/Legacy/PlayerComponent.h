@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "InputComponent.h"
 #include "StaminaComponent.h"
-#include "InventoryManagerComponent.h"
+#include "../InventoryManagerComponent.h"
 
 #include "CollisionEvent.h"
 
@@ -33,8 +33,12 @@ namespace NCL {
                 if (component) component->SetStaminaAction(d, dashTickStam);
             }
 
-            void SetBindingPickUp(uint32_t p) {
-                onItemPickUpBinding = p;
+            void SetBindingInteract(uint32_t p) {
+                onItemInteractBinding = p;
+            }
+
+            void SetBindingScrollInventory(uint32_t p) {
+                onInvScrollBinding = p;
             }
 
             void OnEvent(InputButtonEvent* buttonEvent) override {
@@ -100,9 +104,22 @@ namespace NCL {
                 }
             }
 
-            void OnItemPickUp() {
+           void DropItem() {
+
+           }
+
+            void OnItemInteract() {
                 if (!inventoryComponent) return;
 
+                if (!inventoryComponent->ItemInHand()) {
+                    inventoryComponent->DropItem();
+                    return;
+                }
+
+
+
+                GameObject* itemPickUp;
+                inventoryComponent->PushItemToInventory(itemPickUp);
 
                 // Raycast towards item
                 // pick up item on success
@@ -133,8 +150,8 @@ namespace NCL {
                         OnDashInput();
                     else if (inputStack.top() == onJumpBinding)
                         OnJumpInput();
-                    else if (inputStack.top() == onItemPickUpBinding)
-                        OnItemPickUp();
+                    else if (inputStack.top() == onItemInteractBinding)
+                        OnItemInteract();
                     inputStack.pop();
                 }
             }
@@ -169,7 +186,9 @@ namespace NCL {
 
             uint32_t onJumpBinding;
             uint32_t onDashBinding;
-            uint32_t onItemPickUpBinding;
+            uint32_t onItemInteractBinding;
+            uint32_t onInvScrollBinding;
+
             std::stack<uint32_t> inputStack; 
 
             float downwardsVelocityMod = 50.0f;

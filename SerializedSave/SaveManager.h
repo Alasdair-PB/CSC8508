@@ -275,12 +275,8 @@ namespace NCL::CSC8508 {
                 item.dataSize += sizeof(uint32_t);
                 using ValueType = typename T::value_type;
 
-                //if constexpr (std::is_trivially_copyable_v<ValueType> && !is_specialization<ValueType, std::pair>::value)
-                //    item.dataSize += container.size() * sizeof(ValueType);
-                //else {
-                    for (const auto& val : container)
-                        CalculateSize(val, item);
-               // }
+                for (const auto& val : container)
+                    CalculateSize(val, item);
             }
             else if constexpr (std::is_trivially_copyable_v<T>) 
                 item.dataSize += sizeof(T);
@@ -317,14 +313,8 @@ namespace NCL::CSC8508 {
                 std::memcpy(dataPtr, &containerSize, sizeof(containerSize));
                 dataPtr += sizeof(containerSize);
 
-                //if constexpr (std::is_trivially_copyable_v<typename T::value_type>) {
-                //    std::memcpy(dataPtr, container.data(), containerSize * sizeof(typename T::value_type));
-                //    dataPtr += containerSize * sizeof(typename T::value_type);
-                //}
-                //else {
-                    for (const auto& p : container)
-                        SaveMember(p, item, dataPtr);
-               // }
+                for (const auto& p : container)
+                    SaveMember(p, item, dataPtr);
             }
             else if constexpr (std::is_trivially_copyable_v<T>) {
                 std::memcpy(dataPtr, &container, sizeof(container));
@@ -370,14 +360,8 @@ namespace NCL::CSC8508 {
                 container.resize(containerSize);
 
                 using ValueType = typename T::value_type;
-                //if (!std::is_trivially_copyable_v<ValueType> || is_specialization<ValueType, std::pair>::value) {
                 for (size_t i = 0; i < containerSize; ++i)
                     container[i] = LoadMember<ValueType>(loadedData, offset);
-                //}
-                //else {               
-                //    std::memcpy(container.data(), loadedData.data.data() + offset, containerSize * sizeof(ValueType));
-                //    offset += containerSize * sizeof(ValueType);
-                //}
             }
             else if constexpr (std::is_trivially_copyable_v<T>) {
                 std::memcpy(&container, loadedData.data.data() + offset, sizeof(container));

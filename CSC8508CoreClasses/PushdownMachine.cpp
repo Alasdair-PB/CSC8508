@@ -4,7 +4,10 @@
 using namespace NCL::CSC8508;
 
 
-PushdownMachine::PushdownMachine(PushdownState* initialState){this->initialState = initialState;}
+PushdownMachine::PushdownMachine(PushdownState* initialState){
+	this->initialState = initialState;
+	this->activeState = nullptr;
+}
 
 PushdownMachine::~PushdownMachine(){}
 

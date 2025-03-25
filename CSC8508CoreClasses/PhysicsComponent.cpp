@@ -37,6 +37,10 @@ struct PhysicsComponent::PhysicsComponentDataStruct : public ISerializedData {
 	}
 };
 
+auto PhysicsComponent::GetDerivedSerializedFields() const {
+	return PhysicsComponentDataStruct::GetSerializedFields();
+}
+
 size_t PhysicsComponent::Save(std::string assetPath, size_t* allocationStart)
 {
 	PhysicsComponentDataStruct saveInfo;

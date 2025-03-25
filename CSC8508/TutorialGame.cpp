@@ -19,6 +19,7 @@
 #include "../PS5Starter/GameTechAGCRenderer.h"
 #include "../PS5Core/PS5Window.h"
 #include "../PS5Core/PS5Controller.h"
+#include "../UISystem/UIPlayStation.h"
 #else
 #include "GameTechRenderer.h"
 #include "KeyboardMouseController.h"
@@ -28,66 +29,26 @@
 using namespace NCL;
 using namespace CSC8508;
 
-struct MyX {
-	MyX() : x(0) {}
-	MyX(int x) :x(x) {}
-	int x;
-};
-
-enum testGuy {X};
-
 const static std::string folderPath = NCL::Assets::PFABDIR;
 
 std::string GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
 }
 
-void TestSaveByType() {
-	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
-	std::string intPath = GetAssetPath("int_data.pfab");
-	std::string structPath = GetAssetPath("struct_data.pfab");
-	std::string enumPath = GetAssetPath("enum_data.pfab");
-
-	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
-	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
-	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
-	SaveManager::SaveGameData(enumPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
-	std::cout << SaveManager::LoadMyData<MyX>(enumPath).x << std::endl;
-	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<testGuy>(X));
-	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;
-}
-
-GameObject* TutorialGame::CreateChildInstance(Vector3 offset, bool isStatic) {
-	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, isStatic ? 0 : 10, false);
-	return myObjectToSave;
-}
-
-void TutorialGame::TestSaveGameObject(std::string assetPath) {
-
-	Vector3 position = Vector3(90 + 10, 22, -50);
-	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, 10.0f, false);
-	GameObject* child = CreateChildInstance(Vector3(5, 0, 0), false);
-	child->AddChild(CreateChildInstance(Vector3(5, 0, 0), true));
-
-	myObjectToSaveA->AddChild(child);
-	myObjectToSaveA->Save(assetPath);
-	world->AddGameObject(myObjectToSaveA);	
-}
-
 void TutorialGame::TestLoadGameObject(std::string assetPath) {
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(assetPath);
 	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
-	//myObjectToLoad->SetEnabled(false);
 	world->AddGameObject(myObjectToLoad);
 }
 
-void TutorialGame::TestSave() {
-	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	TestSaveByType();
-	TestSaveGameObject(gameObjectPath);
-	//TestLoadGameObject(gameObjectPath);
+GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
+	GameObject* myObjectToLoad = new GameObject();
+	std::string pfabPath = GetAssetPath(assetPath);
+	myObjectToLoad->Load(pfabPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + offset);
+	world->AddGameObject(myObjectToLoad);
+	return myObjectToLoad;
 }
 
 void LoadControllerMappings(Controller* controller)
@@ -109,13 +70,18 @@ void TutorialGame::InitialiseGame() {
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
 
+	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
+	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
+
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
+	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -128,6 +94,8 @@ TutorialGame::TutorialGame()
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	controller = w->GetController();
 	renderer = new GameTechAGCRenderer(*world);
+	UI::UIPlayStation::GetInstance()->SetPadHandle(static_cast<NCL::PS5::PS5Controller*>(controller)->GetHandle());
+	UI::UIPlayStation::GetInstance()->InitMouse(static_cast<NCL::PS5::PS5Controller*>(controller)->GetUserId());
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
 #ifdef USEVULKAN
@@ -148,7 +116,6 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
 	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
@@ -168,6 +135,13 @@ TutorialGame::~TutorialGame()
 	delete world;
 	delete controller;
 	delete navMesh;
+
+	delete framerate;
+	delete mainMenuUI;
+	delete audioSliders;
+	delete healthbar;
+	delete lobbySearchField;
+	delete inventoryUI;
 }
 
 void TutorialGame::UpdateObjectSelectMode(float dt) {
@@ -199,6 +173,7 @@ void TutorialGame::UpdateGame(float dt)
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
+	
 	Debug::UpdateRenderables(dt);
 
 	world->UpdateWorld(dt);
@@ -210,23 +185,18 @@ void TutorialGame::LoadWorld(std::string assetPath) {
 	world->Load(assetPath);
 }
 
-void TutorialGame::SaveWorld(std::string assetPath) {
-	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-	delete x;
-	world->Save(assetPath);
-}
-
-const bool load = true;
-
 void TutorialGame::InitWorld() 
 {
 	world->ClearAndErase();
 	physics->Clear();
+
 	//TestSave();
+	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
+	LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);
 	LoadWorld(assetPath);
-	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
+	AddRoleTToWorld(Vector3(90, 30, -52));
 }
 
 bool TutorialGame::SelectObject() {
@@ -270,7 +240,7 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->RemoveStack("Inventory");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 

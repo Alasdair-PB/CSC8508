@@ -7,8 +7,8 @@ using namespace UI;
 
 InventoryUI::InventoryUI() {
 	std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
-		/*for (auto const& item : ) {
-		
+		/*for (auto const& item : inventory.storedItems) {
+
 		}*/
 
 		return CSC8508::PushdownState::PushdownResult::NoChange;

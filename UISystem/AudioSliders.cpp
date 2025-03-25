@@ -47,11 +47,10 @@ AudioSliders::AudioSliders() {
 		audioEngine->SetInputDeviceIndex(inputDevice);
 		if (ImGui::BeginCombo("Input Device", audioEngine->GetInputDeviceList()[inputDevice].data()))
 		{
-			for (int i = 0; i < audioEngine->GetInputDeviceList().size(); i++)
-			{
-				const bool is_selected = (inputDevice == i);
-				if (ImGui::Selectable(audioEngine->GetInputDeviceList()[i].data(), is_selected)) {
-					inputDevice = i;
+			for (auto const& device : audioEngine->GetInputDeviceList()) {
+				const bool is_selected = (inputDevice == device.first);
+				if (ImGui::Selectable(device.second.c_str(), is_selected)) {
+					inputDevice = device.first;
 				}
 
 				if (is_selected) {
@@ -64,11 +63,10 @@ AudioSliders::AudioSliders() {
 		audioEngine->SetOutputDeviceIndex(outputDevice);
 		if (ImGui::BeginCombo("Output Device", audioEngine->GetOutputDeviceList()[outputDevice].data()))
 		{
-			for (int i = 0; i < audioEngine->GetOutputDeviceList().size(); i++)
-			{
-				const bool is_selected = (outputDevice == i);
-				if (ImGui::Selectable(audioEngine->GetOutputDeviceList()[i].data(), is_selected)) {
-					outputDevice = i;
+			for (auto const& device : audioEngine->GetOutputDeviceList()) {
+				const bool is_selected = (outputDevice == device.first);
+				if (ImGui::Selectable(device.second.c_str(), is_selected)) {
+					outputDevice = device.first;
 				}
 
 				if (is_selected) {

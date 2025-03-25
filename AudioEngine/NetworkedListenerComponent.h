@@ -38,31 +38,53 @@ namespace NCL::CSC8508 {
 		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, bool clientOwned) :
 			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, clientOwned) {}
 
-		~NetworkedListenerComponent() = default;
+		~NetworkedListenerComponent() {
+			if (clientOwned) {
+				audioEngine->StopRecording();
+				StopNetworkedEncodeThread();
+				CloseEncoder(encoder);
+			}
+			else {
+				StopNetworkedDecodeThread();
+				CloseDecoder(decoder);
+			}
+		}
 
 
 		void OnAwake() override {
-		
+
 			if (clientOwned) {
 				// Initialise Encoding Pipeline
 				InitMicSound();
-				encoder = OpenEncoder();
-
 				RecordMic();
 
+				encoder = OpenEncoder();
 				encodeThreadRunning = true;
 				StartNetworkedEncodeThread();
 			}
-
-			decoder = OpenDecoder();
-			decodeThreadRunning = true;
-			StartNetworkedDecodeThread();
+			else {
+				decoder = OpenDecoder();
+				decodeThreadRunning = true;
+				StartNetworkedDecodeThread();
+			}
 
 			std::cout << "Listener ID: " << objectID << ", awake!" << std::endl;
 		}
 
 		void Update(float deltaTime) override {
 			dt = deltaTime;
+
+			if(clientOwned){
+				Vector3 pos = transform->GetPosition();
+				//std::cout << "Listener " << objectID << " pos: " << std::to_string(pos.x) << ", " << std::to_string(pos.z) << std::endl;
+
+				Vector3 forward = Vector3(fForward.x, fForward.y, fForward.z);
+				//std::cout << "Listener " << objectID << " forward: " << std::to_string(forward.x) << ", " << std::to_string(forward.z) << std::endl;
+
+
+				AudioListenerComponent::Update(deltaTime);
+			}
+
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -238,7 +260,7 @@ namespace NCL::CSC8508 {
 		void UpdateNetworkedDecode() {
 			uint32_t nextIndex = recieveHistoryCounter % bufferSize;
 
-			std::cout << "Next Index: " << nextIndex << "/" << bufferSize << std::endl;
+			//std::cout << "Next Index: " << nextIndex << "/" << bufferSize << std::endl;
 
 			RecievedAudioPacket* packet = nullptr;
 
@@ -405,6 +427,7 @@ namespace NCL::CSC8508 {
 		}
 
 		void StopNetworkedEncodeThread() {
+			encodeThreadRunning = false;
 			if (encodeThread.joinable()) {
 				encodeThread.join();
 				std::cout << "Networked Audio Encode Stopped" << std::endl;
@@ -433,6 +456,7 @@ namespace NCL::CSC8508 {
 		}
 
 		void StopNetworkedDecodeThread() {
+			decodeThreadRunning = false;
 			if (decodeThread.joinable()) {
 				decodeThread.join();
 				std::cout << "Networked Audio Decode Stopped" << std::endl;

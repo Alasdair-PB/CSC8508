@@ -43,11 +43,6 @@ AudioEngine& AudioEngine::Instance() {
 	return instance;
 }
 
-void AudioEngine::Init() {
-	FMOD::System_Create(&audioSystem);
-	audioSystem->init(512, FMOD_INIT_NORMAL, nullptr);
-}
-
 void AudioEngine::Update() {
     audioSystem->update();
 }

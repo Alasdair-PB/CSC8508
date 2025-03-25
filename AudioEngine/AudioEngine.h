@@ -245,6 +245,14 @@ public:
 		return &soundGroups[group];
 	}
 
+	float GetMinDistance() {
+		return minDistance;
+	}
+
+	float GetMaxDistance() {
+		return maxDistance;
+	}
+
 
 private:
     AudioEngine();

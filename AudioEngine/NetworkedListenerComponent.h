@@ -64,8 +64,8 @@ namespace NCL::CSC8508 {
 			}
 			else {
 				decoder = OpenDecoder();
-				decodeThreadRunning = true;
-				StartNetworkedDecodeThread();
+				//decodeThreadRunning = true;
+				//StartNetworkedDecodeThread();
 			}
 
 			std::cout << "Listener ID: " << objectID << ", awake!" << std::endl;
@@ -83,6 +83,18 @@ namespace NCL::CSC8508 {
 
 
 				AudioListenerComponent::Update(deltaTime);
+			}
+			else {
+				for (size_t i = 0; i < bufferSize; i++) {
+					if (audioPacketQueue[i] != nullptr) {
+						//persistentChannel->setPaused(false);
+						UpdateNetworkedDecode();
+
+					}
+					else {
+						//persistentChannel->setPaused(true);
+					}
+				}
 			}
 
 		}
@@ -441,16 +453,7 @@ namespace NCL::CSC8508 {
 				while (decodeThreadRunning) {
 
 
-					for (size_t i = 0 ; i < bufferSize; i++) {
-						if (audioPacketQueue[i] != nullptr) {
-							//persistentChannel->setPaused(false);
-							UpdateNetworkedDecode();
-
-						}
-						else {
-							//persistentChannel->setPaused(true);
-						}
-					}
+					
 				}
 			});
 		}

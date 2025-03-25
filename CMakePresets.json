@@ -14,6 +14,10 @@
         "PS5": {
           "type": "INTERNAL",
           "value": "TRUE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "FALSE"
         }
       }
     },
@@ -26,6 +30,26 @@
         "PS5": {
           "type": "INTERNAL",
           "value": "FALSE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        }
+      }
+    },
+    {
+      "name": "windows-editor-build",
+      "hidden": false,
+      "generator": "Visual Studio 17 2022",  
+      "binaryDir": "${sourceDir}/build_windows",
+      "cacheVariables": {
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "TRUE"
         }
       }
     }

@@ -1,7 +1,6 @@
 #pragma once
 #include "TutorialGame.h"
 #include "NetworkBase.h"
-#include "NetworkObject.h"
 #include "EventListener.h"
 
 namespace NCL {
@@ -49,8 +48,6 @@ namespace NCL {
 			void OnEvent(NetworkEvent* e) override;
 			void OnEvent(HostLobbyConnectEvent* e) override;
 			void OnEvent(ClientLobbyConnectEvent* e) override;
-
-			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
 		protected:
 			void UpdatePackets(float dt);

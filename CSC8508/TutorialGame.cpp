@@ -138,11 +138,15 @@ void TutorialGame::InitialiseGame() {
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 
+	audioEngine = &AudioEngine::Instance();
+
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
 	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
+
+
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -240,6 +244,7 @@ void TutorialGame::UpdateGame(float dt)
 	world->UpdateWorld(dt);
 	Window::GetWindow()->ShowOSPointer(true);
 	physics->Update(dt);
+	audioEngine->Update();
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {

@@ -59,12 +59,6 @@ public:
     */
     static AudioEngine& Instance();
 
-    /**
-	* Instantiate static singleton instance of Audio Engine
-	* Call this to get the instance of the Audio Engine
-    */
-    void Init();
-
 	/**
 	* Update Audio Engine
     * To be called in main game loop

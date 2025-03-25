@@ -13,7 +13,7 @@
 #include "Assets.h"
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
-
+#include "ItemComponent.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -100,6 +100,17 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapAxis(4, "YLook");
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
+	controller->MapButton(KeyCodes::E, "Interact");
+
+}
+
+void TutorialGame::Loaditem() {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* myObjectToLoad = new GameObject();
+	myObjectToLoad->Load(gameObjectPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
+	myObjectToLoad->AddComponent<ItemComponent>();
+	world->AddGameObject(myObjectToLoad);
 
 }
 

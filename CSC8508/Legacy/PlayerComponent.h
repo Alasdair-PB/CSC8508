@@ -3,6 +3,8 @@
 #include "GameObject.h"
 #include "InputComponent.h"
 #include "StaminaComponent.h"
+#include "InventoryManagerComponent.h"
+
 #include "CollisionEvent.h"
 
 #include "Ray.h"
@@ -58,6 +60,7 @@ namespace NCL {
                 physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
                 inputComponent = GetGameObject().TryGetComponent<InputComponent>();
                 staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();
+                inventoryComponent = GetGameObject().TryGetComponent<InventoryManagerComponent>();
 
                 EventManager::RegisterListener<InputButtonEvent>(this);
                 EventManager::RegisterListener<CollisionEvent>(this);
@@ -98,6 +101,11 @@ namespace NCL {
             }
 
             void OnItemPickUp() {
+                if (!inventoryComponent) return;
+
+
+                // Raycast towards item
+                // pick up item on success
                 std::cout << "pick up item" << "\n";
             }
 
@@ -157,6 +165,7 @@ namespace NCL {
             StaminaComponent* staminaComponent = nullptr;
             PhysicsComponent* physicsComponent = nullptr;
             PhysicsObject* physicsObj = nullptr;
+            InventoryManagerComponent* inventoryComponent = nullptr;
 
             uint32_t onJumpBinding;
             uint32_t onDashBinding;

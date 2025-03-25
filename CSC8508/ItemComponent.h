@@ -23,6 +23,10 @@ namespace NCL::CSC8508 {
             disabledOnPickup.clear();
         }
 
+        void OnAwake() override {
+            EventManager::RegisterListener<DeathEvent>(this);
+        }
+
         int GetSaleValue() const {
             return saleValue;
         }

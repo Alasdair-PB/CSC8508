@@ -51,6 +51,7 @@ namespace NCL {
 			void LoadWorld(std::string assetPath);
 			void TestSave();
 			void UpdateUI();
+			void Loaditem();
 
 			GameObject* CreateChildInstance(Vector3 offset, bool isStatic);
 			GameObject* AddFloorToWorld(const Vector3& position);

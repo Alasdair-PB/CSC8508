@@ -300,7 +300,7 @@ void TutorialGame::UpdateUI() {
 		{
 			if (!eosLobbyMenuCreated)
 			{
-				eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount);
+				eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount + 1);
 				eosLobbyMenuCreated = true;
 			}
 			uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");

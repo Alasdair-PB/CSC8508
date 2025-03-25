@@ -229,7 +229,6 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
     memberCountOptions.ApiVersion = EOS_LOBBYDETAILS_GETMEMBERCOUNT_API_LATEST;
 
     int32_t playerCount = EOS_LobbyDetails_GetMemberCount(LobbyDetailsHandle, &memberCountOptions);
-    std::cout << "Other Members Count: " << (playerCount > 1 ? playerCount - 1 : 0) << std::endl;
 
     std::vector<EOS_ProductUserId> otherUsers;
 

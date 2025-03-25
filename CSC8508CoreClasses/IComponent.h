@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "GameObject.h"
 #include <unordered_set>
+#include <tuple>
 
 namespace NCL::CSC8508 
 {
@@ -94,6 +95,11 @@ namespace NCL::CSC8508
 		}
 
 		/// <summary>
+		/// IComponent Save data struct definition
+		/// </summary>
+		struct ComponentDataStruct;
+
+		/// <summary>
 		/// Query if this IComponent is derived from a type matching type_info
 		/// </summary>
 		/// <param name="typeInfo">The type info of the queried type</param>
@@ -107,20 +113,13 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual void Load(std::string assetPath, size_t allocationStart) override;
-#
+
 		/// <summary>
 		/// Saves the IComponent data into the assetPath file. 
 		/// </summary>
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
-
-
-		/// <summary>
-		/// IComponent Save data struct definition
-		/// </summary>
-		struct ComponentDataStruct;
-
 	protected:
 		virtual void OnAwake() {}
 		virtual void Update(float deltaTime) {}

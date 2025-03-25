@@ -21,7 +21,6 @@ namespace NCL::CSC8508 {
 		enum LayerID { Default, Ignore_RayCast, UI, Player, Enemy, Ignore_Collisions };
 	}
 	class IComponent;
-	class NetworkObject;
 	class RenderObject;
 	class BoundsComponent;
 

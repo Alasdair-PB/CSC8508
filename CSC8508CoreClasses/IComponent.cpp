@@ -11,7 +11,7 @@ GameObject& IComponent::GetGameObject() const {
 }
 
 bool IComponent::IsEnabled() const {
-	return this->enabled;
+	return gameObject.IsEnabled() && this->enabled;
 }
 
 void IComponent::SetEnabled(bool enabled) {

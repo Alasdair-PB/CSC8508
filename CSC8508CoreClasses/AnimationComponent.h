@@ -32,6 +32,9 @@ namespace NCL::CSC8508
 		AnimationComponent(GameObject& gameObject, Rendering::MeshAnimation* anim = nullptr);
 		~AnimationComponent();
 		
+		static const char* Name() { return "Animation"; }
+		const char* GetName() const override { return Name(); }
+
 		std::vector<Matrix4>& GetSkeleton() {
 			return skeleton;
 		}

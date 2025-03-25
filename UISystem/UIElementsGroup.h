@@ -4,6 +4,7 @@
 #include "../CSC8508CoreClasses/PushdownMachine.h"
 #include "../CSC8508CoreClasses/PushdownState.h"
 
+
 namespace NCL {
 	namespace UI {
 		class UIElementsGroup : public CSC8508::PushdownState {
@@ -84,10 +85,34 @@ namespace NCL {
 				}
 			};
 
+			class InputFieldElement : public UIElement {
+			public:
+				void SetName(std::string n) {
+					fieldName = n;
+				}
+				void SetInput(std::string i) {
+					input = i;
+				}
+				void SetFunc(std::function<CSC8508::PushdownState::PushdownResult(std::string)> f) {
+					func = f;
+				}
+				CSC8508::PushdownState::PushdownResult UpdateElement()override {
+					strncpy_s(inputData, input.c_str(), 16);
+					ImGui::InputText(fieldName.c_str(), inputData, 16);
+					input = std::string(inputData);
+					return func(inputData);
+				}
+			protected:
+				std::string fieldName;
+				std::string input;
+				char inputData[16];
+				std::function<CSC8508::PushdownState::PushdownResult(std::string)> func;
+			};
+
 			std::vector<UIElement*> elements;
 
 		public:
-			UIElementsGroup(ImVec2 pos, ImVec2 size, float fontScale = 2, std::string name = "", float elementsOffset = 50, ImGuiWindowFlags flags = 0)
+			UIElementsGroup(ImVec2 pos, ImVec2 size, float fontScale = 2, std::string name = " ", float elementsOffset = 50, ImGuiWindowFlags flags = 0)
 				: pos(pos), size(size), fontScale(fontScale), winName(name), elementsOffset(elementsOffset), flags(flags) {
 			}
 
@@ -136,6 +161,14 @@ namespace NCL {
 			}
 
 			void PushTextElement(std::string text) {}
+
+			void PushInputFieldElement(std::string name, std::string input, std::function<CSC8508::PushdownState::PushdownResult(std::string)> func) {
+				InputFieldElement* inputFieldElem = new InputFieldElement;
+				inputFieldElem->SetName(name);
+				inputFieldElem->SetInput(input);
+				inputFieldElem->SetFunc(func);
+				elements.push_back(inputFieldElem);
+			}
 
 			void PushVoidElement(std::function<CSC8508::PushdownState::PushdownResult()> func) {
 				VoidElement* voidElem = new VoidElement;

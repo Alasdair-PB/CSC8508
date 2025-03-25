@@ -27,7 +27,6 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
         break;
     
     }case ComponentMapId::Animation: {
-        std::cout << "Damageable added" << std::endl;
         object.AddComponent<AnimationComponent>();
         break;
 

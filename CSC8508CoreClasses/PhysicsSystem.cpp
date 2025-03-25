@@ -141,6 +141,7 @@ void PhysicsSystem::UpdateObjectAABBs() {
 	std::vector<BoundsComponent*>::const_iterator last;
 	gameWorld.GetBoundsIterators(first, last);
 	for (auto i = first; i != last; ++i) {
+		if (!(*i)->IsEnabled()) continue;
 		(*i)->UpdateBroadphaseAABB();
 	}
 }
@@ -151,11 +152,11 @@ void PhysicsSystem::BasicCollisionDetection() {
 	gameWorld.GetBoundsIterators(first, last);
 
 	for (auto i = first; i != last; ++i) {
-		if ((*i)->GetPhysicsComponent() == nullptr) {
+		if ((*i)->GetPhysicsComponent() == nullptr || !(*i)->IsEnabled()) {
 			continue;
 		}
 		for (auto j = i + 1; j != last; ++j) {
-			if ((*j)->GetPhysicsComponent() == nullptr) {
+			if ((*j)->GetPhysicsComponent() == nullptr || !(*i)->IsEnabled()) {
 				continue;
 			}
 			CollisionDetection::CollisionInfo info;
@@ -257,7 +258,7 @@ void PhysicsSystem::BroadPhase() {
 
 	for (auto i = first; i != last; ++i) {
 		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes)) {
+		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
 			continue;
 		}
 		Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
@@ -299,7 +300,7 @@ void PhysicsSystem::IntegrateAccel(float dt)
 
 	for (auto i = first; i != last; ++i) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
-		if (object == nullptr)
+		if (object == nullptr || !(*i)->IsEnabled())
 			continue; 
 		float inverseMass = object->GetInverseMass();
 
@@ -335,7 +336,7 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 	for (auto i = first; i != last; ++i) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
 
-		if (object == nullptr) 
+		if (object == nullptr || !(*i)->IsEnabled()) 
 			continue;
 
 		if (object->GetInverseMass() == 0)
@@ -372,7 +373,7 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 void PhysicsSystem::ClearForces() {
 	ComponentManager::OperateOnBufferContents<PhysicsComponent>(
 		[](PhysicsComponent* o) {
-			if (o->GetPhysicsObject())
+			if (o->IsEnabled() && o->GetPhysicsObject())
 				o->GetPhysicsObject()->ClearForces();
 		}
 	);

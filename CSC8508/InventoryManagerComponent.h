@@ -15,14 +15,13 @@ namespace NCL::CSC8508 {
             maxItemStorage = std::max(1, maxStorage);
         }
 
-        bool PushItemToInventory(GameObject* object) {
-            ItemComponent* item = object->TryGetComponent<ItemComponent>();
-            if (!object || !item) return false;
+        bool PushItemToInventory(ItemComponent* item) {
+            if (!item) return false;
             if (storedItems.size() >= maxItemStorage) return false;
 
             item->SetEnabledComponentStates(false);
             storedItems.push_back(item);
-            object->SetEnabled(true);
+            item->GetGameObject().SetEnabled(true);
             scrollIndex = storedItems.size() - 1;
             return true;
         }

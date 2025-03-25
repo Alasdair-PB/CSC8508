@@ -1,23 +1,17 @@
 #include "TutorialGame.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-#include "INetworkComponent.h"
 #include "../AudioEngine/AudioSourceComponent.h"
 #include "InputNetworkComponent.h"
-#include "TransformNetworkComponent.h"
 #include "StaminaComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
 #include "../AudioEngine/AudioListenerComponent.h"
 #include "../AudioEngine/NetworkedListenerComponent.h"
-#include "../AudioEngine/AudioSourceComponent.h"
 #include "AnimationComponent.h"
-#include "MeshAnimation.h"
-#include "InventoryManagerComponent.h"
+#include "TransformNetworkComponent.h"
 #include "InventoryNetworkManagerComponent.h"
 
-using namespace NCL;
-using namespace CSC8508;
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -45,6 +39,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	pc->SetBindingJump(KeyCodes::SPACE, stamina);
 	pc->SetBindingInteract(KeyCodes::E);
 
+	SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 

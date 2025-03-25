@@ -60,15 +60,14 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
 	controller->MapButton(KeyCodes::E, "Interact");
-
 }
 
 void TutorialGame::Loaditem() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
-	myObjectToLoad->AddComponent<ItemComponent>();
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(5, 0, 5));
+	myObjectToLoad->AddComponent<ItemComponent>(10);
 	world->AddGameObject(myObjectToLoad);
 
 }
@@ -155,30 +154,6 @@ TutorialGame::~TutorialGame()
 	delete inventoryUI;
 }
 
-void TutorialGame::UpdateObjectSelectMode(float dt) {
-
-	RayCollision closestCollision;
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && selectionObject) {
-		Vector3 rayPos;
-		Vector3 rayDir;
-
-		rayDir = selectionObject->GetGameObject().GetTransform().GetOrientation() * Vector3(0, 0, -1);
-		rayPos = selectionObject->GetGameObject().GetTransform().GetPosition();
-
-		Ray r = Ray(rayPos, rayDir);
-		bool hit = world->Raycast(r, closestCollision, true, selectionObject, new std::vector<Layers::LayerID>({ Layers::LayerID::Player,  Layers::LayerID::Enemy }));
-
-		if (hit)
-		{
-			if (objClosest)
-				objClosest->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-			objClosest = (GameObject*)closestCollision.node;
-			objClosest->GetRenderObject()->SetColour(Vector4(1, 0, 1, 1));
-		}
-	}
-	SelectObject();
-}
-
 void TutorialGame::UpdateGame(float dt)
 {
 	UpdateUI();
@@ -203,39 +178,12 @@ void TutorialGame::InitWorld()
 
 	//TestSave();
 	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
-	LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+	//LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+	Loaditem();
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 	AddRoleTToWorld(Vector3(90, 30, -52));
-}
-
-bool TutorialGame::SelectObject() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q))
-		inSelectionMode = !inSelectionMode;
-	if (inSelectionMode) {
-		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::Left)) {
-
-			RenderObject* ro = selectionObject->GetGameObject().GetRenderObject();
-			if (selectionObject)
-			{
-				ro->SetColour(Vector4(1, 1, 1, 1));
-				selectionObject = nullptr;
-			}
-
-			Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
-			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true))
-			{
-				selectionObject = (BoundsComponent*)closestCollision.node;
-				ro->SetColour(Vector4(0, 1, 0, 1));
-				return true;
-			}
-			else
-				return false;
-		}
-	}
-	return false;
 }
 
 void TutorialGame::UpdateUI() {

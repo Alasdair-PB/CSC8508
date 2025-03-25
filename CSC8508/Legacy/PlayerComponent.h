@@ -3,16 +3,12 @@
 #include "GameObject.h"
 #include "InputComponent.h"
 #include "StaminaComponent.h"
-#include "../InventoryManagerComponent.h"
-
 #include "CollisionEvent.h"
-
-#include "Ray.h"
+#include "SightComponent.h"
 #include "EventListener.h"
 #include "EventManager.h"
-
-#include "Window.h"
 #include "CollisionDetection.h"
+#include "../InventoryNetworkManagerComponent.h"
 
 namespace NCL {
     namespace CSC8508 {
@@ -65,6 +61,7 @@ namespace NCL {
                 inputComponent = GetGameObject().TryGetComponent<InputComponent>();
                 staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();
                 inventoryComponent = GetGameObject().TryGetComponent<InventoryManagerComponent>();
+                sightComponent = GetGameObject().TryGetComponent<SightComponent>();
 
                 EventManager::RegisterListener<InputButtonEvent>(this);
                 EventManager::RegisterListener<CollisionEvent>(this);
@@ -116,14 +113,15 @@ namespace NCL {
                     return;
                 }
 
+                Vector3 ray = Vector3(0, 1, 0);
+                Vector3 rayOffset = Vector3(0, 1, 0);
+                float visibleRange = 2.0f;
+                ItemComponent* item = sightComponent->CanSeeComponent<ItemComponent>(visibleRange,ray, rayOffset);
 
-
-                GameObject* itemPickUp;
-                inventoryComponent->PushItemToInventory(itemPickUp);
-
-                // Raycast towards item
-                // pick up item on success
-                std::cout << "pick up item" << "\n";
+                if (item) {
+                    std::cout << "pick up item" << "\n";
+                    inventoryComponent->PushItemToInventory(item);
+                }
             }
 
             void OnPlayerMove() {
@@ -178,6 +176,7 @@ namespace NCL {
             float jumpDuration = 0;
             Transform& transform; 
   
+            SightComponent* sightComponent = nullptr;
             InputComponent* inputComponent = nullptr;
             StaminaComponent* staminaComponent = nullptr;
             PhysicsComponent* physicsComponent = nullptr;

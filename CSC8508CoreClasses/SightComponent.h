@@ -1,89 +1,71 @@
 #pragma once
 #include "IComponent.h"
-#include "GameWorld.h"
+#include "Ray.h"
 
-#include "ComponentManager.h"
+//#include "GameWorld.h"
+//#include "ComponentManager.h"
 
 namespace NCL {
     namespace CSC8508 {
 
         class SightComponent : public IComponent {
         public:
-            SightComponent(GameObject& g) :worldInstance(GameWorld::Instance()), IComponent(g) {
-                playerVisible = false;
-            }
+            SightComponent(GameObject& g) :/*worldInstance(GameWorld::Instance()),*/ IComponent(g) {}
             ~SightComponent();
 
-            template<typename T>requires 
+           /* template<typename T>requires
                 std::is_base_of_v<IComponent, T> 
             GameObject* GetClosestVisibleTarget(float maxRange, Vector3 rayOffset) {
                 Ray ray;
                 RayCollision* closestCollision;
                 GameObject* closetsGamObj = nullptr;
                 float closestDist = -1.0f;
-                Vector3 position = GetGameObject().GetTransform().GetPosition();
+                Vector3 position = GetGameObject().GetTransform().GetPosition() + rayOffset;
 
                 ComponentManager::OperateOnBufferContents<T>(
-                    [](T* o) {
+                    [&position, &closestDist, &closetsGamObj, &ray, &closestCollision](T* o) {
                         if (!(o->IsEnabled()))
                             return;
+
                         Vector3 oPositon = o->GetGameObject().GetTransform().GetPosition();
                         Vector3 objToTarget = (oPositon - position);
+
                         auto len = Vector::Length(objToTarget);
-                        if (len > maxRange && (len < closestDist || closestDist == -1.0f)) {
-                            BoundsComponent* bounds = GetGameObject().TryGetComponent<BoundsComponent>();
-                            if (worldInstance.Raycast(ray,closestCollision, true, bounds)) {
+                        if (len > maxRange && (len < closestDist || closestDist == -1.0f)) { 
+                            ray = Ray(position, objToTarget);
+                            BoundsComponent* bounds = o->GetGameObject().TryGetComponent<BoundsComponent>();
+                            if (worldInstance.Raycast(ray, closestCollision, true, bounds)) {
                                 closestDist = len;
-                                closetsGamObj = o->GetGameObject();// Might need to be & or *
+                                closetsGamObj = &o->GetGameObject();
                             }
                         }
                     }
                 );
                 return closetsGamObj;
-            }
+            }*/
 
             template<typename T>requires
                 std::is_base_of_v<IComponent, T>
-            T* CanSeeComponent(float maxRange, Vector3 rayOffset, Vector3 direction) {
-                Ray ray;
-                RayCollision* closestCollision;
-                IComponent* closetsGamObj = nullptr;
+            T* CanSeeComponent(float range, Vector3 rayOffset, Vector3 direction) {
 
-                Vector3 position = GetGameObject().GetTransform().GetPosition();
+                Vector3 position = GetGameObject().GetTransform().GetPosition() + rayOffset;
+                Ray ray = Ray(position, Vector::Normalise(direction) * range);
+                RayCollision closestCollision;
+                T* visibleComponent = nullptr;
+                BoundsComponent* bounds = GetGameObject().TryGetComponent<BoundsComponent>();
+                /*if (worldInstance.Raycast(ray, closestCollision, true, bounds)) {
 
-                if (!(o->IsEnabled()))
-                    return;
-                Vector3 oPositon = o->GetGameObject().GetTransform().GetPosition();
-                Vector3 objToTarget = (oPositon - position);
-
-                auto len = Vector::Length(objToTarget);
-                if (len > maxRange && (len < closestDist || closestDist == -1.0f)) {
-                    BoundsComponent* bounds = GetGameObject().TryGetComponent<BoundsComponent>();
-                    if (worldInstance.Raycast(ray, closestCollision, true, bounds)) {
-                        T* component = o->GetGameObject().TryGetComponent<T>();
+                    if ((BoundsComponent*)closestCollision.node) {
+                        T* component = ((BoundsComponent*)closestCollision.node)->GetGameObject().TryGetComponent<T>();
                         if (component)
                             return component;
-                        closestDist = len;
-                        closetsGamObj = o->GetGameObject();// Might need to be & or *
                     }
-                }
-    
-                return closetsGamObj;
-            }
-
-
-
-            void OnAwake() override {
-
+                }*/
+                return visibleComponent;
             }
 
         protected:
-            GameWorld& worldInstance;
-            
-            
-            bool playerVisible;
-            float playerDis = 0.0f;
-
+            //GameWorld& worldInstance;
         };
     }
 }

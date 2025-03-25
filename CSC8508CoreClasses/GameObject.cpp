@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <typeindex>
+
 #include <queue>
 using namespace NCL::CSC8508;
 
@@ -97,8 +98,10 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 	Texture* basicTex = MaterialManager::GetTexture(loadedSaveData.texturePointer);
 	Shader* basicShader = MaterialManager::GetShader(loadedSaveData.shaderPointer);
 
-	renderObject = new RenderObject(&GetTransform(), mesh, basicTex, basicShader);
-	renderObject->SetColour(loadedSaveData.colour);
+	if (mesh != nullptr && basicTex != nullptr && basicShader != nullptr) {
+		renderObject = new RenderObject(&GetTransform(), mesh, basicTex, basicShader);
+		renderObject->SetColour(loadedSaveData.colour);
+	}
 }
 
 void GameObject::Load(std::string assetPath, size_t allocationStart) {

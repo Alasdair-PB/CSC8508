@@ -262,6 +262,10 @@ void TutorialGame::InitWorld()
 	//TestSave();
 	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
 	LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+	auto t = Transform();
+	t.SetPosition(Vector3(Vector3(100.0f, 0.0f, 300.0f)));
+	DoorLocation const loc(Vector3(0.0f, 0.0f, 100.0f), Vector3(0.0f, 0.0f, 1.0f));
+	AddDungeonToWorld(t, loc, 3);
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);

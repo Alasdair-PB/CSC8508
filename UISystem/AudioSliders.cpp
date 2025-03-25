@@ -49,13 +49,15 @@ AudioSliders::AudioSliders() {
 		{
 			for (int i = 0; i < audioEngine->GetInputDeviceList().size(); i++)
 			{
-				const bool is_selected = (inputDevice == i);
-				if (ImGui::Selectable(audioEngine->GetInputDeviceList()[i].data(), is_selected)) {
-					inputDevice = i;
-				}
+				if (audioEngine->GetInputDeviceList()[i].data() != "") {
+					const bool is_selected = (inputDevice == i);
+					if (ImGui::Selectable(audioEngine->GetInputDeviceList()[i].data(), is_selected)) {
+						inputDevice = i;
+					}
 
-				if (is_selected) {
-					ImGui::SetItemDefaultFocus();
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
 				}
 			}
 			ImGui::EndCombo();
@@ -66,13 +68,15 @@ AudioSliders::AudioSliders() {
 		{
 			for (int i = 0; i < audioEngine->GetOutputDeviceList().size(); i++)
 			{
-				const bool is_selected = (outputDevice == i);
-				if (ImGui::Selectable(audioEngine->GetOutputDeviceList()[i].data(), is_selected)) {
-					outputDevice = i;
-				}
+				if (audioEngine->GetOutputDeviceList()[i].data() != "") {
+					const bool is_selected = (outputDevice == i);
+					if (ImGui::Selectable(audioEngine->GetOutputDeviceList()[i].data(), is_selected)) {
+						outputDevice = i;
+					}
 
-				if (is_selected) {
-					ImGui::SetItemDefaultFocus();
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
 				}
 			}
 			ImGui::EndCombo();

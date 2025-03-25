@@ -9,6 +9,12 @@ std::vector<RoomPrefab*> RoomManager::prefabs = std::vector<RoomPrefab*>();
 void RoomManager::LoadPrefabs() {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     // TODO
+    GameObject* myObjectToLoad = new GameObject();
+    std::string pfabPath = GetAssetPath(assetPath);
+    myObjectToLoad->Load(pfabPath);
+    myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + offset);
+    world->AddGameObject(myObjectToLoad);
+    return myObjectToLoad;
 }
 
 RoomPrefab* RoomManager::GetRandom() {

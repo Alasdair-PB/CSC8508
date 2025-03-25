@@ -269,8 +269,6 @@ private:
 	FMOD::ChannelGroup* voiceGroup;
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
-
-	std::deque<std::vector<unsigned char>> encodedPacketQueue; // After merge? are we still using this?
 	
 	#ifdef USE_PS5	
 	SceKernelModule	libfmodHandle;

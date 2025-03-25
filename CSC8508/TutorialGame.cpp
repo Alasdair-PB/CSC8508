@@ -29,67 +29,17 @@
 using namespace NCL;
 using namespace CSC8508;
 
-struct MyX {
-	MyX() : x(0) {}
-	MyX(int x) :x(x) {}
-	int x;
-};
-
-enum testGuy {X};
-
 const static std::string folderPath = NCL::Assets::PFABDIR;
 
 std::string GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
 }
 
-void TestSaveByType() {
-	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
-	std::string intPath = GetAssetPath("int_data.pfab");
-	std::string structPath = GetAssetPath("struct_data.pfab");
-	std::string enumPath = GetAssetPath("enum_data.pfab");
-
-
-	/*SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
-	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
-	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
-	SaveManager::SaveGameData(enumPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
-	std::cout << SaveManager::LoadMyData<MyX>(enumPath).x << std::endl;
-	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<testGuy>(X));
-	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;*/
-}
-
-GameObject* TutorialGame::CreateChildInstance(Vector3 offset, bool isStatic) {
-	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, isStatic ? 0 : 10, false);
-	return myObjectToSave;
-}
-
-void TutorialGame::TestSaveGameObject(std::string assetPath) {
-
-	Vector3 position = Vector3(90 + 10, 22, -50);
-	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, 10.0f, false);
-	GameObject* child = CreateChildInstance(Vector3(5, 0, 0), false);
-	child->AddChild(CreateChildInstance(Vector3(5, 0, 0), true));
-
-	myObjectToSaveA->AddChild(child);
-	myObjectToSaveA->Save(assetPath);
-	world->AddGameObject(myObjectToSaveA);	
-}
-
 void TutorialGame::TestLoadGameObject(std::string assetPath) {
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(assetPath);
 	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
-	//myObjectToLoad->SetEnabled(false);
 	world->AddGameObject(myObjectToLoad);
-}
-
-void TutorialGame::TestSave() {
-	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	TestSaveByType();
-	TestSaveGameObject(gameObjectPath);
-	//TestLoadGameObject(gameObjectPath);
 }
 
 void LoadControllerMappings(Controller* controller)
@@ -219,23 +169,14 @@ void TutorialGame::LoadWorld(std::string assetPath) {
 	world->Load(assetPath);
 }
 
-void TutorialGame::SaveWorld(std::string assetPath) {
-	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-	delete x;
-	world->Save(assetPath);
-}
-
-const bool load = true;
-
 void TutorialGame::InitWorld() 
 {
 	world->ClearAndErase();
 	physics->Clear();
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);
 	LoadWorld(assetPath);
-	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
+	AddRoleTToWorld(Vector3(90, 30, -52));
 }
 
 bool TutorialGame::SelectObject() {

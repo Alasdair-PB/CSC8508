@@ -83,5 +83,6 @@ enet-master/
 /build_windows
 
 **/Untracked
+**/PSSL
 /ImGui/PS5
 /sce_module

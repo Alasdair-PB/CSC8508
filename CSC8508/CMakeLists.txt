@@ -4,6 +4,7 @@ file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB Legacy_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Legacy/*")
 file(GLOB PS5_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/PS5/*")
+file(GLOB_RECURSE EOS_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*EOS*")
 
 list(REMOVE_ITEM Source_Files ${Legacy_Files})
 list(REMOVE_ITEM Header_Files ${Legacy_Files})
@@ -31,6 +32,8 @@ if(PS5)
 	)
 	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.cpp)
+	list(REMOVE_ITEM Source_Files ${EOS_FILES})
+	list(REMOVE_ITEM Header_Files ${EOS_FILES})
 	
 	source_group("Shader Files" FILES ${ALL_SHADERS})
 	
@@ -396,11 +399,13 @@ else()
 endif()
 
 # Handle `fmod.dll` copying here instead of `AudioEngine`
+if(NOT PS5)
 add_custom_command(TARGET CSC8508 POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${FMOD_DIR}/lib/x64/fmod.dll"
     "$<TARGET_FILE_DIR:CSC8508>"
 )
+endif()
 
 if(USE_VULKAN)
     include_directories("../VulkanRendering/")

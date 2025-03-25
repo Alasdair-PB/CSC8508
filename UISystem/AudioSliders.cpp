@@ -1,5 +1,6 @@
 #include "AudioSliders.h"
 #include <filesystem>        
+#include <iostream>
 
 using namespace NCL;
 using namespace UI;
@@ -42,10 +43,50 @@ AudioSliders::AudioSliders() {
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 		};
 
+	std::function<CSC8508::PushdownState::PushdownResult()> deviceFunc = [this]() -> CSC8508::PushdownState::PushdownResult {
+		audioEngine->SetInputDeviceIndex(inputDevice);
+		if (ImGui::BeginCombo("Input Device", audioEngine->GetInputDeviceList()[inputDevice].data()))
+		{
+			for (int i = 0; i < audioEngine->GetInputDeviceList().size(); i++)
+			{
+				const bool is_selected = (inputDevice == i);
+				if (ImGui::Selectable(audioEngine->GetInputDeviceList()[i].data(), is_selected)) {
+					inputDevice = i;
+				}
+
+				if (is_selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		audioEngine->SetOutputDeviceIndex(outputDevice);
+		if (ImGui::BeginCombo("Output Device", audioEngine->GetOutputDeviceList()[outputDevice].data()))
+		{
+			for (int i = 0; i < audioEngine->GetOutputDeviceList().size(); i++)
+			{
+				const bool is_selected = (outputDevice == i);
+				if (ImGui::Selectable(audioEngine->GetOutputDeviceList()[i].data(), is_selected)) {
+					outputDevice = i;
+				}
+
+				if (is_selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		return CSC8508::PushdownState::PushdownResult::NoChange;
+		};
+
+
 	audioSlidersUI->PushSliderElement("Master Volume", masterVolume, 100, 0, masterFunc);
 	audioSlidersUI->PushSliderElement("Music Volume", musicVolume, 100, 0, musicFunc);
 	audioSlidersUI->PushSliderElement("SFX Volume", sfxVolume, 100, 0, sfxFunc);
 	audioSlidersUI->PushSliderElement("Chat Volume", voiceVolume, 100, 0, voiceFunc);
+	audioSlidersUI->PushVoidElement(deviceFunc);
 }
 
 AudioSliders::~AudioSliders() {

@@ -1,20 +1,22 @@
-#include "FramerateUI.h"
-#include <filesystem>        
-#include <string>
+#include "InventoryUI.h"
+#include <filesystem>  
 #include <functional>
 
 using namespace NCL;
 using namespace UI;
 
-FramerateUI::FramerateUI()  {
+InventoryUI::InventoryUI() {
 	std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
-		ImGui::Text(std::to_string(1.0f / dt).c_str());
+		/*for (auto const& item : ) {
+		
+		}*/
+
 		return CSC8508::PushdownState::PushdownResult::NoChange;
-	};
-	 
-	frameUI->PushVoidElement(func);
+		};
+
+	inventoryUI->PushVoidElement(func);
 }
 
-FramerateUI::~FramerateUI() {
-	delete frameUI;
+InventoryUI::~InventoryUI() {
+	delete inventoryUI;
 }

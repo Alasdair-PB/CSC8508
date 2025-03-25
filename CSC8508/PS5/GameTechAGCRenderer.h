@@ -64,6 +64,8 @@ namespace NCL {
 
 			void GPUSkinningPass();
 
+			void InitialiseImGui();
+
 			Shader*		defaultShader;
 
 			GameWorld&	gameWorld;

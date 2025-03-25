@@ -1,14 +1,11 @@
 //
-// Contributors: Alasdair
+// Contributors: Alasdair, Alfie
 //
 
 #include "BoundsComponent.h"
 
 #include "Axis.h"
 #include "CollisionDetection.h"
-#include "PhysicsObject.h"
-#include "RenderObject.h"
-#include "NetworkObject.h"
 
 using namespace NCL::CSC8508;
 
@@ -61,6 +58,11 @@ void BoundsComponent::UpdateBroadphaseAABB() {
 	else if (static_cast<int>(boundingVolume->type) & static_cast<int>(VolumeType::Sphere)) {
 		float r = ((SphereVolume&)*boundingVolume).GetRadius();
 		broadphaseAABB = Vector3(r, r, r);
+	}
+	else if (static_cast<int>(boundingVolume->type) & static_cast<int>(VolumeType::Capsule)) {
+		auto const vol = dynamic_cast<CapsuleVolume&>(*boundingVolume);
+		float const r = vol.GetRadius();
+		broadphaseAABB = Vector3(r, r + vol.GetHalfHeight(), r);
 	}
 	else if (static_cast<int>(boundingVolume->type) == static_cast<int>(VolumeType::OBB)) {
 		broadphaseAABB = GetOBBBroadphaseAABB(GetGameObject().GetTransform().GetOrientation(), ((OBBVolume&)*boundingVolume).GetHalfDimensions());

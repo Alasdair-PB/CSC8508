@@ -236,7 +236,7 @@ void TutorialGame::UpdateUI() {
 		framerateDelay = 0;
 	}
 
-	if (mainMenuUI->GetMenuOption() != 0) {
+	if (mainMenuUI->GetMenuOption() != 0) { 
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");

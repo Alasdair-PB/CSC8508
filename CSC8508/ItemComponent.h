@@ -1,10 +1,10 @@
 #ifndef ITEM_COMPONENT_H
 #define ITEM_COMPONENT_H
 
-#include "IComponent.h"
+#include "../CSC8508CoreClasses/IComponent.h"
 #include "DamageableComponent.h"
-#include "EventManager.h"
-#include "Event.h"
+#include "../Event/EventManager.h"
+#include "../Event/Event.h"
 
 namespace NCL::CSC8508 {
 

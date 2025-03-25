@@ -16,6 +16,12 @@
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
+#include "AudioSliders.h"
+#include "FramerateUI.h"
+#include "MainMenuUI.h"
+#include "Healthbar.h"
+#include "LobbySearch.h"
+#include "InventoryUI.h"
 
 
 using std::vector;

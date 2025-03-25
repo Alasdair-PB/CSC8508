@@ -1,9 +1,9 @@
 #ifndef DAMAGEABLE_COMPONENT_H
 #define DAMAGEABLE_COMPONENT_H
 
-#include "IComponent.h"
-#include "Event.h"
-#include "EventManager.h"
+#include "../CSC8508CoreClasses/IComponent.h"
+#include "../Event/Event.h"
+#include "../Event/EventManager.h"
 
 namespace NCL::CSC8508
 {

@@ -42,6 +42,7 @@ namespace NCL {
                     }
                 );
                 //Need to add ending to sight test here
+                return closetsGamObj;
             }
 
             void OnAwake() override {

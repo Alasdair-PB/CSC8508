@@ -45,6 +45,7 @@ namespace NCL {
 			bool SelectObject();
 
 			void TestLoadGameObject(std::string assetPath);
+			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			void LoadWorld(std::string assetPath);
 			void UpdateUI();
 

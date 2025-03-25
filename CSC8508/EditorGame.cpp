@@ -37,11 +37,11 @@ enum testGuy {X};
 
 const static std::string folderPath = NCL::Assets::PFABDIR;
 
-std::string GetAssetPath(std::string pfabName) {
+std::string EditorGame::GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
 }
 
-void TestSaveByType() {
+void EditorGame::TestSaveByType() {
 	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
 	std::string intPath = GetAssetPath("int_data.pfab");
 	std::string structPath = GetAssetPath("struct_data.pfab");
@@ -179,7 +179,7 @@ void EditorGame::LoadWorld(std::string assetPath) {
 }
 
 void EditorGame::SaveWorld(std::string assetPath) {
-	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+	auto x = AddNavMeshToWorld("NavMeshObject.msh", "smalltest.navmesh", Vector3(0, 0, 0), Vector3(1, 1, 1));
 	delete x;
 	world->Save(assetPath);
 }

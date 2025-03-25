@@ -267,15 +267,4 @@ void EOSLobbyFunctions::UpdateLobbyDetails()
             }
         }
     }
-
-    // Wait until all expected IPs have been received
-    std::cout << "Waiting to collect all members' IP addresses..." << std::endl;
-
-    std::cout << "All IP addresses received successfully!\n";
-    for (const auto& entry : collectedIPs) {
-        std::cout << "User " << entry.first << " -> IP: " << entry.second << "\n";
-    }
-
-    
-
 }

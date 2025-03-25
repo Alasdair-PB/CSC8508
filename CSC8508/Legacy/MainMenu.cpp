@@ -179,22 +179,11 @@ namespace NCL {
 		PushdownState::PushdownResult MainMenu::LobbyDetailsOnUpdate(float dt, PushdownState** newState)
 		{
 			lobbyUpdateTimer += dt;
-			std::cout << "Lobby Details On Update " << std::endl;
 			if (lobbyUpdateTimer >= updateInterval)
 			{
 				startEOSLobbyUpdate();
 				lobbyUpdateTimer = 0.0f;
-
-				std::string ip = getOwnerIPFunc();
-				std::string id = getLobbyIDFunc();
-				int count = getPlayerCountFunc();
-
-				std::cout << "Lobby Update Triggered:" << std::endl;
-				std::cout << "Owner IP: " << ip << std::endl;
-				std::cout << "Lobby ID: " << id << std::endl;
-				std::cout << "Player Count: " << count << std::endl;
 			}
-
 
 			if (eosLobbyOption == startGameAsHost)
 			{
@@ -214,7 +203,6 @@ namespace NCL {
 
 			return PushdownState::NoChange;
 		}
-
 
 		PushdownState::PushdownResult LobbyScreenOnUpdate(float dt, PushdownState** newState) {
 			Debug::Print("Waiting for players...", Vector2(5, 80));

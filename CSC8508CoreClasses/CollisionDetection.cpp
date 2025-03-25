@@ -309,16 +309,6 @@ bool CollisionDetection::AABBIntersection(
 	return false;
 }
 
-// void GetAllOBBVertices(Vector3 array[8], Transform const& worldTransform, Vector3 const& halfDimensions) {
-// 	for (int i = 0; i < 8; i++) {
-// 		array[i] = worldTransform.GetPosition() + worldTransform.GetOrientation() * (halfDimensions * Vector3(
-// 			i & 1 ? 1 : -1,
-// 			i & 2 ? 1 : -1,
-// 			i & 4 ? 1 : -1
-// 			));
-// 	}
-// }
-
 bool CollisionDetection::OBBIntersection(
 	const OBBVolume& volumeA, const Transform& worldTransformA,
 	const OBBVolume& volumeB, const Transform& worldTransformB,

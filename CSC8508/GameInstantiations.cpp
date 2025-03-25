@@ -13,6 +13,7 @@
 #include "../AudioEngine/AudioSourceComponent.h"
 #include "AnimationComponent.h"
 #include "MeshAnimation.h"
+#include "Map/DungeonComponent.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -302,4 +303,15 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 
 	world->AddGameObject(cube);
 	return cube;
+}
+
+GameObject* TutorialGame::AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int const roomCount) {
+	auto* dungeon = new GameObject();
+	dungeon->GetTransform() = transform;
+
+	auto const* dc = dungeon->AddComponent<DungeonComponent>(entryPosition);
+	dc->Generate(roomCount);
+
+	world->AddGameObject(dungeon);
+	return dungeon;
 }

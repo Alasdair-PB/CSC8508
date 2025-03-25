@@ -78,7 +78,6 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-	std::cout << "startinmg"<<std::endl;
 	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 

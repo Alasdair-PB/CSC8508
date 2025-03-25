@@ -85,9 +85,29 @@ void TutorialGame::TestLoadGameObject(std::string assetPath) {
 
 void TutorialGame::TestSave() {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	TestSaveByType();
+	//TestSaveByType();
 	TestSaveGameObject(gameObjectPath);
-	//TestLoadGameObject(gameObjectPath);
+	TestLoadGameObject(gameObjectPath);
+}
+
+int navMeshCounter; 
+void TutorialGame::SaveUnityNavMeshPrefab(std::string assetPath, std::string navMeshObPath, std::string navMeshNavPath) {
+	navMeshCounter++;
+	std::string pfabPath = GetAssetPath(assetPath);
+	std::string navMeshName = ("navMesh" + navMeshCounter);
+	MaterialManager::PushMesh(navMeshName, renderer->LoadMesh(navMeshObPath));
+	GameObject* myPrefabToSave = AddNavMeshToWorld(navMeshNavPath, navMeshName, Vector3(0, 0, 0), Vector3(1, 1, 1));
+	myPrefabToSave->Save(pfabPath);
+	world->AddGameObject(myPrefabToSave);
+}
+
+GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
+	GameObject* myObjectToLoad = new GameObject();
+	std::string pfabPath = GetAssetPath(assetPath);
+	myObjectToLoad->Load(pfabPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + offset);
+	world->AddGameObject(myObjectToLoad);
+	return myObjectToLoad;
 }
 
 void LoadControllerMappings(Controller* controller)
@@ -148,7 +168,6 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
 	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
@@ -211,7 +230,7 @@ void TutorialGame::LoadWorld(std::string assetPath) {
 }
 
 void TutorialGame::SaveWorld(std::string assetPath) {
-	auto x = AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
+	auto x = AddNavMeshToWorld("NavMeshObject.msh", "smalltest.navmesh", Vector3(0, 0, 0), Vector3(1, 1, 1));
 	delete x;
 	world->Save(assetPath);
 }
@@ -223,6 +242,10 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 	//TestSave();
+
+	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
+	LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);
 	LoadWorld(assetPath);

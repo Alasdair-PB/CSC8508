@@ -5,15 +5,11 @@
 #include "TextureLoader.h"
 
 #include "GameObject.h"
-#include "TransformNetworkComponent.h"
-
-#include "PositionConstraint.h"
 #include "MaterialManager.h"
-#include "OrientationConstraint.h"
 #include "Assets.h"
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
-#include "ItemComponent.h"
+//#include "ItemComponent.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -67,7 +63,7 @@ void TutorialGame::Loaditem() {
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
 	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(5, 0, 5));
-	myObjectToLoad->AddComponent<ItemComponent>(10);
+	//myObjectToLoad->AddComponent<ItemComponent>(10);
 	world->AddGameObject(myObjectToLoad);
 
 }

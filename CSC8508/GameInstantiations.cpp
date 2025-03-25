@@ -10,7 +10,7 @@
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
 #include "TransformNetworkComponent.h"
-#include "InventoryNetworkManagerComponent.h"
+//#include "InventoryNetworkManagerComponent.h"
 
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
@@ -56,8 +56,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
 			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
-		InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2,
-			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+		//InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2,
+		//	spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
@@ -75,7 +75,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			listenerComp->SetPersistentSound(sourceComp->GetPersistentPair());
 	}
 	else {
-		InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2);
+		//InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2);
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 

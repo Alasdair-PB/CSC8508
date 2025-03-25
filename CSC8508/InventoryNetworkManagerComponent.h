@@ -1,5 +1,4 @@
 #pragma once
-#include "INetworkComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "InventoryManagerComponent.h"
 

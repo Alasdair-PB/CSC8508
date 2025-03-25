@@ -1,7 +1,6 @@
 #ifndef BINDINGMANAGER_H
 #define BINDINGMANAGER_H
 
-#include "Texture.h"
 #include "RenderObject.h"
 #include "SaveManager.h"
 #include <unordered_map>
@@ -47,4 +46,4 @@ namespace NCL {
     }
 }
 
-#endif // MATERIALMANAGER_H
+#endif // BINDINGMANAGER_H

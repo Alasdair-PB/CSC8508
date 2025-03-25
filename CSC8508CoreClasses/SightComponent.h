@@ -1,13 +1,12 @@
 #pragma once
 #include "IComponent.h"
-#include "Ray.h"
+//#include "Ray.h"
 
 //#include "GameWorld.h"
 //#include "ComponentManager.h"
 
-namespace NCL {
-    namespace CSC8508 {
-
+namespace NCL::CSC8508
+{
         class SightComponent : public IComponent {
         public:
             SightComponent(GameObject& g) :/*worldInstance(GameWorld::Instance()),*/ IComponent(g) {}
@@ -47,12 +46,12 @@ namespace NCL {
             template<typename T>requires
                 std::is_base_of_v<IComponent, T>
             T* CanSeeComponent(float range, Vector3 rayOffset, Vector3 direction) {
+                T* visibleComponent = nullptr;
 
-                Vector3 position = GetGameObject().GetTransform().GetPosition() + rayOffset;
+               /* Vector3 position = GetGameObject().GetTransform().GetPosition() + rayOffset;
                 Ray ray = Ray(position, Vector::Normalise(direction) * range);
                 RayCollision closestCollision;
-                T* visibleComponent = nullptr;
-                BoundsComponent* bounds = GetGameObject().TryGetComponent<BoundsComponent>();
+                BoundsComponent* bounds = GetGameObject().TryGetComponent<BoundsComponent>();*/
                 /*if (worldInstance.Raycast(ray, closestCollision, true, bounds)) {
 
                     if ((BoundsComponent*)closestCollision.node) {
@@ -67,5 +66,4 @@ namespace NCL {
         protected:
             //GameWorld& worldInstance;
         };
-    }
 }

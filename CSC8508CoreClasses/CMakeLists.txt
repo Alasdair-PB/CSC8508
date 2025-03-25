@@ -133,6 +133,8 @@ set(Components
     "StaminaComponent.cpp"
     "AnimationComponent.cpp"
     "AnimationComponent.h"
+    "SightComponent.h"
+    "SightComponent.cpp"
 )
 source_group("Components" FILES ${Components})
 

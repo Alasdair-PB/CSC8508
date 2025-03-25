@@ -122,7 +122,7 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
+	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));

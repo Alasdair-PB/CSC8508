@@ -102,7 +102,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 GameObject* TutorialGame::AddRoleTToWorld(const Vector3& position, float inverseMass)
 {	
 	GameObject* roleT = new GameObject();
-	Vector3 size = Vector3(10.0f, 10.0f, 10.0f);
+	Vector3 size = Vector3(1.0f, 1.0f, 1.0f);
 	CapsuleVolume* volume = new CapsuleVolume(4.0f, 2.5f);
 	Mesh* roleTMesh = MaterialManager::GetMesh("Role_T");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
@@ -112,11 +112,11 @@ GameObject* TutorialGame::AddRoleTToWorld(const Vector3& position, float inverse
 	BoundsComponent* bounds = roleT->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	roleT->GetTransform().SetScale(size).SetPosition(position);
+	roleT->GetTransform().SetScale(size).SetPosition(position + Vector3(0,5,0));
 
 	roleT->SetRenderObject(new RenderObject(&roleT->GetTransform(), roleTMesh, basicTex, animShader));
 	phys->SetPhysicsObject(new PhysicsObject(&roleT->GetTransform()));
-	roleT->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Role_T.anm"));
+	roleT->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Astronaut.anm"));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();

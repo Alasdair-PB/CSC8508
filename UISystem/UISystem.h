@@ -1,6 +1,5 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
-#include "../AudioEngine/AudioEngine.h"
 #include "imgui.h"
 #include "../CSC8508CoreClasses/PushdownMachine.h"
 #include "../CSC8508CoreClasses/PushdownState.h"
@@ -9,6 +8,7 @@
 #include "MainMenuUI.h"
 #include "Healthbar.h"
 #include "LobbySearch.h"
+#include "InventoryUI.h"
 #include <list>
 
 namespace NCL {

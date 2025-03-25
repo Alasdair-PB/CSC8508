@@ -1,4 +1,4 @@
-#ifdef USE_PS5
+#ifdef false
 #include "PS5Window.h"
 #include "../CSC8508/NetworkedGame.h"
 #include "../CSC8508CoreClasses/PhysicsSystem.h"
@@ -52,7 +52,7 @@ int PS5main() {
 	c->MapButton(0, "Up");
 	c->MapButton(2, "Down");
 
-	std::unique_ptr<TutorialGame> g = std::make_unique<TutorialGame>(world.get(), renderer.get());
+	//std::unique_ptr<TutorialGame> g = std::make_unique<TutorialGame>(world.get(), renderer.get());
 
 	while (window->UpdateWindow()) {
 		float dt = window->GetTimer().GetTimeDeltaSeconds();

@@ -11,6 +11,9 @@
 
 #include <fmod.hpp>
 #include <map>
+#ifdef USE_PS5
+#include <kernel.h>
+#endif
 #include <deque>
 #include <vector>
 #include <thread>
@@ -20,7 +23,6 @@
 
 class AudioListenerComponent;
 class AudioSourceComponent;
-
 
 /**
 * Type of Channel Group
@@ -267,6 +269,14 @@ private:
 	FMOD::ChannelGroup* voiceGroup;
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
+
+	std::deque<std::vector<unsigned char>> encodedPacketQueue; // After merge? are we still using this?
+	
+	#ifdef USE_PS5	
+	SceKernelModule	libfmodHandle;
+	SceKernelModule	libfmodLHandle;
+
+	#endif // USE_PS5
 
 	std::string soundDir;
 

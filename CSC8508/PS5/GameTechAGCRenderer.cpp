@@ -1,3 +1,4 @@
+#pragma once
 #include "GameTechAGCRenderer.h"
 #include "GameObject.h"
 #include "RenderObject.h"
@@ -10,6 +11,7 @@
 #include "../PS5Core/AGCShader.h"
 
 #include "../CSC8508CoreClasses/Debug.h"
+#include "../UISystem/UIPlayStation.h"
 
 using namespace NCL;
 using namespace Rendering;
@@ -96,6 +98,8 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world) : AGCRenderer(*Window
 			sce::Agc::Core::Sampler::FilterMode::kPoint		//minificaction
 		)
 		.setMipFilterMode(sce::Agc::Core::Sampler::MipFilterMode::kPoint);
+	
+	InitialiseImGui();
 }
 
 GameTechAGCRenderer::~GameTechAGCRenderer()	{
@@ -159,6 +163,8 @@ void GameTechAGCRenderer::RenderFrame() {
 	currentFrame->textVertCount		= 0;
 	currentFrame->lineVertCount		= 0;
 
+	UI::UIPlayStation::GetInstance()->UpdateDCB(&frameContext->m_dcb);
+
 	//Step 1: Write the frame's constant data to the buffer
 	WriteRenderPassConstants();
 	//Step 2: Walk the object list and build up the object set and required buffer memory
@@ -175,6 +181,7 @@ void GameTechAGCRenderer::RenderFrame() {
 	UpdateDebugData();
 	RenderDebugLines();
 	RenderDebugText();	
+	UI::UIPlayStation::GetInstance()->EndFrame();
 	//Step 8: Draw the main scene render target to the screen with a compute shader
 	DisplayRenderPass(); //Puts our scene on screen, uses a compute
 	
@@ -440,6 +447,10 @@ void GameTechAGCRenderer::UpdateDebugData() {
 		currentFrame->data.bytesWritten += count;
 		verts.clear();
 	}
+}
+
+void GameTechAGCRenderer::InitialiseImGui() {
+	UI::UIPlayStation::Initialize(&frameContexts[currentSwap].m_dcb, &allocator, SWAPCOUNT);
 }
 
 void GameTechAGCRenderer::DisplayRenderPass() {

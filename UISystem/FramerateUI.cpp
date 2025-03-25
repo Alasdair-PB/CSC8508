@@ -1,5 +1,6 @@
 #include "FramerateUI.h"
-#include <filesystem>  
+#include <filesystem>        
+#include <string>
 #include <functional>
 
 using namespace NCL;

@@ -18,7 +18,7 @@ namespace NCL::PS5 {
 
 		void ReloadShader() override;
 
-		const sce::Agc::Shader* GetAGCPointer() const {
+		sce::Agc::Shader* GetAGCPointer() const {
 			return binary;
 		}
 

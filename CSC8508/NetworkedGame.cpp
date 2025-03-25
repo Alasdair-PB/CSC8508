@@ -61,6 +61,7 @@ NetworkedGame::NetworkedGame()	{
 	timeToNextPacket  = 0.0f;
 	packetsToSnapshot = 0;
 	playerStates = std::vector<int>();
+
 }
 
 NetworkedGame::~NetworkedGame()	{

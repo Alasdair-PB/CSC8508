@@ -19,6 +19,7 @@
 #include "../PS5Starter/GameTechAGCRenderer.h"
 #include "../PS5Core/PS5Window.h"
 #include "../PS5Core/PS5Controller.h"
+#include "../UISystem/UIPlayStation.h"
 #else
 #include "GameTechRenderer.h"
 #include "KeyboardMouseController.h"
@@ -48,14 +49,15 @@ void TestSaveByType() {
 	std::string structPath = GetAssetPath("struct_data.pfab");
 	std::string enumPath = GetAssetPath("enum_data.pfab");
 
-	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+
+	/*SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
 	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
 	SaveManager::SaveGameData(intPath, SaveManager::CreateSaveDataAsset<int>(45));
 	std::cout << SaveManager::LoadMyData<int>(intPath) << std::endl;
 	SaveManager::SaveGameData(enumPath, SaveManager::CreateSaveDataAsset<MyX>(MyX(2)));
 	std::cout << SaveManager::LoadMyData<MyX>(enumPath).x << std::endl;
 	SaveManager::SaveGameData(structPath, SaveManager::CreateSaveDataAsset<testGuy>(X));
-	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;
+	std::cout << SaveManager::LoadMyData<testGuy>(structPath) << std::endl;*/
 }
 
 GameObject* TutorialGame::CreateChildInstance(Vector3 offset, bool isStatic) {
@@ -109,6 +111,10 @@ void TutorialGame::InitialiseGame() {
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
 
+	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
+	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
+	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
+
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 
@@ -128,6 +134,8 @@ TutorialGame::TutorialGame()
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	controller = w->GetController();
 	renderer = new GameTechAGCRenderer(*world);
+	UI::UIPlayStation::GetInstance()->SetPadHandle(static_cast<NCL::PS5::PS5Controller*>(controller)->GetHandle());
+	UI::UIPlayStation::GetInstance()->InitMouse(static_cast<NCL::PS5::PS5Controller*>(controller)->GetUserId());
 #else
 	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
 #ifdef USEVULKAN
@@ -199,6 +207,7 @@ void TutorialGame::UpdateGame(float dt)
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
+	
 	Debug::UpdateRenderables(dt);
 
 	world->UpdateWorld(dt);
@@ -222,7 +231,7 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-	//TestSave();
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);
 	LoadWorld(assetPath);
@@ -273,7 +282,6 @@ void TutorialGame::UpdateUI() {
 		uiSystem->RemoveStack("Lobby Search Field");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
-
 	uiSystem->RenderFrame();
 }
 

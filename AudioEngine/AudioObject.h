@@ -125,6 +125,20 @@ public:
 		opus_decoder_destroy(decoder);
 	}
 
+	/**
+	* Convert packet to fixed size array
+	* @return unsigned char* (array of packet data)
+	* @param std::vector<unsigned char>& (packet data)
+	* NOTE: Remember to delete the array after use
+	*/
+	unsigned char* PacketToArray(std::vector<unsigned char>& packet) {
+		unsigned char* array = new unsigned char[packet.size()];
+		for (size_t i = 0; i < packet.size(); i++) {
+			array[i] = packet[i];
+		}
+		return array;
+	}
+
 
 
 #pragma endregion

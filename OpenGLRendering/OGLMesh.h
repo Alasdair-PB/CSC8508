@@ -25,8 +25,8 @@ namespace NCL::Rendering {
 		void UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount);
 
 	protected:
-		GLuint	GetVAO()			const { return vao;			}
-		void	BindVertexAttribute(int attribSlot, int bufferID, int bindingID, int elementCount, int elementSize, int elementOffset);
+		GLuint GetVAO() const { return vao;			}
+		void BindVertexAttribute(int attribSlot, int bufferID, int bindingID, int elementCount, int elementSize, int elementOffset);
 
 		GLuint vao;
 		GLuint attributeBuffers[VertexAttribute::MAX_ATTRIBUTES];

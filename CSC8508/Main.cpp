@@ -1,18 +1,11 @@
 #include "Debug.h"
 
+#if EDITOR
+#include "EditorGame.h"
+#else 
 #include "TutorialGame.h"
 #include "NetworkedGame.h"
-
-using namespace NCL;
-using namespace CSC8508;
-
-#ifdef USE_PS5
-#include "./PS5/GameTechAGCRenderer.h"
-#include "PS5Window.h"
-#else
-#include "Window.h"
-#include "GameTechRenderer.h"
-#endif // USE_PS5
+#endif
 
 #include <chrono>
 #include <thread>
@@ -20,7 +13,28 @@ using namespace CSC8508;
 #include <functional>
 #include <cstdlib>
 
+#ifdef USE_PS5
+#include "./PS5/GameTechAGCRenderer.h"
+#include "PS5Window.h"
+using namespace NCL;
+using namespace PS5;
+
+size_t sceUserMainThreadStackSize = 2 * 1024 * 1024;
+extern const char sceUserMainThreadName[] = "TeamProjectGameMain";
+int sceUserMainThreadPriority = SCE_KERNEL_PRIO_FIFO_DEFAULT;
+size_t sceLibcHeapSize = 256 * 1024 * 1024;
+#else
+#include "Window.h"
+#include "GameTechRenderer.h"
+using namespace NCL;
+using namespace CSC8508;
+#endif
+
+#if EDITOR
+void UpdateWindow(Window* w, EditorGame* g)
+#else 
 void UpdateWindow(Window* w, NetworkedGame* g)
+#endif
 {
 	float dt = w->GetTimer().GetTimeDeltaSeconds();
 	w->SetTitle("Gametech frame time:" + std::to_string(std::roundf(1000.0f * dt)));
@@ -66,7 +80,11 @@ int main(int argc, char** argv)
 	w->LockMouseToWindow(true);
 	w->GetTimer().GetTimeDeltaSeconds();
 
+#if EDITOR
+	EditorGame* g = new EditorGame();
+#else 
 	NetworkedGame* g = new NetworkedGame();
+#endif
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{

@@ -4,16 +4,13 @@
 //
 
 #include "NetworkedGame.h"
-#include "NetworkPlayer.h"
-#include "NetworkObject.h"
 #include "GameServer.h"
-#include "GameClient.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "ComponentManager.h"
 #include "EventManager.h"
-#include "EOSInitialisationManager.h"
+#include "GameClient.h"
 
 #define COLLISION_MSG 30
 
@@ -83,6 +80,7 @@ NetworkedGame::NetworkedGame()	{
 	timeToNextPacket  = 0.0f;
 	packetsToSnapshot = 0;
 	playerStates = std::vector<int>();
+
 }
 
 NetworkedGame::~NetworkedGame()	{
@@ -99,7 +97,6 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-	std::cout << "starting"<<std::endl;
 	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
 }
 
@@ -392,19 +389,3 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 	if (thisClient) thisClient->ReceivePacket(type, payload, source);
 	else if (thisServer) thisServer->ReceivePacket(type, payload, source);
 }
-
-void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
-	if (thisServer) 
-	{ 
-		MessagePacket newPacket;
-		newPacket.messageID = COLLISION_MSG;
-		newPacket.playerID  = a->GetPlayerNum();
-
-		thisClient->SendPacket(newPacket);
-
-		newPacket.playerID = b->GetPlayerNum();
-		thisClient->SendPacket(newPacket);
-
-	}
-}
-//1001e8931661490896580a1ce1aa7cd3

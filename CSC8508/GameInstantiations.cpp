@@ -17,14 +17,15 @@
 using namespace NCL;
 using namespace CSC8508;
 
-GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dimensions)
+GameObject* TutorialGame::AddNavMeshToWorld(std::string navMeshFilePath, std::string meshId, const Vector3& position, Vector3 dimensions)
 {
-	navMesh = new NavigationMesh("smalltest.navmesh");
+	navMesh = new NavigationMesh(navMeshFilePath);
 	GameObject* navMeshObject = new GameObject();
-	Mesh* navigationMesh = MaterialManager::GetMesh("navMesh");
+	Mesh* navigationMesh = MaterialManager::GetMesh(meshId);
 	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
 	Shader* basicShader = MaterialManager::GetShader("basic");
+	Quaternion rotationMatrix;
 
 	for (size_t i = 0; i < navigationMesh->GetSubMeshCount(); ++i)
 	{
@@ -34,7 +35,7 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 		std::vector<Vector3> vertices = GetVertices(navigationMesh, i);
 
 		Vector3 dimensions, localPosition;
-		Quaternion rotationMatrix;
+		rotationMatrix = Quaternion();
 		CalculateCubeTransformations(vertices, localPosition, dimensions, rotationMatrix);
 
 		GameObject* colliderObject = new GameObject();
@@ -51,7 +52,7 @@ GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dim
 		phys->GetPhysicsObject()->InitCubeInertia();
 		colliderObject->SetLayerID(Layers::LayerID::Default);
 
-		world->AddGameObject(colliderObject);
+		navMeshObject->AddChild(colliderObject);
 	}
 	return navMeshObject;
 }

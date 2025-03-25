@@ -18,7 +18,7 @@ namespace NCL {
 
                 Ray ray;
                 RayCollision* closestCollision;
-                GameObject* closetsGamObj;
+                GameObject* closetsGamObj = nullptr;
                 float closestDist = -1.0f;
                 Vector3 position = GetGameObject().GetTransform().GetPosition();
 
@@ -41,7 +41,6 @@ namespace NCL {
 
                     }
                 );
-                //Need to add ending to sight test here
                 return closetsGamObj;
             }
 

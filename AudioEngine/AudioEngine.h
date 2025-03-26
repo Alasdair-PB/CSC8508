@@ -155,6 +155,7 @@ public:
 	*/
 	void SetOutputDeviceIndex(int index) {
 		outputDeviceIndex = index;
+		audioSystem->setDriver(outputDeviceIndex);
 	}
 
 	/**

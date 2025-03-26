@@ -62,7 +62,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		
 		NetworkedListenerComponent* listenerComp = player->AddComponent<NetworkedListenerComponent>(
 			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
-		listenerComp->RecordMic();
 
 		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
 		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));

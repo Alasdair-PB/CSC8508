@@ -70,6 +70,7 @@ NetworkedGame::NetworkedGame()	{
 NetworkedGame::~NetworkedGame()	{
 	delete thisServer;
 	delete thisClient;
+	TutorialGame::~TutorialGame();
 }
 
 void NetworkedGame::StartAsServer() 

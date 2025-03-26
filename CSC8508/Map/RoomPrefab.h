@@ -12,11 +12,12 @@
 using namespace NCL::CSC8508;
 
 class RoomPrefab : public IComponent {
-protected:
+public:
     struct RoomPrefabDataStruct : ISerializedData {
         std::vector<Vector3> possibleItemSpawnLocations;
         std::vector<DoorLocation> possibleDoorLocations;
 
+        RoomPrefabDataStruct() = default;
         RoomPrefabDataStruct(std::vector<Vector3> const& possibleItemSpawnLocations, std::vector<DoorLocation> const& possibleDoorLocations)
             : possibleItemSpawnLocations(possibleItemSpawnLocations), possibleDoorLocations(possibleDoorLocations) { }
 
@@ -28,7 +29,6 @@ protected:
         }
     };
 
-public:
     RoomPrefab(GameObject& roomObject, NavigationMesh* navMesh) : IComponent(roomObject), navMesh(navMesh) { }
 
     [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return possibleDoorLocations; }

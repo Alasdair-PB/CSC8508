@@ -17,14 +17,9 @@ namespace NCL {
 		typedef std::function<void(GameObject*)> GameObjectFunc;	
 		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
 
-
-		// To remove all below
 		typedef std::function<void(PhysicsComponent*)> PhysicsComponentFunc;
-		typedef std::function<void(IComponent*)> IComponentFunc;
-
 		typedef std::vector<PhysicsComponent*>::const_iterator PhysicsIterator;
 		typedef std::vector<BoundsComponent*>::const_iterator BoundsIterator;
-		typedef std::vector<IComponent*>::const_iterator ICompIterator;
 
 		class GameWorld : ISerializable	{
 		public:
@@ -94,8 +89,6 @@ namespace NCL {
 			std::vector<BoundsComponent*> boundsComponents;
 
 			std::vector<GameObject*> gameObjects;
-			std::vector<IComponent*> components;
-
 			std::vector<Constraint*> constraints;
 
 			PerspectiveCamera mainCamera;

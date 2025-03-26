@@ -56,8 +56,11 @@ namespace NCL {
 			void Update(float dt);
 
 			void SetMainMenuOption(int option) { mainMenuOption = option; } // Change this for each menu
+
+#if !PS5
 			void SetEOSMenuOption(int option) { eosMenuOption = option; } // Change this for each menu
 			void SetEOSLobbyOption(int option) { eosLobbyOption = option; } // Change this for each menu
+#endif
 
 			float lobbyUpdateTimer = 10.0f;
 			const float updateInterval = 10.0f; // 3 seconds

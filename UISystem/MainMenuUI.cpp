@@ -21,15 +21,21 @@ MainMenuUI::MainMenuUI() {
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 	};
 
+#if !PS5
+
 	std::function<CSC8508::PushdownState::PushdownResult()> funcD = [this]() -> CSC8508::PushdownState::PushdownResult {
 		menuOption = startEOS;
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 		};
 
+	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "StartEOS", funcD);
+
+#endif
+
 	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Offline", funcA);
 	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Server", funcB);
 	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Client", funcC);
-	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "StartEOS", funcD);
+	
 }
 
 MainMenuUI::~MainMenuUI() {

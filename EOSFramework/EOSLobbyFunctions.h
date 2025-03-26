@@ -4,12 +4,13 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <atomic>
+#include <thread>
 #include "eos_sdk.h"
 #include "eos_lobby.h"
 #include "EOSInitialisationManager.h"
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
-#include <thread>
 
 class EOSLobbyFunctions {
 public:
@@ -18,18 +19,26 @@ public:
 
     void JoinLobby();
     void LeaveLobby();
-    static void OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackInfo* Data);
-    static void OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data);
     void UpdateLobbyDetails();
     void RunUpdateLoop();
-    std::string ownerIP; 
+
+    static void OnLeaveLobbyComplete(const EOS_Lobby_LeaveLobbyCallbackInfo* Data);
+    static void OnJoinLobbyComplete(const EOS_Lobby_JoinLobbyCallbackInfo* Data);
+
+    std::string ownerIP;
     std::string lobbyID;
     int playerCount = 0;
+
 private:
-    std::atomic<bool> running; // Flag to control the update loop
+    std::atomic<bool> running;
     EOSInitialisationManager& eosInitManager;
     EOSLobbySearch& eosSearchManager;
+    bool hasStartedClientCallback = false;
 
-
-    bool hasStartedClientCallback = false; // Ensure it only runs once
+    bool ValidateLobbyDetailsHandle(EOS_HLobbyDetails handle);
+    EOS_LobbyDetails_Info* CopyLobbyInfo(EOS_HLobbyDetails handle);
+    bool DetermineIfOwner(EOS_ProductUserId ownerId);
+    std::string GetOwnerIPAttribute(EOS_HLobbyDetails handle);
+    void ParseOwnerIP(const std::string& ip);
+    std::vector<EOS_ProductUserId> GetLobbyMembers(EOS_HLobbyDetails handle);
 };

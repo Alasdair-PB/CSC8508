@@ -65,9 +65,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 
-	pc->SetBindingDash(KeyCodes::SHIFT, stamina);
-	pc->SetBindingJump(KeyCodes::SPACE, stamina);
-	pc->SetBindingInteract(KeyCodes::E);
+	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
+	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
+	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
 
 	SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();

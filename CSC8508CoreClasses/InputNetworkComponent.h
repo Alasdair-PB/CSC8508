@@ -28,11 +28,11 @@ namespace NCL::CSC8508
 	struct InputDeltaPacket : INetworkPacket {
 		uint32_t axisIDs[MAX_AXIS_COUNT];
 		uint32_t buttonIDs[MAX_BUTTON_COUNT];
+
 		float axisValues[MAX_AXIS_COUNT];
 		float deltaTime = 0;
 		float mouseYaw = 0;
 		float mousePitch = 0;
-
 		int historyStamp = 0;
 
 		InputDeltaPacket() {
@@ -55,8 +55,14 @@ namespace NCL::CSC8508
 		void OnAwake() override {	
 			InputComponent::OnAwake();
 			boundAxis = activeController->GetBoundAxis();
-			for (uint32_t binding : boundButtons) lastBoundState[binding] = false;
-			for (uint32_t binding : boundAxis) lastAxisState[binding] = 0;
+			for (uint32_t binding : boundButtons){
+				uint32_t hashBinding = activeController->GetButtonHashId(binding);
+				lastBoundState[hashBinding] = false;
+			}
+			for (uint32_t binding : boundAxis) {
+				uint32_t hashBinding = activeController->GetAxisHashId(binding);
+				lastAxisState[hashBinding] = 0;
+			}
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -143,8 +149,8 @@ namespace NCL::CSC8508
 		{
 			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
-				uint32_t binding = activeController->GetNamedAxisBinding(name);
-				return reset ? 0 : lastAxisState[binding];
+				uint32_t hashBinding = activeController->GetAxisHashId(name);
+				return reset ? 0 : lastAxisState[hashBinding];
 			}
 		}
 
@@ -211,9 +217,10 @@ namespace NCL::CSC8508
 					if (axisValue != 0)
 						hasChanged = true;
 
-					deltaPacket->axisIDs[j] = binding;
+					uint32_t hashBinding = activeController->GetAxisHashId(binding);
+					deltaPacket->axisIDs[j] = hashBinding;
 					deltaPacket->axisValues[j] = axisValue;
-					lastAxisState[binding] = axisValue;
+					lastAxisState[hashBinding] = axisValue;
 				}
 			}
 		}
@@ -226,7 +233,8 @@ namespace NCL::CSC8508
 					bool pressed = activeController->GetBoundButton(binding);
 					if (pressed) {
 						hasChanged = true;
-						deltaPacket->buttonIDs[j] = binding;
+						uint32_t hashBinding = activeController->GetButtonHashId(binding);
+						deltaPacket->buttonIDs[j] = hashBinding;
 					}
 				}
 			}

@@ -86,8 +86,8 @@ namespace NCL {
             void RemoveItemEntry(int inventoryIndex) {
                 storedItems.erase(storedItems.begin() + inventoryIndex);
             }
-        protected:
 
+        protected:
             int maxItemStorage;
             int scrollIndex = 0;
             float itemCarryOffset;
@@ -106,7 +106,6 @@ namespace NCL {
                 Transform& objectTransform = storedItems[inventoryIndex]->GetGameObject().GetTransform();
                 objectTransform.SetPosition(transform.GetPosition() + GetDirection() * itemDropOffset);
             }
-
 
             ItemComponent* PopItemFromInventory(int inventoryIndex) {
                 if (inventoryIndex < 0 || inventoryIndex >= storedItems.size()) return nullptr;

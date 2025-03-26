@@ -4,7 +4,6 @@
 using namespace NCL;
 using namespace CSC8508;
 
-
 void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i) {
 	ItemComponent* itemDelta = nullptr;
 	ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
@@ -16,7 +15,6 @@ void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* 
 			}
 		}
 	);
-
 	if (itemDelta != nullptr) {
 		ComponentManager::OperateOnBufferContents<InventoryManagerComponent>(
 			[&itemDelta](InventoryManagerComponent* o) { o->RemoveItemEntry(itemDelta);});
@@ -59,8 +57,6 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 	}
 	return true;
 }
-
-
 
 vector<GamePacket*> InventoryNetworkManagerComponent::WritePacket() {
 	vector<GamePacket*> packets;

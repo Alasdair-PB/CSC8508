@@ -50,16 +50,14 @@ namespace NCL {
 
 			void HostGame();
 
+#if !PS5
 			void EOSLobbyCreation();
-
 			void EOSLobbySearchFunc(const std::string& lobbyID);
-
-
 			void EOSLobbyDetailsUpdate();
-
 			void EOSStartAsHost();
-
 			void EOSStartAsJoin(char a, char b, char c, char d);
+#endif
+
 
 			void UpdateGame(float dt) override;
 
@@ -80,16 +78,20 @@ namespace NCL {
 			void StartClientCallBack();
 			void StartServerCallBack();
 			void StartOfflineCallBack();
+
+#if !PS5
 			void StartEOSCallBack();
 			void StartAsHostCallBack();
 			void StartAsJoinCallBack();
 			void StartEOSLobbyCreationCallBack();
-
 			void StartEOSLobbySearchCallBack(const std::string& lobbyID);
-
-			
-
 			void StartEOSLobbyUpdateCallBack();
+
+			EOSInitialisationManager* eosManager = new EOSInitialisationManager();
+			EOSLobbyManager* eosLobbyManager = new EOSLobbyManager(*eosManager);
+			EOSLobbySearch* eosLobbySearch = new EOSLobbySearch(*eosManager);
+			EOSLobbyFunctions* eosLobbyFunctions = nullptr;
+#endif
 
 			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastOwnedObjects(bool deltaFrame);
@@ -104,14 +106,6 @@ namespace NCL {
 			GameServer* thisServer;
 			GameClient* thisClient;
 
-#if !PS5
-
-			EOSInitialisationManager* eosManager = new EOSInitialisationManager();
-			EOSLobbyManager* eosLobbyManager = new EOSLobbyManager(*eosManager);
-			EOSLobbySearch* eosLobbySearch = new EOSLobbySearch(*eosManager);
-			EOSLobbyFunctions* eosLobbyFunctions = nullptr;
-
-#endif
 			float timeToNextPacket;
 			int packetsToSnapshot;
 			int nextObjectId;
@@ -119,8 +113,6 @@ namespace NCL {
 			vector<GameObject*> ownedObjects;
 			GameObject* GetPlayerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 			std::vector<int> playerStates;
-
-
 		};
 	}
 }

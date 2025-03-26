@@ -59,6 +59,8 @@ public:
     */
     static AudioEngine& Instance();
 
+	~AudioEngine();
+
 	/**
 	* Update Audio Engine
     * To be called in main game loop

@@ -43,6 +43,7 @@ namespace NCL::CSC8508 {
 				audioEngine->StopRecording();
 				StopNetworkedEncodeThread();
 				CloseEncoder(encoder);
+				audioEngine->StopRecording();
 			}
 			else {
 				CloseDecoder(decoder);

@@ -134,6 +134,7 @@ TutorialGame::~TutorialGame()
 	MaterialManager::CleanUp();
 	ComponentManager::CleanUp();
 
+	delete audioEngine;
 	delete physics;
 	delete renderer;
 	delete world;

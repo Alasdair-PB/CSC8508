@@ -35,8 +35,8 @@ namespace NCL::CSC8508 {
 	class NetworkedListenerComponent : public AudioListenerComponent, public INetworkComponent {
 
 	public:
-		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, bool clientOwned) :
-			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, clientOwned) {}
+		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, int pFabId, bool clientOwned) :
+			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, pFabId, clientOwned) {}
 
 		~NetworkedListenerComponent() = default;
 

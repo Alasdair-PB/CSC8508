@@ -7,6 +7,8 @@ using namespace CSC8508;
 
 void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i) {
 	ItemComponent* itemDelta = nullptr;
+	std::cout << "Searching for matching item" << std::endl;
+
 	ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
 		[&lastInvFullState, &itemDelta, &i](TransformNetworkComponent* o) {
 			if (o->GetObjectID() == lastInvFullState->inventory[i]) {
@@ -20,6 +22,7 @@ void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* 
 	);
 
 	// Maybe for every inventory component drop the item if carried?
+	// Add the item don't set it!!!
 	if (itemDelta != nullptr)
 		storedItems[i] = itemDelta;
 }
@@ -31,8 +34,9 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 	if (!UpdateFullStateHistory<InventoryNetworkState, InvFullPacket>(p, &newStateId))
 		return false;
 
-	for (int i = 0; i < MAX_INVENTORY_ITEMS; i++)
+	for (int i = 0; i < MAX_INVENTORY_ITEMS; i++) 
 		((InventoryNetworkState*)lastFullState)->inventory[i] = p.fullState.inventory[i];
+	
 	((InventoryNetworkState*)lastFullState)->stateID = newStateId;
 	InventoryNetworkState* lastInvFullState = static_cast<InventoryNetworkState*>(lastFullState);
 
@@ -42,6 +46,8 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 
 		if (lastInvFullState->inventory[i] == 0)
 			continue;
+
+		std::cout << "Non zero recieved" << std::endl;
 
 		if (i < storedItems.size() && storedItems[i]) {
 			TransformNetworkComponent* networkComponent = storedItems[i]->GetGameObject().TryGetComponent<TransformNetworkComponent>();
@@ -65,11 +71,16 @@ vector<GamePacket*> InventoryNetworkManagerComponent::WritePacket() {
 
 	for (int i = 0; i < MAX_INVENTORY_ITEMS; i++) {
 		state->inventory[i] = 0;
-		if (i < storedItems.size()) {
+		fp->fullState.inventory[i] = 0;
+		if (i < storedItems.size() && storedItems.size() > 0) {
 			if (storedItems[i] != nullptr) {
+				std::cout << "try get" << std::endl;
 				TransformNetworkComponent* networkComponent = storedItems[i]->GetGameObject().TryGetComponent<TransformNetworkComponent>();
-				if (networkComponent != nullptr)
-					state->inventory[i] = networkComponent->GetObjectID();
+				if (networkComponent != nullptr) {
+					int id = networkComponent->GetObjectID();
+					state->inventory[i] = id;
+					fp->fullState.inventory[i] = id;
+				}
 			}
 		}
 	}

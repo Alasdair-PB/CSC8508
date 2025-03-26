@@ -155,8 +155,6 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-
-	Loaditem(Vector3(5, 0, 5));
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 }

@@ -24,20 +24,22 @@ int GetUniqueId(int objectId, int& componentCount) {
 }
 
 
-void TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
+GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + position);
+	myObjectToLoad->GetTransform().SetPosition(position);
 	myObjectToLoad->AddComponent<ItemComponent>(10);
 	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	if (spawnData)
 	{	
+		int pFabId = spawnData->pfab;
 		int componentIdCount = 0;
 		TransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<TransformNetworkComponent>(
-			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 	}
 	world->AddGameObject(myObjectToLoad);
+	return myObjectToLoad;
 }
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
@@ -80,18 +82,19 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	if (spawnData)
 	{
+		int pFabId = spawnData->pfab;
 		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
 		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
-			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2, carryOffset, dropOffset,
-			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
-			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 		
 		NetworkedListenerComponent* listenerComp = player->AddComponent<NetworkedListenerComponent>(
-			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 		listenerComp->RecordMic();
 
 		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();

@@ -38,31 +38,57 @@ namespace NCL::CSC8508 {
 		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, bool clientOwned) :
 			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, clientOwned) {}
 
-		~NetworkedListenerComponent() = default;
+		~NetworkedListenerComponent() {
+			if (clientOwned) {
+				StopNetworkedEncodeThread();
+				CloseEncoder(encoder);
+				audioEngine->StopRecording();
+			}
+			else {
+				CloseDecoder(decoder);
+			}
+		}
 
 
 		void OnAwake() override {
-		
+
 			if (clientOwned) {
 				// Initialise Encoding Pipeline
 				InitMicSound();
-				encoder = OpenEncoder();
-
 				RecordMic();
 
+				encoder = OpenEncoder();
 				encodeThreadRunning = true;
 				StartNetworkedEncodeThread();
 			}
-
-			decoder = OpenDecoder();
-			decodeThreadRunning = true;
-			StartNetworkedDecodeThread();
+			else {
+				decoder = OpenDecoder();
+			}
 
 			std::cout << "Listener ID: " << objectID << ", awake!" << std::endl;
 		}
 
 		void Update(float deltaTime) override {
 			dt = deltaTime;
+
+			if(clientOwned){
+				Vector3 pos = transform->GetPosition();
+				//std::cout << "Listener " << objectID << " pos: " << std::to_string(pos.x) << ", " << std::to_string(pos.z) << std::endl;
+
+				Vector3 forward = Vector3(fForward.x, fForward.y, fForward.z);
+				//std::cout << "Listener " << objectID << " forward: " << std::to_string(forward.x) << ", " << std::to_string(forward.z) << std::endl;
+
+
+				AudioListenerComponent::Update(deltaTime);
+			}
+			else {
+				for (int i = 0; i < bufferSize; i++) {
+					if (audioPacketQueue[i] != nullptr) {
+						UpdateNetworkedDecode();
+					}
+				}
+			}
+
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -124,7 +150,7 @@ namespace NCL::CSC8508 {
 
 			// Calculate the number of complete frames available
 			unsigned int completeFrames = availableSamples / frameSize;
-			if (completeFrames == 0) return std::make_pair(std::vector<unsigned char>(), 0);
+			if (completeFrames == 0) return std::make_pair(std::vector<unsigned char>(), -1);
 
 			// Calculate the number of samples to process
 			unsigned int samplesToProcess = completeFrames * frameSize;
@@ -177,20 +203,22 @@ namespace NCL::CSC8508 {
 
 
 		void SendEncodedAudioPacket(std::pair<std::vector<unsigned char>, size_t> encodedPair) {
-			EncodedAudioPacket* packet = new EncodedAudioPacket();
 
-			//std::cout << "Packet Size: " << encodedPair.second << "/" << MAXFRAMESIZE << std::endl;
-			
-
-			if (encodedPair.first.empty() or packet->packetSize <= 0) {
-				delete packet;
+			if (encodedPair.first.empty() || (encodedPair.second <= 0 || encodedPair.second > MAXFRAMESIZE)) {
 				return;
 			}
+
+			EncodedAudioPacket* packet = new EncodedAudioPacket();
+
 
 			std::copy(encodedPair.first.begin(), encodedPair.first.end(), packet->encodedFrame);
 
 			packet->historyStamp = sendHistoryCounter;
 			packet->packetSize = encodedPair.second;
+
+
+			//std::cout << "Packet Size: " << packet->packetSize << "/" << MAXFRAMESIZE << std::endl;
+
 			SendEventPacket(packet);
 	
 			delete packet;
@@ -208,14 +236,6 @@ namespace NCL::CSC8508 {
 				EncodedAudioPacket* encodedPacket = (EncodedAudioPacket*)&p;
 				if (encodedPacket->encodedFrame == NULL) return false;
 
-
-				{
-					std::lock_guard<std::mutex> lock(audioQueueMutex);
-					if (audioPacketQueue.empty()) { // if first packet set playbackStartTime to current time + jitterDelays
-						playbackStartTime = dt + jitterDelayMS;
-					}
-				}
-
 				size_t index = encodedPacket->historyStamp % bufferSize;
 
 				RecievedAudioPacket* recieved = new RecievedAudioPacket();
@@ -230,15 +250,18 @@ namespace NCL::CSC8508 {
 					std::lock_guard<std::mutex> lock(audioQueueMutex);
 					audioPacketQueue[index] = recieved;
 				}
+
+				//std::cout << "Recieved Packet: " << recieved->historyStamp << "/" << recieveHistoryCounter << std::endl;
 				return true;
 			}
 			else return false;
 		}
 		
 		void UpdateNetworkedDecode() {
+
 			uint32_t nextIndex = recieveHistoryCounter % bufferSize;
 
-			std::cout << "Next Index: " << nextIndex << "/" << bufferSize << std::endl;
+			//std::cout << "Next Index: " << nextIndex << "/" << bufferSize << std::endl;
 
 			RecievedAudioPacket* packet = nullptr;
 
@@ -248,15 +271,10 @@ namespace NCL::CSC8508 {
 			}
 
 			// if no valid packet or packet is outdated, insert silence
-			if (packet == nullptr || packet->historyStamp < recieveHistoryCounter) {
-				
-				//std::cout << "Inserting Silence" << std::endl;
-				//InsertSilence(nextIndex);
-
-			}
-			else { // Decode valid packet and increment history counter
+			if (packet != nullptr && packet->historyStamp >= recieveHistoryCounter) {
+				 // Decode valid packet and increment history counter
+				std::cout << "Decoding Packet: " << packet->historyStamp << "/" << recieveHistoryCounter << std::endl;
 				DecodePersistentPlayback(audioPacketQueue[nextIndex]);
-				recieveHistoryCounter++;
 			}
 
 
@@ -264,23 +282,8 @@ namespace NCL::CSC8508 {
 				std::lock_guard<std::mutex> lock(audioQueueMutex);
 				audioPacketQueue[nextIndex] = nullptr;
 			}
-		}
-		
 
-		/**
-		* TODO: Insert silence into the audio queue
-		*/
-		void InsertSilence(size_t index) {
-
-			RecievedAudioPacket* silentPacket = new RecievedAudioPacket();
-			
-			silentPacket->encodedFrame = new unsigned char[1];
-			silentPacket->encodedFrame[0] = 0;
-
-			silentPacket->historyStamp = recieveHistoryCounter;
-			silentPacket->packetSize = 1;
-
-			audioPacketQueue[index] = silentPacket;
+			recieveHistoryCounter++;
 		}
 
 
@@ -380,7 +383,7 @@ namespace NCL::CSC8508 {
 
 		#pragma endregion
 
-		#pragma region Threads
+		#pragma region Encode Thread
 
 		// Only start the encode thread if the object is owned by the client
 		void StartNetworkedEncodeThread() {
@@ -405,37 +408,10 @@ namespace NCL::CSC8508 {
 		}
 
 		void StopNetworkedEncodeThread() {
+			encodeThreadRunning = false;
 			if (encodeThread.joinable()) {
 				encodeThread.join();
 				std::cout << "Networked Audio Encode Stopped" << std::endl;
-			}
-		}
-
-		void StartNetworkedDecodeThread() {
-			std::cout << "Networked Audio Decode Started" << std::endl;
-
-			decodeThread = std::thread([this]() {
-				while (decodeThreadRunning) {
-
-
-					for (size_t i = 0 ; i < bufferSize; i++) {
-						if (audioPacketQueue[i] != nullptr) {
-							//persistentChannel->setPaused(false);
-							UpdateNetworkedDecode();
-
-						}
-						else {
-							//persistentChannel->setPaused(true);
-						}
-					}
-				}
-			});
-		}
-
-		void StopNetworkedDecodeThread() {
-			if (decodeThread.joinable()) {
-				decodeThread.join();
-				std::cout << "Networked Audio Decode Stopped" << std::endl;
 			}
 		}
 
@@ -463,9 +439,6 @@ namespace NCL::CSC8508 {
 
 		/////////////Decoding///////////////
 		OpusDecoder* decoder;
-		bool decodeThreadRunning;
-		std::thread decodeThread;
-
 
 		const size_t bufferSize = 64;
 		std::vector<RecievedAudioPacket*> audioPacketQueue{ bufferSize, nullptr };
@@ -478,11 +451,6 @@ namespace NCL::CSC8508 {
 		unsigned int persistentBufferSize = sampleRate / 2; // 0.5 second
 		unsigned int currentWritePos = 0; // in samples
 		/////////////////////////
-
-
-		// Playback Data
-		uint32_t jitterDelayMS = 100;
-		uint32_t playbackStartTime = 0;
 
 
 	};

@@ -22,7 +22,7 @@ AudioEngine::AudioEngine() : audioSystem(nullptr) {
     FMOD::System_Create(&audioSystem);
 
 
-	audioSystem->setDriver(0);
+	audioSystem->setDriver(outputDeviceIndex);
 
 	// Set FMOD to use a right-handed coordinate system
 	audioSystem->init(512, FMOD_INIT_3D_RIGHTHANDED, nullptr);
@@ -61,11 +61,6 @@ AudioEngine::~AudioEngine() {
 AudioEngine& AudioEngine::Instance() {
 	static AudioEngine instance;
 	return instance;
-}
-
-void AudioEngine::Init() {
-	FMOD::System_Create(&audioSystem);
-	audioSystem->init(512, FMOD_INIT_NORMAL, nullptr);
 }
 
 void AudioEngine::Update() {
@@ -131,7 +126,7 @@ void AudioEngine::PrintOutputList() {
 
 bool AudioEngine::IsRecording() {
 	bool isRecording;
-	FMOD_RESULT result = audioSystem->isRecording(0, &isRecording);
+	FMOD_RESULT result = audioSystem->isRecording(inputDeviceIndex, &isRecording);
 	if (result != FMOD_OK) {
 		// std::cerr << "Error: " << FMOD_ErrorString(result) << std::endl;
 		return false;

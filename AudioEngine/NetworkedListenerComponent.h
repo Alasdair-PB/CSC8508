@@ -40,7 +40,6 @@ namespace NCL::CSC8508 {
 
 		~NetworkedListenerComponent() {
 			if (clientOwned) {
-				audioEngine->StopRecording();
 				StopNetworkedEncodeThread();
 				CloseEncoder(encoder);
 				audioEngine->StopRecording();

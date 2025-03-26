@@ -255,7 +255,6 @@ public:
 
 private:
     AudioEngine();
-    ~AudioEngine();
 
     FMOD::System* audioSystem;
 

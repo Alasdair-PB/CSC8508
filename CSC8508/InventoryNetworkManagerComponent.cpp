@@ -7,24 +7,24 @@ using namespace CSC8508;
 
 void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i) {
 	ItemComponent* itemDelta = nullptr;
-	std::cout << "Searching for matching item" << std::endl;
-
 	ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
 		[&lastInvFullState, &itemDelta, &i](TransformNetworkComponent* o) {
 			if (o->GetObjectID() == lastInvFullState->inventory[i]) {
-				std::cout << "matching componentId" << std::endl;
 				ItemComponent* itemComponent = o->GetGameObject().TryGetComponent<ItemComponent>();
-				if (itemComponent) {
+				if (itemComponent)
 					itemDelta = itemComponent;
-				}
 			}
 		}
 	);
 
-	// Maybe for every inventory component drop the item if carried?
-	// Add the item don't set it!!!
-	if (itemDelta != nullptr)
-		storedItems[i] = itemDelta;
+	if (itemDelta != nullptr) {
+		ComponentManager::OperateOnBufferContents<InventoryManagerComponent>(
+			[&itemDelta](InventoryManagerComponent* o) { o->RemoveItemEntry(itemDelta);});
+		if (i < storedItems.size())
+			storedItems[i] = itemDelta;
+		else
+			PushItemToInventory(itemDelta);
+	}
 }
 
 bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
@@ -46,8 +46,6 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 
 		if (lastInvFullState->inventory[i] == 0)
 			continue;
-
-		std::cout << "Non zero recieved" << std::endl;
 
 		if (i < storedItems.size() && storedItems[i]) {
 			TransformNetworkComponent* networkComponent = storedItems[i]->GetGameObject().TryGetComponent<TransformNetworkComponent>();
@@ -74,7 +72,6 @@ vector<GamePacket*> InventoryNetworkManagerComponent::WritePacket() {
 		fp->fullState.inventory[i] = 0;
 		if (i < storedItems.size() && storedItems.size() > 0) {
 			if (storedItems[i] != nullptr) {
-				std::cout << "try get" << std::endl;
 				TransformNetworkComponent* networkComponent = storedItems[i]->GetGameObject().TryGetComponent<TransformNetworkComponent>();
 				if (networkComponent != nullptr) {
 					int id = networkComponent->GetObjectID();

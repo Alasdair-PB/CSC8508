@@ -21,6 +21,17 @@ namespace NCL {
 			}
 		};
 
+#if PS5
+		MainMenu::MainMenu(SetPauseGame setPauseFunc,
+			StartClient startClient,
+			StartServer startServer,
+			StartOffline startOffline)
+		{
+			setPause = setPauseFunc;
+			this->startClient = startClient;
+			this->startServer = startServer;
+			this->startOffline = startOffline;
+#else
 		MainMenu::MainMenu(SetPauseGame setPauseFunc,
 			StartClient startClient,
 			StartServer startServer,
@@ -31,7 +42,7 @@ namespace NCL {
 			StartEOSLobbyUpdate startEOSLobbyUpdate,
 			GetStringFunc getOwnerIP,
 			GetStringFunc getLobbyID,
-			GetIntFunc getPlayerCount, 
+			GetIntFunc getPlayerCount,
 			EOSStartAsHost eosStartAsHost,
 			EOSStartAsHost eosStartAsJoin)
 		{
@@ -48,7 +59,7 @@ namespace NCL {
 			getPlayerCountFunc = getPlayerCount;
 			this->EOSStartAsHostFunc = eosStartAsHost;
 			this->EOSStartAsJoinFunc = eosStartAsJoin;
-
+#endif
 			
 
 			machine = new PushdownMachine(new OverlayScreen(
@@ -127,6 +138,7 @@ namespace NCL {
 				startOffline();
 				return PushdownState::Pop;
 			}
+#if !PS5
 			if (mainMenuOption == eosOption) {
 				startEOS();
 				*newState = new OverlayScreen(
@@ -137,9 +149,11 @@ namespace NCL {
 				);
 				return PushdownState::Push;
 			}
+#endif
 			return PushdownState::NoChange;
 		}
 
+#if !PS5
 		PushdownState::PushdownResult MainMenu::LobbyScreenOnUpdate(float dt, PushdownState** newState)
 		{
 			Debug::Print("Duplicate Main Menu", Vector2(5, 85));
@@ -210,6 +224,7 @@ namespace NCL {
 			return PushdownState::NoChange;
 		}
 
+#endif
 
 		MainMenu::~MainMenu() {
 			delete activeController;

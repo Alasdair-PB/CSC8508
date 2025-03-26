@@ -39,12 +39,17 @@ struct SpawnPacket : public GamePacket {
 void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
+
+#if !PS5
+
 void NetworkedGame::StartEOSCallBack() { HostGame(); }
 void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
 void NetworkedGame::StartEOSLobbySearchCallBack(const std::string& lobbyID) {EOSLobbySearchFunc(lobbyID);}
 void NetworkedGame::StartAsHostCallBack() {EOSStartAsHost();}
 void NetworkedGame::StartAsJoinCallBack() {EOSStartAsJoin(10, 70, 33, 111);}
 void NetworkedGame::StartEOSLobbyUpdateCallBack() { EOSLobbyDetailsUpdate(); }
+
+#endif
 
 
 
@@ -58,6 +63,14 @@ NetworkedGame::NetworkedGame()	{
 	thisServer = nullptr;
 	thisClient = nullptr;
 
+#if PS5
+	mainMenu = new MainMenu(
+		[&](bool state) -> void { world->SetPausedWorld(state); },
+		[&]() -> void { this->StartClientCallBack(); },
+		[&]() -> void { this->StartServerCallBack(); },
+		[&]() -> void { this->StartOfflineCallBack(); }
+	);
+#else
 	mainMenu = new MainMenu(
 		[&](bool state) -> void { world->SetPausedWorld(state); },
 		[&]() -> void { this->StartClientCallBack(); },
@@ -72,9 +85,8 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> int { return this->GetPlayerCount(); },
 		[&]() -> void { this->StartAsHostCallBack(); },
 		[&]() -> void { this->StartAsJoinCallBack(); }
-
-		
 	);
+#endif
 
 	NetworkBase::Initialise();
 	timeToNextPacket  = 0.0f;
@@ -115,8 +127,10 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
 }
 
+#if !PS5
 void NetworkedGame::HostGame()
 {
+
 	eosManager->StartEOS();
 }
 
@@ -130,19 +144,24 @@ void NetworkedGame::EOSLobbyCreation()
 
 void NetworkedGame::EOSLobbySearchFunc(const std::string& lobbyID)
 {
+
 	eosLobbySearch->CreateLobbySearch(lobbyID.c_str()); // <-- convert std::string to const char*
 
 	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
 	eosLobbyFunctions->JoinLobby();
+
 }
 
 void NetworkedGame::EOSLobbyDetailsUpdate()
 {
+
 	eosLobbyFunctions->UpdateLobbyDetails();
+
 }
 
 void NetworkedGame::EOSStartAsHost()
 {
+
 	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
 	thisServer->RegisterPacketHandler(Received_State, this);
 	thisServer->RegisterPacketHandler(Spawn_Object, this);
@@ -151,6 +170,7 @@ void NetworkedGame::EOSStartAsHost()
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
 	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
+
 }
 
 void NetworkedGame::EOSStartAsJoin(char a, char b, char c, char d)
@@ -166,8 +186,9 @@ void NetworkedGame::EOSStartAsJoin(char a, char b, char c, char d)
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
-}
 
+}
+#endif
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 
 {
 	int id = e->GetClientId();

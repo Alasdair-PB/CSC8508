@@ -1,3 +1,5 @@
+#if !PS5
+
 #pragma once
 #include <eos_sdk.h>
 #include <iostream>
@@ -34,3 +36,5 @@ private:
     
     std::function<void()> authCompleteCallback;
 };
+
+#endif

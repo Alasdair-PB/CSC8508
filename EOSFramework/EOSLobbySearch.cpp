@@ -1,3 +1,5 @@
+#if !PS5
+
 #include "EOSLobbySearch.h"
 #include "EOSLobbyManager.h"
 #include "EOSLobbyFunctions.h"
@@ -208,3 +210,5 @@ EOS_HLobbyDetails EOSLobbySearch::GetLobbyDetailsHandle() const {
 std::vector<std::string> EOSLobbySearch::GetLobbyMemberIds() const {
     return LobbyMemberIds;
 }
+
+#endif

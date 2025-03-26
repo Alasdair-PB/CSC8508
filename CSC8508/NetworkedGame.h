@@ -2,9 +2,14 @@
 #include "TutorialGame.h"
 #include "NetworkBase.h"
 #include "EventListener.h"
+
+#if !PS5
+
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
 #include "EOSLobbyFunctions.h"
+
+#endif
 
 namespace NCL {
 	namespace CSC8508 {
@@ -99,11 +104,14 @@ namespace NCL {
 			GameServer* thisServer;
 			GameClient* thisClient;
 
+#if !PS5
+
 			EOSInitialisationManager* eosManager = new EOSInitialisationManager();
 			EOSLobbyManager* eosLobbyManager = new EOSLobbyManager(*eosManager);
 			EOSLobbySearch* eosLobbySearch = new EOSLobbySearch(*eosManager);
 			EOSLobbyFunctions* eosLobbyFunctions = nullptr;
 
+#endif
 			float timeToNextPacket;
 			int packetsToSnapshot;
 			int nextObjectId;

@@ -1,3 +1,5 @@
+#if !PS5
+
 #include "EOSLobbyMenuUI.h"
 #include <filesystem>        
 
@@ -44,3 +46,4 @@ EOSLobbyMenuUI::~EOSLobbyMenuUI() {
 	delete eosLobbyMenuUI;
 }
 
+#endif

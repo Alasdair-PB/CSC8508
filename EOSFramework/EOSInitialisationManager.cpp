@@ -1,3 +1,5 @@
+#if !PS5
+
 #include "EOSInitialisationManager.h"
 #include <eos_auth.h>
 #include "EOSLobbyManager.h"
@@ -330,3 +332,5 @@ EOS_HPlatform EOSInitialisationManager::GetPlatformHandle() const {
 EOS_ProductUserId EOSInitialisationManager::GetLocalUserId() const {
     return LocalUserId;
 }
+
+#endif

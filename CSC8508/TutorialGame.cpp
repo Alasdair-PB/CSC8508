@@ -23,8 +23,9 @@
 #else
 #include "GameTechRenderer.h"
 #include "KeyboardMouseController.h"
+#include "EOSLobbyFunctions.h"
 #endif // USE_PS5
-#include <EOSLobbyFunctions.h>
+
 
 
 using namespace NCL;
@@ -235,7 +236,18 @@ void TutorialGame::UpdateUI() {
 		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
 	}
+#if PS5
+	if (mainMenuUI->GetMenuOption() != 0) {
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->RemoveStack("Inventory");
+		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
+	}
 
+#else
+
+	//This needs to change back to how it was
 	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() == 0)
 	{
 		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
@@ -283,6 +295,8 @@ void TutorialGame::UpdateUI() {
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 
 	}
+
+#endif
 
 	uiSystem->RenderFrame();
 }

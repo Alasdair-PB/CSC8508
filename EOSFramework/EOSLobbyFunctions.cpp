@@ -1,3 +1,5 @@
+#if !PS5
+
 #include "EOSLobbyFunctions.h"
 #include "EOSInitialisationManager.h"
 #include "EOSLobbyManager.h"
@@ -265,3 +267,5 @@ std::vector<EOS_ProductUserId> EOSLobbyFunctions::GetLobbyMembers(EOS_HLobbyDeta
 
     return otherUsers;
 }
+
+#endif

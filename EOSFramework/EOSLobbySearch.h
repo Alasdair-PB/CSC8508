@@ -1,3 +1,4 @@
+#if !PS5
 #pragma once
 #define EOS_LOBBY_SEARCH_H
 
@@ -34,3 +35,4 @@ private:
 
     EOSInitialisationManager& eosInitManager;
 };
+#endif

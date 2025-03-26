@@ -1,3 +1,5 @@
+#if !PS5
+
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
 #include "EOSLobbyFunctions.h"
@@ -188,3 +190,5 @@ void EOSLobbyManager::OnLobbyUpdated(const EOS_Lobby_UpdateLobbyCallbackInfo* Da
 EOS_HLobby EOSLobbyManager::GetLobbyHandle() const {
     return LobbyHandle;
 }
+
+#endif

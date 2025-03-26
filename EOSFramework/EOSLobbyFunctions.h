@@ -1,3 +1,5 @@
+#if !PS5
+
 #pragma once
 #define EOS_LOBBY_FUNCTIONS_H
 
@@ -42,3 +44,5 @@ private:
     void ParseOwnerIP(const std::string& ip);
     std::vector<EOS_ProductUserId> GetLobbyMembers(EOS_HLobbyDetails handle);
 };
+
+#endif

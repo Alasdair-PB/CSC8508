@@ -2,7 +2,7 @@
 #include "IComponent.h"
 #include "GameWorld.h"
 
-#include "ComponentManager.h"
+//#include "ComponentManager.h"
 
 namespace NCL {
     namespace CSC8508 {
@@ -13,7 +13,7 @@ namespace NCL {
                 playerVisible = false;
             }
             ~SightComponent();
-
+            /*
             template<typename T>requires std::is_base_of_v<IComponent, T> GameObject* GetClosestVisibleTarget(float maxRange, Vector3 rayOffset) {
 
                 Ray ray;
@@ -46,7 +46,7 @@ namespace NCL {
 
             void OnAwake() override {
 
-            }
+            }*/
 
         protected:
             GameWorld& worldInstance;

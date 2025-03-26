@@ -111,6 +111,7 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
+	MaterialManager::PushMesh("Astronaut", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
@@ -191,7 +192,7 @@ void TutorialGame::InitWorld()
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
-	AddRoleTToWorld(Vector3(90, 30, -52));
+	AddRoleTToWorld(Vector3(90, 60, -95));
 }
 
 bool TutorialGame::SelectObject() {

@@ -41,9 +41,11 @@ namespace NCL {
 			NetworkedGame();
 			~NetworkedGame();
 
+#if !PS5
 			std::string GetOwnerIP() const { return eosLobbyFunctions ? eosLobbyFunctions->ownerIP : ""; }
 			std::string GetLobbyID() const { return eosLobbyFunctions ? eosLobbyFunctions->lobbyID : ""; }
 			int GetPlayerCount() const { return eosLobbyFunctions ? eosLobbyFunctions->playerCount : 0; }
+#endif
 
 			void StartAsServer();
 			void StartAsClient(char a, char b, char c, char d);

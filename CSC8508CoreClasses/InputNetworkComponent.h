@@ -31,6 +31,8 @@ namespace NCL::CSC8508
 		float axisValues[MAX_AXIS_COUNT];
 		float deltaTime = 0;
 		float mouseYaw = 0;
+		float mousePitch = 0;
+
 		int historyStamp = 0;
 
 		InputDeltaPacket() {
@@ -105,6 +107,7 @@ namespace NCL::CSC8508
 						lastHistoryEntry = data.historyStamp;
 						lastAxisState = data.axisMap;
 						mouseGameWorldYaw = data.mouseGameWorldYaw;
+						mouseGameWorldPitch = data.mouseGameWorldYaw;
 						reset = false;
 					}
 					skippedFrames++;
@@ -156,15 +159,17 @@ namespace NCL::CSC8508
 		{
 			float deltaTime;
 			float mouseGameWorldYaw;
+			float mouseGameWorldPitch;
 			int historyStamp;
 			std::map<uint32_t, float> axisMap;
 			std::stack<uint32_t> buttonMap;
 
-			HistoryData(std::map<uint32_t, float> axisMap, std::stack<uint32_t> buttonMap, float mouseGameWorldYaw, float deltaTime, int historyStamp) {
+			HistoryData(std::map<uint32_t, float> axisMap, std::stack<uint32_t> buttonMap, float mouseGameWorldYaw, float mouseGameWorldPitch, float deltaTime, int historyStamp) {
 				this->axisMap = axisMap;
 				this->buttonMap = buttonMap;
 				this->deltaTime = deltaTime;
 				this->mouseGameWorldYaw = mouseGameWorldYaw; 
+				this->mouseGameWorldPitch = mouseGameWorldPitch;
 				this->historyStamp = historyStamp;
 			}
 		};
@@ -184,7 +189,7 @@ namespace NCL::CSC8508
 				elements[pck.axisIDs[i]] = pck.axisValues[i];
 			for (int i = 0; i < MAX_BUTTON_COUNT; i++)
 				if (pck.buttonIDs[i] > 0) buttonElements.push(pck.buttonIDs[i]);
-			HistoryData data = HistoryData(elements, buttonElements, pck.mouseYaw, pck.deltaTime, pck.historyStamp);
+			HistoryData data = HistoryData(elements, buttonElements, pck.mouseYaw, pck.mousePitch, pck.deltaTime, pck.historyStamp);
 			historyQueue.push(data);
 			return true;
 		}
@@ -236,6 +241,7 @@ namespace NCL::CSC8508
 
 			deltaPacket->deltaTime = deltaTime;
 			deltaPacket->mouseYaw = mouseGameWorldYaw;
+			deltaPacket->mousePitch = mouseGameWorldPitch;
 			deltaPacket->historyStamp = lastHistoryEntry;
 
 			if (hasChanged) {				

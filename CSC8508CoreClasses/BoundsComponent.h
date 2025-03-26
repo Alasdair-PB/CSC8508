@@ -21,7 +21,7 @@ namespace NCL::CSC8508
 
 		BoundsComponent(GameObject& gameObject, CollisionVolume* collisionVolume, PhysicsComponent* physicsComponent = nullptr);
 
-		~BoundsComponent();
+		~BoundsComponent() override;
 
 		static const char* Name() { return "Bounds"; }
 		const char* GetName() const override { return Name(); }
@@ -58,14 +58,14 @@ namespace NCL::CSC8508
 		/// </summary>
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
-		virtual void Load(std::string assetPath, size_t allocationStart) override;
+		void Load(std::string assetPath, size_t allocationStart) override;
 #
 		/// <summary>
 		/// Saves the PhysicsComponent data into the assetPath file.
 		/// </summary>
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
-		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+		size_t Save(std::string assetPath, size_t* allocationStart) override;
 		auto GetDerivedSerializedFields() const;
 
 	protected:

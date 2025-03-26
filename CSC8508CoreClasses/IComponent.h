@@ -107,6 +107,9 @@ namespace NCL::CSC8508
 		bool IsDerived(const std::type_info& typeInfo) const {
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
+
+		virtual IComponent* Copy() = 0;
+
 		/// <summary>
 		/// Loads the IComponent save data into this IComponent
 		/// </summary>

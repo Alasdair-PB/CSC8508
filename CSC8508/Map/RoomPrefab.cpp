@@ -3,10 +3,12 @@
 //
 
 #include "RoomPrefab.h"
+
+#include "AABBVolume.h"
 #include "GameObject.h"
 #include "Axis.h"
 
-NCL::AABBVolume RoomPrefab::GetEncasingVolume() const {
+/*NCL::AABBVolume RoomPrefab::GetEncasingVolume() const {
     auto min = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
     auto max = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
     auto children = std::vector<GameObject*>(); // TODO: Replace these 2 lines with roomObject.GetChildren() once it exists
@@ -33,4 +35,16 @@ NCL::AABBVolume RoomPrefab::GetEncasingVolume() const {
         (max[y] - min[y]) / 2,
         (max[z] - min[z]) / 2
         )};
+}*/
+
+size_t RoomPrefab::Save(std::string const assetPath, size_t* allocationStart) {
+    RoomPrefabDataStruct const saveInfo(possibleItemSpawnLocations, possibleDoorLocations);
+    SaveManager::GameData const saveData = ISerializedData::CreateGameData<RoomPrefabDataStruct>(saveInfo);
+    return SaveManager::SaveGameData(assetPath, saveData, allocationStart, true);
+}
+
+void RoomPrefab::Load(std::string const assetPath, size_t const allocationStart) {
+    auto const loadedSaveData = ISerializedData::LoadISerializable<RoomPrefabDataStruct>(assetPath, allocationStart);
+    possibleItemSpawnLocations = loadedSaveData.possibleItemSpawnLocations;
+    possibleDoorLocations = loadedSaveData.possibleDoorLocations;
 }

@@ -12,10 +12,29 @@
 using namespace NCL::CSC8508;
 
 class RoomPrefab : public IComponent {
+protected:
+    struct RoomPrefabDataStruct : ISerializedData {
+        std::vector<Vector3> possibleItemSpawnLocations;
+        std::vector<DoorLocation> possibleDoorLocations;
+
+        RoomPrefabDataStruct(std::vector<Vector3> const& possibleItemSpawnLocations, std::vector<DoorLocation> const& possibleDoorLocations)
+            : possibleItemSpawnLocations(possibleItemSpawnLocations), possibleDoorLocations(possibleDoorLocations) { }
+
+        static auto GetSerializedFields() {
+            return std::make_tuple(
+                SERIALIZED_FIELD(RoomPrefabDataStruct, possibleItemSpawnLocations),
+                SERIALIZED_FIELD(RoomPrefabDataStruct, possibleDoorLocations)
+                );
+        }
+    };
+
 public:
     RoomPrefab(GameObject& roomObject, NavigationMesh* navMesh) : IComponent(roomObject), navMesh(navMesh) { }
 
     [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return possibleDoorLocations; }
+
+    size_t Save(std::string assetPath, size_t* allocationStart) override;
+    void Load(std::string assetPath, size_t allocationStart) override;
 
 protected:
     NavigationMesh* navMesh;

@@ -31,9 +31,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	float inverseMass = 0.5f;
 
 	GameObject* player = new GameObject();
-	GameObject* sphereB = AddSphereToWorld(Vector3(0,5,0), 1, 0);
+	//GameObject* sphereB = AddSphereToWorld(Vector3(0,5,0), 1, 0);
 	
-	player->AddChild(sphereB);
+	//player->AddChild(sphereB);
 
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
@@ -126,28 +126,28 @@ GameObject* TutorialGame::AddRoleTToWorld(const Vector3& position, float inverse
 	return roleT;
 }
 
-GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
-	GameObject* cube = new GameObject();
-	OBBVolume* volume = new OBBVolume(dimensions);
-	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-
-	PhysicsComponent* phys = cube->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = cube->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	cube->GetTransform().SetPosition(position).SetScale(dimensions * 2.0f);
-
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&cube->GetTransform()));
-
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
-	phys->GetPhysicsObject()->InitCubeInertia();
-
-	world->AddGameObject(cube);
-	return cube;
-}
+// GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
+// 	GameObject* cube = new GameObject();
+// 	OBBVolume* volume = new OBBVolume(dimensions);
+// 	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
+// 	Texture* basicTex = MaterialManager::GetTexture("basic");
+// 	Shader* basicShader = MaterialManager::GetShader("basic");
+//
+// 	PhysicsComponent* phys = cube->AddComponent<PhysicsComponent>();
+// 	BoundsComponent* bounds = cube->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+//
+// 	bounds->SetBoundingVolume((CollisionVolume*)volume);
+// 	cube->GetTransform().SetPosition(position).SetScale(dimensions * 2.0f);
+//
+// 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+// 	phys->SetPhysicsObject(new PhysicsObject(&cube->GetTransform()));
+//
+// 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
+// 	phys->GetPhysicsObject()->InitCubeInertia();
+//
+// 	world->AddGameObject(cube);
+// 	return cube;
+// }
 
 GameObject* TutorialGame::AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int const roomCount) {
 	auto* dungeon = new GameObject();

@@ -196,7 +196,7 @@ void TutorialGame::InitWorld()
 	auto t = Transform();
 	t.SetPosition(Vector3(Vector3(100.0f, 0.0f, 300.0f)));
 	DoorLocation const loc(Vector3(0.0f, 0.0f, 100.0f), Vector3(0.0f, 0.0f, 1.0f));
-	AddDungeonToWorld(t, loc, 3);
+	//AddDungeonToWorld(t, loc, 3); // TODO: Add back in
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);

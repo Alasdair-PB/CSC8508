@@ -72,26 +72,26 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	}
 };
 
-GameObject* GameObject::Copy(GameObject const& in) {
-	auto* out = new GameObject(in.isStatic);
-	out->isEnabled = in.isEnabled;
-	out->worldID = in.worldID;
-	out->transform = Transform(in.transform);
-	if (auto const ro = in.GetRenderObject()) {
-		auto* newRo = new RenderObject(&Transform(*ro->GetTransform()), ro->GetMesh(), ro->GetDefaultTexture(), ro->GetShader());
-		out->SetRenderObject(newRo);
-	}
-
-	// Components handling
-	for (IComponent const* c : in.components) {
-
-	}
-
-	// Children handling
-	for (GameObject const* c : in.children) {
-		out->AddChild(Copy(c));
-	}
-}
+// GameObject* GameObject::Copy(GameObject const& in) {
+// 	auto* out = new GameObject(in.isStatic);
+// 	out->isEnabled = in.isEnabled;
+// 	out->worldID = in.worldID;
+// 	out->transform = Transform(in.transform);
+// 	if (auto const ro = in.GetRenderObject()) {
+// 		auto* newRo = new RenderObject(&Transform(*ro->GetTransform()), ro->GetMesh(), ro->GetDefaultTexture(), ro->GetShader());
+// 		out->SetRenderObject(newRo);
+// 	}
+//
+// 	// Components handling
+// 	for (IComponent const* c : in.components) {
+//
+// 	}
+//
+// 	// Children handling
+// 	for (GameObject const* c : in.children) {
+// 		out->AddChild(Copy(c));
+// 	}
+// }
 
 
 void GameObject::LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath) {

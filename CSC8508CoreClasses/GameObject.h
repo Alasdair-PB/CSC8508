@@ -30,7 +30,7 @@ namespace NCL::CSC8508 {
 		GameObject(bool isStatic = false);
 		~GameObject();
 
-		static GameObject* Copy(GameObject const& in);
+		//static GameObject* Copy(GameObject const& in);
 
 		/// <summary>
 		/// Query if this GameObject is enabled

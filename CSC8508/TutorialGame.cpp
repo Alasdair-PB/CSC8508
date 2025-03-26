@@ -9,7 +9,7 @@
 #include "Assets.h"
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
-//#include "ItemComponent.h"
+#include "ItemComponent.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -63,7 +63,8 @@ void TutorialGame::Loaditem() {
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
 	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(5, 0, 5));
-	//myObjectToLoad->AddComponent<ItemComponent>(10);
+	myObjectToLoad->AddComponent<ItemComponent>(10);
+	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	world->AddGameObject(myObjectToLoad);
 
 }
@@ -95,7 +96,7 @@ void TutorialGame::InitialiseGame() {
 
 TutorialGame::TutorialGame()
 {
-	world = new GameWorld();
+	world = &GameWorld::Instance();
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	controller = w->GetController();
@@ -122,8 +123,11 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Astronaut.msh"));
+	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
+
+	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
+	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
 
@@ -151,14 +155,15 @@ TutorialGame::~TutorialGame()
 }
 
 void TutorialGame::UpdateGame(float dt)
-{
+{	
+	Debug::DrawLine(Vector3(90, 22, -50), Vector3(90, -22, -50));	
+	world->UpdateWorld(dt);
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
-	
 	Debug::UpdateRenderables(dt);
 
-	world->UpdateWorld(dt);
+
 	Window::GetWindow()->ShowOSPointer(true);
 	physics->Update(dt);
 }
@@ -176,10 +181,8 @@ void TutorialGame::InitWorld()
 	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
 	//LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
 	Loaditem();
-
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
-	AddRoleTToWorld(Vector3(90, 30, -52));
 }
 
 void TutorialGame::UpdateUI() {

@@ -10,8 +10,9 @@
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
 #include "TransformNetworkComponent.h"
-//#include "SightComponent.h"
-//#include "InventoryNetworkManagerComponent.h"
+#include "SightComponent.h"
+#include "InventoryNetworkManagerComponent.h"
+#include "InventoryManagerComponent.h"
 
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
@@ -23,16 +24,25 @@ int GetUniqueId(int objectId, int& componentCount) {
 }
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
-	float meshSize = 1.0f;
+	float meshSize = 0.25f;
 	float inverseMass = 0.5f;
 
 	GameObject* player = new GameObject();
-
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
-	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
 
+	Mesh* playerMesh = MaterialManager::GetMesh("player");
+	Texture* basicTex = MaterialManager::GetTexture("player");
+	Shader* playerShader = MaterialManager::GetShader("anim");
+
+	float carryOffset = 0.5f;
+	float dropOffset = 3.0f;
+
+	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
+	player->SetLayerID(Layers::LayerID::Player);
+	player->SetTag(Tags::Player);
+	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
+
+	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Astronaut.anm"));
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 
@@ -40,7 +50,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	pc->SetBindingJump(KeyCodes::SPACE, stamina);
 	pc->SetBindingInteract(KeyCodes::E);
 
-	//SightComponent* sight = player->AddComponent<SightComponent>();
+	SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
@@ -57,8 +67,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
 			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
-		//InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2,
-		//	spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+		InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2, carryOffset, dropOffset,
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
@@ -76,7 +86,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			listenerComp->SetPersistentSound(sourceComp->GetPersistentPair());
 	}
 	else {
-		//InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2);
+		InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2, carryOffset, dropOffset);
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 
@@ -84,11 +94,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		listenerComp->RecordMic();
 	}
 
-	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
-	player->SetLayerID(Layers::LayerID::Player);
-	player->SetTag(Tags::Player);
 
-	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, basicTex, basicShader));
 	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -97,31 +103,4 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	world->AddGameObject(player);
 
 	return player;
-}
-
-GameObject* TutorialGame::AddRoleTToWorld(const Vector3& position, float inverseMass)
-{	
-	GameObject* roleT = new GameObject();
-	Vector3 size = Vector3(1.0f, 1.0f, 1.0f);
-	CapsuleVolume* volume = new CapsuleVolume(4.0f, 2.5f);
-	Mesh* roleTMesh = MaterialManager::GetMesh("Role_T");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* animShader = MaterialManager::GetShader("anim");
-
-	PhysicsComponent* phys = roleT->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = roleT->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	roleT->GetTransform().SetScale(size).SetPosition(position + Vector3(0,5,0));
-
-	roleT->SetRenderObject(new RenderObject(&roleT->GetTransform(), roleTMesh, basicTex, animShader));
-	phys->SetPhysicsObject(new PhysicsObject(&roleT->GetTransform()));
-	roleT->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Astronaut.anm"));
-
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
-	phys->GetPhysicsObject()->InitSphereInertia();
-	phys->GetPhysicsObject()->SetRestitution(0.5f);
-
-	world->AddGameObject(roleT);
-	return roleT;
 }

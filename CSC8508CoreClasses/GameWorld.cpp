@@ -206,7 +206,6 @@ void GameWorld::ShuffleWorldConstraints() {
 
 bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, BoundsComponent* ignoreThis, vector<Layers::LayerID>* ignoreLayers) const {
 	RayCollision collision;
-
 	for (auto& i : boundsComponents) {
 		if (!i->IsEnabled() || !i->GetBoundingVolume() || i == ignoreThis) continue;
 		bool toContinue = false;
@@ -220,10 +219,8 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 			}
 		}
 
-		if (toContinue)
-			continue;
-
-		if (i->GetGameObject().GetLayerID() == Layers::Ignore_RayCast || i->GetGameObject().GetLayerID() == Layers::UI)
+		if (toContinue || (i->GetGameObject().GetLayerID() == Layers::Ignore_RayCast || 
+			i->GetGameObject().GetLayerID() == Layers::UI))
 			continue;
 
 		RayCollision thisCollision;

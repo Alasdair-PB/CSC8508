@@ -24,9 +24,9 @@ namespace NCL::CSC8508 {
 	class InventoryNetworkManagerComponent : public InventoryManagerComponent, public INetworkDeltaComponent {
 
 	public:
-		InventoryNetworkManagerComponent(GameObject& gameObject, int maxStorage, int objId, int ownId, int componId, bool clientOwned)
+		InventoryNetworkManagerComponent(GameObject& gameObject, int maxStorage, float carryOffset, float dropOffset, int objId, int ownId, int componId, bool clientOwned)
 			:
-			InventoryManagerComponent(gameObject, maxStorage),
+			InventoryManagerComponent(gameObject, maxStorage, carryOffset, dropOffset),
 			INetworkDeltaComponent(objId, ownId, componId, clientOwned, new InventoryNetworkState()) {
 		}
 

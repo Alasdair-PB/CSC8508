@@ -40,13 +40,12 @@ namespace NCL {
 			void InitWorld();
 			void InitialiseGame();
 
-			void TestLoadGameObject(std::string assetPath);
-			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			void LoadWorld(std::string assetPath);
 			void UpdateUI();
-			void Loaditem();
+			void Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
+			std::string GetAssetPath(std::string pfabName);
 
-			GameObject* AddRoleTToWorld(const Vector3& position, float inverseMass = 10.0f); // Anim
+			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 
 			MainMenu* GetMainMenu() { return mainMenu; }

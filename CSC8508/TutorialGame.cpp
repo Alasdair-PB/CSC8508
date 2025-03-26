@@ -27,15 +27,8 @@ using namespace CSC8508;
 
 const static std::string folderPath = NCL::Assets::PFABDIR;
 
-std::string GetAssetPath(std::string pfabName) {
+std::string TutorialGame::GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
-}
-
-void TutorialGame::TestLoadGameObject(std::string assetPath) {
-	GameObject* myObjectToLoad = new GameObject();
-	myObjectToLoad->Load(assetPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
-	world->AddGameObject(myObjectToLoad);
 }
 
 GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
@@ -56,17 +49,6 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
 	controller->MapButton(KeyCodes::E, "Interact");
-}
-
-void TutorialGame::Loaditem() {
-	std::string gameObjectPath = GetAssetPath("object_data.pfab");
-	GameObject* myObjectToLoad = new GameObject();
-	myObjectToLoad->Load(gameObjectPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(5, 0, 5));
-	myObjectToLoad->AddComponent<ItemComponent>(10);
-	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
-	world->AddGameObject(myObjectToLoad);
-
 }
 
 void TutorialGame::InitialiseGame() {
@@ -156,14 +138,11 @@ TutorialGame::~TutorialGame()
 
 void TutorialGame::UpdateGame(float dt)
 {	
-	Debug::DrawLine(Vector3(90, 22, -50), Vector3(90, -22, -50));	
 	world->UpdateWorld(dt);
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
-
-
 	Window::GetWindow()->ShowOSPointer(true);
 	physics->Update(dt);
 }
@@ -177,10 +156,7 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 
-	//TestSave();
-	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
-	//LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
-	Loaditem();
+	Loaditem(Vector3(5, 0, 5));
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 }

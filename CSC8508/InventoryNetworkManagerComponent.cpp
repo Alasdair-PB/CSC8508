@@ -1,8 +1,28 @@
 #include "InventoryNetworkManagerComponent.h"
-//#include "ComponentManager.h"
+#include "ComponentManager.h"
 #include "../CSC8508CoreClasses/TransformNetworkComponent.h"
 using namespace NCL;
 using namespace CSC8508;
+
+
+void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i) {
+	ItemComponent* itemDelta = nullptr;
+	ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
+		[&lastInvFullState, &itemDelta, &i](TransformNetworkComponent* o) {
+			if (o->GetObjectID() == lastInvFullState->inventory[i]) {
+				std::cout << "matching componentId" << std::endl;
+				ItemComponent* itemComponent = o->GetGameObject().TryGetComponent<ItemComponent>();
+				if (itemComponent) {
+					itemDelta = itemComponent;
+				}
+			}
+		}
+	);
+
+	// Maybe for every inventory component drop the item if carried?
+	if (itemDelta != nullptr)
+		storedItems[i] = itemDelta;
+}
 
 bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 	int newStateId = 0;
@@ -23,30 +43,15 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 		if (lastInvFullState->inventory[i] == 0)
 			continue;
 
-		if (storedItems[i]) {
+		if (i < storedItems.size() && storedItems[i]) {
 			TransformNetworkComponent* networkComponent = storedItems[i]->GetGameObject().TryGetComponent<TransformNetworkComponent>();
-
 			if (!networkComponent) continue;
-
 			if (networkComponent->GetObjectID() == lastInvFullState->inventory[i])
 				continue;
-
-			ItemComponent* itemDelta = nullptr;
-			/*ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
-				[&lastInvFullState, &itemDelta, &i](TransformNetworkComponent* o) {
-					if (o->GetObjectID() == lastInvFullState->inventory[i]) {
-						ItemComponent* itemComponent = o->GetGameObject().TryGetComponent<ItemComponent>();
-						if (itemComponent) {
-							itemDelta = itemComponent;
-						}
-					}
-				}
-			);*/
-
-			// Maybe for every inventory component drop the item if carried?
-			if (itemDelta != nullptr)
-				storedItems[i] = itemDelta;
+			TrySetStoredItems(lastInvFullState, i);
 		}
+		else
+			TrySetStoredItems(lastInvFullState, i);
 	}
 	return true;
 }

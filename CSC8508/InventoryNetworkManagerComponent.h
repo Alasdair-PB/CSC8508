@@ -45,7 +45,7 @@ namespace NCL::CSC8508 {
 		vector<GamePacket*> WriteFullPacket() override { return WritePacket(); }
 
 	private:
-
+		void TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i);
 		bool ReadPacket() {}
 		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override { return false; }
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override;

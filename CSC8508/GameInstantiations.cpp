@@ -23,6 +23,23 @@ int GetUniqueId(int objectId, int& componentCount) {
 	return unqiueId;
 }
 
+
+void TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* myObjectToLoad = new GameObject();
+	myObjectToLoad->Load(gameObjectPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + position);
+	myObjectToLoad->AddComponent<ItemComponent>(10);
+	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+	if (spawnData)
+	{	
+		int componentIdCount = 0;
+		TransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<TransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+	}
+	world->AddGameObject(myObjectToLoad);
+}
+
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
 	float meshSize = 0.25f;
 	float inverseMass = 0.5f;
@@ -42,7 +59,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetTag(Tags::Player);
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
 
-	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Astronaut.anm"));
+	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Walk.anm"));
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 

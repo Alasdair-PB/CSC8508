@@ -116,11 +116,13 @@ namespace NCL {
 		{
 			Debug::Print("Main Menu", Vector2(5, 85));
 
+#if !PS5
 			if (eosFlowFinished)
 			{
 				std::cout << "Popping Success";
 				return PushdownState::Pop;
 			}
+#endif
 
 			if (mainMenuOption == startClientOpt) {
 				std::cout << "Start Client Pressed";

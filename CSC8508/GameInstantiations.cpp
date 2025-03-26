@@ -1,21 +1,19 @@
 #include "TutorialGame.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-#include "INetworkComponent.h"
 #include "../AudioEngine/AudioSourceComponent.h"
 #include "InputNetworkComponent.h"
-#include "TransformNetworkComponent.h"
 #include "StaminaComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
 #include "../AudioEngine/AudioListenerComponent.h"
 #include "../AudioEngine/NetworkedListenerComponent.h"
-#include "../AudioEngine/AudioSourceComponent.h"
 #include "AnimationComponent.h"
-#include "MeshAnimation.h"
+#include "TransformNetworkComponent.h"
+#include "SightComponent.h"
+#include "InventoryNetworkManagerComponent.h"
+#include "InventoryManagerComponent.h"
 
-using namespace NCL;
-using namespace CSC8508;
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -25,22 +23,51 @@ int GetUniqueId(int objectId, int& componentCount) {
 	return unqiueId;
 }
 
+
+void TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* myObjectToLoad = new GameObject();
+	myObjectToLoad->Load(gameObjectPath);
+	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + position);
+	myObjectToLoad->AddComponent<ItemComponent>(10);
+	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+	if (spawnData)
+	{	
+		int componentIdCount = 0;
+		TransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<TransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+	}
+	world->AddGameObject(myObjectToLoad);
+}
+
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
-	float meshSize = 1.0f;
+	float meshSize = 0.25f;
 	float inverseMass = 0.5f;
 
 	GameObject* player = new GameObject();
-
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
-	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
 
+	Mesh* playerMesh = MaterialManager::GetMesh("player");
+	Texture* basicTex = MaterialManager::GetTexture("player");
+	Shader* playerShader = MaterialManager::GetShader("anim");
+
+	float carryOffset = 0.5f;
+	float dropOffset = 3.0f;
+
+	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
+	player->SetLayerID(Layers::LayerID::Player);
+	player->SetTag(Tags::Player);
+	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
+
+	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Walk.anm"));
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
+
 	pc->SetBindingDash(KeyCodes::SHIFT, stamina);
 	pc->SetBindingJump(KeyCodes::SPACE, stamina);
+	pc->SetBindingInteract(KeyCodes::E);
 
+	SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
@@ -56,6 +83,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
 		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
 			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
+
+		InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2, carryOffset, dropOffset,
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
 		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
@@ -73,6 +103,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			listenerComp->SetPersistentSound(sourceComp->GetPersistentPair());
 	}
 	else {
+		InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2, carryOffset, dropOffset);
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 
@@ -80,11 +111,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		listenerComp->RecordMic();
 	}
 
-	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
-	player->SetLayerID(Layers::LayerID::Player);
-	player->SetTag(Tags::Player);
 
-	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, basicTex, basicShader));
 	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -93,31 +120,4 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	world->AddGameObject(player);
 
 	return player;
-}
-
-GameObject* TutorialGame::AddRoleTToWorld(const Vector3& position, float inverseMass)
-{	
-	GameObject* roleT = new GameObject();
-	Vector3 size = Vector3(10.0f, 10.0f, 10.0f);
-	CapsuleVolume* volume = new CapsuleVolume(4.0f, 2.5f);
-	Mesh* roleTMesh = MaterialManager::GetMesh("Role_T");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* animShader = MaterialManager::GetShader("anim");
-
-	PhysicsComponent* phys = roleT->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = roleT->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	roleT->GetTransform().SetScale(size).SetPosition(position);
-
-	roleT->SetRenderObject(new RenderObject(&roleT->GetTransform(), roleTMesh, basicTex, animShader));
-	phys->SetPhysicsObject(new PhysicsObject(&roleT->GetTransform()));
-	roleT->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Role_T.anm"));
-
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
-	phys->GetPhysicsObject()->InitSphereInertia();
-	phys->GetPhysicsObject()->SetRestitution(0.5f);
-
-	world->AddGameObject(roleT);
-	return roleT;
 }

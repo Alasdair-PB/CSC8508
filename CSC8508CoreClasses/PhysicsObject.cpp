@@ -44,7 +44,7 @@ void PhysicsObject::ClearForces() {
 	torque = Vector3();
 }
 
-void  PhysicsObject::RotateTowardsVelocity(float offset) {
+void PhysicsObject::RotateTowardsVelocity(float offset) {
 	auto rotDir = Vector::Normalise(this->GetLinearVelocity());
 	float angle = -std::atan2(rotDir.z, rotDir.x) * (180.0f / PI);
 	angle += offset;

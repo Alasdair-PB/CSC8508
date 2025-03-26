@@ -5,15 +5,11 @@
 #include "TextureLoader.h"
 
 #include "GameObject.h"
-#include "TransformNetworkComponent.h"
-
-#include "PositionConstraint.h"
 #include "MaterialManager.h"
-#include "OrientationConstraint.h"
 #include "Assets.h"
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
-
+#include "ItemComponent.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -31,15 +27,8 @@ using namespace CSC8508;
 
 const static std::string folderPath = NCL::Assets::PFABDIR;
 
-std::string GetAssetPath(std::string pfabName) {
+std::string TutorialGame::GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
-}
-
-void TutorialGame::TestLoadGameObject(std::string assetPath) {
-	GameObject* myObjectToLoad = new GameObject();
-	myObjectToLoad->Load(assetPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + Vector3(-2, 0, 2));
-	world->AddGameObject(myObjectToLoad);
 }
 
 GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
@@ -59,7 +48,7 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapAxis(4, "YLook");
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
-
+	controller->MapButton(KeyCodes::E, "Interact");
 }
 
 void TutorialGame::InitialiseGame() {
@@ -84,7 +73,7 @@ void TutorialGame::InitialiseGame() {
 
 TutorialGame::TutorialGame()
 {
-	world = new GameWorld();
+	world = &GameWorld::Instance();
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	controller = w->GetController();
@@ -111,9 +100,11 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("Astronaut", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
+	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
+	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
+	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
 
@@ -140,39 +131,13 @@ TutorialGame::~TutorialGame()
 	delete inventoryUI;
 }
 
-void TutorialGame::UpdateObjectSelectMode(float dt) {
-
-	RayCollision closestCollision;
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && selectionObject) {
-		Vector3 rayPos;
-		Vector3 rayDir;
-
-		rayDir = selectionObject->GetGameObject().GetTransform().GetOrientation() * Vector3(0, 0, -1);
-		rayPos = selectionObject->GetGameObject().GetTransform().GetPosition();
-
-		Ray r = Ray(rayPos, rayDir);
-		bool hit = world->Raycast(r, closestCollision, true, selectionObject, new std::vector<Layers::LayerID>({ Layers::LayerID::Player,  Layers::LayerID::Enemy }));
-
-		if (hit)
-		{
-			if (objClosest)
-				objClosest->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-			objClosest = (GameObject*)closestCollision.node;
-			objClosest->GetRenderObject()->SetColour(Vector4(1, 0, 1, 1));
-		}
-	}
-	SelectObject();
-}
-
 void TutorialGame::UpdateGame(float dt)
-{
+{	
+	world->UpdateWorld(dt);
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
-	
 	Debug::UpdateRenderables(dt);
-
-	world->UpdateWorld(dt);
 	Window::GetWindow()->ShowOSPointer(true);
 	physics->Update(dt);
 }
@@ -186,41 +151,9 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 
-	//TestSave();
-	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
-	LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
-
+	Loaditem(Vector3(5, 0, 5));
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
-	AddRoleTToWorld(Vector3(90, 60, -95));
-}
-
-bool TutorialGame::SelectObject() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q))
-		inSelectionMode = !inSelectionMode;
-	if (inSelectionMode) {
-		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::Left)) {
-
-			RenderObject* ro = selectionObject->GetGameObject().GetRenderObject();
-			if (selectionObject)
-			{
-				ro->SetColour(Vector4(1, 1, 1, 1));
-				selectionObject = nullptr;
-			}
-
-			Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
-			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true))
-			{
-				selectionObject = (BoundsComponent*)closestCollision.node;
-				ro->SetColour(Vector4(0, 1, 0, 1));
-				return true;
-			}
-			else
-				return false;
-		}
-	}
-	return false;
 }
 
 void TutorialGame::UpdateUI() {

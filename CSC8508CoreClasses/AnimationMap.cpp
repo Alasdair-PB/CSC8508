@@ -4,7 +4,7 @@
 
 using namespace NCL::CSC8508;
 
-AnimationComponent::AnimationComponent(GameObject& gameObject) : IStateComponent(gameObject) {
+AnimationComponent::AnimationComponent(GameObject& gameObject) : StateComponent(gameObject) {
 	activeState = nullptr;
 	ro = gameObject.GetRenderObject();
 	if (!ro) {
@@ -22,12 +22,8 @@ AnimationComponent::~AnimationComponent() {
 }
 
 void AnimationComponent::SetAnimation(AnimState* anim) {
-	if (anim) {
-		this->AddState(anim);
-		activeState = anim;
-		skeleton.resize(anim->GetAnimation()->GetJointCount());
-		resetTime();
-	}
+	activeState = anim;
+	resetTime();
 }
 
 void AnimationComponent::UpdateAnimation(float dt) {
@@ -41,7 +37,7 @@ void AnimationComponent::UpdateAnimation(float dt) {
 
 	if (animTime <= 0) {
 		currentAnimFrame++;
-		animTime += anim->GetFrameTime();
+		animTime += 
 		currentAnimFrame = (currentAnimFrame++) % anim->GetFrameCount();
 		// handle loop end here
 

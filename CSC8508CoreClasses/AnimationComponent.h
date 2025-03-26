@@ -1,55 +1,61 @@
 #pragma once
-//
-// Contributors: David
-//
+#include "IStateComponent.h"
 
-#ifndef ANIMATIONCOMPONENT_H
-#define ANIMATIONCOMPONENT_H
+namespace NCL {
+	namespace Rendering {
+		class MeshAnimation;
+	}
+	namespace CSC8508 {
+		class AnimState : public IState {
+		public:
+			AnimState(Rendering::MeshAnimation* anim) {
+				this->anim = std::shared_ptr<Rendering::MeshAnimation>(anim);
+			}
+			Rendering::MeshAnimation* GetAnimation() {
+				return anim.get();
+			}
+		protected:
+			std::shared_ptr<Rendering::MeshAnimation> anim;
+		};
 
-#include "Mesh.h"
-#include "MeshAnimation.h"
-#include "IComponent.h"
-#include <memory>
+		class AnimationComponent : public IStateComponent {
+		public:
+			AnimationComponent(GameObject& gameObject);
+			~AnimationComponent();
 
-using std::vector;
+			virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
+				static std::unordered_set<std::type_index> derivedTypes = {
+					typeid(AnimationComponent),
+					typeid(IStateComponent),
+					typeid(IComponent)
+				};
+				return derivedTypes;
+			}
 
-namespace NCL::CSC8508
-{
-	class RenderObject;
+			static const char* Name() { return "Animation"; }
+			const char* GetName() const override { return Name(); }
 
-	/**
-		Struct holding animation data
-	*/
-	struct AnimationData {
-		std::shared_ptr<Rendering::MeshAnimation> anim;
-		int currentAnimFrame = 0.0f;
-		float animTime = 0;
-	};
+			std::vector<Matrix4>& GetSkeleton() {
+				return skeleton;
+			}
 
-	class AnimationComponent : public IComponent
-	{
-	public:
-		AnimationComponent(GameObject& gameObject, Rendering::MeshAnimation* anim = nullptr);
-		~AnimationComponent();
-		
-		static const char* Name() { return "Animation"; }
-		const char* GetName() const override { return Name(); }
+			void SetAnimation(AnimState* anim);
+			void TriggerAnimation(const std::string& triggerName);
+			void UpdateAnimation(float dt);
+			void resetTime() {
+				currentAnimFrame = 0.0f;
+				animTime = 0;
+			}
 
-		std::vector<Matrix4>& GetSkeleton() {
-			return skeleton;
-		}
+			void Update(float dt) override {
+				UpdateAnimation(dt);
+			}
 
-		void SetAnimation(Rendering::MeshAnimation* inAnim);
-		void UpdateAnimation(float dt);
-
-		void Update(float dt) override {
-			UpdateAnimation(dt);
-		}
-
-	protected:
-		AnimationData animData;
-		std::vector<Matrix4> skeleton;
-		RenderObject* ro;
-	};
+        protected:
+			int currentAnimFrame = 0.0f;
+			float animTime = 0;
+			std::vector<Matrix4> skeleton;
+			RenderObject* ro;
+        };
+	}
 }
-#endif //ANIMATIONCOMPONENT_H

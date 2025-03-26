@@ -9,6 +9,7 @@
 #include "../AudioEngine/AudioListenerComponent.h"
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
+#include "MeshAnimation.h"
 #include "TransformNetworkComponent.h"
 #include "SightComponent.h"
 #include "InventoryNetworkManagerComponent.h"
@@ -59,7 +60,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetTag(Tags::Player);
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
 
-	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Walk.anm"));
+	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
+	animator->SetAnimation(new AnimState(new Rendering::MeshAnimation("Walk.anm")));
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 
@@ -70,11 +72,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	/*AudioSourceComponent * audio_src = player->AddComponent<AudioSourceComponent>(ChannelGroupType::SFX);
-	audio_src->LoadSound("pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
-	audio_src->PlaySound("pollo");
-	audio_src->randomSounds(5);*/
 
 	int componentIdCount = 0;
 
@@ -94,7 +91,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
 
 		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
-		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+		//sourceComp->LoadSound("pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
+		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::POLLO));
+		sourceComp->RandomSound();
 
 		if (spawnData->clientOwned)
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);

@@ -129,6 +129,8 @@ set(Components
     "BoundsComponent.cpp"
     "StateComponent.cpp"
     "StateComponent.h"
+	"IStateComponent.cpp"
+    "IStateComponent.h"
     "StaminaComponent.h"
     "StaminaComponent.cpp"
     "AnimationComponent.cpp"

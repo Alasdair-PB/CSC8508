@@ -44,6 +44,7 @@ enum class EntitySoundGroup {
 	ENVIRONMENT,
 	WEAPON,
 	ITEM,
+	POLLO
 };
 
 
@@ -222,6 +223,7 @@ public:
 		LoadSoundDirectory("environment", EntitySoundGroup::ENVIRONMENT);
 		LoadSoundDirectory("weapon", EntitySoundGroup::WEAPON);
 		LoadSoundDirectory("item", EntitySoundGroup::ITEM);
+		LoadSoundDirectory("pollo", EntitySoundGroup::POLLO);
 	}
 
 	/**

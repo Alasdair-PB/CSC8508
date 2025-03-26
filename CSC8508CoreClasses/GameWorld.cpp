@@ -26,6 +26,11 @@ GameWorld::GameWorld()	{
 
 GameWorld::~GameWorld(){}
 
+GameWorld& GameWorld::Instance() {
+	static GameWorld instance;
+	return instance;
+}
+
 void GameWorld::Clear() {
 	gameObjects.clear();
 	constraints.clear();

@@ -31,6 +31,8 @@ namespace NCL {
 			GameWorld();
 			~GameWorld();
 
+			static GameWorld& Instance();
+
 			void Clear();
 			void ClearAndErase();
 

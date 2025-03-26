@@ -60,14 +60,47 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetTag(Tags::Player);
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
 
-	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
-	animator->SetAnimation(new AnimState(new Rendering::MeshAnimation("Walk.anm")));
-	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
+	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100, 100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
-
 	pc->SetBindingDash(KeyCodes::SHIFT, stamina);
 	pc->SetBindingJump(KeyCodes::SPACE, stamina);
 	pc->SetBindingInteract(KeyCodes::E);
+
+	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
+	
+	AnimState* walk = new AnimState(new Rendering::MeshAnimation("Walk.anm"));
+	AnimState* stance = new AnimState(new Rendering::MeshAnimation("Stance.anm"));
+	AnimState* onjump = new AnimState(new Rendering::MeshAnimation("OnJump.anm"), false);
+	AnimState* jumping = new AnimState(new Rendering::MeshAnimation("Jumping.anm"));
+	AnimState* jumpland = new AnimState(new Rendering::MeshAnimation("JumpLand.anm"), false);
+		
+	animator->AddState(walk);
+	animator->AddState(onjump);
+	animator->AddState(jumping);
+	animator->AddState(jumpland);
+	animator->AddState(stance);
+
+	animator->AddTransition(new IStateTransition(stance, walk, [&]()->bool {
+		return pc->IsMoving();
+		}));
+	animator->AddTransition(new IStateTransition(walk, stance, [&]()->bool {
+		return !pc->IsMoving();
+		}));
+	animator->AddTransition(new IStateTransition(stance, onjump, [&]()->bool {
+		return pc->IsJumping();
+		}));
+	animator->AddTransition(new IStateTransition(walk, onjump, [&]()->bool {
+		return pc->IsJumping();
+		}));
+	animator->AddTransition(new IStateTransition(onjump, jumping, [&]()->bool {
+		return onjump->IsComplete();
+		}));
+	animator->AddTransition(new IStateTransition(jumping, jumpland, [&]()->bool {
+		return pc->IsGrounded();
+		}));
+	animator->AddTransition(new IStateTransition(jumpland , stance, [&]()->bool {
+		return jumpland->IsComplete();
+		}));
 
 	SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();

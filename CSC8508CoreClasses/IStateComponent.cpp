@@ -18,7 +18,7 @@ IStateComponent::~IStateComponent() {
 void IStateComponent::AddState(IState* s) {
 	allStates.emplace_back(s);
 	if (activeState == nullptr) {
-		activeState = s;
+		SetActiveState(s);
 	}
 }
 
@@ -36,7 +36,7 @@ void IStateComponent::Update(float dt, GameObject& gamneObject) {
 		for (auto& i = range.first; i != range.second; ++i) {
 			if (i->second->CanTransition()) {
 				IState* newState = i->second->GetDestinationState();
-				activeState = newState;
+				SetActiveState(newState);
 			}
 		}
 	}

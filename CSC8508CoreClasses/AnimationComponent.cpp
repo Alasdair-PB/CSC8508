@@ -23,7 +23,6 @@ AnimationComponent::~AnimationComponent() {
 
 void AnimationComponent::SetAnimation(AnimState* anim) {
 	if (anim) {
-		this->AddState(anim);
 		activeState = anim;
 		skeleton.resize(anim->GetAnimation()->GetJointCount());
 		resetTime();
@@ -35,16 +34,19 @@ void AnimationComponent::UpdateAnimation(float dt) {
 		std::cerr << "No render object or animation set!" << std::endl;
 		return;
 	}
-
-	MeshAnimation* anim = static_cast<AnimState*>(activeState)->GetAnimation();
+	
+	AnimState* animState = static_cast<AnimState*>(activeState);
+	MeshAnimation* anim = animState->GetAnimation();
 	animTime -= dt;
 
 	if (animTime <= 0) {
 		currentAnimFrame++;
 		animTime += anim->GetFrameTime();
-		currentAnimFrame = (currentAnimFrame++) % anim->GetFrameCount();
-		// handle loop end here
-
+		if (currentAnimFrame + 1 > anim->GetFrameCount() && !animState->IsLooped())
+		{
+			animState->SetComplete();
+		}
+		currentAnimFrame = (currentAnimFrame + 1) % anim->GetFrameCount();
 		std::vector<Matrix4>const& inverseBindPose = ro->GetMesh()->GetInverseBindPose();
 
 		if (inverseBindPose.size() != anim->GetJointCount()) {

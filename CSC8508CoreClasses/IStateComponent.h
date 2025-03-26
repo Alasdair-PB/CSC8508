@@ -28,6 +28,7 @@ namespace NCL {
 
 
         protected:
+            virtual void SetActiveState(IState* state) { activeState = state; }
             IState* activeState;
             
             std::vector<IState*> allStates;

@@ -8,20 +8,37 @@ namespace NCL {
 	namespace CSC8508 {
 		class AnimState : public IState {
 		public:
-			AnimState(Rendering::MeshAnimation* anim) {
+			AnimState(Rendering::MeshAnimation* anim, bool loop = true) {
 				this->anim = std::shared_ptr<Rendering::MeshAnimation>(anim);
+				this->loop = loop;
+				this->complete = false;
 			}
 			Rendering::MeshAnimation* GetAnimation() {
 				return anim.get();
 			}
+			bool IsLooped() {
+				return loop;
+			}
+			bool IsComplete() {
+				return complete;
+			}
+			void SetComplete() {
+				this->complete = true;
+			}
 		protected:
 			std::shared_ptr<Rendering::MeshAnimation> anim;
+			bool loop;
+			bool complete;
 		};
 
 		class AnimationComponent : public IStateComponent {
 		public:
 			AnimationComponent(GameObject& gameObject);
 			~AnimationComponent();
+
+			void SetActiveState(IState* state) override {
+				SetAnimation((AnimState*) state);
+			}
 
 			virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
 				static std::unordered_set<std::type_index> derivedTypes = {
@@ -48,6 +65,7 @@ namespace NCL {
 			}
 
 			void Update(float dt) override {
+				IStateComponent::Update(dt, this->GetGameObject());
 				UpdateAnimation(dt);
 			}
 

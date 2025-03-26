@@ -30,6 +30,10 @@ namespace NCL {
             void OnAwake() override;
             void Update(float deltaTime) override;
 
+			bool IsGrounded() { return isGrounded; }
+            bool IsJumping() { return isJumping; }
+            bool IsMoving() { return isMoving; }
+
         protected:
             void OnDashInput();
             void OnJumpInput();
@@ -63,6 +67,7 @@ namespace NCL {
             bool isGrounded;
             bool isJumping;
             bool isDashing;
+            bool isMoving;
 
             Vector3 visionHeight = Vector3(0, 0.3f, 0);
             std::stack<uint32_t> inputStack; 

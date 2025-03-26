@@ -293,7 +293,6 @@ void TutorialGame::UpdateUI() {
 		uiSystem->RemoveStack("EOS Lobby Menu");
 		uiSystem->RemoveStack("Inventory");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
-
 	}
 
 #endif

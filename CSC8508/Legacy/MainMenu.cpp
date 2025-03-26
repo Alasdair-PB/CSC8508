@@ -44,7 +44,7 @@ namespace NCL {
 			GetStringFunc getLobbyID,
 			GetIntFunc getPlayerCount,
 			EOSStartAsHost eosStartAsHost,
-			EOSStartAsHost eosStartAsJoin)
+			EOSStartAsJoin eosStartAsJoin)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
@@ -212,7 +212,7 @@ namespace NCL {
 			if (eosLobbyOption == startGameAsJoin)
 			{
 				setPause(false);
-				EOSStartAsJoinFunc();
+				EOSStartAsJoinFunc(getOwnerIPFunc());
 				eosFlowFinished = true;
 				return PushdownState::Pop;
 			}

@@ -57,7 +57,7 @@ namespace NCL {
 			void EOSLobbySearchFunc(const std::string& lobbyID);
 			void EOSLobbyDetailsUpdate();
 			void EOSStartAsHost();
-			void EOSStartAsJoin(char a, char b, char c, char d);
+			void EOSStartAsJoin(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 #endif
 
 
@@ -84,7 +84,7 @@ namespace NCL {
 #if !PS5
 			void StartEOSCallBack();
 			void StartAsHostCallBack();
-			void StartAsJoinCallBack();
+			void StartAsJoinCallBack(const std::string& code);
 			void StartEOSLobbyCreationCallBack();
 			void StartEOSLobbySearchCallBack(const std::string& lobbyID);
 			void StartEOSLobbyUpdateCallBack();

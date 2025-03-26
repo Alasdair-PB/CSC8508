@@ -46,12 +46,39 @@ void NetworkedGame::StartEOSCallBack() { HostGame(); }
 void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
 void NetworkedGame::StartEOSLobbySearchCallBack(const std::string& lobbyID) {EOSLobbySearchFunc(lobbyID);}
 void NetworkedGame::StartAsHostCallBack() {EOSStartAsHost();}
-void NetworkedGame::StartAsJoinCallBack() {EOSStartAsJoin(10, 70, 33, 111);}
+
+void NetworkedGame::StartAsJoinCallBack(const std::string& ip) {
+	std::stringstream ss(ip);
+	std::string segment;
+	std::vector<uint8_t> bytes;
+
+	while (std::getline(ss, segment, '.')) {
+		int num = std::stoi(segment);
+		if (num < 0 || num > 255) {
+			std::cout << "Invalid IP segment: " << segment << std::endl;
+			return;
+		}
+		bytes.push_back(static_cast<uint8_t>(num));
+	}
+
+	if (bytes.size() != 4) {
+		std::cout << "Invalid IP format: " << ip << std::endl;
+		return;
+	}
+
+	std::cout << "Parsed IP: " << ip << std::endl;
+
+	uint8_t a = bytes[0];
+	uint8_t b = bytes[1];
+	uint8_t c = bytes[2];
+	uint8_t d = bytes[3];
+
+	EOSStartAsJoin(a, b, c, d);
+}
+
 void NetworkedGame::StartEOSLobbyUpdateCallBack() { EOSLobbyDetailsUpdate(); }
 
 #endif
-
-
 
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
 void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
@@ -84,7 +111,7 @@ NetworkedGame::NetworkedGame()	{
 		[&]() -> std::string { return this->GetLobbyID(); },
 		[&]() -> int { return this->GetPlayerCount(); },
 		[&]() -> void { this->StartAsHostCallBack(); },
-		[&]() -> void { this->StartAsJoinCallBack(); }
+		[&](const std::string& code) -> void { this->StartAsJoinCallBack(code); }
 	);
 #endif
 
@@ -173,21 +200,24 @@ void NetworkedGame::EOSStartAsHost()
 
 }
 
-void NetworkedGame::EOSStartAsJoin(char a, char b, char c, char d)
-{
+void NetworkedGame::EOSStartAsJoin(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
+	std::cout << static_cast<int>(a) << std::endl;
+	std::cout << static_cast<int>(b) << std::endl;
+	std::cout << static_cast<int>(c) << std::endl;
+	std::cout << static_cast<int>(d) << std::endl;
+
 	thisClient = new GameClient();
 	thisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
 
 	thisClient->RegisterPacketHandler(Delta_State, this);
 	thisClient->RegisterPacketHandler(Full_State, this);
 	thisClient->RegisterPacketHandler(Component_Event, this);
-
 	thisClient->RegisterPacketHandler(Player_Connected, this);
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
-
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
-
 }
+
+
 #endif
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 
 {

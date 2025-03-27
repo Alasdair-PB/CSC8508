@@ -83,7 +83,7 @@ void GameWorld::Load(std::string assetPath, size_t allocationStart) {
 		loadedSaveData.pitch, loadedSaveData.yaw, loadedSaveData.position);
 
 	for (int i = 0; i < loadedSaveData.gameObjectPointers.size(); i++) {
-		GameObject* object = new GameObject();
+		GameObject* object = new GameObject(true);
 		object->Load(assetPath, loadedSaveData.gameObjectPointers[i]);
 		AddGameObject(object);
 	}

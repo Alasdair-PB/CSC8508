@@ -39,6 +39,10 @@ namespace NCL {
             void OnAwake() override;
             void Update(float deltaTime) override;
 
+			bool IsGrounded() { return isGrounded; }
+            bool IsJumping() { return isJumping; }
+            bool IsMoving() { return isMoving; }
+
         protected:
             void OnDashInput();
             void OnJumpInput();
@@ -63,11 +67,11 @@ namespace NCL {
             Vector3 GetForwardsDirection();
 
             float speed = 15.0f;
-            float dashMultiplier = 1.5f;
+            float dashMultiplier = 2.5f;
             float jumpForce = 10.0f;
             float jumpDuration = 0;
             float downwardsVelocityMod = 50.0f;
-            float dashTickStam = 2.0f;
+            float dashTickStam = 0.3f;
             float jumpStamCost = 10.0f;
             float visibleRange = 5.0f;
 
@@ -77,9 +81,11 @@ namespace NCL {
             bool isGrounded;
             bool isJumping;
             bool isDashing;
+            bool isMoving;
             bool inDropZone;
             bool inBank;
             bool inExit;
+
 
             Vector3 visionHeight = Vector3(0, 0.3f, 0);
             Vector3 maxVelocity = Vector3(15.0f, 15.0f, 15.0f);

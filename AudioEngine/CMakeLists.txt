@@ -28,6 +28,7 @@ target_include_directories(AudioEngine PRIVATE
     "../NCLCoreClasses"
     "../CSC8508CoreClasses"
     "${FMOD_DIR}/inc"
+	"${CMAKE_SOURCE_DIR}/ThirdParty/opus_source/include"
 )
 
 # include Maths headers from NCLCore
@@ -73,6 +74,7 @@ message(STATUS "FMOD Library File: ${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmo
 target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/x64/fmod_vc.lib)
 else()
 target_link_directories(AudioEngine PRIVATE "${FMOD_DIR}/lib")
+target_link_directories(AudioEngine PRIVATE "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source/include")
 target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/libfmod_stub_weak.a)
 target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/libfmodL_stub_weak.a)
 

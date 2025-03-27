@@ -1,0 +1,12 @@
+MeshMat
+1
+1
+3
+Terminal
+3
+Diffuse:/terminal/Terminal_baseColor.png
+Bump:/terminal/Terminal_normal.png
+Metallic:/terminal/Terminal_metallicRoughness.png
+0
+0
+0

@@ -32,10 +32,10 @@ std::string TutorialGame::GetAssetPath(std::string pfabName) {
 }
 
 GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
-	GameObject* myObjectToLoad = new GameObject();
+	GameObject* myObjectToLoad = new GameObject(true);
 	std::string pfabPath = GetAssetPath(assetPath);
 	myObjectToLoad->Load(pfabPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + offset);
+	myObjectToLoad->GetTransform().SetPosition(offset);
 	world->AddGameObject(myObjectToLoad);
 	return myObjectToLoad;
 }
@@ -69,23 +69,17 @@ void TutorialGame::InitialiseGame() {
 
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
-
-	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
-	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
-
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
-
 	audioEngine = &AudioEngine::Instance();
 
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
-	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+
+	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
-
-
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -120,8 +114,8 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
+	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
-
 	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));
@@ -159,6 +153,14 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
+
+	//GameObject* room = LoadRoomPfab("room_A.pfab", Vector3(90, 90, -50));
+	//GameObject* roomB = room->CopyGameObject();
+	//room->SetEnabled(true);
+	//roomB->GetTransform().SetPosition(Vector3(90, 60, -50));
+	//roomB->SetEnabled(true);
+	//world->AddGameObject(roomB);
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 }
@@ -176,10 +178,8 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->RemoveStack("Inventory");
-		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
-
+	
 	uiSystem->RenderFrame();
 }
 

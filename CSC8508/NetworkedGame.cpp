@@ -70,8 +70,8 @@ NetworkedGame::NetworkedGame()	{
 }
 
 NetworkedGame::~NetworkedGame()	{
-	delete thisServer;
-	delete thisClient;
+	if(thisServer) delete thisServer;
+	if (thisClient) delete thisClient;
 	TutorialGame::~TutorialGame();
 }
 

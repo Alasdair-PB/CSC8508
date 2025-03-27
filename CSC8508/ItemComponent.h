@@ -3,8 +3,8 @@
 
 #include "IComponent.h"
 #include "DamageableComponent.h"
-#include "EventManager.h"
-#include "Event.h"
+#include "../Event/EventManager.h"
+#include "../Event/Event.h"
 
 namespace NCL {
     namespace CSC8508 {

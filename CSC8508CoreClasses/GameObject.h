@@ -179,6 +179,8 @@ namespace NCL::CSC8508 {
 		/// <param name="allocationStart">The location this object is saved in the asset file </param>
 		void Load(std::string assetPath, size_t allocationStart = 0) override;
 
+
+
 		/// <summary>
 		/// Saves the gameobject and its components data into the assetPath file. 
 		/// </summary>
@@ -186,6 +188,11 @@ namespace NCL::CSC8508 {
 		/// <param name="allocationStart">The location this object is saved in the asset file </param>
 		size_t Save(std::string assetPath, size_t* = nullptr) override;
 
+
+		GameObject* CopyGameObject();
+		void CopyChildrenData(GameObject* gameObject);
+		void CopyIcomponentData(GameObject* gameObject);
+		void CopyInstanceData(GameObject* gameObject);
 		/// <summary>
 		/// Loads GameObject specific Data into this GameObject
 		/// </summary>

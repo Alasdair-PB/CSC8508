@@ -1,55 +1,80 @@
 #pragma once
-//
-// Contributors: David
-//
+#include "IStateComponent.h"
 
-#ifndef ANIMATIONCOMPONENT_H
-#define ANIMATIONCOMPONENT_H
+namespace NCL {
+	namespace Rendering {
+		class MeshAnimation;
+	}
+	namespace CSC8508 {
+		class AnimState : public IState {
+		public:
+			AnimState(Rendering::MeshAnimation* anim, bool loop = true) {
+				this->anim = std::shared_ptr<Rendering::MeshAnimation>(anim);
+				this->loop = loop;
+				this->complete = false;
+			}
+			Rendering::MeshAnimation* GetAnimation() {
+				return anim.get();
+			}
+			bool IsLooped() {
+				return loop;
+			}
+			bool IsComplete() {
+				return complete;
+			}
+			void SetComplete(bool complete = true) {
+				this->complete = complete;
+			}
+		protected:
+			std::shared_ptr<Rendering::MeshAnimation> anim;
+			bool loop;
+			bool complete;
+		};
 
-#include "Mesh.h"
-#include "MeshAnimation.h"
-#include "IComponent.h"
-#include <memory>
+		class AnimationComponent : public IStateComponent {
+		public:
+			AnimationComponent(GameObject& gameObject);
+			~AnimationComponent();
 
-using std::vector;
+			void SetActiveState(IState* state) override {
+				SetAnimation((AnimState*) state);
+			}
 
-namespace NCL::CSC8508
-{
-	class RenderObject;
+			virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
+				static std::unordered_set<std::type_index> derivedTypes = {
+					typeid(AnimationComponent),
+					typeid(IStateComponent),
+					typeid(IComponent)
+				};
+				return derivedTypes;
+			}
 
-	/**
-		Struct holding animation data
-	*/
-	struct AnimationData {
-		std::shared_ptr<Rendering::MeshAnimation> anim;
-		int currentAnimFrame = 0.0f;
-		float animTime = 0;
-	};
+			static const char* Name() { return "Animation"; }
+			const char* GetName() const override { return Name(); }
 
-	class AnimationComponent : public IComponent
-	{
-	public:
-		AnimationComponent(GameObject& gameObject, Rendering::MeshAnimation* anim = nullptr);
-		~AnimationComponent();
-		
-		static const char* Name() { return "Animation"; }
-		const char* GetName() const override { return Name(); }
+			std::vector<Matrix4>& GetSkeleton() {
+				return skeleton;
+			}
 
-		std::vector<Matrix4>& GetSkeleton() {
-			return skeleton;
-		}
+			void SetAnimation(AnimState* anim);
+			void TriggerAnimation(const std::string& triggerName);
+			void UpdateAnimation(float dt);
+			bool IsComplete() { return static_cast<AnimState*>(activeState)->IsComplete(); }
+			void resetTime() {
+				currentAnimFrame = 0.0f;
+				animTime = 0;
+			}
 
-		void SetAnimation(Rendering::MeshAnimation* inAnim);
-		void UpdateAnimation(float dt);
+			void Update(float dt) override {
+				IStateComponent::Update(dt, this->GetGameObject());
+				UpdateAnimation(dt);
+			}
 
-		void Update(float dt) override {
-			UpdateAnimation(dt);
-		}
-
-	protected:
-		AnimationData animData;
-		std::vector<Matrix4> skeleton;
-		RenderObject* ro;
-	};
+        protected:
+			int currentAnimFrame = 0.0f;
+			float animTime = 0;
+			std::vector<Matrix4> skeleton;
+			RenderObject* ro;
+        };
+	}
 }
-#endif //ANIMATIONCOMPONENT_H

@@ -184,9 +184,10 @@ void PlayerComponent::OnItemInteract() {
 }
 
 void PlayerComponent::OnPlayerMove() {
+    isMoving = false;
     if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
         return;
-
+    isMoving = true;
     Vector3 dir;
     Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
 
@@ -227,7 +228,8 @@ void PlayerComponent::CheckInputStack() {
 
 void PlayerComponent::UpdateStates(float deltaTime) {
     isDashing = false;
-    isGrounded = false;
+
+    isGrounded = !isJumping ? true : false;
     inDropZone = false;
 	inBank = false;
 	inExit = false;
@@ -236,13 +238,13 @@ void PlayerComponent::UpdateStates(float deltaTime) {
 
 void PlayerComponent::AddDownWardsVelocity() {
     if (isGrounded) return;
-    if (physicsObj->GetLinearVelocity().y <= 0.0f)
+    if (physicsObj->GetLinearVelocity().y <= -0.2f)
         physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
 
     Vector3 force = physicsObj->GetForce();
     Vector3 velocity = physicsObj->GetLinearVelocity();
 
-    if (Vector::Length(velocity) > Vector::Length(maxVelocity)) {
+    if (Vector::Length(velocity) > Vector::Length(maxVelocity) && !isDashing) {
         physicsObj->ClearForces();
         physicsObj->SetLinearVelocity(Vector3(
             std::min(maxVelocity.x, velocity.x),

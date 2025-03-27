@@ -1,25 +1,30 @@
-#pragma once
-#include "imgui.h"
+#ifndef INVENTORYUI_H
+#define INVENTORYUI_H
+
 #include "UIElementsGroup.h"
+#include <vector>
+
+using namespace NCL::CSC8508;
 
 namespace NCL {
 	namespace UI {
-
 		class InventoryUI {
 		public:
 			InventoryUI();
 			~InventoryUI();
 
-			void LoadTex();
+			/*void SetFunc(std::function<CSC8508::PushdownState::PushdownResult()> f) {
+				func = f;
+			}*/
 
-			void SetTex(Texture* tex) {
-				invTex = tex;
-			}
+			void PushInventoryElement(std::function<CSC8508::PushdownState::PushdownResult()> func);
 
-			UIElementsGroup* inventoryUI = new UIElementsGroup(ImVec2(0.3f, 0.1f), ImVec2(0.2f, 0.2f), 1.0f, "Inventory", 0.0f, ImGuiWindowFlags_NoResize);
+			UIElementsGroup* inventoryUI = new UIElementsGroup(ImVec2(0.05f, 0.5f), ImVec2(0.1f, 0.3f), 1.0f, "Inventory", 0.1f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 
 		protected:
-			Texture* invTex;
+			/*std::vector<ItemComponent*> inventory;*/
+			/*std::function<CSC8508::PushdownState::PushdownResult()> func;*/
 		};
 	}
 }
+#endif //INVENTORYUI_H

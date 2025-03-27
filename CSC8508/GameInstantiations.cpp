@@ -9,6 +9,7 @@
 #include "../AudioEngine/AudioListenerComponent.h"
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
+#include "MeshAnimation.h"
 #include "TransformNetworkComponent.h"
 #include "FullTransformNetworkComponent.h"
 #include "SightComponent.h"
@@ -17,6 +18,7 @@
 #include "FallDamageComponent.h"
 #include "DamageableComponent.h"
 #include "GameManagerComponent.h"
+#include "DamageableNetworkComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -120,24 +122,54 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetTag(Tags::Player);
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
 
-	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Walk.anm"));
-	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
+	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100, 100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
-	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
 	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24,20);
 
 	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
 	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
 	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
+	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
+
+	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
+	
+	AnimState* walk = new AnimState(new Rendering::MeshAnimation("Walk.anm"));
+	AnimState* stance = new AnimState(new Rendering::MeshAnimation("Stance.anm"));
+	AnimState* onjump = new AnimState(new Rendering::MeshAnimation("OnJump.anm"), false);
+	AnimState* jumping = new AnimState(new Rendering::MeshAnimation("Jumping.anm"));
+	AnimState* jumpland = new AnimState(new Rendering::MeshAnimation("JumpLand.anm"), false);
+		
+	animator->AddState(walk);
+	animator->AddState(onjump);
+	animator->AddState(jumping);
+	animator->AddState(jumpland);
+	animator->AddState(stance);
+
+	animator->AddTransition(new IStateTransition(stance, walk, [pc]()->bool {
+		return pc->IsMoving();
+		}));
+	animator->AddTransition(new IStateTransition(walk, stance, [pc]()->bool {
+		return !pc->IsMoving();
+		}));
+	animator->AddTransition(new IStateTransition(stance, onjump, [pc]()->bool {
+		return pc->IsJumping();
+		}));
+	animator->AddTransition(new IStateTransition(walk, onjump, [pc]()->bool {
+		return pc->IsJumping();
+		}));
+	animator->AddTransition(new IStateTransition(onjump, jumping, [onjump]()->bool {
+		return onjump->IsComplete();
+		}));
+	animator->AddTransition(new IStateTransition(jumping, jumpland, [pc]()->bool {
+		return pc->IsGrounded();
+		}));
+	animator->AddTransition(new IStateTransition(jumpland , stance, [jumpland]()->bool {
+		return jumpland->IsComplete();
+		}));
 
 	SightComponent* sight = player->AddComponent<SightComponent>();
 	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	/*AudioSourceComponent * audio_src = player->AddComponent<AudioSourceComponent>(ChannelGroupType::SFX);
-	audio_src->LoadSound("pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
-	audio_src->PlaySound("pollo");
-	audio_src->randomSounds(5);*/
 
 	int componentIdCount = 0;
 
@@ -158,7 +190,11 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
+		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::POLLO));
+		sourceComp->RandomSound();
 		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+		DamageableNetworkComponent* dc = player->AddComponent<DamageableNetworkComponent>(100, 100, spawnData->objId,
+			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		if (spawnData->clientOwned)
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
@@ -169,7 +205,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2, carryOffset, dropOffset);
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
-
+		DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
 		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
 		listenerComp->RecordMic();
 	}

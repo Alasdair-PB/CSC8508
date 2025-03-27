@@ -520,7 +520,7 @@ enet_socket_receive(ENetSocket socket,
     msgHdr.msg_iov = (struct iovec*)buffers;
     msgHdr.msg_iovlen = bufferCount;
 
-    recvLength = recvmsg(socket, &msgHdr, MSG_NOSIGNAL);
+    recvLength = recvmsg(socket, &msgHdr, MSG_NOSIGNAL | MSG_DONTWAIT);
 
     if (recvLength == -1)
     {

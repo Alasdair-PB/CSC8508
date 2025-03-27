@@ -1,7 +1,7 @@
 #ifndef EOS_LOBBY_MANAGER_H
 #define EOS_LOBBY_MANAGER_H
 
-#if !PS5
+#if EOSBUILD
 
 #include <iostream>
 #include <eos_sdk.h>
@@ -28,6 +28,6 @@ private:
     EOSInitialisationManager& eosManager;
 };
 
-#endif // !PS5
+#endif // EOSBUILD
 
 #endif // EOS_LOBBY_MANAGER_H

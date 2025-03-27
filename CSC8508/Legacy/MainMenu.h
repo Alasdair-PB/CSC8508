@@ -14,7 +14,7 @@ namespace NCL {
 		typedef std::function<void()> StartServer;
 		typedef std::function<void()> StartOffline;
 
-#if !PS5
+#if EOSBUILD
 		typedef std::function<void()> StartEOS;
 		typedef std::function<void()> StartEOSLobbyCreation;
 		typedef std::function<void(std::string)> StartEOSLobbySearch;
@@ -30,7 +30,7 @@ namespace NCL {
 		public:			
 			typedef std::function<void(bool state)> SetPauseGame;
 
-#if PS5
+#if !EOSBUILD
 			MainMenu(SetPauseGame setPauseFunc,
 				StartClient startClient,
 				StartServer startServer,
@@ -56,7 +56,7 @@ namespace NCL {
 
 			void SetMainMenuOption(int option) { mainMenuOption = option; } // Change this for each menu
 
-#if !PS5
+#if EOSBUILD
 			void SetEOSMenuOption(int option) { eosMenuOption = option; } // Change this for each menu
 			void SetEOSLobbyOption(int option) { eosLobbyOption = option; } // Change this for each menu
 #endif
@@ -69,7 +69,7 @@ namespace NCL {
 			StartServer startServer;
 			StartOffline startOffline;
 
-#if !PS5
+#if EOSBUILD
 			StartEOS startEOS;
 			StartEOSLobbyCreation startEOSLobbyCreation;
 			StartEOSLobbySearch startEOSLobbySearch;
@@ -101,7 +101,7 @@ namespace NCL {
 			enum menuOptions { none, startOfflineOpt, startServerOpt, startClientOpt, eosOption }; //Relates to menuOptions in MainMenu.h
 			int mainMenuOption = 0;
 			
-#if !PS5
+#if EOSBUILD
 			enum eosMenuOptions { eosNone, hostLobby, joinLobby }; //Relates to menuOptions in MainMenu.h
 			int eosMenuOption = 0;
 

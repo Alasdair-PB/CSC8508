@@ -12,6 +12,10 @@ else ()
     endif()
 endif()
 
+if(EOSBuild)
+    add_compile_definitions("EOSBUILD")
+endif()
+
 
 set(CMAKE_CXX_STANDARD 20)
 add_compile_options(-std=c++20)
@@ -208,7 +212,7 @@ target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
 target_link_libraries(AudioEngine PRIVATE ${OPUS_LIBRARY})
 
 # Link EOS Engine
-if(NOT PS5)
+if(EOSBuild)
 target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")
 else()
 target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")

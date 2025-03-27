@@ -3,7 +3,7 @@
 #include "NetworkBase.h"
 #include "EventListener.h"
 
-#if !PS5
+#if EOSBUILD
 
 #include "EOSLobbyManager.h"
 #include "EOSLobbySearch.h"
@@ -41,7 +41,7 @@ namespace NCL {
 			NetworkedGame();
 			~NetworkedGame();
 
-#if !PS5
+#if EOSBUILD
 			std::string GetOwnerIP() const { return eosLobbyFunctions ? eosLobbyFunctions->ownerIP : ""; }
 			std::string GetLobbyID() const { return eosLobbyFunctions ? eosLobbyFunctions->lobbyID : ""; }
 			int GetPlayerCount() const { return eosLobbyFunctions ? eosLobbyFunctions->playerCount : 0; }
@@ -52,7 +52,7 @@ namespace NCL {
 
 			void HostGame();
 
-#if !PS5
+#if EOSBUILD
 			void EOSLobbyCreation();
 			void EOSLobbySearchFunc(const std::string& lobbyID);
 			void EOSLobbyDetailsUpdate();
@@ -81,7 +81,7 @@ namespace NCL {
 			void StartServerCallBack();
 			void StartOfflineCallBack();
 
-#if !PS5
+#if EOSBUILD
 			void StartEOSCallBack();
 			void StartAsHostCallBack();
 			void StartAsJoinCallBack(const std::string& code);

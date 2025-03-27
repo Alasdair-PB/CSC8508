@@ -23,9 +23,11 @@
 #else
 #include "GameTechRenderer.h"
 #include "KeyboardMouseController.h"
-#include "EOSLobbyFunctions.h"
 #endif // USE_PS5
 
+#if EOSBUILD
+#include "EOSLobbyFunctions.h"
+#endif
 
 
 using namespace NCL;
@@ -236,7 +238,7 @@ void TutorialGame::UpdateUI() {
 		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
 	}
-#if PS5
+#if !EOSBUILD
 	if (mainMenuUI->GetMenuOption() != 0) {
 		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");

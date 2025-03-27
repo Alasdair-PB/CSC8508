@@ -1,4 +1,5 @@
-#if !PS5
+#if EOSBUILD
+
 
 #include "EOSLobbyMenuUI.h"
 #include <filesystem>        

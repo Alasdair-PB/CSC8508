@@ -40,7 +40,7 @@ void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
 
-#if !PS5
+#if EOSBUILD
 
 void NetworkedGame::StartEOSCallBack() { HostGame(); }
 void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
@@ -90,7 +90,7 @@ NetworkedGame::NetworkedGame()	{
 	thisServer = nullptr;
 	thisClient = nullptr;
 
-#if PS5
+#if !EOSBUILD
 	mainMenu = new MainMenu(
 		[&](bool state) -> void { world->SetPausedWorld(state); },
 		[&]() -> void { this->StartClientCallBack(); },
@@ -154,7 +154,7 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
 }
 
-#if !PS5
+#if EOSBUILD
 void NetworkedGame::HostGame()
 {
 
@@ -216,7 +216,6 @@ void NetworkedGame::EOSStartAsJoin(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
 }
-
 
 #endif
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 

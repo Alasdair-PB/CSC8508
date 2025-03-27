@@ -1,4 +1,4 @@
-#if !PS5
+#if EOSBUILD
 
 #include "EOSInitialisationManager.h"
 #include <eos_auth.h>

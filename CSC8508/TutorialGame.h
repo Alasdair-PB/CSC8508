@@ -17,10 +17,14 @@
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
 #include "FramerateUI.h"
+
+#if EOSBUILD
 #include "MainMenuUI.h"
 #include "EOSMenuUI.h"
 #include "LobbySearch.h"
 #include "EOSLobbyMenuUI.h"
+#endif
+
 
 
 using std::vector;
@@ -40,7 +44,6 @@ namespace NCL {
 			TutorialGame();
 			~TutorialGame();
 			virtual void UpdateGame(float dt);
-			EOSInitialisationManager eosManager;
 		protected:
 			void InitialiseAssets();
 			void InitWorld();
@@ -95,13 +98,14 @@ namespace NCL {
 			UI::Healthbar* healthbar = new UI::Healthbar;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
+			float framerateDelay = 0;
+
+#if EOSBUILD
 			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;
 			UI::EOSLobbyMenuUI* eosLobbyMenuUI = new UI::EOSLobbyMenuUI(false, "", "", 0);
-			
 
-			float framerateDelay = 0;
 			bool eosLobbyMenuCreated = false;
-
+#endif
 		};
 	}
 }

@@ -21,7 +21,7 @@ namespace NCL {
 			}
 		};
 
-#if PS5
+#if !EOSBUILD
 		MainMenu::MainMenu(SetPauseGame setPauseFunc,
 			StartClient startClient,
 			StartServer startServer,
@@ -116,7 +116,8 @@ namespace NCL {
 		{
 			Debug::Print("Main Menu", Vector2(5, 85));
 
-#if !PS5
+#if EOSBUILD
+
 			if (eosFlowFinished)
 			{
 				std::cout << "Popping Success";
@@ -140,7 +141,7 @@ namespace NCL {
 				startOffline();
 				return PushdownState::Pop;
 			}
-#if !PS5
+#if EOSBUILD
 			if (mainMenuOption == eosOption) {
 				startEOS();
 				*newState = new OverlayScreen(
@@ -155,7 +156,7 @@ namespace NCL {
 			return PushdownState::NoChange;
 		}
 
-#if !PS5
+#if EOSBUILD
 		PushdownState::PushdownResult MainMenu::LobbyScreenOnUpdate(float dt, PushdownState** newState)
 		{
 			Debug::Print("Duplicate Main Menu", Vector2(5, 85));

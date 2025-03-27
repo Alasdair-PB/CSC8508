@@ -1,4 +1,5 @@
-#if !PS5
+#if EOSBUILD
+
 
 #include "EOSLobbySearch.h"
 #include "EOSLobbyManager.h"

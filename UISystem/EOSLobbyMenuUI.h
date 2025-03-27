@@ -1,4 +1,4 @@
-#if !PS5
+#if EOSBUILD
 
 #pragma once
 #include "imgui.h"

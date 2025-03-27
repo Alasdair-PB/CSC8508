@@ -21,7 +21,7 @@ MainMenuUI::MainMenuUI() {
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 	};
 
-#if !PS5
+#if EOSBUILD
 
 	std::function<CSC8508::PushdownState::PushdownResult()> funcD = [this]() -> CSC8508::PushdownState::PushdownResult {
 		menuOption = startEOS;

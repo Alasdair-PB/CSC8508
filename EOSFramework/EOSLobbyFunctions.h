@@ -1,4 +1,4 @@
-#if !PS5
+#if EOSBUILD
 
 #pragma once
 #define EOS_LOBBY_FUNCTIONS_H

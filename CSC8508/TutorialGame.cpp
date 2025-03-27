@@ -134,22 +134,6 @@ void TutorialGame::InitialiseAssets() {
 
 TutorialGame::~TutorialGame()	
 {
-	MaterialManager::CleanUp();
-	ComponentManager::CleanUp();
-
-	delete audioEngine;
-	delete physics;
-	delete renderer;
-	delete world;
-	delete controller;
-	delete navMesh;
-
-	delete framerate;
-	delete mainMenuUI;
-	delete audioSliders;
-	delete healthbar;
-	delete lobbySearchField;
-	delete inventoryUI;
 }
 
 void TutorialGame::UpdateGame(float dt)

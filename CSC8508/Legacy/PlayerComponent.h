@@ -54,11 +54,11 @@ namespace NCL {
             Vector3 GetForwardsDirection();
 
             float speed = 15.0f;
-            float dashMultiplier = 1.5f;
+            float dashMultiplier = 2.5f;
             float jumpForce = 10.0f;
             float jumpDuration = 0;
             float downwardsVelocityMod = 50.0f;
-            float dashTickStam = 2.0f;
+            float dashTickStam = 0.3f;
             float jumpStamCost = 10.0f;
             float visibleRange = 5.0f;
 

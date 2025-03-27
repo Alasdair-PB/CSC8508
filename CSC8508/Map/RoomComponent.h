@@ -20,8 +20,7 @@ using namespace NCL::Rendering;
  */
 class RoomComponent final : public IComponent {
 public:
-     RoomComponent(GameObject& gameObject, RoomPrefab* prefab)
-        : IComponent(gameObject), prefab(prefab) { }
+     RoomComponent(GameObject& gameObject, RoomPrefab* prefab);
 
      /**
       * Attempts to find an appropriate place to attach the new room

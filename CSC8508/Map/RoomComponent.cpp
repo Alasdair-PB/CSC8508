@@ -11,6 +11,10 @@
 #include "RoomManager.h"
 #include "../../CSC8508CoreClasses/Util.cpp"
 
+RoomComponent::RoomComponent(GameObject& gameObject, RoomPrefab* prefab) : IComponent(gameObject), prefab(prefab) {
+    for (GameObject* c : prefab->GetGameObject().GetChildren()) this->GetGameObject().AddChild(c);
+}
+
 bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
 
     // Randomly order door locations
@@ -35,7 +39,7 @@ bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
 
             // Check if roomB's GameObject collides with any other object in the dungeon
             auto info = NCL::CollisionDetection::CollisionInfo();
-            if (!NCL::CollisionDetection::ObjectIntersection(&this->GetGameObject(), GetDungeonGameObject(), info)) {
+            if (!NCL::CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), GetDungeonGameObject(), info)) {
 
                 // Success (no collision)
                 this->nextDoorRooms.push_back(&roomB);

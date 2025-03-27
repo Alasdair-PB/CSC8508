@@ -17,7 +17,7 @@ public:
         std::vector<Vector3> possibleItemSpawnLocations;
         std::vector<DoorLocation> possibleDoorLocations;
 
-        RoomPrefabDataStruct() = default;
+        RoomPrefabDataStruct() : possibleItemSpawnLocations(std::vector<Vector3>()), possibleDoorLocations(std::vector<DoorLocation>()) { }
         RoomPrefabDataStruct(std::vector<Vector3> const& possibleItemSpawnLocations, std::vector<DoorLocation> const& possibleDoorLocations)
             : possibleItemSpawnLocations(possibleItemSpawnLocations), possibleDoorLocations(possibleDoorLocations) { }
 
@@ -29,15 +29,20 @@ public:
         }
     };
 
-    RoomPrefab(GameObject& roomObject, NavigationMesh* navMesh) : IComponent(roomObject), navMesh(navMesh) { }
+    explicit RoomPrefab(
+        GameObject& roomObject,
+        std::vector<Vector3> const& possibleItemSpawnLocations = std::vector<Vector3>(),
+        std::vector<DoorLocation> const& possibleDoorLocations = std::vector<DoorLocation>()
+        )
+    : IComponent(roomObject), possibleItemSpawnLocations(possibleItemSpawnLocations), possibleDoorLocations(possibleDoorLocations) { }
 
+    [[nodiscard]] std::vector<Vector3> const& GetItemSpawnLocations() const { return possibleItemSpawnLocations; }
     [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return possibleDoorLocations; }
 
     size_t Save(std::string assetPath, size_t* allocationStart) override;
     void Load(std::string assetPath, size_t allocationStart) override;
 
 protected:
-    NavigationMesh* navMesh;
     std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>();
     std::vector<DoorLocation> possibleDoorLocations = std::vector<DoorLocation>();
 };

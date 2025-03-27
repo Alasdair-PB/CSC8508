@@ -12,6 +12,8 @@
 #include "../../CSC8508CoreClasses/Util.cpp"
 
 void DungeonComponent::Generate(int const roomCount) const {
+    int failures = 0;
+
     // Generate the first room
     auto* entryRoom = new GameObject();
     RoomPrefab* prefab = RoomManager::GetRandom();
@@ -20,7 +22,14 @@ void DungeonComponent::Generate(int const roomCount) const {
 
     // Generate subsequent rooms
     for (int i = 0; i < roomCount - 1; i++) {
-        if (!GenerateRoom()) i--;
+        if (!GenerateRoom()) {
+            i--;
+            failures++;
+        }
+        if (failures >= 5) {
+            std::cout << "DungeonComponent::Generate roomCount exceeded max attempts!\n";
+            return;
+        }
     }
 }
 
@@ -36,6 +45,7 @@ bool DungeonComponent::GenerateRoom() const {
         if (r->TryGenerateNewRoom(*component)) return true;
     }
 
+    delete roomB;
     return false;
 }
 

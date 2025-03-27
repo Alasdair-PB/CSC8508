@@ -20,10 +20,12 @@ public:
      */
     static RoomPrefab* GetRandom();
 
-    [[nodiscard]] static std::vector<RoomPrefab*> const& GetPrefabs() { return prefabs; }
+    [[nodiscard]] static std::vector<std::string> const& GetPrefabPaths() { return prefabPaths; }
 
 protected:
-    static std::vector<RoomPrefab*> prefabs;
+    static std::vector<std::string> prefabPaths;
+
+    static RoomPrefab* LoadPrefab(std::string path);
 };
 
 #endif //ROOMMANAGER_H

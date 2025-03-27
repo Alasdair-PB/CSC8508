@@ -127,6 +127,8 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 			TrySetStoredItems(lastInvFullState, i);
 	}
 
+	if (wallet != p.fullState.wallet)
+		std::cout << "Rollback Sold::" << p.fullState.wallet << std::endl;
 	wallet = p.fullState.wallet;
 	return true;
 }

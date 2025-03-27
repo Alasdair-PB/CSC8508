@@ -70,6 +70,7 @@ namespace NCL {
                 }
                 storedItems.clear();
                 wallet += itemTotal;
+                std::cout << "Sold::" << itemTotal << std::endl;
                 return itemTotal;
             }
 

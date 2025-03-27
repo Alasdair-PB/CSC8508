@@ -8,6 +8,7 @@ PlayerComponent::PlayerComponent(GameObject& gameObject) :
 	isDashing(false),
 	isGrounded(false),
 	isJumping(false),
+    inDropZone(false),
 	onDashBinding(0),
 	onJumpBinding(0),
 	onItemInteractBinding(0),
@@ -49,8 +50,9 @@ void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
 {
     if (CheckTag(Tag::Ground, collisionEvent))
         collidedTags.push(Tag::Ground);
-    if (CheckTag(Tag::DropZone, collisionEvent))
+    if (CheckTag(Tag::DropZone, collisionEvent)) {
         collidedTags.push(Tag::DropZone);
+    }
 }
 
 /**

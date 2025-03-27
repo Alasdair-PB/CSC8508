@@ -228,7 +228,7 @@ namespace NCL::CSC8508 {
 		/// </summary>
 		/// <param name="tag">The queried tag</param>
 		/// <returns>True if the tag is found otherwise returns false</returns>
-		bool HasTag(Tags::Tag tag) const { return true; }
+		bool HasTag(Tags::Tag tag) const { return std::find(tags.begin(), tags.end(), tag) != tags.end(); }
 		
 		/// <summary>
 		/// Call function func on all Child GameObjects of this GameObject
@@ -252,8 +252,8 @@ namespace NCL::CSC8508 {
 
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
-		void SetTag(Tags::Tag newTag) {  tag = newTag;}
-		Tags::Tag GetTag() const { return tag;}
+		void SetTag(Tags::Tag newTag) {  tags.push_back(newTag);}
+		vector<Tags::Tag> GetTags() const { return tags;}
 
 	protected:
 		bool isEnabled;
@@ -267,7 +267,6 @@ namespace NCL::CSC8508 {
 		vector<GameObject*> children;
 
 		Layers::LayerID	layerID;
-		Tags::Tag tag;
 		vector<Tags::Tag> tags;
 		void GetGameObjData(GameObjDataStruct& saveInfo);
 		void GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart);

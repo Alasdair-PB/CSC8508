@@ -5,17 +5,23 @@
 
 #include "IComponent.h"
 #include <chrono>
+#include "EventManager.h"
 
 namespace NCL::CSC8508
 {
+
+	struct OverTimeEvent : public Event {
+		OverTimeEvent() {
+		}
+	};
+
 	class TimerComponent : public IComponent
 	{
 	public:
 
-		TimerComponent(GameObject& gameObject) : IComponent(gameObject) {
+		TimerComponent(GameObject& gameObject, float timeRemaining) : IComponent(gameObject) {
 			isComplete = false;
-			isPaused = false;
-			remainingTime = -1.0f;
+			remainingTime = timeRemaining;
 		}
 
 		~TimerComponent() {
@@ -23,16 +29,9 @@ namespace NCL::CSC8508
 
 
 		void Update(float dt) override {
-			if (!isComplete && !isPaused) {
-				auto now = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsedTime = now - lastUpdateTime;
-				remainingTime -= elapsedTime.count();
-				lastUpdateTime = now;
-
-				if (remainingTime <= 0.0f) {
-					remainingTime = 0.0f;
-					isComplete = true;
-				}
+			if (!isComplete) {
+				remainingTime -= dt;
+				HandleOverTime();
 			}
 		}
 
@@ -41,21 +40,6 @@ namespace NCL::CSC8508
 
 		void SetTime(float time) {
 			remainingTime = time;
-			lastUpdateTime = std::chrono::high_resolution_clock::now();
-		}
-
-		void Pause() {
-			isPaused = true;
-		}
-
-		void Unpause() {
-			if (!isPaused) return;
-			isPaused = false;
-			lastUpdateTime = std::chrono::high_resolution_clock::now();
-		}
-
-		void TogglePause() {
-			isPaused ? Unpause() : Pause();
 		}
 
 		float GetRemainingTime() const {
@@ -66,18 +50,21 @@ namespace NCL::CSC8508
 			return isComplete;
 		}
 
-		bool IsPaused() const {
-			return isPaused;
+
+		void HandleOverTime() {
+			if (remainingTime <= 0.0f) {
+				remainingTime = 0.0f;
+				isComplete = true;
+				OverTimeEvent* e = new OverTimeEvent();
+				EventManager::Call<OverTimeEvent>(e);
+				delete e;
+			}
 		}
 
 	protected:
 
 		bool isComplete;
-		bool isPaused;
-
 		float remainingTime;
-		std::chrono::high_resolution_clock::time_point lastUpdateTime;
-
 
 
 

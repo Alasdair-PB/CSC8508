@@ -157,6 +157,11 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
+
+	GameObject* room = LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+	auto roomB = room->CopyGameObject();
+	roomB->GetTransform().SetPosition(Vector3(-26, 26, 0));
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 }

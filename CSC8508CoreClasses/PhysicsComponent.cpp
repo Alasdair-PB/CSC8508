@@ -37,6 +37,35 @@ struct PhysicsComponent::PhysicsComponentDataStruct : public ISerializedData {
 	}
 };
 
+void PhysicsComponent::SetInitType(InitType type, PhysicsObject* phyObj) {
+	switch (type)
+	{
+	case(Sphere): {
+		phyObj->InitSphereInertia();
+		break;
+	}
+	case(Cube): {
+		phyObj->InitCubeInertia();
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void PhysicsComponent::CopyComponent(GameObject* gameObject) {
+
+	PhysicsComponent* component = gameObject->AddComponent<PhysicsComponent>();
+	component->SetEnabled(IsEnabled());
+
+	PhysicsObject* physObjCopy = new PhysicsObject(&gameObject->GetTransform());
+	physObjCopy->SetInverseMass(physicsObject->GetInverseMass());
+	physObjCopy->SetFriction(physicsObject->GetFriction());
+	physObjCopy->SetRestitution(physicsObject->GetCRestitution());
+	component->SetPhysicsObject(physObjCopy);
+	SetInitType(initiType, physObjCopy);
+}
+
 auto PhysicsComponent::GetDerivedSerializedFields() const {
 	return PhysicsComponentDataStruct::GetSerializedFields();
 }
@@ -58,18 +87,5 @@ void PhysicsComponent::Load(std::string assetPath, size_t allocationStart) {
 	physicsObject->SetInverseMass(loadedSaveData.inverseMass);
 	physicsObject->SetFriction(loadedSaveData.friction);
 	physicsObject->SetRestitution(loadedSaveData.cRestitution);	
-	
-	switch (loadedSaveData.initType)
-	{
-		case(Sphere): {
-			physicsObject->InitSphereInertia();
-			break;
-		}
-		case(Cube): {
-			physicsObject->InitCubeInertia();
-			break;
-		}
-		default:
-			break;
-	}
+	SetInitType(loadedSaveData.initType, physicsObject);
 }

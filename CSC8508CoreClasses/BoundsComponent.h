@@ -28,7 +28,7 @@ namespace NCL::CSC8508
 		void SetBoundingVolume(CollisionVolume* vol) { boundingVolume = vol;}
 
 		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}		
-		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
+		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize, CollisionVolume* volume);
 		const PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
 
 		bool GetBroadphaseAABB(Vector3& outsize) const;
@@ -51,6 +51,8 @@ namespace NCL::CSC8508
 		/// IComponent Save data struct definition
 		/// </summary>
 		struct BoundsComponentDataStruct;
+
+		void CopyComponent(GameObject* gameObject) override;
 
 		/// <summary>
 		/// Loads the PhysicsComponent save data into this PhysicsComponent

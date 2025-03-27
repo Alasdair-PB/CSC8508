@@ -10,6 +10,7 @@ namespace NCL::CSC8508 {
 		InventoryNetworkState() {}
 		~InventoryNetworkState() = default;
 		int inventory[MAX_INVENTORY_ITEMS];
+		int wallet;
 	};
 
 	struct InvFullPacket : public IFullNetworkPacket {
@@ -21,13 +22,24 @@ namespace NCL::CSC8508 {
 		}
 	};
 
+	struct SellInventoryPacket : INetworkPacket {
+		int soldInventory[MAX_INVENTORY_ITEMS];
+
+		SellInventoryPacket() {
+			type = Component_Event;
+			packetSubType = None;
+			size = sizeof(SellInventoryPacket) - sizeof(GamePacket);
+		}
+	};
+
+
 	class InventoryNetworkManagerComponent : public InventoryManagerComponent, public INetworkDeltaComponent {
 
 	public:
-		InventoryNetworkManagerComponent(GameObject& gameObject, int maxStorage, float carryOffset, float dropOffset, int objId, int ownId, int componId, bool clientOwned)
+		InventoryNetworkManagerComponent(GameObject& gameObject, int maxStorage, float carryOffset, float dropOffset, int objId, int ownId, int componId, int pfabID, bool clientOwned)
 			:
 			InventoryManagerComponent(gameObject, maxStorage, carryOffset, dropOffset),
-			INetworkDeltaComponent(objId, ownId, componId, clientOwned, new InventoryNetworkState()) {
+			INetworkDeltaComponent(objId, ownId, componId, pfabID, clientOwned, new InventoryNetworkState()) {
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -47,9 +59,14 @@ namespace NCL::CSC8508 {
 	private:
 		void TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i);
 		bool ReadPacket() {}
+		bool ReadSellInventoryPacket(SellInventoryPacket pck);
 		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override { return false; }
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override;
-		bool ReadEventPacket(INetworkPacket& p) override { return true; }
+		bool ReadEventPacket(INetworkPacket& p) override;
+		void DisableSoldItemsInWorld(SellInventoryPacket& pck);
+		void DisableSoldItemInWorld(SellInventoryPacket& pck, int i);
+		bool InventoryIsMatch(SellInventoryPacket& pck);
+		float SellAllItems() override;
 	};
 
 }

@@ -68,9 +68,6 @@ public:
 	FMOD_RESULT RecordMic() {
 		return fSystem->recordStart(audioEngine->GetInputDeviceIndex(), micInput, true);
 	}
-
-	
-
 	
 
 	/**

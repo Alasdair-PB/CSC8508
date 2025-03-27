@@ -42,8 +42,8 @@ namespace NCL::CSC8508
 	class TransformNetworkComponent :public IComponent, public INetworkDeltaComponent
 	{
 	public:
-		TransformNetworkComponent(GameObject& gameObject, int objId, int ownId, int componId, bool clientOwned): 
-			INetworkDeltaComponent(objId, ownId, componId, clientOwned, new TransformNetworkState), 
+		TransformNetworkComponent(GameObject& gameObject, int objId, int ownId, int componId, int pfabID, bool clientOwned): 
+			INetworkDeltaComponent(objId, ownId, componId, pfabID, clientOwned, new TransformNetworkState),
 			IComponent(gameObject),
 			myObject(gameObject) {}
 		

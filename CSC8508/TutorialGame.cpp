@@ -43,6 +43,15 @@ GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
 
 void LoadControllerMappings(Controller* controller)
 {
+#ifdef USE_PS5
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(2, "Forward");
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
+	controller->MapButton(KeyCodes::SHIFT, "Dash"); //Ps5 relevant buttons
+	controller->MapButton(KeyCodes::SPACE, "Jump"); // Keep names
+	controller->MapButton(KeyCodes::E, "Interact");
+#else
 	controller->MapAxis(0, "Sidestep");
 	controller->MapAxis(2, "Forward");
 	controller->MapAxis(3, "XLook");
@@ -50,6 +59,8 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
 	controller->MapButton(KeyCodes::E, "Interact");
+#endif
+	controller->BindMappingsToHashIds();
 }
 
 void TutorialGame::InitialiseGame() {
@@ -67,11 +78,15 @@ void TutorialGame::InitialiseGame() {
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 
+	audioEngine = &AudioEngine::Instance();
+
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
 	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
+
+
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -146,17 +161,17 @@ void TutorialGame::UpdateGame(float dt)
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
-	
+
 	Debug::UpdateRenderables(dt);
 
 	world->UpdateWorld(dt);
 	Window::GetWindow()->ShowOSPointer(true);
 	physics->Update(dt);
-
-	//std::cout << "World objects count: " << world->GetGameObjectCount() << '\n';
+	audioEngine->Update();
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {
+	LoadDropZone(Vector3(85, 22, -60), Vector3(5,5,5));
 	world->Load(assetPath);
 }
 
@@ -178,19 +193,14 @@ void TutorialGame::LoadDungeon(Vector3 const offset) {
 	// }
 }
 
-void TutorialGame::InitWorld() 
+void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
+	std::string assetPath = GetAssetPath("myScene.pfab");
+	LoadWorld(assetPath);
 
-	//TestSave();
-	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
-	//LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
-	//for (int i = 0; i < 5; i++) LoadDungeon(Vector3(i * 20, 0, i*20));
 	LoadDungeon(Vector3());
-	//Loaditem(Vector3(5, 0, 5));
-	//std::string assetPath = GetAssetPath("myScene.pfab");
-	//LoadWorld(assetPath);
 }
 
 void TutorialGame::UpdateUI() {

@@ -18,14 +18,14 @@ namespace NCL {
             }
 
             bool PushItemToInventory(ItemComponent* item) {
-                    if (!item) return false;
-                    if (storedItems.size() >= maxItemStorage) return false;
+                if (!item) return false;
+                if (storedItems.size() >= maxItemStorage) return false;
 
-                    item->SetEnabledComponentStates(false);
-                    storedItems.push_back(item);
-                    item->GetGameObject().SetEnabled(true);
-                    scrollIndex = storedItems.size() - 1;
-                    return true;
+                item->SetEnabledComponentStates(false);
+                storedItems.push_back(item);
+                item->GetGameObject().SetEnabled(true);
+                scrollIndex = storedItems.size() - 1;
+                return true;
             }
 
             bool ItemInHand() {
@@ -57,13 +57,21 @@ namespace NCL {
                 PopItemFromInventory(inventoryIndex);
             }
 
-            float SellAllItems() {
+            void DisableItemInWorld(ItemComponent* item) {
+                item->SetSaleValue(0);
+                item->GetGameObject().SetEnabled(false);
+            }
+
+           virtual float SellAllItems() {
                 float itemTotal = 0;
                 for (ItemComponent* item : storedItems) {
                     itemTotal += item->GetSaleValue();
-                    item->GetGameObject().SetEnabled(false);
+                    DisableItemInWorld(item);
                 }
                 storedItems.clear();
+                wallet += itemTotal;
+                std::cout << "Sold::" << itemTotal << std::endl;
+                return itemTotal;
             }
 
             /// <summary>
@@ -73,14 +81,27 @@ namespace NCL {
 
             void Load(std::string assetPath, size_t allocationStart) override;
             size_t Save(std::string assetPath, size_t* allocationStart) override;
-                
-        protected:
+            
+            void RemoveItemEntry(ItemComponent* item) {
+                for (int i = 0; i < storedItems.size(); i++) {
+                    if (storedItems[i] == item) {
+                        RemoveItemEntry(i);
+                        return;
+                    }
+                }
+            }
 
+            void RemoveItemEntry(int inventoryIndex) {
+                storedItems.erase(storedItems.begin() + inventoryIndex);
+            }
+
+        protected:
             int maxItemStorage;
             int scrollIndex = 0;
             float itemCarryOffset;
             float itemDropOffset;
             float carryYOffset = 3;
+            float wallet; 
             Transform& transform;
             
             std::vector<ItemComponent*> storedItems;
@@ -101,8 +122,7 @@ namespace NCL {
                 item->SetEnabledComponentStates(true);
                 item->GetGameObject().SetEnabled(true);
                 ReturnItemToWorld(inventoryIndex);
-
-                storedItems.erase(storedItems.begin() + inventoryIndex);
+                RemoveItemEntry(inventoryIndex);
                 return item;
             }
         };

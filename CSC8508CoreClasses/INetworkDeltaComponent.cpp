@@ -7,8 +7,8 @@ using namespace NCL::CSC8508;
 using namespace NCL;
 using namespace CSC8508;
 
-INetworkDeltaComponent::INetworkDeltaComponent(int objId, int ownId, int componentId, bool clientOwned, INetworkState* state)
-	: INetworkComponent(objId, ownId, componentId, clientOwned),
+INetworkDeltaComponent::INetworkDeltaComponent(int objId, int ownId, int componentId, int pfabID, bool clientOwned, INetworkState* state)
+	: INetworkComponent(objId, ownId, componentId, pfabID, clientOwned),
 	deltaErrors(0), fullErrors(0), lastFullState(state) {}
 
 vector<GamePacket*> INetworkDeltaComponent::WriteDeltaFullPacket(bool deltaFrame){

@@ -8,6 +8,7 @@ PlayerComponent::PlayerComponent(GameObject& gameObject) :
 	isDashing(false),
 	isGrounded(false),
 	isJumping(false),
+    inDropZone(false),
 	onDashBinding(0),
 	onJumpBinding(0),
 	onItemInteractBinding(0),
@@ -40,12 +41,23 @@ void PlayerComponent::OnEvent(InputButtonEvent* buttonEvent) {
     inputStack.push(buttonEvent->buttonId);
 }
 
+bool PlayerComponent::CheckTag(Tag tag, CollisionEvent* collisionEvent) {
+    return (collisionEvent->object1.HasTag(tag) && &collisionEvent->object2 == &GetGameObject()) ||
+        (collisionEvent->object2.HasTag(tag) && &collisionEvent->object1 == &GetGameObject());
+}
+
 void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
 {
-    bool hasTag = (collisionEvent->object1.HasTag(Tags::Ground) && &collisionEvent->object2 == &GetGameObject()) ||
-        (collisionEvent->object2.HasTag(Tags::Ground) && &collisionEvent->object1 == &GetGameObject());
-    if (hasTag) {
-        isGrounded = true;
+    if (CheckTag(Tag::Ground, collisionEvent))
+        collidedTags.push(Tag::Ground);
+    if (CheckTag(Tag::DropZone, collisionEvent)) {
+        collidedTags.push(Tag::DropZone);
+    }
+}
+
+void PlayerComponent::OnEvent(DeathEvent* deathEvent) {
+    if (&deathEvent->GetGameObject() == &GetGameObject()) {
+        std::cout << "dead" << "\n";
     }
 }
 
@@ -63,6 +75,7 @@ void PlayerComponent::OnAwake()
 
     EventManager::RegisterListener<InputButtonEvent>(this);
     EventManager::RegisterListener<CollisionEvent>(this);
+    EventManager::RegisterListener<DeathEvent>(this);
 
     if (physicsComponent)
         physicsObj = physicsComponent->GetPhysicsObject();
@@ -93,17 +106,26 @@ void PlayerComponent::OnJump(float deltaTime) {
     if (jumpDuration < 0.2f)
         SetLinearVelocity(jumpDuration);
     else {
-        if (physicsObj->GetLinearVelocity().y <= 0.0f)
-            physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
+        
         if (isGrounded) { isJumping = false; }
     }
 }
 
+bool PlayerComponent::DropItemToFloor() {
+    inventoryComponent->DropItem();
+    timeSinceLastPickUp = 0;
+    return true;
+}
+
+bool PlayerComponent::DropItemToDropZone() {
+    float sellValue = inventoryComponent->SellAllItems();
+    return true;
+}
+
 bool PlayerComponent::DropItem() {
     if (inventoryComponent->ItemInHand()) {
-        inventoryComponent->DropItem();
-        timeSinceLastPickUp = 0;
-        return true;
+        if (inDropZone) return DropItemToDropZone();
+        else return DropItemToFloor();
     }
     return false;
 }
@@ -148,6 +170,16 @@ void PlayerComponent::OnPlayerMove() {
     physicsObj->RotateTowardsVelocity();
 }
 
+void PlayerComponent::CheckTagStack() {
+    while (!collidedTags.empty()) {
+        if (collidedTags.top() == Tags::DropZone)
+            inDropZone = true;
+        else if (collidedTags.top() == Tags::Ground)
+            isGrounded = true;
+        collidedTags.pop();
+    }
+}
+
 void PlayerComponent::CheckInputStack() {
     while (!inputStack.empty()) {
         if (inputStack.top() == onDashBinding)
@@ -163,15 +195,36 @@ void PlayerComponent::CheckInputStack() {
 void PlayerComponent::UpdateStates(float deltaTime) {
     isDashing = false;
     isGrounded = false;
+    inDropZone = false;
     timeSinceLastPickUp += deltaTime;
+}
+
+void PlayerComponent::AddDownWardsVelocity() {
+    if (isGrounded) return;
+    if (physicsObj->GetLinearVelocity().y <= 0.0f)
+        physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
+
+    Vector3 force = physicsObj->GetForce();
+    Vector3 velocity = physicsObj->GetLinearVelocity();
+
+    if (Vector::Length(velocity) > Vector::Length(maxVelocity)) {
+        physicsObj->ClearForces();
+        physicsObj->SetLinearVelocity(Vector3(
+            std::min(maxVelocity.x, velocity.x),
+            std::min(maxVelocity.y, velocity.y),
+            std::min(maxVelocity.z, velocity.z)));
+    }
+
 }
 
 void PlayerComponent::Update(float deltaTime)
 {
     if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
         return;
+    CheckTagStack();
     OnPlayerMove();
     CheckInputStack();
     OnJump(deltaTime);
+    AddDownWardsVelocity();
     UpdateStates(deltaTime);
 }

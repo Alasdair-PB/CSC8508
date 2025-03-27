@@ -27,6 +27,7 @@ namespace NCL {
 		{
 			int objId;
 			int ownId;
+			size_t pfab;
 			bool clientOwned;
 		};
 
@@ -43,11 +44,12 @@ namespace NCL {
 
 			void LoadWorld(std::string assetPath);
 			void UpdateUI();
-			void Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			std::string GetAssetPath(std::string pfabName);
 			void LoadDungeon(Vector3 offset);
 			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
+			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
+			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions);
 			GameObject* AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int roomCount);
 
 			MainMenu* GetMainMenu() { return mainMenu; }

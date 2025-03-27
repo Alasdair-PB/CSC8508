@@ -21,7 +21,7 @@ GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nu
 	worldID = -1;
 	isEnabled = true;
 	layerID = Layers::LayerID::Default;
-	tag = Tags::Tag::Default;
+	tags.push_back(Tags::Tag::Default);
 	renderObject = nullptr;
 	components = vector<IComponent*>();
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
@@ -115,7 +115,7 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 	transform.SetPosition(loadedSaveData.position);
 	transform.SetScale(loadedSaveData.scale);
 	SetEnabled(loadedSaveData.isEnabled);
-
+	tags = loadedSaveData.tags;
 	Mesh* mesh = MaterialManager::GetMesh(loadedSaveData.meshPointer);
 	Texture* basicTex = MaterialManager::GetTexture(loadedSaveData.texturePointer);
 	Shader* basicShader = MaterialManager::GetShader(loadedSaveData.shaderPointer);
@@ -128,9 +128,9 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 
 void GameObject::Load(std::string assetPath, size_t allocationStart) {
 	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
+	LoadGameObjectInstanceData(loadedSaveData);
 	components.size() > 0 ? LoadInto(loadedSaveData, assetPath) : LoadClean(loadedSaveData, assetPath);
 	LoadChildInstanceData(loadedSaveData, assetPath);
-	LoadGameObjectInstanceData(loadedSaveData);
 }
 
 void GameObject::InitializeComponentMaps(

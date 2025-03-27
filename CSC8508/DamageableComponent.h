@@ -4,6 +4,7 @@
 #include "../CSC8508CoreClasses/IComponent.h"
 #include "../Event/Event.h"
 #include "../Event/EventManager.h"
+#include "Healthbar.h"
 
 namespace NCL::CSC8508
 {

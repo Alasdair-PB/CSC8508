@@ -201,7 +201,7 @@ void NetworkedGame::EOSStartAsHost()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
 
 }
 

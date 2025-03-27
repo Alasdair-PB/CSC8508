@@ -230,7 +230,6 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("EOS Lobby Menu");
 		uiSystem->RemoveStack("Inventory");
-		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
 
 #endif

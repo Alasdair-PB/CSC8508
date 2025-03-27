@@ -1,6 +1,7 @@
 #pragma once
 #include "IComponent.h"
-
+#include "StaminaBar.h"
+#include "UISystem.h"
 
 
 namespace NCL {
@@ -12,18 +13,23 @@ namespace NCL {
                 this->maxStamina = std::max(1.0f, maxStam);
                 this->stamina = std::min(initStam, maxStamina);
                 this->sRegen = std::max(1.0f, sRegen);
+                UI::UISystem::GetInstance()->PushNewStack(staminaBar->staminaBar, "Stamina Bar");
+                staminaBar->UpdateStamina(stamina);
             }
             ~StaminaComponent() = default;
 
             void Update(float dt)override {
                 stamina = std::min(stamina + (sRegen * dt), maxStamina);
+                staminaBar->UpdateStamina(stamina);
             }
 
             void IncreaseStamina(float regen) {
                 stamina = std::min(stamina + abs(regen), maxStamina);
+                staminaBar->UpdateStamina(stamina);
             }
             void DecreaseStamina(float regen) {
                 stamina = std::max(stamina - abs(regen), 0.0f);
+                staminaBar->UpdateStamina(stamina);
             }
 
             void SetStaminaAction(uint32_t a, float s) {
@@ -49,6 +55,7 @@ namespace NCL {
 
             void SetStamina(float s) {
                 stamina = std::min(stamina, maxStamina);
+                staminaBar->UpdateStamina(stamina);
             }
             void SetStaminaRegain(float r) {
                 sRegen = r;
@@ -72,6 +79,7 @@ namespace NCL {
             float maxStamina;
 
             std::unordered_map<uint32_t, float> staminaActionMap;
+            UI::StaminaBar* staminaBar = new UI::StaminaBar;
         };
     }
 }

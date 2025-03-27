@@ -1,6 +1,10 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
-#include "imgui.h"
+#ifdef USE_PS5
+#include "../ImGui/PS5/imgui.h"
+#else
+#include "../ImGui/WIN/imgui.h"
+#endif // USE_PS5
 #include "../CSC8508CoreClasses/PushdownMachine.h"
 #include "../CSC8508CoreClasses/PushdownState.h"
 #include <iostream>

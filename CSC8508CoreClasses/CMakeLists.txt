@@ -249,6 +249,7 @@ include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
 include_directories("../ImGui/")
+include_directories("../UISystem/")
 include_directories("../SerializedSave/")
 
 if(MSVC)

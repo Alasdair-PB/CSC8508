@@ -43,11 +43,14 @@ namespace NCL {
             void AddDownWardsVelocity();
             void TryPickUp();
             bool DropItem();
-            void PickUpItem(ItemComponent* item);
 
+            bool DropItemToFloor();
+            bool DropItemToDropZone();
+            void PickUpItem(ItemComponent* item);
+            void CheckTagStack();
             void CheckInputStack();
             void UpdateStates(float deltaTime);
-
+            bool CheckTag(Tag tag, CollisionEvent* collisionEvent);
             Vector3 GetForwardsDirection();
 
             float speed = 15.0f;
@@ -65,11 +68,13 @@ namespace NCL {
             bool isGrounded;
             bool isJumping;
             bool isDashing;
+            bool inDropZone;
 
             Vector3 visionHeight = Vector3(0, 0.3f, 0);
             Vector3 maxVelocity = Vector3(15.0f, 15.0f, 15.0f);
             float maxForce = 15.0f;
             std::stack<uint32_t> inputStack; 
+            std::stack<Tag> collidedTags;
 
             Transform& transform; 
             SightComponent* sightComponent = nullptr;

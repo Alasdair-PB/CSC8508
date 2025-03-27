@@ -16,37 +16,38 @@ namespace NCL::CSC8508
 {
 	class FullTransformNetworkState : public INetworkState {
 	public:
-		FullTransformNetworkState(): position(0,0,0) /*, orientation(0.0, 0.0, 0.0, 0.0)*/ {}
+		FullTransformNetworkState(): position(0,0,0), orientation(0.0, 0.0, 0.0, 0.0) {}
 		~FullTransformNetworkState() = default;
 
 		Vector3 position;
 		Quaternion orientation;
+		bool enabled;
 	};
 
-	struct FullPacket : public IFullNetworkPacket {
+	struct FullTransformPacket : public IFullNetworkPacket {
 		FullTransformNetworkState fullState;
 
-		FullPacket() {
+		FullTransformPacket() {
 			type = Full_State;
-			size = sizeof(FullPacket) - sizeof(GamePacket);
+			size = sizeof(FullTransformPacket) - sizeof(GamePacket);
 		}
 	};
 
-	struct DeltaPacket : public IDeltaNetworkPacket {
+	struct DeltaTransformPacket : public IDeltaNetworkPacket {
 		float pos[3];
 		char orientation[4];
 
-		DeltaPacket() {
+		DeltaTransformPacket() {
 			type = Delta_State;
-			size = sizeof(DeltaPacket) - sizeof(GamePacket);
+			size = sizeof(DeltaTransformPacket) - sizeof(GamePacket);
 		}
 	};
 
 	class FullTransformNetworkComponent :public IComponent, public INetworkDeltaComponent
 	{
 	public:
-		FullTransformNetworkComponent(GameObject& gameObject, int objId, int ownId, int componId, bool clientOwned):
-			INetworkDeltaComponent(objId, ownId, componId, clientOwned, new FullTransformNetworkState), 
+		FullTransformNetworkComponent(GameObject& gameObject, int objId, int ownId, int componId, int pfabId, bool clientOwned):
+			INetworkDeltaComponent(objId, ownId, componId, pfabId, clientOwned, new FullTransformNetworkState), 
 			IComponent(gameObject),
 			myObject(gameObject) {}
 		
@@ -67,7 +68,7 @@ namespace NCL::CSC8508
 		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override 
 		{ 
 			vector<GamePacket*> packets;
-			DeltaPacket* dp = new DeltaPacket();
+			DeltaTransformPacket* dp = new DeltaTransformPacket();
 			FullTransformNetworkState* state = static_cast<FullTransformNetworkState*>(lastFullState);
 			if (state == nullptr) return packets;
 
@@ -95,7 +96,7 @@ namespace NCL::CSC8508
 		vector<GamePacket*> WriteFullPacket() override
 		{ 
 			vector<GamePacket*> packets;
-			FullPacket* fp = new FullPacket();
+			FullTransformPacket* fp = new FullTransformPacket();
 			FullTransformNetworkState* state = static_cast<FullTransformNetworkState*>(lastFullState);
 
 			state->position = myObject.GetTransform().GetPosition();
@@ -105,6 +106,7 @@ namespace NCL::CSC8508
 			fp->fullState.position = myObject.GetTransform().GetPosition();
 			fp->fullState.orientation = myObject.GetTransform().GetOrientation();
 			fp->fullState.stateID = state->stateID;
+			fp->fullState.enabled = myObject.IsEnabled();
 
 			if (clientOwned && state->stateID >= MAX_PACKETID)
 				state->stateID = 0;
@@ -119,7 +121,7 @@ namespace NCL::CSC8508
 
 		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override 
 		{
-			DeltaPacket p = ((DeltaPacket&)idp);
+			DeltaTransformPacket p = ((DeltaTransformPacket&)idp);
 			if (p.fullID != lastFullState->stateID) return false;
 
 			FullTransformNetworkState* lastTransformFullState = static_cast<FullTransformNetworkState*>(lastFullState);
@@ -144,9 +146,9 @@ namespace NCL::CSC8508
 	
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override {
 			int newStateId = 0; 			
-			FullPacket p = ((FullPacket&) ifp);		
+			FullTransformPacket p = ((FullTransformPacket&) ifp);
 
-			if (!UpdateFullStateHistory<FullTransformNetworkState, FullPacket>(p, &newStateId))
+			if (!UpdateFullStateHistory<FullTransformNetworkState, FullTransformPacket>(p, &newStateId))
 				return false;
 			
 			((FullTransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
@@ -157,6 +159,8 @@ namespace NCL::CSC8508
 			if (!lastTransformFullState) return false;
 			myObject.GetTransform().SetPosition(lastTransformFullState->position);
 			myObject.GetTransform().SetOrientation(lastTransformFullState->orientation);
+			myObject.SetEnabled(p.fullState.enabled);
+
 			return true;
 		}
 		bool ReadEventPacket(INetworkPacket& p) override { return true;}

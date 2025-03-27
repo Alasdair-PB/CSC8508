@@ -10,6 +10,7 @@
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
 #include "ItemComponent.h"
+#include "Map/RoomManager.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -113,6 +114,8 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
 
+	RoomManager::LoadPrefabs();
+
 	lockedObject = nullptr;
 	InitWorld();
 }
@@ -139,6 +142,7 @@ TutorialGame::~TutorialGame()
 void TutorialGame::UpdateGame(float dt)
 {
 	world->UpdateWorld(dt);
+	Debug::DrawLine(Vector3(100.0f, 0.0f, 100.0f), Vector3(100.0f, 1000.0f, 100.0f)); // TODO: Remove
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
@@ -148,10 +152,30 @@ void TutorialGame::UpdateGame(float dt)
 	world->UpdateWorld(dt);
 	Window::GetWindow()->ShowOSPointer(true);
 	physics->Update(dt);
+
+	//std::cout << "World objects count: " << world->GetGameObjectCount() << '\n';
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {
 	world->Load(assetPath);
+}
+
+void TutorialGame::LoadDungeon(Vector3 const offset) {
+
+	auto t = Transform();
+	t.SetPosition(offset);
+	DoorLocation const loc(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
+	auto x = AddDungeonToWorld(t, loc, 3); // TODO: Add back in
+
+	// for (auto child : x->GetChildren()) {
+	// 	for (auto childling : child->GetChildren()) {
+	// 		auto b = childling->TryGetComponent<BoundsComponent>();
+	// 		auto p = childling->TryGetComponent<PhysicsComponent>();
+	//
+	// 		if (b) b->SetEnabled(false);
+	// 		if (p)p->SetEnabled(false);
+	// 	}
+	// }
 }
 
 void TutorialGame::InitWorld() 
@@ -161,15 +185,12 @@ void TutorialGame::InitWorld()
 
 	//TestSave();
 	//SaveUnityNavMeshPrefab("room_A.pfab", "RoomNavMeshObj.msh", "room.navmesh");
-	LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
-	auto t = Transform();
-	t.SetPosition(Vector3(Vector3(100.0f, 0.0f, 300.0f)));
-	DoorLocation const loc(Vector3(0.0f, 0.0f, 100.0f), Vector3(0.0f, 0.0f, 1.0f));
-	//AddDungeonToWorld(t, loc, 3); // TODO: Add back in
-
-	Loaditem(Vector3(5, 0, 5));
-	std::string assetPath = GetAssetPath("myScene.pfab");
-	LoadWorld(assetPath);
+	//LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
+	//for (int i = 0; i < 5; i++) LoadDungeon(Vector3(i * 20, 0, i*20));
+	LoadDungeon(Vector3());
+	//Loaditem(Vector3(5, 0, 5));
+	//std::string assetPath = GetAssetPath("myScene.pfab");
+	//LoadWorld(assetPath);
 }
 
 void TutorialGame::UpdateUI() {

@@ -223,10 +223,50 @@ void GameObject::GetChildData(GameObjDataStruct& saveInfo, std::string assetPath
 
 void GameObject::LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath){
 	for (int i = 0; i < loadedSaveData.childrenPointers.size(); i++) {
-		GameObject* object = new GameObject();
+		GameObject* object = new GameObject(isStatic);
 		object->Load(assetPath, loadedSaveData.childrenPointers[i]);
 		AddChild(object);
 	}
+}
+
+void GameObject::CopyChildrenData(GameObject* gameObject)
+{
+	for (GameObject* child : children)
+		gameObject->AddChild(child->CopyGameObject());
+}
+
+void GameObject::CopyIcomponentData(GameObject* gameObject)
+{
+	for (IComponent* component : components)
+		component->CopyComponent(gameObject);
+}
+
+void GameObject::CopyInstanceData(GameObject* gameObject) {
+	gameObject->GetTransform().SetPosition(transform.GetLocalPosition());
+	gameObject->GetTransform().SetScale(transform.GetLocalScale());
+	gameObject->GetTransform().SetOrientation(transform.GetLocalOrientation());
+	gameObject->SetEnabled(isEnabled);
+
+	for (Tags::Tag tag:tags)
+		gameObject->SetTag(tag);
+
+	if (renderObject) {
+		RenderObject* copyRend = new RenderObject(&gameObject->GetTransform(),
+			renderObject->GetMesh(),
+			renderObject->GetDefaultTexture(),
+			renderObject->GetShader());
+		copyRend->SetColour(renderObject->GetColour());
+		gameObject->SetRenderObject(copyRend);
+	}
+}
+
+GameObject* GameObject::CopyGameObject() {
+	OrderComponentsByDependencies();
+	GameObject* copy = new GameObject(isStatic);
+	CopyInstanceData(copy);
+	CopyIcomponentData(copy);
+	CopyChildrenData(copy);
+	return copy;
 }
 
 size_t GameObject::Save(std::string assetPath, size_t* allocationStart)

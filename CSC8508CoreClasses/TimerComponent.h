@@ -6,6 +6,8 @@
 #include "IComponent.h"
 #include <chrono>
 #include "EventManager.h"
+#include "TimerUI.h"
+#include "UISystem.h"
 
 namespace NCL::CSC8508
 {
@@ -22,6 +24,8 @@ namespace NCL::CSC8508
 		TimerComponent(GameObject& gameObject, float timeRemaining) : IComponent(gameObject) {
 			isComplete = false;
 			remainingTime = timeRemaining;
+			UI::UISystem::GetInstance()->PushNewStack(timerUI->timerUI, "Timer");
+			timerUI->UpdateTimer(remainingTime);
 		}
 
 		~TimerComponent() {
@@ -32,6 +36,7 @@ namespace NCL::CSC8508
 			if (!isComplete) {
 				remainingTime -= dt;
 				HandleOverTime();
+				timerUI->UpdateTimer(remainingTime);
 			}
 		}
 
@@ -66,7 +71,7 @@ namespace NCL::CSC8508
 		bool isComplete;
 		float remainingTime;
 
-
+		UI::TimerUI* timerUI = new UI::TimerUI;
 
 
 	};

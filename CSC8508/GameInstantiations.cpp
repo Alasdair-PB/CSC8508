@@ -95,7 +95,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
 
 	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Walk.anm"));
-	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
+	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 2);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24,20);
 

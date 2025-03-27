@@ -55,7 +55,7 @@ namespace NCL {
 			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
-
+			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions);
 			MainMenu* GetMainMenu() { return mainMenu; }
 			ComponentAssemblyDefiner* componentAssembly;
 

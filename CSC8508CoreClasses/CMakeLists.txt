@@ -95,7 +95,6 @@ set(Header_Files
     "GameWorld.h"
     "RenderObject.h"
     "MaterialManager.h"
-    "BindingManager.h"
     "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -135,6 +134,8 @@ set(Components
     "AnimationComponent.h"
     "SightComponent.h"
     "SightComponent.cpp"
+    "FallDamageComponent.h"
+    "FallDamageComponent.cpp"
     "TimerComponent.h"
 )
 source_group("Components" FILES ${Components})

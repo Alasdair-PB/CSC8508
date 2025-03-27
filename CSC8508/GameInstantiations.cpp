@@ -10,10 +10,12 @@
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
 #include "TransformNetworkComponent.h"
+#include "FullTransformNetworkComponent.h"
 #include "SightComponent.h"
 #include "InventoryNetworkManagerComponent.h"
 #include "InventoryManagerComponent.h"
-
+#include "FallDamageComponent.h"
+#include "DamageableComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -35,11 +37,40 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 	{	
 		int pFabId = spawnData->pfab;
 		int componentIdCount = 0;
-		TransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<TransformNetworkComponent>(
+		FullTransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<FullTransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 	}
 	world->AddGameObject(myObjectToLoad);
+
 	return myObjectToLoad;
+}
+
+GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensions) {
+
+	//std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* dropZone = new GameObject();
+	//myObjectToLoad->Load(gameObjectPath);
+
+	OBBVolume* volume = new OBBVolume(dimensions);
+	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
+	Shader* basicShader = MaterialManager::GetShader("basic");
+
+	PhysicsComponent* phys = dropZone->AddComponent<PhysicsComponent>();
+	BoundsComponent* bounds = dropZone->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+
+	bounds->AddToIgnoredLayers(Layers::LayerID::Player);
+	bounds->SetBoundingVolume((CollisionVolume*)volume);
+	dropZone->GetTransform().SetPosition(position).SetScale(dimensions * 2.0f);
+
+	dropZone->SetRenderObject(new RenderObject(&dropZone->GetTransform(), cubeMesh, basicTex, basicShader));
+	phys->SetPhysicsObject(new PhysicsObject(&dropZone->GetTransform()));
+	phys->GetPhysicsObject()->SetInverseMass(0);
+	phys->GetPhysicsObject()->InitCubeInertia();
+	dropZone->SetTag(Tags::DropZone);
+	dropZone->GetRenderObject()->SetColour(Vector4(0, 1, 0, 0.3f));
+	world->AddGameObject(dropZone);
+	return dropZone;
 }
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
@@ -56,6 +87,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	float carryOffset = 0.5f;
 	float dropOffset = 3.0f;
 
+	player->SetLayerID(Layers::Player);
 	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
 	player->SetLayerID(Layers::LayerID::Player);
 	player->SetTag(Tags::Player);
@@ -64,6 +96,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Walk.anm"));
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
+	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
+	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24,20);
 
 	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
 	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);

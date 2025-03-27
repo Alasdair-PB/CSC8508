@@ -149,6 +149,7 @@ void TutorialGame::UpdateGame(float dt)
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {
+	LoadDropZone(Vector3(85, 22, -60), Vector3(5,5,5));
 	world->Load(assetPath);
 }
 

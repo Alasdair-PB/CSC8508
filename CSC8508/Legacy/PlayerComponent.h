@@ -38,7 +38,7 @@ namespace NCL {
 
             void SetLinearVelocity(float jumpDuration);
             void OnJump(float deltaTime);
-
+            void AddDownWardsVelocity();
             void TryPickUp();
             bool DropItem();
             void PickUpItem(ItemComponent* item);
@@ -65,6 +65,8 @@ namespace NCL {
             bool isDashing;
 
             Vector3 visionHeight = Vector3(0, 0.3f, 0);
+            Vector3 maxVelocity = Vector3(15.0f, 15.0f, 15.0f);
+            float maxForce = 15.0f;
             std::stack<uint32_t> inputStack; 
 
             Transform& transform; 

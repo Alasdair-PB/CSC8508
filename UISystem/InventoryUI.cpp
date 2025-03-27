@@ -19,5 +19,5 @@ InventoryUI::InventoryUI() {
 }
 
 InventoryUI::~InventoryUI() {
-	delete inventoryUI;
+	/*delete inventoryUI;*/
 }

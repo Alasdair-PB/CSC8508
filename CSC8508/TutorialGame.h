@@ -20,8 +20,9 @@
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
 #include "Healthbar.h"
+#include "StaminaBar.h"
 #include "LobbySearch.h"
-#include "InventoryUI.h"
+//#include "InventoryUI.h"
 
 using std::vector;
 
@@ -88,8 +89,9 @@ namespace NCL {
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
 			UI::Healthbar* healthbar = new UI::Healthbar;
+			UI::StaminaBar* staminaBar = new UI::StaminaBar;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
-			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
+			/*UI::InventoryUI* inventoryUI = new UI::InventoryUI;*/
 
 			float framerateDelay = 0;
 		};

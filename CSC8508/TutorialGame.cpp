@@ -71,7 +71,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+	/*uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");*/
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 
 
@@ -137,8 +137,9 @@ TutorialGame::~TutorialGame()
 	delete mainMenuUI;
 	delete audioSliders;
 	delete healthbar;
+	delete staminaBar;
 	delete lobbySearchField;
-	delete inventoryUI;
+	/*delete inventoryUI;*/
 }
 
 void TutorialGame::UpdateGame(float dt)
@@ -176,14 +177,15 @@ void TutorialGame::UpdateUI() {
 		framerateDelay = 0;
 	}
 
-	if (mainMenuUI->GetMenuOption() != 0) { 
+	if (mainMenuUI->GetMenuOption() != 0) {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
 		uiSystem->RemoveStack("Inventory");
 		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
+		uiSystem->PushNewStack(staminaBar->staminaBar, "Stamina Bar");
 	}
-
+	
 	uiSystem->RenderFrame();
 }
 

@@ -1,7 +1,7 @@
 #ifndef ITEM_COMPONENT_H
 #define ITEM_COMPONENT_H
 
-#include "../CSC8508CoreClasses/IComponent.h"
+#include "IComponent.h"
 #include "DamageableComponent.h"
 #include "../Event/EventManager.h"
 #include "../Event/Event.h"

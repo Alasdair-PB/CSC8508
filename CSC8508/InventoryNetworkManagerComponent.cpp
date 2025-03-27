@@ -111,7 +111,6 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 	if (!lastInvFullState) return false;
 
 	for (int i = 0; i < MAX_INVENTORY_ITEMS; i++) {
-
 		if (lastInvFullState->inventory[i] == 0)
 			continue;
 

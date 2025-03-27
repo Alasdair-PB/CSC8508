@@ -118,8 +118,8 @@ bool PlayerComponent::DropItemToDropZone() {
 
 bool PlayerComponent::DropItem() {
     if (inventoryComponent->ItemInHand()) {
-        if (inDropZone) DropItemToDropZone();
-        else DropItemToFloor();
+        if (inDropZone) return DropItemToDropZone();
+        else return DropItemToFloor();
     }
     return false;
 }

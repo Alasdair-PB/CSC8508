@@ -76,7 +76,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
 
-	//uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
 
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/

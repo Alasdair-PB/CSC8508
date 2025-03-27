@@ -247,11 +247,19 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
 )
 add_subdirectory(enet)
 
+target_include_directories (${PROJECT_NAME} 
+    PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
+	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
+	)
+target_link_libraries(
+	${PROJECT_NAME}
+	PUBLIC UISystem
+	PUBLIC ImGui
+	) 
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
-include_directories("../ImGui/")
-include_directories("../UISystem/")
+#include_directories("../ImGui/")
 include_directories("../SerializedSave/")
 
 if(MSVC)

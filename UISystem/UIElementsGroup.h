@@ -13,7 +13,7 @@ namespace NCL {
 
 			class UIElement {
 			public:
-				std::string elemenetName = "";
+				std::string elementName = "";
 				virtual CSC8508::PushdownState::PushdownResult UpdateElement() {
 					return CSC8508::PushdownState::PushdownResult::NoChange;
 				};

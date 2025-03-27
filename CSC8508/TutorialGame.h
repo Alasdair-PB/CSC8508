@@ -29,6 +29,7 @@
 #include "MainMenuUI.h"
 #include "StaminaBar.h"
 #include "LobbySearch.h"
+//#include "PauseUI.h"
 
 using std::vector;
 
@@ -98,6 +99,7 @@ namespace NCL {
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
+			/*UI::PauseUI* pauseUI = new UI::PauseUI;*/
 
 			float framerateDelay = 0;
 

@@ -22,8 +22,8 @@ namespace NCL {
 			bool IsComplete() {
 				return complete;
 			}
-			void SetComplete() {
-				this->complete = true;
+			void SetComplete(bool complete = true) {
+				this->complete = complete;
 			}
 		protected:
 			std::shared_ptr<Rendering::MeshAnimation> anim;
@@ -59,6 +59,7 @@ namespace NCL {
 			void SetAnimation(AnimState* anim);
 			void TriggerAnimation(const std::string& triggerName);
 			void UpdateAnimation(float dt);
+			bool IsComplete() { return static_cast<AnimState*>(activeState)->IsComplete(); }
 			void resetTime() {
 				currentAnimFrame = 0.0f;
 				animTime = 0;

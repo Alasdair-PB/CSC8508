@@ -133,6 +133,7 @@ void PlayerComponent::OnItemInteract() {
 }
 
 void PlayerComponent::OnPlayerMove() {
+    isMoving = false;
     if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
         return;
     isMoving = true;
@@ -161,9 +162,8 @@ void PlayerComponent::CheckInputStack() {
 }
 
 void PlayerComponent::UpdateStates(float deltaTime) {
-    isMoving = false;
     isDashing = false;
-    isGrounded = false;
+    isGrounded = !isJumping ? true : false;
     timeSinceLastPickUp += deltaTime;
 }
 

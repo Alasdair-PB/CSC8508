@@ -23,6 +23,7 @@ AnimationComponent::~AnimationComponent() {
 
 void AnimationComponent::SetAnimation(AnimState* anim) {
 	if (anim) {
+		anim->SetComplete(false);
 		activeState = anim;
 		skeleton.resize(anim->GetAnimation()->GetJointCount());
 		resetTime();
@@ -40,9 +41,8 @@ void AnimationComponent::UpdateAnimation(float dt) {
 	animTime -= dt;
 
 	if (animTime <= 0) {
-		currentAnimFrame++;
 		animTime += anim->GetFrameTime();
-		if (currentAnimFrame + 1 > anim->GetFrameCount() && !animState->IsLooped())
+		if (currentAnimFrame + 1 == anim->GetFrameCount() && !animState->IsLooped())
 		{
 			animState->SetComplete();
 		}

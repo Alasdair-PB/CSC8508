@@ -80,25 +80,25 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	animator->AddState(jumpland);
 	animator->AddState(stance);
 
-	animator->AddTransition(new IStateTransition(stance, walk, [&]()->bool {
+	animator->AddTransition(new IStateTransition(stance, walk, [pc]()->bool {
 		return pc->IsMoving();
 		}));
-	animator->AddTransition(new IStateTransition(walk, stance, [&]()->bool {
+	animator->AddTransition(new IStateTransition(walk, stance, [pc]()->bool {
 		return !pc->IsMoving();
 		}));
-	animator->AddTransition(new IStateTransition(stance, onjump, [&]()->bool {
+	animator->AddTransition(new IStateTransition(stance, onjump, [pc]()->bool {
 		return pc->IsJumping();
 		}));
-	animator->AddTransition(new IStateTransition(walk, onjump, [&]()->bool {
+	animator->AddTransition(new IStateTransition(walk, onjump, [pc]()->bool {
 		return pc->IsJumping();
 		}));
-	animator->AddTransition(new IStateTransition(onjump, jumping, [&]()->bool {
+	animator->AddTransition(new IStateTransition(onjump, jumping, [onjump]()->bool {
 		return onjump->IsComplete();
 		}));
-	animator->AddTransition(new IStateTransition(jumping, jumpland, [&]()->bool {
+	animator->AddTransition(new IStateTransition(jumping, jumpland, [pc]()->bool {
 		return pc->IsGrounded();
 		}));
-	animator->AddTransition(new IStateTransition(jumpland , stance, [&]()->bool {
+	animator->AddTransition(new IStateTransition(jumpland , stance, [jumpland]()->bool {
 		return jumpland->IsComplete();
 		}));
 

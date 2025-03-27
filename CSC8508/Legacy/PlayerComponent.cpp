@@ -49,6 +49,12 @@ void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
     }
 }
 
+void PlayerComponent::OnEvent(DeathEvent* deathEvent) {
+    if (&deathEvent->GetGameObject() == &GetGameObject()) {
+        std::cout << "dead" << "\n";
+    }
+}
+
 /**
  * Function invoked each frame after Update.
  * @param deltaTime Time since last frame
@@ -63,6 +69,7 @@ void PlayerComponent::OnAwake()
 
     EventManager::RegisterListener<InputButtonEvent>(this);
     EventManager::RegisterListener<CollisionEvent>(this);
+    EventManager::RegisterListener<DeathEvent>(this);
 
     if (physicsComponent)
         physicsObj = physicsComponent->GetPhysicsObject();
@@ -93,8 +100,7 @@ void PlayerComponent::OnJump(float deltaTime) {
     if (jumpDuration < 0.2f)
         SetLinearVelocity(jumpDuration);
     else {
-        if (physicsObj->GetLinearVelocity().y <= 0.0f)
-            physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
+        
         if (isGrounded) { isJumping = false; }
     }
 }
@@ -166,6 +172,24 @@ void PlayerComponent::UpdateStates(float deltaTime) {
     timeSinceLastPickUp += deltaTime;
 }
 
+void PlayerComponent::AddDownWardsVelocity() {
+    if (isGrounded) return;
+    if (physicsObj->GetLinearVelocity().y <= 0.0f)
+        physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
+
+    Vector3 force = physicsObj->GetForce();
+    Vector3 velocity = physicsObj->GetLinearVelocity();
+
+    if (Vector::Length(velocity) > Vector::Length(maxVelocity)) {
+        physicsObj->ClearForces();
+        physicsObj->SetLinearVelocity(Vector3(
+            std::min(maxVelocity.x, velocity.x),
+            std::min(maxVelocity.y, velocity.y),
+            std::min(maxVelocity.z, velocity.z)));
+    }
+
+}
+
 void PlayerComponent::Update(float deltaTime)
 {
     if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
@@ -173,5 +197,6 @@ void PlayerComponent::Update(float deltaTime)
     OnPlayerMove();
     CheckInputStack();
     OnJump(deltaTime);
+    AddDownWardsVelocity();
     UpdateStates(deltaTime);
 }

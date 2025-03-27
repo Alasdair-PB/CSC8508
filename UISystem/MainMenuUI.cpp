@@ -35,7 +35,6 @@ MainMenuUI::MainMenuUI() {
 	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Offline", funcA);
 	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Server", funcB);
 	menuUI->PushButtonElement(ImVec2(0.4f, 0.05f), "Start Client", funcC);
-	
 }
 
 MainMenuUI::~MainMenuUI() {

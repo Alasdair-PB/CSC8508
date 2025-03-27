@@ -71,7 +71,9 @@ namespace NCL {
             std::function<CSC8508::PushdownState::PushdownResult()> InventoryMenu() {
                 std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
                     int index = 0;
+                    ImGui::Text(("Wallet: " + std::to_string(wallet)).c_str());
                     for (auto const& item : storedItems) {
+                        ImGui::SetCursorPosY(0.04 * Window::GetWindow()->GetScreenSize().y);
                         std::string name = item->GetName();
                         std::string sellVal = std::to_string(item->GetSaleValue());
                         if (index == scrollIndex) {

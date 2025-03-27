@@ -29,6 +29,7 @@ namespace NCL::CSC8508
 		}
 
 		~TimerComponent() {
+			UI::UISystem::GetInstance()->RemoveStack("Timer");
 		}
 
 

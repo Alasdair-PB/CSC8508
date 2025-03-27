@@ -19,10 +19,8 @@
 #include "AudioSliders.h"
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
-//#include "Healthbar.h"
-#include "StaminaBar.h"
 #include "LobbySearch.h"
-//#include "InventoryUI.h"
+//#include "PauseUI.h"
 
 using std::vector;
 
@@ -90,6 +88,7 @@ namespace NCL {
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
+			/*UI::PauseUI* pauseUI = new UI::PauseUI;*/
 
 			float framerateDelay = 0;
 		};

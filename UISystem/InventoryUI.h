@@ -19,7 +19,7 @@ namespace NCL {
 
 			void PushInventoryElement(std::function<CSC8508::PushdownState::PushdownResult()> func);
 
-			UIElementsGroup* inventoryUI = new UIElementsGroup(ImVec2(0.05f, 0.5f), ImVec2(0.1f, 0.3f), 1.0f, "Inventory", 0.0f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+			UIElementsGroup* inventoryUI = new UIElementsGroup(ImVec2(0.05f, 0.5f), ImVec2(0.1f, 0.3f), 1.0f, "Inventory", 0.1f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 
 		protected:
 			/*std::vector<ItemComponent*> inventory;*/

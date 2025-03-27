@@ -1,5 +1,4 @@
 #pragma once
-#include "imgui.h"
 #include "UIElementsGroup.h"
 
 namespace NCL {
@@ -10,12 +9,12 @@ namespace NCL {
 			TimerUI();
 			~TimerUI();
 
-			void UpdateTimer(float delta) { dt = delta; }
+			void UpdateTimer(float t) { time = t; }
 
 			UIElementsGroup* timerUI = new UIElementsGroup(ImVec2(0.95f, 0.05f), ImVec2(0.08f, 0.08f), 1.0f, "Timer", 0.0f, ImGuiWindowFlags_NoResize);
 
 		protected:
-			float dt = 60;
+			float time = 0;
 		};
 	}
 }

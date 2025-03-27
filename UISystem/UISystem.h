@@ -1,6 +1,5 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
-#include "imgui.h"
 #include "UIElementsGroup.h"
 #include <list>
 

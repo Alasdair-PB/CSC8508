@@ -1,7 +1,6 @@
 #ifndef INVENTORYUI_H
 #define INVENTORYUI_H
 
-#include "imgui.h"
 #include "UIElementsGroup.h"
 #include <vector>
 
@@ -14,10 +13,17 @@ namespace NCL {
 			InventoryUI();
 			~InventoryUI();
 
-			UIElementsGroup* inventoryUI = new UIElementsGroup(ImVec2(0.3f, 0.1f), ImVec2(0.2f, 0.2f), 1.0f, "Inventory", 0.0f, ImGuiWindowFlags_NoResize);
+			/*void SetFunc(std::function<CSC8508::PushdownState::PushdownResult()> f) {
+				func = f;
+			}*/
+
+			void PushInventoryElement(std::function<CSC8508::PushdownState::PushdownResult()> func);
+
+			UIElementsGroup* inventoryUI = new UIElementsGroup(ImVec2(0.05f, 0.5f), ImVec2(0.1f, 0.3f), 1.0f, "Inventory", 0.0f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 
 		protected:
 			/*std::vector<ItemComponent*> inventory;*/
+			/*std::function<CSC8508::PushdownState::PushdownResult()> func;*/
 		};
 	}
 }

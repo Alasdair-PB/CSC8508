@@ -82,7 +82,6 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	/*uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");*/
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 
 
@@ -174,9 +173,6 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->RemoveStack("Inventory");
-		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
-		uiSystem->PushNewStack(staminaBar->staminaBar, "Stamina Bar");
 	}
 	
 	uiSystem->RenderFrame();

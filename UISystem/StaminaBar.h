@@ -1,5 +1,4 @@
 #pragma once
-#include "imgui.h"
 #include "UIElementsGroup.h"
 
 namespace NCL {
@@ -15,7 +14,7 @@ namespace NCL {
 				stamina = h;
 			}
 
-			UIElementsGroup* staminaBar = new UIElementsGroup(ImVec2(0.1f, 0.9f), ImVec2(0.4, 0.4), 1.0f, "Stamina Bar", 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+			UIElementsGroup* staminaBar = new UIElementsGroup(ImVec2(0.05f, 0.9f), ImVec2(0.4, 0.4), 1.0f, "Stamina Bar", 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 
 		protected:
 			int stamina = 100;

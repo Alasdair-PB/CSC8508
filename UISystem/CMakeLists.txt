@@ -11,7 +11,6 @@ if(PS5)
 	set(PROJECT_DEPENDENCIES
 		${CMAKE_SOURCE_DIR}/ImGui/PS5
 		${CMAKE_SOURCE_DIR}/NCLCoreClasses/
-		${CMAKE_SOURCE_DIR}/CSC8508CoreClasses/
 	)
 	target_link_libraries(
 	${PROJECT_NAME}
@@ -22,7 +21,6 @@ else()
 	set(PROJECT_DEPENDENCIES
 		${CMAKE_SOURCE_DIR}/ImGui/WIN
 		${CMAKE_SOURCE_DIR}/NCLCoreClasses/
-		${CMAKE_SOURCE_DIR}/CSC8508CoreClasses/
 	)
 	target_link_libraries(
 	${PROJECT_NAME}

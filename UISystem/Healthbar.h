@@ -1,5 +1,4 @@
-#pragma once
-#include "imgui.h"
+#pragma 
 #include "UIElementsGroup.h"
 
 namespace NCL {
@@ -11,15 +10,14 @@ namespace NCL {
 			Healthbar();
 			~Healthbar();
 
-			void SetFunc(std::function<CSC8508::PushdownState::PushdownResult()> f) {
-				func = f;
+			void UpdateHealth(int h) {
+				health = h;
 			}
 
-			UIElementsGroup* healthbar = new UIElementsGroup(ImVec2(0.1f, 0.85f), ImVec2(0.4, 0.4), 1.0f, "Healthbar", 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+			UIElementsGroup* healthbar = new UIElementsGroup(ImVec2(0.05f, 0.85f), ImVec2(0.4, 0.4), 1.0f, "Healthbar", 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 
 		protected:
 			int health = 100;
-			std::function<CSC8508::PushdownState::PushdownResult()> func;
 		};
 	}
 }

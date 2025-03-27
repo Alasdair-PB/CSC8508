@@ -8,7 +8,7 @@ using namespace UI;
 
 TimerUI::TimerUI() {
 	std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
-		ImGui::Text(std::to_string(1.0f / dt).c_str());
+		ImGui::Text(std::to_string(time).c_str());
 		return CSC8508::PushdownState::PushdownResult::NoChange;
 		};
 

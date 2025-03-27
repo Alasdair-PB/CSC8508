@@ -49,6 +49,12 @@ void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
     }
 }
 
+void PlayerComponent::OnEvent(DeathEvent* deathEvent) {
+    if (&deathEvent->GetGameObject() == &GetGameObject()) {
+        std::cout << "dead" << "\n";
+    }
+}
+
 /**
  * Function invoked each frame after Update.
  * @param deltaTime Time since last frame
@@ -63,6 +69,7 @@ void PlayerComponent::OnAwake()
 
     EventManager::RegisterListener<InputButtonEvent>(this);
     EventManager::RegisterListener<CollisionEvent>(this);
+    EventManager::RegisterListener<DeathEvent>(this);
 
     if (physicsComponent)
         physicsObj = physicsComponent->GetPhysicsObject();

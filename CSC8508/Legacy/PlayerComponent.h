@@ -5,6 +5,7 @@
 #include "StaminaComponent.h"
 #include "CollisionEvent.h"
 #include "SightComponent.h"
+#include "../DamageableComponent.h"
 #include "EventListener.h"
 #include "EventManager.h"
 #include "CollisionDetection.h"
@@ -13,7 +14,7 @@
 namespace NCL {
     namespace CSC8508 {
         using namespace NCL::CSC8508::Tags;
-        class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent> {
+        class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent>, public EventListener<DeathEvent> {
         public:
 
             PlayerComponent(GameObject& gameObject);
@@ -26,6 +27,7 @@ namespace NCL {
 
             void OnEvent(InputButtonEvent* buttonEvent) override;
             void OnEvent(CollisionEvent* collisionEvent) override;
+            void OnEvent(DeathEvent* deathEvent) override;
 
             void OnAwake() override;
             void Update(float deltaTime) override;

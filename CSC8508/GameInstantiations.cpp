@@ -13,7 +13,8 @@
 #include "SightComponent.h"
 #include "InventoryNetworkManagerComponent.h"
 #include "InventoryManagerComponent.h"
-
+#include "FallDamageComponent.h"
+#include "DamageableComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -62,6 +63,8 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	AnimationComponent* animatior = player->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Walk.anm"));
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
+	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
+	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24,20);
 
 	pc->SetBindingDash(KeyCodes::SHIFT, stamina);
 	pc->SetBindingJump(KeyCodes::SPACE, stamina);

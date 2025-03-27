@@ -10,11 +10,12 @@ namespace NCL {
         class FallDamageComponent : public IComponent {
         public:
             FallDamageComponent(GameObject& gameObject, float Y, int D):IComponent(gameObject) {
-                fallDamageVelocity = Y;
+                fallDamageVelocity = Y; //Set player fallDamageVelocity to 24.0f
                 takingFallDamage = false;
                 fallDamage = D;
+                fallingTime = 0.0f;
             }
-            ~FallDamageComponent();
+            ~FallDamageComponent() = default;
 
             void OnAwake() override {
                 damageComponent = GetGameObject().TryGetComponent<DamageableComponent>();
@@ -23,22 +24,29 @@ namespace NCL {
 
             void Update(float dt) override {
                 float yVelocity = physObj->GetLinearVelocity().y;
-                if (abs(yVelocity) < FLT_EPSILON && takingFallDamage == true) {
-                    //flag take damage
+                if (abs(yVelocity) < 0.1f) {
+                    if (takingFallDamage && fallingTime > 0.2f) {
+                        damageComponent->Damage(fallDamage);
+                        
+                    }
+                    takingFallDamage = false;
+                    fallingTime = 0.0f;
                 }
-                if (yVelocity >= fallDamageVelocity) {
+                if (yVelocity <= -(fallDamageVelocity)) {
                     takingFallDamage = true;
+                    fallingTime += dt;
                 }
             }
         protected:
             float fallDamageVelocity;
             bool takingFallDamage;
             int fallDamage;
+            float fallingTime;
 
-            DamageableComponent* damageComponent;
-            PhysicsObject* physObj;
+            DamageableComponent* damageComponent = nullptr;
+            PhysicsObject* physObj = nullptr;
         };
     }
 } //Damage y speed is -24.0f 
 
-// keep track of float of t wth dt then when v > fdv set track t = 0 then in update if v - cv > fdv + t < allowed time, then take damage
+// keep track of float of t wth dt then when v > fdv set track t = 0 then in update if v - cv > fdv and t < allowed time, then take damage

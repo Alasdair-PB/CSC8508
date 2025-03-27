@@ -105,6 +105,16 @@ namespace NCL {
                 return itemTotal;
             }
 
+           float ResetWallet() {
+			   float walletValue = wallet;
+			   wallet = 0;
+			   return walletValue;
+		   }
+
+           float GetWallet() {
+			   return wallet;
+           }
+
             /// <summary>
             /// IComponent Save data struct definition
             /// </summary>
@@ -126,6 +136,11 @@ namespace NCL {
                 storedItems.erase(storedItems.begin() + inventoryIndex);
             }
 
+            void DepositWalletToQuota() {
+				deposited += wallet;
+				wallet = 0;
+            }
+
         protected:
             int maxItemStorage;
             int scrollIndex = 0;
@@ -133,6 +148,7 @@ namespace NCL {
             float itemDropOffset;
             float carryYOffset = 3;
             float wallet; 
+            float deposited;
             Transform& transform;
 
             UI::InventoryUI* inventoryUI = new UI::InventoryUI;

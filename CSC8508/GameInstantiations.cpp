@@ -17,6 +17,7 @@
 #include "InventoryManagerComponent.h"
 #include "FallDamageComponent.h"
 #include "DamageableComponent.h"
+#include "GameManagerComponent.h"
 #include "DamageableNetworkComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
@@ -47,7 +48,25 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 	return myObjectToLoad;
 }
 
-GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensions) {
+
+
+GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
+	GameObject* myObjectToLoad = new GameObject();
+#
+	myObjectToLoad->AddComponent<GameManagerComponent>();/*
+	if (spawnData)
+	{
+		int pFabId = spawnData->pfab;
+		int componentIdCount = 0;
+		FullTransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<FullTransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+	}*/
+	world->AddGameObject(myObjectToLoad);
+
+	return myObjectToLoad;
+}
+
+GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag) {
 
 	//std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	GameObject* dropZone = new GameObject();
@@ -69,8 +88,16 @@ GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensio
 	phys->SetPhysicsObject(new PhysicsObject(&dropZone->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(0);
 	phys->GetPhysicsObject()->InitCubeInertia();
-	dropZone->SetTag(Tags::DropZone);
-	dropZone->GetRenderObject()->SetColour(Vector4(0, 1, 0, 0.3f));
+	dropZone->SetTag(tag);
+	if (tag == Tags::DropZone)
+		dropZone->GetRenderObject()->SetColour(Vector4(0, 1, 0, 0.3f));
+	else if (tag == Tags::Exit)
+		dropZone->GetRenderObject()->SetColour(Vector4(1, 0, 0, 0.3f));
+	else if (tag == Tags::DepositZone)
+		dropZone->GetRenderObject()->SetColour(Vector4(0, .2, 1, 0.3f));
+	else
+		dropZone->GetRenderObject()->SetColour(Vector4(1, 0, 1, 0.3f));
+
 	world->AddGameObject(dropZone);
 	return dropZone;
 }

@@ -26,6 +26,7 @@ AudioEngine::AudioEngine() : audioSystem(nullptr) {
 
 	// Set FMOD to use a right-handed coordinate system
 	audioSystem->init(512, FMOD_INIT_3D_RIGHTHANDED, nullptr);
+	isSystemValid = true;
 
 	// Create channel groups
 	masterGroup = CreateChannelGroups(ChannelGroupType::MASTER, "Master");
@@ -46,6 +47,7 @@ AudioEngine::AudioEngine() : audioSystem(nullptr) {
 
 
 AudioEngine::~AudioEngine() {
+	isSystemValid = false;
 	Shutdown();
 	
 	#ifdef USE_PS5
@@ -55,7 +57,7 @@ AudioEngine::~AudioEngine() {
 	unloaded = sceKernelStopUnloadModule(libfmodLHandle, 0, NULL, 0, NULL, NULL);
 
 	#endif // USE_PS5
-
+	audioSystem = nullptr;
 }
 
 AudioEngine& AudioEngine::Instance() {
@@ -125,6 +127,12 @@ void AudioEngine::PrintOutputList() {
 }
 
 bool AudioEngine::IsRecording() {
+	//check if fmod system is valid
+	if (!audioSystem) {
+		return false;
+	}
+
+
 	bool isRecording;
 	FMOD_RESULT result = audioSystem->isRecording(inputDeviceIndex, &isRecording);
 	if (result != FMOD_OK) {

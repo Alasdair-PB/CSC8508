@@ -137,6 +137,7 @@ set(Components
     "SightComponent.cpp"
     "FallDamageComponent.h"
     "FallDamageComponent.cpp"
+    "TimerComponent.h"
 )
 source_group("Components" FILES ${Components})
 
@@ -144,6 +145,7 @@ set(NetworkComponents
     "InputNetworkComponent.h"
     "TransformNetworkComponent.h"
     "FullTransformNetworkComponent.h"
+    "TimerNetworkComponent.h"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 

@@ -4,24 +4,25 @@
 using namespace NCL;
 using namespace CSC8508;
 
-
 void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i) {
 	ItemComponent* itemDelta = nullptr;
 	ComponentManager::OperateOnBufferContents<TransformNetworkComponent>(
 		[&lastInvFullState, &itemDelta, &i](TransformNetworkComponent* o) {
 			if (o->GetObjectID() == lastInvFullState->inventory[i]) {
-				std::cout << "matching componentId" << std::endl;
 				ItemComponent* itemComponent = o->GetGameObject().TryGetComponent<ItemComponent>();
-				if (itemComponent) {
+				if (itemComponent)
 					itemDelta = itemComponent;
-				}
 			}
 		}
 	);
-
-	// Maybe for every inventory component drop the item if carried?
-	if (itemDelta != nullptr)
-		storedItems[i] = itemDelta;
+	if (itemDelta != nullptr) {
+		ComponentManager::OperateOnBufferContents<InventoryManagerComponent>(
+			[&itemDelta](InventoryManagerComponent* o) { o->RemoveItemEntry(itemDelta);});
+		if (i < storedItems.size())
+			storedItems[i] = itemDelta;
+		else
+			PushItemToInventory(itemDelta);
+	}
 }
 
 bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
@@ -31,8 +32,9 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 	if (!UpdateFullStateHistory<InventoryNetworkState, InvFullPacket>(p, &newStateId))
 		return false;
 
-	for (int i = 0; i < MAX_INVENTORY_ITEMS; i++)
+	for (int i = 0; i < MAX_INVENTORY_ITEMS; i++) 
 		((InventoryNetworkState*)lastFullState)->inventory[i] = p.fullState.inventory[i];
+	
 	((InventoryNetworkState*)lastFullState)->stateID = newStateId;
 	InventoryNetworkState* lastInvFullState = static_cast<InventoryNetworkState*>(lastFullState);
 
@@ -56,8 +58,6 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 	return true;
 }
 
-
-
 vector<GamePacket*> InventoryNetworkManagerComponent::WritePacket() {
 	vector<GamePacket*> packets;
 	InvFullPacket* fp = new InvFullPacket();
@@ -65,11 +65,15 @@ vector<GamePacket*> InventoryNetworkManagerComponent::WritePacket() {
 
 	for (int i = 0; i < MAX_INVENTORY_ITEMS; i++) {
 		state->inventory[i] = 0;
-		if (i < storedItems.size()) {
+		fp->fullState.inventory[i] = 0;
+		if (i < storedItems.size() && storedItems.size() > 0) {
 			if (storedItems[i] != nullptr) {
 				TransformNetworkComponent* networkComponent = storedItems[i]->GetGameObject().TryGetComponent<TransformNetworkComponent>();
-				if (networkComponent != nullptr)
-					state->inventory[i] = networkComponent->GetObjectID();
+				if (networkComponent != nullptr) {
+					int id = networkComponent->GetObjectID();
+					state->inventory[i] = id;
+					fp->fullState.inventory[i] = id;
+				}
 			}
 		}
 	}

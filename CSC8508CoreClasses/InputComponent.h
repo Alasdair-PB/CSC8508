@@ -59,8 +59,10 @@ namespace NCL::CSC8508
 
 		void CheckButtonBindings() {
 			for (auto binding : boundButtons) {
-				if (activeController->GetBoundButton(binding))
-					CallInputEvent(binding);
+				if (activeController->GetBoundButton(binding)) {
+					uint32_t hashBinding = activeController->GetButtonHashId(binding);
+					CallInputEvent(hashBinding);
+				}
 			}
 		}
 

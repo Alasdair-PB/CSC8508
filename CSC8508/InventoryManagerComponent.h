@@ -73,9 +73,21 @@ namespace NCL {
 
             void Load(std::string assetPath, size_t allocationStart) override;
             size_t Save(std::string assetPath, size_t* allocationStart) override;
-                
-        protected:
+            
+            void RemoveItemEntry(ItemComponent* item) {
+                for (int i = 0; i < storedItems.size(); i++) {
+                    if (storedItems[i] == item) {
+                        RemoveItemEntry(i);
+                        return;
+                    }
+                }
+            }
 
+            void RemoveItemEntry(int inventoryIndex) {
+                storedItems.erase(storedItems.begin() + inventoryIndex);
+            }
+
+        protected:
             int maxItemStorage;
             int scrollIndex = 0;
             float itemCarryOffset;
@@ -101,8 +113,7 @@ namespace NCL {
                 item->SetEnabledComponentStates(true);
                 item->GetGameObject().SetEnabled(true);
                 ReturnItemToWorld(inventoryIndex);
-
-                storedItems.erase(storedItems.begin() + inventoryIndex);
+                RemoveItemEntry(inventoryIndex);
                 return item;
             }
         };

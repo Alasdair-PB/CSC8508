@@ -252,6 +252,10 @@ public:
 		return maxDistance;
 	}
 
+	bool GetIsSystemValid() {
+		return isSystemValid;
+	}
+
 
 private:
     AudioEngine();
@@ -294,6 +298,8 @@ private:
 
 	float minDistance = 0.5f;
 	float maxDistance = 500.0f;
+
+	bool isSystemValid;
 };
 
 #endif

@@ -392,7 +392,7 @@ namespace NCL::CSC8508 {
 			encodeThread = std::thread([this]() {
 				// Set the update interval to 20ms
 				auto nextUpdateTime = std::chrono::steady_clock::now();
-				while (encodeThreadRunning) {
+				while (encodeThreadRunning && audioEngine->GetIsSystemValid()) {
 					// Schedule the next update
 					nextUpdateTime += std::chrono::milliseconds(20);
 

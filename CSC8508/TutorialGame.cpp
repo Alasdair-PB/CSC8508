@@ -73,18 +73,16 @@ void TutorialGame::InitialiseGame() {
 
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
-
-	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
-	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
-
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 	audioEngine = &AudioEngine::Instance();
 
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
-	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
+
+	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -119,8 +117,8 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
+	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
-
 	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));

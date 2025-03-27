@@ -98,7 +98,8 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 	Texture* basicTex = MaterialManager::GetTexture(loadedSaveData.texturePointer);
 	Shader* basicShader = MaterialManager::GetShader(loadedSaveData.shaderPointer);
 
-	if (mesh != nullptr && basicTex != nullptr && basicShader != nullptr) {
+
+	if (mesh != nullptr && basicTex != nullptr) {
 		renderObject = new RenderObject(&GetTransform(), mesh, basicTex, basicShader);
 		renderObject->SetColour(loadedSaveData.colour);
 	}

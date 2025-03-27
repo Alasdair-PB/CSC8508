@@ -15,7 +15,7 @@ namespace NCL::CSC8508
 {		
 	class InputButtonEvent : Event {
 		public:
-			InputButtonEvent(uint32_t eventData, GameObject& owner) : owner(owner) {
+			InputButtonEvent(uint32_t buttonId, GameObject& owner) : owner(owner) {
 				this->buttonId = buttonId;
 			}
 			uint32_t buttonId;
@@ -37,10 +37,7 @@ namespace NCL::CSC8508
 
 		virtual void EarlyUpdate(float deltaTime) override
 		{
-			for (auto binding : boundButtons) {
-				if (activeController->GetButton(binding));
-					CallInputEvent(binding);
-			}
+			CheckButtonBindings();
 			UpdateMouseGameWorldPitchYaw();
 		}
 
@@ -58,6 +55,15 @@ namespace NCL::CSC8508
 		void CallInputEvent(uint32_t button) {
 			InputButtonEvent inputEvent = InputButtonEvent(button, GetGameObject());
 			EventManager::Call<InputButtonEvent>(&inputEvent);
+		}
+
+		void CheckButtonBindings() {
+			for (auto binding : boundButtons) {
+				if (activeController->GetBoundButton(binding)) {
+					uint32_t hashBinding = activeController->GetButtonHashId(binding);
+					CallInputEvent(hashBinding);
+				}
+			}
 		}
 
 		void UpdateMouseGameWorldPitchYaw() {

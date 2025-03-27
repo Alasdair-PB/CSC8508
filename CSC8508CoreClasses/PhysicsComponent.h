@@ -22,6 +22,9 @@ namespace NCL::CSC8508
 		PhysicsComponent(GameObject& gameObject);
 		~PhysicsComponent();
 
+		static const char* Name() { return "Physics"; }
+		const char* GetName() const override { return Name(); }
+
 		enum InitType { None, Sphere, Cube };
 
 		PhysicsObject* GetPhysicsObject() const {
@@ -47,7 +50,7 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
 		virtual void Load(std::string assetPath, size_t allocationStart) override;
-#
+
 		/// <summary>
 		/// Saves the PhysicsComponent data into the assetPath file. 
 		/// </summary>
@@ -55,6 +58,7 @@ namespace NCL::CSC8508
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
 
+		auto GetDerivedSerializedFields() const;
 
 	protected:
 		PhysicsObject* physicsObject;

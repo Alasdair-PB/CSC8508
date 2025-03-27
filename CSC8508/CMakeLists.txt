@@ -1,9 +1,10 @@
 set(PROJECT_NAME CSC8508)
-
+set(EXE_NAME "CSC8505_Game")
 file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB Legacy_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Legacy/*")
 file(GLOB PS5_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/PS5/*")
+file(GLOB_RECURSE EOS_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*EOS*")
 
 list(REMOVE_ITEM Source_Files ${Legacy_Files})
 list(REMOVE_ITEM Header_Files ${Legacy_Files})
@@ -31,6 +32,14 @@ if(PS5)
 	)
 	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.cpp)
+	list(REMOVE_ITEM Source_Files ${EOS_FILES})
+	list(REMOVE_ITEM Header_Files ${EOS_FILES})
+
+	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.h)
+	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.cpp)
+	file(GLOB_RECURSE files_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/EditorCore/*")
+	list(REMOVE_ITEM Header_Files ${files_to_remove})
+	list(REMOVE_ITEM Source_Files ${files_to_remove})
 	
 	source_group("Shader Files" FILES ${ALL_SHADERS})
 	
@@ -52,6 +61,20 @@ if(PS5)
 else()
 	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechAGCRenderer.h)
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechAGCRenderer.cpp)
+
+	if (Editor)
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/TutorialGame.h)
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/NetworkedGame.h)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/NetworkedGame.cpp)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/TutorialGame.cpp)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameInstantiations.cpp)
+	else()
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.h)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.cpp)
+		file(GLOB_RECURSE files_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/EditorCore/*")
+		list(REMOVE_ITEM Header_Files ${files_to_remove})
+		list(REMOVE_ITEM Source_Files ${files_to_remove})
+	endif()
 	
 	set(ALL_FILES
     ${Header_Files}
@@ -188,6 +211,9 @@ else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES
 		INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
 	)
+	set_target_properties(${PROJECT_NAME} PROPERTIES 
+		OUTPUT_NAME ${EXE_NAME})
+
 endif()
 ################################################################################
 # Compile definitions
@@ -393,11 +419,13 @@ else()
 endif()
 
 # Handle `fmod.dll` copying here instead of `AudioEngine`
+if(NOT PS5)
 add_custom_command(TARGET CSC8508 POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${FMOD_DIR}/lib/x64/fmod.dll"
     "$<TARGET_FILE_DIR:CSC8508>"
 )
+endif()
 
 if(USE_VULKAN)
     include_directories("../VulkanRendering/")

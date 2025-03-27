@@ -95,6 +95,7 @@ set(Header_Files
     "GameWorld.h"
     "RenderObject.h"
     "MaterialManager.h"
+    "BindingManager.h"
     "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -128,15 +129,19 @@ set(Components
     "BoundsComponent.cpp"
     "StateComponent.cpp"
     "StateComponent.h"
-	"AnimationComponent.cpp"
+    "StaminaComponent.h"
+    "StaminaComponent.cpp"
+    "AnimationComponent.cpp"
     "AnimationComponent.h"
-	
+    "SightComponent.h"
+    "SightComponent.cpp"
 )
 source_group("Components" FILES ${Components})
 
 set(NetworkComponents
     "InputNetworkComponent.h"
     "TransformNetworkComponent.h"
+    "FullTransformNetworkComponent.h"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 

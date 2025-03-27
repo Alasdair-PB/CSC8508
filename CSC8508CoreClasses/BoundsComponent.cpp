@@ -66,7 +66,6 @@ struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 	}
 };
 
-
 Vector3 BoundsComponent::GetBoundsScale() {
 	switch (boundingVolume->type) {
 	case VolumeType::AABB: {
@@ -112,7 +111,7 @@ void BoundsComponent::LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 
 	}
 	case VolumeType::Sphere: {
 		boundingVolume = new SphereVolume(boundsSize.x);
-			break;
+		break;
 	}
 	case VolumeType::Capsule: {
 		boundingVolume = new CapsuleVolume(boundsSize.y, boundsSize.x);
@@ -134,6 +133,11 @@ void BoundsComponent::LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 
 	boundingVolume->isTrigger = isTrigger;
 }
 
+auto BoundsComponent::GetDerivedSerializedFields() const {
+	return BoundsComponentDataStruct::GetSerializedFields();
+}
+
+
 size_t BoundsComponent::Save(std::string assetPath, size_t* allocationStart)
 {
 	BoundsComponentDataStruct saveInfo;
@@ -148,7 +152,6 @@ void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 	LoadVolume(loadedSaveData.isTrigger, loadedSaveData.volumeType, loadedSaveData.boundsSize);
 	SetEnabled(loadedSaveData.enabled);
 
-	if (loadedSaveData.hasPhysics) {
+	if (loadedSaveData.hasPhysics)
 		physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
-	}
 }

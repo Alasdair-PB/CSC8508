@@ -1,21 +1,20 @@
 #include "FramerateUI.h"
 #include <filesystem>        
+#include <string>
+#include <functional>
 
 using namespace NCL;
 using namespace UI;
 
 FramerateUI::FramerateUI()  {
-
+	std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
+		ImGui::Text(std::to_string(1.0f / dt).c_str());
+		return CSC8508::PushdownState::PushdownResult::NoChange;
+	};
+	 
+	frameUI->PushVoidElement(func);
 }
 
 FramerateUI::~FramerateUI() {
-}
-
-void FramerateUI::Draw(float dt) {
-	ImGui::SetNextWindowPos(ImVec2(50, 50));
-	ImGui::SetNextWindowSize(ImVec2(120, 50));
-	bool open = true;
-	ImGui::Begin("Framerate", &open, ImGuiWindowFlags_NoResize);
-	ImGui::Text(std::to_string(1.0f / dt).c_str());
-	ImGui::End();
+	delete frameUI;
 }

@@ -16,11 +16,10 @@ namespace NCL::CSC8508
 {
 	class TransformNetworkState : public INetworkState {
 	public:
-		TransformNetworkState(): position(0,0,0), orientation(0.0,0.0,0.0,0.0) {}
+		TransformNetworkState(): position(0,0,0) {}
 		~TransformNetworkState() = default;
 
 		Vector3 position;
-		Quaternion orientation;
 	};
 
 	struct FullPacket : public IFullNetworkPacket {
@@ -34,8 +33,6 @@ namespace NCL::CSC8508
 
 	struct DeltaPacket : public IDeltaNetworkPacket {
 		float pos[3];
-		char orientation[4];
-
 		DeltaPacket() {
 			type = Delta_State;
 			size = sizeof(DeltaPacket) - sizeof(GamePacket);
@@ -45,8 +42,8 @@ namespace NCL::CSC8508
 	class TransformNetworkComponent :public IComponent, public INetworkDeltaComponent
 	{
 	public:
-		TransformNetworkComponent(GameObject& gameObject, int objId, int ownId, int componId, bool clientOwned): 
-			INetworkDeltaComponent(objId, ownId, componId, clientOwned, new TransformNetworkState), 
+		TransformNetworkComponent(GameObject& gameObject, int objId, int ownId, int componId, int pfabID, bool clientOwned): 
+			INetworkDeltaComponent(objId, ownId, componId, pfabID, clientOwned, new TransformNetworkState),
 			IComponent(gameObject),
 			myObject(gameObject) {}
 		
@@ -72,19 +69,11 @@ namespace NCL::CSC8508
 			if (state == nullptr) return packets;
 
 			Vector3 currentPos = GetGameObject().GetTransform().GetPosition();
-			Quaternion currentOrientation = GetGameObject().GetTransform().GetOrientation();
-
 			currentPos -= state->position;
-			currentOrientation -= state->orientation;
 
 			dp->pos[0] =(currentPos.x * decPnt);
 			dp->pos[1] = (currentPos.y * decPnt);
 			dp->pos[2] =(currentPos.z * decPnt);
-
-			dp->orientation[0] =(currentOrientation.x * 12700.0f);
-			dp->orientation[1] = (currentOrientation.y * 12700.0f);
-			dp->orientation[2] =(currentOrientation.z * 12700.0f);
-			dp->orientation[3] = (currentOrientation.w * 12700.0f);
 			dp->fullID = state->stateID;
 
 			SetPacketOwnership(dp);
@@ -99,11 +88,8 @@ namespace NCL::CSC8508
 			TransformNetworkState* state = static_cast<TransformNetworkState*>(lastFullState);
 
 			state->position = myObject.GetTransform().GetPosition();
-			state->orientation = myObject.GetTransform().GetOrientation();
-
 			state->stateID++;
 			fp->fullState.position = myObject.GetTransform().GetPosition();
-			fp->fullState.orientation = myObject.GetTransform().GetOrientation();
 			fp->fullState.stateID = state->stateID;
 
 			if (clientOwned && state->stateID >= MAX_PACKETID)
@@ -126,19 +112,11 @@ namespace NCL::CSC8508
 			if (!lastTransformFullState) return false;
 
 			Vector3 fullPos = lastTransformFullState->position;
-			Quaternion fullOrientation = lastTransformFullState->orientation;
-
 			fullPos.x += (p.pos[0]/ decPnt);
 			fullPos.y += (p.pos[1]/ decPnt);
 			fullPos.z += (p.pos[2]/ decPnt);
 
-			fullOrientation.x += ((float)p.orientation[0]) / 12700.0f;
-			fullOrientation.y += ((float)p.orientation[1]) / 12700.0f;
-			fullOrientation.z += ((float)p.orientation[2]) / 12700.0f;
-			fullOrientation.w += ((float)p.orientation[3]) / 12700.0f;
-
 			GetGameObject().GetTransform().SetPosition(fullPos);
-			myObject.GetTransform().SetOrientation(fullOrientation);
 			return true;
 		}
 	
@@ -146,15 +124,15 @@ namespace NCL::CSC8508
 			int newStateId = 0; 			
 			FullPacket p = ((FullPacket&) ifp);		
 
-			if (!UpdateFullStateHistory<TransformNetworkState, FullPacket>(p, &newStateId)) return false;
-			((TransformNetworkState*)lastFullState)->orientation = p.fullState.orientation;
+			if (!UpdateFullStateHistory<TransformNetworkState, FullPacket>(p, &newStateId))
+				return false;
+			
 			((TransformNetworkState*)lastFullState)->position = p.fullState.position;
 			((TransformNetworkState*)lastFullState)->stateID = newStateId;
 			TransformNetworkState* lastTransformFullState = static_cast<TransformNetworkState*>(lastFullState);
 			
 			if (!lastTransformFullState) return false;
 			myObject.GetTransform().SetPosition(lastTransformFullState->position);
-			myObject.GetTransform().SetOrientation(lastTransformFullState->orientation);
 			return true;
 		}
 		bool ReadEventPacket(INetworkPacket& p) override { return true;}

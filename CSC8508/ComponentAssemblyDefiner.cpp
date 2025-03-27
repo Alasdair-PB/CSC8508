@@ -14,24 +14,19 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
     switch (componentMap[t])
     {
     case ComponentMapId::Bounds: {
-        std::cout << "Bounds added" << std::endl;
         object.AddComponent<BoundsComponent>(nullptr, nullptr);
         break;
     } case ComponentMapId::Physics: {
-        std::cout << "Physics added" << std::endl;
         object.AddComponent<PhysicsComponent>();
         break;
     }case ComponentMapId::NavMesh: {
-        std::cout << "Navmesh added" << std::endl;
         object.AddComponent<PhysicsComponent>();
         break;
     }case ComponentMapId::Damageable: {
-        std::cout << "Damageable added" << std::endl;
         object.AddComponent<DamageableComponent>(1, 1);
         break;
     
     }case ComponentMapId::Animation: {
-        std::cout << "Damageable added" << std::endl;
         object.AddComponent<AnimationComponent>();
         break;
 

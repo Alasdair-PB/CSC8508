@@ -57,6 +57,7 @@ namespace NCL::CSC8508 {
 					static_assert(HasGetSerializedFields<T>::value, ERROR_GET_SERIALIZED_FIELDS(T));
 				return saveData;
 			}
+
 	};
 }
 

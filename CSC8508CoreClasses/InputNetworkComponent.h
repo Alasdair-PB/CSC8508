@@ -22,24 +22,17 @@ namespace NCL::CSC8508
 		Bound
 	};
 
-	struct InputAxisPacket : INetworkPacket
-	{
-		uint32_t axisID = -1;
-		float axisValue = 0; 
-
-		InputAxisPacket() {
-			type = Component_Event;
-			packetSubType = Axis;
-			size = sizeof(InputAxisPacket) - sizeof(GamePacket);
-		}
-	};
-
 	const int MAX_AXIS_COUNT = 5;
+	const int MAX_BUTTON_COUNT = 5;
+
 	struct InputDeltaPacket : INetworkPacket {
 		uint32_t axisIDs[MAX_AXIS_COUNT];
+		uint32_t buttonIDs[MAX_BUTTON_COUNT];
+
 		float axisValues[MAX_AXIS_COUNT];
 		float deltaTime = 0;
 		float mouseYaw = 0;
+		float mousePitch = 0;
 		int historyStamp = 0;
 
 		InputDeltaPacket() {
@@ -50,32 +43,26 @@ namespace NCL::CSC8508
 		}
 	};
 
-	struct InputButtonPacket : INetworkPacket
-	{
-		uint32_t buttonID = -1;
-		bool held = false;
-
-		InputButtonPacket() {
-			type = Component_Event;
-			packetSubType = Button;
-			size = sizeof(InputButtonPacket) - sizeof(GamePacket);
-		}
-	};
-
 	class InputNetworkComponent :public InputComponent, public INetworkComponent
 	{
 	public:
-		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, bool clientOwned) :
+		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, int pfabID, bool clientOwned) :
 			InputComponent(gameObject, controller), 
-			INetworkComponent(objId, ownId, componId, clientOwned), reset(true) {}
+			INetworkComponent(objId, ownId, componId, pfabID, clientOwned), reset(true) {}
 
 		~InputNetworkComponent() = default;
 
 		void OnAwake() override {	
 			InputComponent::OnAwake();
 			boundAxis = activeController->GetBoundAxis();
-			for (uint32_t binding : boundButtons) lastBoundState[binding] = false;
-			for (uint32_t binding : boundAxis) lastAxisState[binding] = 0;
+			for (uint32_t binding : boundButtons){
+				uint32_t hashBinding = activeController->GetButtonHashId(binding);
+				lastBoundState[hashBinding] = false;
+			}
+			for (uint32_t binding : boundAxis) {
+				uint32_t hashBinding = activeController->GetAxisHashId(binding);
+				lastAxisState[hashBinding] = 0;
+			}
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -115,10 +102,18 @@ namespace NCL::CSC8508
 				skippedFrames--;
 				while (!historyQueue.empty()) {
 					HistoryData data = historyQueue.front();
+
+					while (!data.buttonMap.empty()) {
+						uint32_t id = data.buttonMap.top();
+						lastBoundState[id] = true;
+						data.buttonMap.pop();
+					}
+					
 					if (data.historyStamp >= lastHistoryEntry) {
 						lastHistoryEntry = data.historyStamp;
 						lastAxisState = data.axisMap;
 						mouseGameWorldYaw = data.mouseGameWorldYaw;
+						mouseGameWorldPitch = data.mouseGameWorldYaw;
 						reset = false;
 					}
 					skippedFrames++;
@@ -127,14 +122,25 @@ namespace NCL::CSC8508
 			}
 		}
 
+		void PredictButtonInput() {
+			for (const auto& [key, value] : lastBoundState) {
+				if (lastBoundState[key]) {
+					CallInputEvent(key);
+					lastBoundState[key] = false;
+				}
+			}
+		}
+
 		void EarlyUpdate(float deltaTime) override
 		{
-			if (clientOwned) {
+			if (clientOwned) {				
+				CheckButtonBindings();
 				UpdateMouseGameWorldPitchYaw();
 				UpdateDeltaAxis(deltaTime);
 			}
 			else {
 				PredictUpdate();
+				PredictButtonInput();
 				ManageFramePrediction();
 			}
 		}
@@ -143,8 +149,8 @@ namespace NCL::CSC8508
 		{
 			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
-				uint32_t binding = activeController->GetNamedAxisBinding(name);
-				return reset ? 0 : lastAxisState[binding];
+				uint32_t hashBinding = activeController->GetAxisHashId(name);
+				return reset ? 0 : lastAxisState[hashBinding];
 			}
 		}
 
@@ -159,13 +165,17 @@ namespace NCL::CSC8508
 		{
 			float deltaTime;
 			float mouseGameWorldYaw;
+			float mouseGameWorldPitch;
 			int historyStamp;
 			std::map<uint32_t, float> axisMap;
+			std::stack<uint32_t> buttonMap;
 
-			HistoryData(std::map<uint32_t, float> axisMap, float mouseGameWorldYaw, float deltaTime, int historyStamp) {
+			HistoryData(std::map<uint32_t, float> axisMap, std::stack<uint32_t> buttonMap, float mouseGameWorldYaw, float mouseGameWorldPitch, float deltaTime, int historyStamp) {
 				this->axisMap = axisMap;
+				this->buttonMap = buttonMap;
 				this->deltaTime = deltaTime;
 				this->mouseGameWorldYaw = mouseGameWorldYaw; 
+				this->mouseGameWorldPitch = mouseGameWorldPitch;
 				this->historyStamp = historyStamp;
 			}
 		};
@@ -175,70 +185,71 @@ namespace NCL::CSC8508
 		std::map<uint32_t, bool> lastBoundState;
 		std::queue<HistoryData> historyQueue;
 		int lastHistoryEntry = 0;
-			 
-		bool ReadAxisPacket(InputAxisPacket pck) {
-			lastAxisState[pck.axisID] = pck.axisValue;
-			return true;
-		}
-
+		
 		bool ReadDeltaPacket(InputDeltaPacket pck) 
 		{
 			std::map<uint32_t, float> elements = std::map<uint32_t, float>();
+			std::stack<uint32_t> buttonElements = std::stack<uint32_t>();
+
 			for (int i = 0; i < MAX_AXIS_COUNT; i++)
 				elements[pck.axisIDs[i]] = pck.axisValues[i];
-			HistoryData data = HistoryData(elements, pck.mouseYaw, pck.deltaTime, pck.historyStamp);
+			for (int i = 0; i < MAX_BUTTON_COUNT; i++)
+				if (pck.buttonIDs[i] > 0) buttonElements.push(pck.buttonIDs[i]);
+			HistoryData data = HistoryData(elements, buttonElements, pck.mouseYaw, pck.mousePitch, pck.deltaTime, pck.historyStamp);
 			historyQueue.push(data);
-			return true;
-		}
-
-		bool ReadButtonPacket(InputButtonPacket pck) {
-			if (pck.held) CallInputEvent(boundButtons[pck.buttonID]);
-			// May add events for on release
-			lastBoundState[pck.buttonID] = pck.held;
 			return true;
 		}
 
 		bool ReadEventPacket(INetworkPacket& p) override
 		{
-			if (p.packetSubType == InputTypes::Axis)
-				return ReadAxisPacket((InputAxisPacket&)p);
-			else if (p.packetSubType == InputTypes::Delta) 
+			if (p.packetSubType == InputTypes::Delta) 
 				return ReadDeltaPacket((InputDeltaPacket&)p);
-			else if (p.packetSubType == InputTypes::Button) 
-				return ReadButtonPacket((InputButtonPacket&)p);
 			return false;
 		}
-		
-		void SendAxisPacket(uint32_t binding, float axisValue) {
-			InputAxisPacket* axisPacket = new InputAxisPacket();
-			axisPacket->axisID = binding;
-			axisPacket->axisValue = axisValue;
 
-			SendEventPacket(axisPacket);
-			lastAxisState[binding] = axisValue;
-			delete axisPacket;
-		}
-
-		void UpdateDeltaAxis(float deltaTime) {
-			int t = boundAxis.size();				
-			InputDeltaPacket* deltaPacket = new InputDeltaPacket();
-			bool hasChanged = false;
-			for (int i = 0; i < t; i += MAX_AXIS_COUNT){
+		void ReadBoundAxis(bool& hasChanged, InputDeltaPacket* deltaPacket) {
+			int t = boundAxis.size();
+			for (int i = 0; i < t; i += MAX_AXIS_COUNT) {
 				for (int j = 0; j < MAX_AXIS_COUNT && (i + j) < t; j++) {
 					uint32_t binding = boundAxis[i + j];
 					float axisValue = activeController->GetAxis(binding);
 
-					if (axisValue != 0) 
+					if (axisValue != 0)
 						hasChanged = true;
 
-					deltaPacket->axisIDs[j] = binding;
+					uint32_t hashBinding = activeController->GetAxisHashId(binding);
+					deltaPacket->axisIDs[j] = hashBinding;
 					deltaPacket->axisValues[j] = axisValue;
-					lastAxisState[binding] = axisValue;
+					lastAxisState[hashBinding] = axisValue;
 				}
-			}				
-			
+			}
+		}
+
+		void ReadBoundButtons(bool& hasChanged, InputDeltaPacket* deltaPacket) {			
+			int tB = boundButtons.size();
+			for (int i = 0; i < tB; i += MAX_BUTTON_COUNT) {
+				for (int j = 0; j < MAX_BUTTON_COUNT && (i + j) < tB; j++) {
+					uint32_t binding = boundButtons[i + j];
+					bool pressed = activeController->GetBoundButton(binding);
+					if (pressed) {
+						hasChanged = true;
+						uint32_t hashBinding = activeController->GetButtonHashId(binding);
+						deltaPacket->buttonIDs[j] = hashBinding;
+					}
+				}
+			}
+		}
+
+		void UpdateDeltaAxis(float deltaTime) {
+			InputDeltaPacket* deltaPacket = new InputDeltaPacket();
+			bool hasChanged = false;
+
+			ReadBoundAxis(hasChanged, deltaPacket);
+			ReadBoundButtons(hasChanged, deltaPacket);
+
 			deltaPacket->deltaTime = deltaTime;
 			deltaPacket->mouseYaw = mouseGameWorldYaw;
+			deltaPacket->mousePitch = mouseGameWorldPitch;
 			deltaPacket->historyStamp = lastHistoryEntry;
 
 			if (hasChanged) {				
@@ -246,25 +257,6 @@ namespace NCL::CSC8508
 				SendEventPacket(deltaPacket);
 			}
 			delete deltaPacket;
-		}
-
-		void UpdateBoundButtons() 
-		{
-			for (auto binding : boundButtons)
-			{
-				bool buttonDown = activeController->GetButton(binding);
-				if (buttonDown || lastBoundState[binding]);
-				{
-					InputButtonPacket* buttonPacket = new InputButtonPacket();
-					buttonPacket->buttonID = binding;
-					buttonPacket->held = buttonDown;
-
-					SendEventPacket(buttonPacket);
-					CallInputEvent(binding);
-					lastBoundState[binding] = buttonDown;
-					delete buttonPacket;
-				}
-			}
 		}
 	};
 }

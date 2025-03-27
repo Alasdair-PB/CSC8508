@@ -10,9 +10,7 @@ PhysicsObject::PhysicsObject(Transform* parentTransform)	{
 	friction	= 0.8f;
 }
 
-PhysicsObject::~PhysicsObject()	{
-
-}
+PhysicsObject::~PhysicsObject()	{}
 
 void PhysicsObject::ApplyAngularImpulse(const Vector3& force) {
 	angularVelocity += inverseInteriaTensor * force;
@@ -42,11 +40,11 @@ float PhysicsObject::GetFriction() { return friction; }
 float PhysicsObject::GetCRestitution() { return cRestitution; }
 
 void PhysicsObject::ClearForces() {
-	force				= Vector3();
-	torque				= Vector3();
+	force = Vector3();
+	torque = Vector3();
 }
 
-void  PhysicsObject::RotateTowardsVelocity(float offset) {
+void PhysicsObject::RotateTowardsVelocity(float offset) {
 	auto rotDir = Vector::Normalise(this->GetLinearVelocity());
 	float angle = -std::atan2(rotDir.z, rotDir.x) * (180.0f / PI);
 	angle += offset;
@@ -56,9 +54,7 @@ void  PhysicsObject::RotateTowardsVelocity(float offset) {
 
 void PhysicsObject::InitCubeInertia() {
 	Vector3 dimensions	= transform->GetScale();
-
 	Vector3 fullWidth = dimensions * 2.0f;
-
 	Vector3 dimsSqr		= fullWidth * fullWidth;
 
 	inverseInertia.x = (12.0f * inverseMass) / (dimsSqr.y + dimsSqr.z);
@@ -67,16 +63,14 @@ void PhysicsObject::InitCubeInertia() {
 }
 
 void PhysicsObject::InitSphereInertia() {
-
-	float radius	= Vector::GetMaxElement(transform->GetScale());
-	float i			= 2.5f * inverseMass / (radius*radius);
+	float radius = Vector::GetMaxElement(transform->GetScale());
+	float i = 2.5f * inverseMass / (radius*radius);
 
 	inverseInertia	= Vector3(i, i, i);
 }
 
 void PhysicsObject::UpdateInertiaTensor() {
 	Quaternion q = transform->GetOrientation();
-
 	Matrix3 invOrientation = Quaternion::RotationMatrix<Matrix3>(q.Conjugate());
 	Matrix3 orientation = Quaternion::RotationMatrix<Matrix3>(q);
 

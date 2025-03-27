@@ -20,7 +20,7 @@ struct PhysicsComponent::PhysicsComponentDataStruct : public ISerializedData {
 	PhysicsComponentDataStruct(bool enabled, InitType initType, float inverseMass, float friction, float cRestitution) :
 		enabled(enabled), initType(initType), inverseMass(inverseMass), friction(friction), cRestitution(cRestitution) {}
 	
-	bool enabled;	
+	bool enabled;
 	InitType initType;
 	float inverseMass;
 	float friction;
@@ -37,6 +37,10 @@ struct PhysicsComponent::PhysicsComponentDataStruct : public ISerializedData {
 	}
 };
 
+auto PhysicsComponent::GetDerivedSerializedFields() const {
+	return PhysicsComponentDataStruct::GetSerializedFields();
+}
+
 size_t PhysicsComponent::Save(std::string assetPath, size_t* allocationStart)
 {
 	PhysicsComponentDataStruct saveInfo;
@@ -50,21 +54,22 @@ void PhysicsComponent::Load(std::string assetPath, size_t allocationStart) {
 
 	PhysicsComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<PhysicsComponentDataStruct>(assetPath, allocationStart);
 	SetPhysicsObject(new PhysicsObject(&GetGameObject().GetTransform()));
+
+	physicsObject->SetInverseMass(loadedSaveData.inverseMass);
+	physicsObject->SetFriction(loadedSaveData.friction);
+	physicsObject->SetRestitution(loadedSaveData.cRestitution);	
+	
 	switch (loadedSaveData.initType)
 	{
 		case(Sphere): {
 			physicsObject->InitSphereInertia();
+			break;
 		}
 		case(Cube): {
 			physicsObject->InitCubeInertia();
+			break;
 		}
 		default:
 			break;
 	}
-	physicsObject->SetInverseMass(loadedSaveData.inverseMass);
-	physicsObject->SetFriction(loadedSaveData.friction);
-	physicsObject->SetRestitution(loadedSaveData.cRestitution);
-
-	std::cout << loadedSaveData.enabled << ": Component is enabled" << std::endl;
-	std::cout << physicsObject->GetInverseMass() << ": Component inverse mass" << std::endl;
 }

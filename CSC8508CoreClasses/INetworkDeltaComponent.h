@@ -5,11 +5,8 @@
 #ifndef INETWORKDELTACOMPONENT_H
 #define INETWORKDELTACOMPONENT_H
 
-#include "Transform.h"
 #include "IComponent.h"
 #include "NetworkBase.h"
-#include "Event.h"
-#include "EventManager.h"
 #include "INetworkComponent.h"
 using std::vector;
 
@@ -46,7 +43,7 @@ namespace NCL::CSC8508
 	class INetworkDeltaComponent : public INetworkComponent
 	{
 	public:
-		INetworkDeltaComponent(int objId, int ownId, int componentId, bool clientOwned, INetworkState* state = nullptr);
+		INetworkDeltaComponent(int objId, int ownId, int componentId, int pfabID, bool clientOwned, INetworkState* state = nullptr);
 		virtual ~INetworkDeltaComponent() { delete lastFullState; }
 
 		vector<GamePacket*> WriteDeltaFullPacket(bool deltaFrame);
@@ -107,9 +104,10 @@ namespace NCL::CSC8508
 			int packetFullState = p.fullState.stateID;
 			int modifiedPFullState = p.fullState.stateID - MAX_PACKETID;
 			int modifiedLastState = lastState - MAX_PACKETID;
+
 			if (packetFullState < MAX_PACKETID) {
-				if (packetFullState < lastState ||
-					((lastState < (MAX_PACKETID / 2)) && (packetFullState > (MAX_PACKETID / 2))))
+				if (lastState != 0 && (packetFullState < lastState ||
+					((lastState < (MAX_PACKETID / 2)) && (packetFullState > (MAX_PACKETID / 2)))))
 					return false;
 				else {
 					*newStateId = packetFullState;
@@ -121,7 +119,7 @@ namespace NCL::CSC8508
 					*newStateId = modifiedPFullState;
 					UpdateStateHistory(MAX_PACKETID);
 				}
-				else if (modifiedPFullState > modifiedLastState)
+				else if (modifiedPFullState > modifiedLastState || lastState == 0)
 					*newStateId = modifiedPFullState;
 				else
 					return false;

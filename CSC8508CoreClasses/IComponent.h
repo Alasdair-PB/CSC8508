@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "GameObject.h"
 #include <unordered_set>
+#include <tuple>
 
 namespace NCL::CSC8508 
 {
@@ -16,8 +17,10 @@ namespace NCL::CSC8508
 	public:
 
 		IComponent(GameObject& gameObject) : gameObject(gameObject), enabled(true) {}
-
 		virtual ~IComponent() = default;
+		
+		static const char* Name() { return "Base";}
+		virtual const char* GetName() const { return Name();}
 
 		/**
 		 * Function invoked after the object and components have been instantiated.
@@ -83,6 +86,20 @@ namespace NCL::CSC8508
 		}
 
 		/// <summary>
+		/// Query for dependent types of this IComponent
+		/// </summary>
+		/// <returns>A unordered set of types this component is dependent on</returns>
+		virtual std::unordered_set<std::type_index>& GetDependentTypes() const {
+			static std::unordered_set<std::type_index> types = {};
+			return types;
+		}
+
+		/// <summary>
+		/// IComponent Save data struct definition
+		/// </summary>
+		struct ComponentDataStruct;
+
+		/// <summary>
 		/// Query if this IComponent is derived from a type matching type_info
 		/// </summary>
 		/// <param name="typeInfo">The type info of the queried type</param>
@@ -96,20 +113,13 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual void Load(std::string assetPath, size_t allocationStart) override;
-#
+
 		/// <summary>
 		/// Saves the IComponent data into the assetPath file. 
 		/// </summary>
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
-
-
-		/// <summary>
-		/// IComponent Save data struct definition
-		/// </summary>
-		struct ComponentDataStruct;
-
 	protected:
 		virtual void OnAwake() {}
 		virtual void Update(float deltaTime) {}

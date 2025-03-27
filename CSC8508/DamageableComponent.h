@@ -17,12 +17,11 @@ namespace NCL::CSC8508
     };
 
     class DamageableComponent : public IComponent {
-    private:
-        int health;
-        int maxHealth;
-        GameObject& owner;
 
     public:
+        static const char* Name() { return "Damageable"; }
+        const char* GetName() const override { return Name(); }
+
         DamageableComponent(GameObject& gameObject, int initialHealth, int initialMaxHealth)
             : IComponent(gameObject), owner(gameObject),
             health(std::max(0, initialHealth)),
@@ -30,7 +29,7 @@ namespace NCL::CSC8508
             health = std::min(health, maxHealth);
         }
 
-        void DamageComponent(int damage) {
+        void Damage(int damage) {
             if (damage > 0) {
                 health = std::max(0, health - damage);
                 if (health <= 0)
@@ -38,7 +37,7 @@ namespace NCL::CSC8508
             }
         }
 
-        void HealComponent(int healthRegain) {
+        void Heal(int healthRegain) {
             if (healthRegain > 0) {
                 health = std::min(maxHealth, health + healthRegain);
             }
@@ -72,6 +71,10 @@ namespace NCL::CSC8508
             
 
     private:
+        int health;
+        int maxHealth;
+        GameObject& owner;
+
         void InvokeDeathEvent() {
             auto event = DeathEvent(owner);
             EventManager::Call(&event);

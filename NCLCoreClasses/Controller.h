@@ -30,32 +30,34 @@ public:
 
 	virtual void Update(float dt = 0.0f) {}
 	uint32_t GetNamedAxisBinding(const std::string& name) const;
+	virtual bool GetBoundButton(uint32_t keyId) const { return false; }
 
-	vector<uint32_t> GetBoundButtons() const {
-		vector<uint32_t> boundButtons;
-		for (auto binding : buttonMappings) {
-			boundButtons.push_back(binding.second);
-		}
-		return boundButtons;
-	}
+	vector<uint32_t> GetBoundButtons() const;
+	vector<uint32_t> GetBoundAnalogue() const;
+	vector<uint32_t> GetBoundAxis() const;
 
-	vector<uint32_t> GetBoundAnalogue() const {
-		vector<uint32_t> boundAnalogue;
-		for (auto binding : analogueMappings) {
-			boundAnalogue.push_back(binding.second);
-		}
-		return boundAnalogue;
-	}
+	uint32_t GetHashId(std::string str);
 
-	vector<uint32_t> GetBoundAxis() const {
-		vector<uint32_t> boundAxis;
-		for (auto binding : axisMappings) {
-			boundAxis.push_back(binding.second);
-		}
-		return boundAxis;
-	}
+	uint32_t GetAxisFromHashId(const uint32_t key) const;
+	uint32_t GetButtonFromHashId(const uint32_t key) const;
+	uint32_t GetAnalogueFromHashId(const uint32_t key) const;
+
+	uint32_t GetAxisHashId(const std::string& name) const;
+	uint32_t GetButtonHashId(const std::string name) const;
+	uint32_t GetAnalogueHashId(const std::string name) const;
+
+	uint32_t GetAxisHashId(const uint32_t key) const;
+	uint32_t GetButtonHashId(const uint32_t key) const;
+	uint32_t GetAnalogueHashId(const uint32_t key) const;
+
+	void BindMappingsToHashIds();
+
 protected:
 	std::map<std::string, uint32_t> buttonMappings;
 	std::map<std::string, uint32_t> analogueMappings;
 	std::map<std::string, uint32_t> axisMappings;
+
+	std::map<uint32_t, uint32_t> buttonHashMaps;
+	std::map<uint32_t, uint32_t> analogueHashMaps;
+	std::map<uint32_t, uint32_t> axisHashMaps;
 };

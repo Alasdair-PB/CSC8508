@@ -38,13 +38,21 @@ public:
 		defaultChannelGroup = type;
 		fVolume = 1.0f;
 
-		encodedPacketQueue = &audioEngine->GetEncodedPacketQueue();
 
-		decoder = OpenDecoder();
-
+		// Initialise Persistent Sound
 		InitPersistentSound();
-
 	}
+
+	/**
+	* Destructor for Audio Source
+	*/
+	~AudioSourceComponent() {
+		fChannel ? fChannel->stop() : 0;
+		delete persistentSound;
+	}
+
+	void OnAwake() override {}
+
 
 	/**
 	* Update position vectors of source for use by FMOD
@@ -54,7 +62,7 @@ public:
 		Vector3 pos = transform->GetPosition();
 		fPosition = VecToFMOD(pos);
 
-		/*
+		
 		PhysicsComponent* physComp = GetGameObject().TryGetComponent<PhysicsComponent>();
 
 		if (physComp) {
@@ -63,20 +71,21 @@ public:
 		}
 		else if(debug) {
 			std::cout << "No Physics Component found for AudioSourceComponentComponent!" << std::endl;
-		}*/
+		}
 		
 		fChannel->set3DAttributes(&fPosition, &fVelocity);
-
-		fSystem->update();
+		persistentChannel->set3DAttributes(&fPosition, &fVelocity);
 
 		if (debug) {
-			Debug::Print("Source Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z), Vector2(5, 5));
+			std::cout << "Source Pos: " << std::to_string(pos.x) << ", " + std::to_string(pos.y) << ", " << std::to_string(pos.z) << std::endl;
 		}
+
 	}
 
 	#pragma region FMOD Sound Loading
 
 	/**
+	* [No longer used as audio engine stores all sounds]
 	* Load sound from file
 	* Different modes include FMOD_3D, FMOD_2D, FMOD_DEFAULT, FMOD_LOOP_NORMAL
 	* FMOD_3D is defualt for spacial audio
@@ -106,7 +115,9 @@ public:
 		return true;
 	}
 
-
+	void setSoundCollection(std::map<std::string, FMOD::Sound*> sounds) {
+		fSoundCol = sounds;
+	}
 
 	/**
 	* Play created sound
@@ -160,14 +171,28 @@ public:
 
 	/**
 	* Cycle through sounds in collection
+	* @param delay between sounds
+	* @return true if successfully cycled through all sounds
 	*/
-	void CycleSounds();
+	bool CycleSounds(float delay) {
+		for (auto& sound : fSoundCol) {
+			PlaySound(sound.first.c_str());
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)(delay * 1000))); //TODO - Find a way to delay sounds without pausing the thread
+		}
+		return true;
+	}
 
 
 	/**
-	* Play random sound from collection using specified delay
+	* Play random sound from collection
+	* @return sound played status (true if successful)
 	*/
-	void RandomSounds(int delay);
+	bool RandomSound() {
+		int randomIndex = rand() % fSoundCol.size();
+		auto it = fSoundCol.begin();
+		std::advance(it, randomIndex);
+		return PlaySound(it->first.c_str());
+	}
 
 	/**
 	* Stop Playback
@@ -177,27 +202,6 @@ public:
 	};
 
 	#pragma endregion
-
-	#pragma region Decoding VOIP Pipeline
-
-	std::vector<short> DecodeOpusFrame(std::vector<unsigned char>& encodedPacket) {
-		std::vector<short> pcmFrame(960);
-		int decodedSamples = opus_decode(decoder, encodedPacket.data(), encodedPacket.size(), pcmFrame.data(), pcmFrame.size(), 0);
-
-		std::cout << "[DEBUG] UpdatePersistentPlayback() Decoded " << decodedSamples << " samples." << std::endl;
-
-		if (decodedSamples < 0) {
-			std::cerr << "[ERROR] UpdatePersistentPlayback() Opus Decoding Failed: " << decodedSamples << std::endl;
-			return std::vector<short>();
-		}
-
-		if (decodedSamples < static_cast<int>(pcmFrame.size())) {
-			pcmFrame.resize(decodedSamples);
-		}
-
-		return pcmFrame;
-
-	}
 
 	void InitPersistentSound() {
 		FMOD_CREATESOUNDEXINFO exinfo = {};
@@ -223,91 +227,18 @@ public:
 		}
 
 		persistentChannel->setPaused(false);
-		currentWritePos = 0;
+		persistentChannel->setMode(FMOD_3D);
+		persistentChannel->set3DMinMaxDistance(audioEngine->GetMinDistance(), audioEngine->GetMaxDistance());
 
 	}
 
-	void DecodePersistentPlayback(std::vector<unsigned char>& encodedPacket) {
-
-		if (!persistentSound) return;
-
-		std::vector<short> pcmFrame = DecodeOpusFrame(encodedPacket);
-
-		if (pcmFrame.empty()) {
-			std::cerr << "[ERROR] UpdatePersistentPlayback() Decoded PCM Frame is empty." << std::endl;
-			return;
-		}
-
-		unsigned int bytesToWrite = pcmFrame.size() * sizeof(short);
-		unsigned int bufferSizeBytes = persistentBufferSize * sizeof(short);
-
-		if (currentWritePos * sizeof(short) + bytesToWrite > bufferSizeBytes) {
-
-			unsigned int bytesUntilEnd = bufferSizeBytes - currentWritePos * sizeof(short);
-			void* ptr1 = nullptr;
-			void* ptr2 = nullptr;
-			unsigned int len1 = 0, len2 = 0;
-
-			FMOD_RESULT result = persistentSound->lock(currentWritePos * sizeof(short), bytesUntilEnd, &ptr1, &ptr2, &len1, &len2);
-
-			if (result != FMOD_OK) {
-				std::cerr << "[ERROR] UpdatePersistentPlayback() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
-				return;
-			}
-
-			// Copy the first chunk of data
-			memcpy(ptr1, pcmFrame.data(), bytesUntilEnd);
-			persistentSound->unlock(ptr1, ptr2, len1, len2);
-
-			// Copy the remaining data to the start of the buffer
-			unsigned int remainingBytes = bytesToWrite - bytesUntilEnd;
-			result = persistentSound->lock(0, remainingBytes, &ptr1, &ptr2, &len1, &len2);
-
-			if (result != FMOD_OK) {
-				std::cerr << "[ERROR] UpdatePersistentPlayback() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
-				return;
-			}
-
-			memcpy(ptr1, ((char*)pcmFrame.data()) + bytesUntilEnd, remainingBytes);
-			persistentSound->unlock(ptr1, ptr2, len1, len2);
-
-			currentWritePos = remainingBytes / sizeof(short);
-
-		}
-		else { // normal write, no wrap-around
-			void* ptr1 = nullptr;
-			void* ptr2 = nullptr;
-			unsigned int len1 = 0, len2 = 0;
-			FMOD_RESULT result = persistentSound->lock(currentWritePos * sizeof(short), bytesToWrite, &ptr1, &ptr2, &len1, &len2);
-			if (result != FMOD_OK) {
-				std::cerr << "[ERROR] UpdatePersistentPlayback() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
-				return;
-			}
-			memcpy(ptr1, pcmFrame.data(), bytesToWrite);
-			persistentSound->unlock(ptr1, ptr2, len1, len2);
-			currentWritePos = (currentWritePos + pcmFrame.size()) % persistentBufferSize;
-		}
-
+	std::pair<FMOD::Sound*, FMOD::Channel*> GetPersistentPair() {
+		return std::make_pair(persistentSound, persistentChannel);
 	}
 
-	void UpdateAudioDecode() {
-		if (encodedPacketQueue != nullptr && !encodedPacketQueue->empty()) {
-			std::vector<unsigned char> packet = encodedPacketQueue->front();
-			encodedPacketQueue->pop_front();  // Process oldest frame first
-			DecodePersistentPlayback(packet);
-		}
-	}
-
-	#pragma endregion
 
 private:
 
-	/**
-	* Destructor for Audio Source
-	*/
-	~AudioSourceComponent() {
-		fChannel ? fChannel->stop() : 0;
-	}
 
 	FMOD::Channel* fChannel;
 	ChannelGroupType defaultChannelGroup;
@@ -317,15 +248,10 @@ private:
 
 	float fVolume;
 
-
-	std::deque<std::vector<unsigned char>>* encodedPacketQueue;
-
-	OpusDecoder* decoder;
-
-	FMOD::Sound* persistentSound = nullptr;
+	// VOIP Playback
 	FMOD::Channel* persistentChannel = nullptr;
+	FMOD::Sound* persistentSound = nullptr;
 	unsigned int persistentBufferSize = sampleRate / 2; // 0.5 second
-	unsigned int currentWritePos = 0; // in samples
 
 };
 

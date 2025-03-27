@@ -17,6 +17,7 @@
 #include "InventoryManagerComponent.h"
 #include "FallDamageComponent.h"
 #include "DamageableComponent.h"
+#include "DamageableNetworkComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -96,11 +97,12 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 
 	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100, 100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
+	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24,20);
+
 	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
 	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
 	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
 	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
-	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24, 20);
 
 	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
 	
@@ -161,9 +163,11 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
-		//sourceComp->LoadSound("pollo.mp3", 10.0f, FMOD_LOOP_NORMAL);
 		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::POLLO));
 		sourceComp->RandomSound();
+		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+		DamageableNetworkComponent* dc = player->AddComponent<DamageableNetworkComponent>(100, 100, spawnData->objId,
+			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		if (spawnData->clientOwned)
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
@@ -174,7 +178,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2, carryOffset, dropOffset);
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
-
+		DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
 		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
 		listenerComp->RecordMic();
 	}

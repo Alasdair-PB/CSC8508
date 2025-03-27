@@ -10,6 +10,7 @@ namespace NCL::CSC8508 {
 		InventoryNetworkState() {}
 		~InventoryNetworkState() = default;
 		int inventory[MAX_INVENTORY_ITEMS];
+		int wallet;
 	};
 
 	struct InvFullPacket : public IFullNetworkPacket {
@@ -20,6 +21,17 @@ namespace NCL::CSC8508 {
 			size = sizeof(InvFullPacket) - sizeof(GamePacket);
 		}
 	};
+
+	struct SellInventoryPacket : INetworkPacket {
+		int soldInventory[MAX_INVENTORY_ITEMS];
+
+		SellInventoryPacket() {
+			type = Component_Event;
+			packetSubType = None;
+			size = sizeof(SellInventoryPacket) - sizeof(GamePacket);
+		}
+	};
+
 
 	class InventoryNetworkManagerComponent : public InventoryManagerComponent, public INetworkDeltaComponent {
 
@@ -47,9 +59,14 @@ namespace NCL::CSC8508 {
 	private:
 		void TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i);
 		bool ReadPacket() {}
+		bool ReadSellInventoryPacket(SellInventoryPacket pck);
 		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override { return false; }
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override;
-		bool ReadEventPacket(INetworkPacket& p) override { return true; }
+		bool ReadEventPacket(INetworkPacket& p) override;
+		void DisableSoldItemsInWorld(SellInventoryPacket& pck);
+		void DisableSoldItemInWorld(SellInventoryPacket& pck, int i);
+		bool InventoryIsMatch(SellInventoryPacket& pck);
+		float SellAllItems() override;
 	};
 
 }

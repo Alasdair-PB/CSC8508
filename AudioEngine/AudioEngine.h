@@ -59,11 +59,7 @@ public:
     */
     static AudioEngine& Instance();
 
-    /**
-	* Instantiate static singleton instance of Audio Engine
-	* Call this to get the instance of the Audio Engine
-    */
-    void Init();
+	~AudioEngine();
 
 	/**
 	* Update Audio Engine
@@ -161,6 +157,7 @@ public:
 	*/
 	void SetOutputDeviceIndex(int index) {
 		outputDeviceIndex = index;
+		audioSystem->setDriver(outputDeviceIndex);
 	}
 
 	/**
@@ -247,10 +244,21 @@ public:
 		return &soundGroups[group];
 	}
 
+	float GetMinDistance() {
+		return minDistance;
+	}
+
+	float GetMaxDistance() {
+		return maxDistance;
+	}
+
+	bool GetIsSystemValid() {
+		return isSystemValid;
+	}
+
 
 private:
     AudioEngine();
-    ~AudioEngine();
 
     FMOD::System* audioSystem;
 
@@ -290,6 +298,8 @@ private:
 
 	float minDistance = 0.5f;
 	float maxDistance = 500.0f;
+
+	bool isSystemValid;
 };
 
 #endif

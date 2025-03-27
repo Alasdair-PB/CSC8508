@@ -28,7 +28,7 @@ struct SpawnPacket : public GamePacket {
 
 	short ownerId;
 	short objectId;
-	// add a prefab reference in the future
+	short pfabId;
 
 	SpawnPacket() {
 		type = Spawn_Object;
@@ -38,7 +38,10 @@ struct SpawnPacket : public GamePacket {
 
 void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
-void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
+void NetworkedGame::StartOfflineCallBack() { 
+	TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); 
+	TutorialGame::Loaditem(Vector3(93, 22, -53));
+}
 
 #if EOSBUILD
 
@@ -123,8 +126,9 @@ NetworkedGame::NetworkedGame()	{
 }
 
 NetworkedGame::~NetworkedGame()	{
-	delete thisServer;
-	delete thisClient;
+	if(thisServer) delete thisServer;
+	if (thisClient) delete thisClient;
+	TutorialGame::~TutorialGame();
 }
 
 void NetworkedGame::StartAsServer() 
@@ -136,7 +140,8 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Item);
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) 
@@ -222,7 +227,7 @@ void NetworkedGame::OnEvent(ClientConnectedEvent* e)
 {
 	int id = e->GetClientId();
 	SendSpawnPacketsOnClientConnect(id);	
-	SpawnPlayerServer(id, Prefab::Player);
+	SpawnObjectServer(id, Prefab::Player);
 }
 
 void NetworkedGame::OnEvent(NetworkEvent* e)
@@ -307,34 +312,49 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		});
 }
 
+// To change to Pfab managed system in the future where all pfabs 
+// are loaded as disabled GameObjects that can be copied to new objects during runtime
 GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) 
 	{ return TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50), spawnPacket);}
 
-void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, Prefab prefab)
+GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket)
+	{ return TutorialGame::Loaditem(Vector3(93, 22, -53), spawnPacket);}
+
+GameObject* NetworkedGame::GetObjectFromPfab(size_t pfab, NetworkSpawnData data) {
+	GameObject* object;
+	if (pfab == Prefab::Player)
+		object = GetPlayerPrefab(&data);
+	else
+		object = GetItemPrefab(&data);
+	return object;
+}
+
+void NetworkedGame::SpawnObjectClient(int ownerId, int objectId, size_t pfab)
 {
-	// Will be prefab reference in the future	
 	bool clientOwned = ownerId == thisClient->GetPeerId();
 	NetworkSpawnData data = NetworkSpawnData();
 
 	data.clientOwned = clientOwned;
 	data.objId = objectId;
 	data.ownId = ownerId;
-	auto object = GetPlayerPrefab(&data);
+	data.pfab = pfab;
+	GameObject* object = GetObjectFromPfab(pfab, data);
 
 	if (clientOwned)
 		ownedObjects.emplace_back(object);
 }
 
-void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
+void NetworkedGame::SpawnObjectServer(int ownerId, size_t pfab)
 {
-	// Will be prefab reference in the future
 	bool serverOwned = ownerId == thisServer->GetPeerId();
 	NetworkSpawnData data = NetworkSpawnData();
 
 	data.clientOwned = serverOwned;
 	data.objId = nextObjectId;
 	data.ownId = ownerId;
-	auto object = GetPlayerPrefab(&data);
+	data.pfab = pfab;
+
+	GameObject* object = GetObjectFromPfab(pfab, data);
 
 	if (serverOwned)
 		ownedObjects.emplace_back(object);
@@ -342,6 +362,7 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 	SpawnPacket* newPacket = new SpawnPacket();
 	newPacket->ownerId = ownerId;
 	newPacket->objectId = nextObjectId;
+	newPacket->pfabId = pfab;
 
 	SendToAllClients(newPacket);
 
@@ -349,7 +370,8 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 	nextObjectId++;
 }
 
-bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId) {
+// Change to addNetworkObject component in the future so this info does not need to be included on every GameObject
+bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId, int& pFabId) {
 	if (!object)
 		return false;
 
@@ -361,6 +383,7 @@ bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId) {
 				std::cout << "NetworkComponent is not derived type" << std::endl;
 			objectId = networkComponent->GetObjectID();
 			ownerId = networkComponent->GetOwnerID();
+			pFabId = networkComponent->GetPfabID();
 			return true;
 		}
 	}
@@ -375,13 +398,16 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 
 	int ownerId;
 	int objectId;
+	int pfabId;
+
 	for (auto i = first; i != last; ++i)
 	{
-		if (HasNetworkComponent(*i, objectId, ownerId))
+		if (HasNetworkComponent(*i, objectId, ownerId, pfabId))
 		{
 			SpawnPacket* newPacket = new SpawnPacket();
 			newPacket->ownerId = ownerId;
 			newPacket->objectId = objectId;
+			newPacket->pfabId = pfabId;
 			thisServer->SendPacketToPeer(newPacket, clientId);
 			delete newPacket;
 		}
@@ -426,7 +452,7 @@ void NetworkedGame::ReceiveSpawnPacket(int type, GamePacket* payload) {
 	if (type == Spawn_Object) {
 		if (thisClient) {
 			SpawnPacket* ackPacket = (SpawnPacket*)payload;
-			SpawnPlayerClient(ackPacket->ownerId, ackPacket->objectId, Prefab::Player);
+			SpawnObjectClient(ackPacket->ownerId, ackPacket->objectId, ackPacket->pfabId);
 		}
 	}
 }

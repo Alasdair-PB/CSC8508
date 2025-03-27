@@ -5,11 +5,8 @@
 #ifndef INETWORKDELTACOMPONENT_H
 #define INETWORKDELTACOMPONENT_H
 
-#include "Transform.h"
 #include "IComponent.h"
 #include "NetworkBase.h"
-#include "Event.h"
-#include "EventManager.h"
 #include "INetworkComponent.h"
 using std::vector;
 
@@ -46,7 +43,7 @@ namespace NCL::CSC8508
 	class INetworkDeltaComponent : public INetworkComponent
 	{
 	public:
-		INetworkDeltaComponent(int objId, int ownId, int componentId, bool clientOwned, INetworkState* state = nullptr);
+		INetworkDeltaComponent(int objId, int ownId, int componentId, int pfabID, bool clientOwned, INetworkState* state = nullptr);
 		virtual ~INetworkDeltaComponent() { delete lastFullState; }
 
 		vector<GamePacket*> WriteDeltaFullPacket(bool deltaFrame);

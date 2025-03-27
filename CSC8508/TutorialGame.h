@@ -16,7 +16,6 @@
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
-#include "FramerateUI.h"
 
 #if EOSBUILD
 #include "MainMenuUI.h"
@@ -25,7 +24,11 @@
 #include "EOSLobbyMenuUI.h"
 #endif
 
-
+#include "AudioSliders.h"
+#include "FramerateUI.h"
+#include "MainMenuUI.h"
+#include "StaminaBar.h"
+#include "LobbySearch.h"
 
 using std::vector;
 
@@ -36,6 +39,7 @@ namespace NCL {
 		{
 			int objId;
 			int ownId;
+			size_t pfab;
 			bool clientOwned;
 		};
 
@@ -49,17 +53,14 @@ namespace NCL {
 			void InitWorld();
 			void InitialiseGame();
 
-			void UpdateObjectSelectMode(float dt);
-			bool SelectObject();
-
-			void TestLoadGameObject(std::string assetPath);
-			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			void LoadWorld(std::string assetPath);
 			void UpdateUI();
+			std::string GetAssetPath(std::string pfabName);
 
-			GameObject* AddRoleTToWorld(const Vector3& position, float inverseMass = 10.0f); // Anim
+			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
-
+			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
+			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions);
 			MainMenu* GetMainMenu() { return mainMenu; }
 			ComponentAssemblyDefiner* componentAssembly;
 
@@ -94,10 +95,10 @@ namespace NCL {
 
 			UI::FramerateUI* framerate = new UI::FramerateUI;
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
-			UI::AudioSliders* audioSliders = new UI::AudioSliders;
-			UI::Healthbar* healthbar = new UI::Healthbar;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
+			UI::AudioSliders* audioSliders = new UI::AudioSliders;
+
 			float framerateDelay = 0;
 
 #if EOSBUILD

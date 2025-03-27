@@ -59,6 +59,8 @@ namespace NCL::CSC8508
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
 
 		auto GetDerivedSerializedFields() const;
+		void SetInitType(InitType type, PhysicsObject* phyObj);
+		void CopyComponent(GameObject* gameObject) override;
 
 	protected:
 		PhysicsObject* physicsObject;

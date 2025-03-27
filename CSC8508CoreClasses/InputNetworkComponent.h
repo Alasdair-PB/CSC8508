@@ -28,9 +28,11 @@ namespace NCL::CSC8508
 	struct InputDeltaPacket : INetworkPacket {
 		uint32_t axisIDs[MAX_AXIS_COUNT];
 		uint32_t buttonIDs[MAX_BUTTON_COUNT];
+
 		float axisValues[MAX_AXIS_COUNT];
 		float deltaTime = 0;
 		float mouseYaw = 0;
+		float mousePitch = 0;
 		int historyStamp = 0;
 
 		InputDeltaPacket() {
@@ -44,17 +46,23 @@ namespace NCL::CSC8508
 	class InputNetworkComponent :public InputComponent, public INetworkComponent
 	{
 	public:
-		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, bool clientOwned) :
+		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, int pfabID, bool clientOwned) :
 			InputComponent(gameObject, controller), 
-			INetworkComponent(objId, ownId, componId, clientOwned), reset(true) {}
+			INetworkComponent(objId, ownId, componId, pfabID, clientOwned), reset(true) {}
 
 		~InputNetworkComponent() = default;
 
 		void OnAwake() override {	
 			InputComponent::OnAwake();
 			boundAxis = activeController->GetBoundAxis();
-			for (uint32_t binding : boundButtons) lastBoundState[binding] = false;
-			for (uint32_t binding : boundAxis) lastAxisState[binding] = 0;
+			for (uint32_t binding : boundButtons){
+				uint32_t hashBinding = activeController->GetButtonHashId(binding);
+				lastBoundState[hashBinding] = false;
+			}
+			for (uint32_t binding : boundAxis) {
+				uint32_t hashBinding = activeController->GetAxisHashId(binding);
+				lastAxisState[hashBinding] = 0;
+			}
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -105,6 +113,7 @@ namespace NCL::CSC8508
 						lastHistoryEntry = data.historyStamp;
 						lastAxisState = data.axisMap;
 						mouseGameWorldYaw = data.mouseGameWorldYaw;
+						mouseGameWorldPitch = data.mouseGameWorldYaw;
 						reset = false;
 					}
 					skippedFrames++;
@@ -140,8 +149,8 @@ namespace NCL::CSC8508
 		{
 			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
-				uint32_t binding = activeController->GetNamedAxisBinding(name);
-				return reset ? 0 : lastAxisState[binding];
+				uint32_t hashBinding = activeController->GetAxisHashId(name);
+				return reset ? 0 : lastAxisState[hashBinding];
 			}
 		}
 
@@ -156,15 +165,17 @@ namespace NCL::CSC8508
 		{
 			float deltaTime;
 			float mouseGameWorldYaw;
+			float mouseGameWorldPitch;
 			int historyStamp;
 			std::map<uint32_t, float> axisMap;
 			std::stack<uint32_t> buttonMap;
 
-			HistoryData(std::map<uint32_t, float> axisMap, std::stack<uint32_t> buttonMap, float mouseGameWorldYaw, float deltaTime, int historyStamp) {
+			HistoryData(std::map<uint32_t, float> axisMap, std::stack<uint32_t> buttonMap, float mouseGameWorldYaw, float mouseGameWorldPitch, float deltaTime, int historyStamp) {
 				this->axisMap = axisMap;
 				this->buttonMap = buttonMap;
 				this->deltaTime = deltaTime;
 				this->mouseGameWorldYaw = mouseGameWorldYaw; 
+				this->mouseGameWorldPitch = mouseGameWorldPitch;
 				this->historyStamp = historyStamp;
 			}
 		};
@@ -184,7 +195,7 @@ namespace NCL::CSC8508
 				elements[pck.axisIDs[i]] = pck.axisValues[i];
 			for (int i = 0; i < MAX_BUTTON_COUNT; i++)
 				if (pck.buttonIDs[i] > 0) buttonElements.push(pck.buttonIDs[i]);
-			HistoryData data = HistoryData(elements, buttonElements, pck.mouseYaw, pck.deltaTime, pck.historyStamp);
+			HistoryData data = HistoryData(elements, buttonElements, pck.mouseYaw, pck.mousePitch, pck.deltaTime, pck.historyStamp);
 			historyQueue.push(data);
 			return true;
 		}
@@ -206,9 +217,10 @@ namespace NCL::CSC8508
 					if (axisValue != 0)
 						hasChanged = true;
 
-					deltaPacket->axisIDs[j] = binding;
+					uint32_t hashBinding = activeController->GetAxisHashId(binding);
+					deltaPacket->axisIDs[j] = hashBinding;
 					deltaPacket->axisValues[j] = axisValue;
-					lastAxisState[binding] = axisValue;
+					lastAxisState[hashBinding] = axisValue;
 				}
 			}
 		}
@@ -221,7 +233,8 @@ namespace NCL::CSC8508
 					bool pressed = activeController->GetBoundButton(binding);
 					if (pressed) {
 						hasChanged = true;
-						deltaPacket->buttonIDs[j] = binding;
+						uint32_t hashBinding = activeController->GetButtonHashId(binding);
+						deltaPacket->buttonIDs[j] = hashBinding;
 					}
 				}
 			}
@@ -236,6 +249,7 @@ namespace NCL::CSC8508
 
 			deltaPacket->deltaTime = deltaTime;
 			deltaPacket->mouseYaw = mouseGameWorldYaw;
+			deltaPacket->mousePitch = mouseGameWorldPitch;
 			deltaPacket->historyStamp = lastHistoryEntry;
 
 			if (hasChanged) {				

@@ -22,10 +22,11 @@ AudioEngine::AudioEngine() : audioSystem(nullptr) {
     FMOD::System_Create(&audioSystem);
 
 
-	audioSystem->setDriver(0);
+	audioSystem->setDriver(outputDeviceIndex);
 
 	// Set FMOD to use a right-handed coordinate system
 	audioSystem->init(512, FMOD_INIT_3D_RIGHTHANDED, nullptr);
+	isSystemValid = true;
 
 	// Create channel groups
 	masterGroup = CreateChannelGroups(ChannelGroupType::MASTER, "Master");
@@ -46,6 +47,7 @@ AudioEngine::AudioEngine() : audioSystem(nullptr) {
 
 
 AudioEngine::~AudioEngine() {
+	isSystemValid = false;
 	Shutdown();
 	
 	#ifdef USE_PS5
@@ -55,17 +57,12 @@ AudioEngine::~AudioEngine() {
 	unloaded = sceKernelStopUnloadModule(libfmodLHandle, 0, NULL, 0, NULL, NULL);
 
 	#endif // USE_PS5
-
+	audioSystem = nullptr;
 }
 
 AudioEngine& AudioEngine::Instance() {
 	static AudioEngine instance;
 	return instance;
-}
-
-void AudioEngine::Init() {
-	FMOD::System_Create(&audioSystem);
-	audioSystem->init(512, FMOD_INIT_NORMAL, nullptr);
 }
 
 void AudioEngine::Update() {
@@ -130,8 +127,14 @@ void AudioEngine::PrintOutputList() {
 }
 
 bool AudioEngine::IsRecording() {
+	//check if fmod system is valid
+	if (!audioSystem) {
+		return false;
+	}
+
+
 	bool isRecording;
-	FMOD_RESULT result = audioSystem->isRecording(0, &isRecording);
+	FMOD_RESULT result = audioSystem->isRecording(inputDeviceIndex, &isRecording);
 	if (result != FMOD_OK) {
 		// std::cerr << "Error: " << FMOD_ErrorString(result) << std::endl;
 		return false;

@@ -1,5 +1,4 @@
 #pragma once
-#include "imgui.h"
 #include "UIElementsGroup.h"
 
 namespace NCL {

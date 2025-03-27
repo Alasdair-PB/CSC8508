@@ -111,7 +111,7 @@ public:
 		int error;
 		OpusDecoder* decoder = opus_decoder_create(sampleRate, channels, &error);
 		if (error != OPUS_OK) {
-			// std::cout << "[ERROR] OpenDecoder(): " + std::to_string(error) << std::endl;
+			std::cout << "[ERROR] OpenDecoder(): " + std::to_string(error) << std::endl;
 			return nullptr;
 		}
 		return decoder;

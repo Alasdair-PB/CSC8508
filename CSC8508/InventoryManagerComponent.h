@@ -4,129 +4,160 @@
 
 #include "IComponent.h"
 #include "ItemComponent.h"
+#include "UISystem.h"
+#include "InventoryUI.h"
 #include <vector>
 
-namespace NCL::CSC8508 {
+namespace NCL {
+    namespace CSC8508 {
 
-    class InventoryManagerComponent : public IComponent {
-    public:
-        InventoryManagerComponent(GameObject& gameObject, int maxStorage)
-            : IComponent(gameObject), transform(gameObject.GetTransform()) {
-            maxItemStorage = std::max(1, maxStorage);
-        }
+        class InventoryManagerComponent : public IComponent {
+        public:
+            InventoryManagerComponent(GameObject& gameObject, int maxStorage, float itemCarryOffset, float itemDropOffset)
+                : IComponent(gameObject), transform(gameObject.GetTransform()), 
+                itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset)
+            {
+                maxItemStorage = std::max(1, maxStorage);
 
-        bool PushItemToInventory(GameObject* object) {
-            ItemComponent* item = object->TryGetComponent<ItemComponent>();
-            if (!object || !item) return false;
-            if (storedItems.size() >= maxItemStorage) return false;
+                UI::UISystem::GetInstance()->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+                inventoryUI->PushInventoryElement(InventoryMenu());
+            }
 
-            item->SetEnabledComponentStates(false);
-            storedItems.push_back(item);
-            object->SetEnabled(true);
-            scrollIndex = storedItems.size() - 1;
-            return true;
-        }
+            bool PushItemToInventory(ItemComponent* item) {
+                if (!item) return false;
+                if (storedItems.size() >= maxItemStorage) return false;
 
-        void Update(float deltaTime) override {
-            if (!ItemAtScrollIndex()) return;
-            Transform& objectTransform = storedItems[scrollIndex]->GetGameObject().GetTransform();
-            objectTransform.SetPosition(transform.GetPosition() + itemCarryOffset);
-        }
+                item->SetEnabledComponentStates(false);
+                storedItems.push_back(item);
+                item->GetGameObject().SetEnabled(true);
+                scrollIndex = storedItems.size() - 1;
+                return true;
+            }
 
-        void IncrementScrollIndex() {
-            if (ItemAtScrollIndex()) storedItems[scrollIndex]->GetGameObject().SetEnabled(false);
-            scrollIndex >= maxItemStorage - 1 ? scrollIndex = 0 : scrollIndex++;
+            bool ItemInHand() {
+                return ItemAtScrollIndex();
+            }
 
-            if (!ItemAtScrollIndex()) return;
-            storedItems[scrollIndex]->GetGameObject().SetEnabled(true);
-        }
+            void Update(float deltaTime) override {
+                if (!ItemAtScrollIndex()) return;
+                Transform& objectTransform = storedItems[scrollIndex]->GetGameObject().GetTransform();
+                objectTransform.SetPosition(transform.GetPosition() + 
+                    Vector3(0,carryYOffset,0) + 
+                    (GetDirection() * itemCarryOffset));
+            }
 
-        void DropItem() {
-            if (!ItemAtScrollIndex()) return;
-            PopItemFromInventory(scrollIndex);
-        }
+            void IncrementScrollIndex() {
+                if (ItemAtScrollIndex()) storedItems[scrollIndex]->GetGameObject().SetEnabled(false);
+                scrollIndex >= maxItemStorage - 1 ? scrollIndex = 0 : scrollIndex++;
 
-        void DropItemAtIndex(int inventoryIndex) {
-            PopItemFromInventory(inventoryIndex);
-        }
+                if (!ItemAtScrollIndex()) return;
+                storedItems[scrollIndex]->GetGameObject().SetEnabled(true);
+            }
 
-        float SellAllItems() {
-            float itemTotal = 0;
-            for (ItemComponent* item : storedItems) {
-                itemTotal += item->GetSaleValue();
+            void DropItem() {
+                if (!ItemAtScrollIndex()) return;
+                PopItemFromInventory(scrollIndex);
+            }
+
+            void DropItemAtIndex(int inventoryIndex) {
+                PopItemFromInventory(inventoryIndex);
+            }
+
+            void DisableItemInWorld(ItemComponent* item) {
+                item->SetSaleValue(0);
                 item->GetGameObject().SetEnabled(false);
             }
-            storedItems.clear();
-        }
 
-        /// <summary>
-        /// IComponent Save data struct definition
-        /// </summary>
-        struct InventoryManagerComponentDataStruct;
+            std::function<CSC8508::PushdownState::PushdownResult()> InventoryMenu() {
+                std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
+                    int index = 0;
+                    for (auto const& item : storedItems) {
+                        std::string name = item->GetName();
+                        std::string sellVal = std::to_string(item->GetSaleValue());
+                        if (index == scrollIndex) {
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.00f, 0.60f, 0.00f, 1.00f));
+                            ImGui::Text(("Item: " + name).c_str());
+                            ImGui::Text(("Sell Value: " + sellVal).c_str());
+                            ImGui::PopStyleColor();
+                        }
+                        else {
+                            ImGui::Text(("Item: " + name).c_str());
+                            ImGui::Text(("Sell Value: " + sellVal).c_str());
+                        }
+                    }
+                    index += 1;
+                    return CSC8508::PushdownState::PushdownResult::NoChange;
+                    };
+                return func;
+            }
 
-        void Load(std::string assetPath, size_t allocationStart) override;
-        size_t Save(std::string assetPath, size_t* allocationStart) override;
+           virtual float SellAllItems() {
+                float itemTotal = 0;
+                for (ItemComponent* item : storedItems) {
+                    itemTotal += item->GetSaleValue();
+                    DisableItemInWorld(item);
+                }
+                storedItems.clear();
+                wallet += itemTotal;
+                std::cout << "Sold::" << itemTotal << std::endl;
+                return itemTotal;
+            }
 
-    private:
-        std::vector<ItemComponent*> storedItems;
-        int maxItemStorage;
-        int scrollIndex = 0;
-        Vector3 itemCarryOffset;
-        Vector3 itemDropOffset;
-        Transform& transform;
+            /// <summary>
+            /// IComponent Save data struct definition
+            /// </summary>
+            struct InventoryManagerComponentDataStruct;
 
-        bool ItemAtScrollIndex() { return storedItems.size() >= scrollIndex; }
+            void Load(std::string assetPath, size_t allocationStart) override;
+            size_t Save(std::string assetPath, size_t* allocationStart) override;
+            
+            void RemoveItemEntry(ItemComponent* item) {
+                for (int i = 0; i < storedItems.size(); i++) {
+                    if (storedItems[i] == item) {
+                        RemoveItemEntry(i);
+                        return;
+                    }
+                }
+            }
 
-        void ReturnItemToWorld(int inventoryIndex) {
-            Transform& objectTransform = storedItems[inventoryIndex]->GetGameObject().GetTransform();
-            objectTransform.SetPosition(transform.GetPosition() + itemDropOffset);
-        }
+            void RemoveItemEntry(int inventoryIndex) {
+                storedItems.erase(storedItems.begin() + inventoryIndex);
+            }
 
-        ItemComponent* PopItemFromInventory(int inventoryIndex) {
-            if (inventoryIndex < 0 || inventoryIndex >= storedItems.size()) return nullptr;
-            ItemComponent* item = storedItems[inventoryIndex];
-            item->SetEnabledComponentStates(true);
-            item->GetGameObject().SetEnabled(true);
-            ReturnItemToWorld(inventoryIndex);
+        protected:
+            int maxItemStorage;
+            int scrollIndex = 0;
+            float itemCarryOffset;
+            float itemDropOffset;
+            float carryYOffset = 3;
+            float wallet; 
+            Transform& transform;
 
-            storedItems.erase(storedItems.begin() + inventoryIndex);
-            return item;
-        }
+            UI::InventoryUI* inventoryUI = new UI::InventoryUI;
+            
+            std::vector<ItemComponent*> storedItems;
+             bool ItemAtScrollIndex() { return storedItems.size() > scrollIndex; }
 
-    };
+             Vector3 GetDirection() {
+                 return (transform.GetOrientation() * Vector3(0, 0, 1));
+             }
 
-    struct InventoryManagerComponent::InventoryManagerComponentDataStruct : public ISerializedData {
-        InventoryManagerComponentDataStruct() : maxItemStorage(0) {}
-        InventoryManagerComponentDataStruct(int maxItemStorage, Vector3 itemCarryOffset, Vector3 itemDropOffset)
-            : maxItemStorage(maxItemStorage), itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset){}
+            void ReturnItemToWorld(int inventoryIndex) {
+                Transform& objectTransform = storedItems[inventoryIndex]->GetGameObject().GetTransform();
+                objectTransform.SetPosition(transform.GetPosition() + GetDirection() * itemDropOffset);
+            }
 
-        int maxItemStorage;
-        Vector3 itemCarryOffset;
-        Vector3 itemDropOffset;
-
-        static auto GetSerializedFields() {
-            return std::make_tuple(
-                SERIALIZED_FIELD(InventoryManagerComponentDataStruct, maxItemStorage),
-                SERIALIZED_FIELD(InventoryManagerComponentDataStruct, itemCarryOffset),
-                SERIALIZED_FIELD(InventoryManagerComponentDataStruct, itemDropOffset)
-            );
-        }
-    };
-
-    size_t InventoryManagerComponent::Save(std::string assetPath, size_t* allocationStart) {
-        InventoryManagerComponentDataStruct saveInfo(maxItemStorage, itemCarryOffset, itemDropOffset);
-        SaveManager::GameData saveData = ISerializedData::CreateGameData<InventoryManagerComponentDataStruct>(saveInfo);
-        return SaveManager::SaveGameData(assetPath, saveData, allocationStart, true);
+            ItemComponent* PopItemFromInventory(int inventoryIndex) {
+                if (inventoryIndex < 0 || inventoryIndex >= storedItems.size()) return nullptr;
+                ItemComponent* item = storedItems[inventoryIndex];
+                item->SetEnabledComponentStates(true);
+                item->GetGameObject().SetEnabled(true);
+                ReturnItemToWorld(inventoryIndex);
+                RemoveItemEntry(inventoryIndex);
+                return item;
+            }
+        };
     }
-
-    void InventoryManagerComponent::Load(std::string assetPath, size_t allocationStart) {
-        InventoryManagerComponentDataStruct loadedSaveData =
-            ISerializedData::LoadISerializable<InventoryManagerComponentDataStruct>(assetPath, allocationStart);
-
-        maxItemStorage = std::max(1, loadedSaveData.maxItemStorage);
-        itemCarryOffset = loadedSaveData.itemCarryOffset;
-        itemDropOffset = loadedSaveData.itemDropOffset;
-    }
-};
+}
 
 #endif // INVENTORY_MANAGER_COMPONENT_H

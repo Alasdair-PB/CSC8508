@@ -74,8 +74,7 @@ public:
 		}
 		
 		fChannel->set3DAttributes(&fPosition, &fVelocity);
-
-		fSystem->update();
+		persistentChannel->set3DAttributes(&fPosition, &fVelocity);
 
 		if (debug) {
 			std::cout << "Source Pos: " << std::to_string(pos.x) << ", " + std::to_string(pos.y) << ", " << std::to_string(pos.z) << std::endl;
@@ -178,7 +177,7 @@ public:
 	bool CycleSounds(float delay) {
 		for (auto& sound : fSoundCol) {
 			PlaySound(sound.first.c_str());
-			std::this_thread::sleep_for(std::chrono::milliseconds((int)(delay * 1000))); //TODO - Find a way to 
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)(delay * 1000))); //TODO - Find a way to delay sounds without pausing the thread
 		}
 		return true;
 	}
@@ -228,6 +227,8 @@ public:
 		}
 
 		persistentChannel->setPaused(false);
+		persistentChannel->setMode(FMOD_3D);
+		persistentChannel->set3DMinMaxDistance(audioEngine->GetMinDistance(), audioEngine->GetMaxDistance());
 
 	}
 

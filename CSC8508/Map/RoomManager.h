@@ -20,9 +20,12 @@ public:
      */
     static RoomPrefab* GetRandom();
 
+    [[nodiscard]] static unsigned int GetSeed() { return seed; }
     [[nodiscard]] static std::vector<std::string> const& GetPrefabPaths() { return prefabPaths; }
 
 protected:
+    static unsigned int seed; // TODO: This needs to be smarter
+
     static std::vector<std::string> prefabPaths;
 
     static RoomPrefab* LoadPrefab(std::string path);

@@ -31,6 +31,7 @@ bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
             // Put the roomB GameObject in the test position
             Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
             transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
+            //transformB.SetOrientation(orientationDifference);
             transformB.SetPosition(
                 transformA.GetPosition()
                 + transformA.GetOrientation() * aDoorLoc.pos * transformA.GetScale()

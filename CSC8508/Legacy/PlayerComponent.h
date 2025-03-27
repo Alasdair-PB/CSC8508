@@ -5,6 +5,7 @@
 #include "StaminaComponent.h"
 #include "CollisionEvent.h"
 #include "SightComponent.h"
+#include "../DamageableComponent.h"
 #include "EventListener.h"
 #include "EventManager.h"
 #include "CollisionDetection.h"
@@ -13,7 +14,7 @@
 namespace NCL {
     namespace CSC8508 {
         using namespace NCL::CSC8508::Tags;
-        class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent> {
+        class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent>, public EventListener<DeathEvent> {
         public:
 
             PlayerComponent(GameObject& gameObject);
@@ -26,6 +27,7 @@ namespace NCL {
 
             void OnEvent(InputButtonEvent* buttonEvent) override;
             void OnEvent(CollisionEvent* collisionEvent) override;
+            void OnEvent(DeathEvent* deathEvent) override;
 
             void OnAwake() override;
             void Update(float deltaTime) override;
@@ -42,22 +44,25 @@ namespace NCL {
 
             void SetLinearVelocity(float jumpDuration);
             void OnJump(float deltaTime);
-
+            void AddDownWardsVelocity();
             void TryPickUp();
             bool DropItem();
-            void PickUpItem(ItemComponent* item);
 
+            bool DropItemToFloor();
+            bool DropItemToDropZone();
+            void PickUpItem(ItemComponent* item);
+            void CheckTagStack();
             void CheckInputStack();
             void UpdateStates(float deltaTime);
-
+            bool CheckTag(Tag tag, CollisionEvent* collisionEvent);
             Vector3 GetForwardsDirection();
 
             float speed = 15.0f;
-            float dashMultiplier = 1.5f;
+            float dashMultiplier = 2.5f;
             float jumpForce = 10.0f;
             float jumpDuration = 0;
             float downwardsVelocityMod = 50.0f;
-            float dashTickStam = 2.0f;
+            float dashTickStam = 0.3f;
             float jumpStamCost = 10.0f;
             float visibleRange = 5.0f;
 
@@ -68,9 +73,14 @@ namespace NCL {
             bool isJumping;
             bool isDashing;
             bool isMoving;
+            bool inDropZone;
+
 
             Vector3 visionHeight = Vector3(0, 0.3f, 0);
+            Vector3 maxVelocity = Vector3(15.0f, 15.0f, 15.0f);
+            float maxForce = 15.0f;
             std::stack<uint32_t> inputStack; 
+            std::stack<Tag> collidedTags;
 
             Transform& transform; 
             SightComponent* sightComponent = nullptr;

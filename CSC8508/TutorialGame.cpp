@@ -32,16 +32,25 @@ std::string TutorialGame::GetAssetPath(std::string pfabName) {
 }
 
 GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
-	GameObject* myObjectToLoad = new GameObject();
+	GameObject* myObjectToLoad = new GameObject(true);
 	std::string pfabPath = GetAssetPath(assetPath);
 	myObjectToLoad->Load(pfabPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + offset);
+	myObjectToLoad->GetTransform().SetPosition(offset);
 	world->AddGameObject(myObjectToLoad);
 	return myObjectToLoad;
 }
 
 void LoadControllerMappings(Controller* controller)
 {
+#ifdef USE_PS5
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(2, "Forward");
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
+	controller->MapButton(KeyCodes::SHIFT, "Dash"); //Ps5 relevant buttons
+	controller->MapButton(KeyCodes::SPACE, "Jump"); // Keep names
+	controller->MapButton(KeyCodes::E, "Interact");
+#else
 	controller->MapAxis(0, "Sidestep");
 	controller->MapAxis(2, "Forward");
 	controller->MapAxis(3, "XLook");
@@ -49,6 +58,8 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
 	controller->MapButton(KeyCodes::E, "Interact");
+#endif
+	controller->BindMappingsToHashIds();
 }
 
 void TutorialGame::InitialiseGame() {
@@ -60,16 +71,15 @@ void TutorialGame::InitialiseGame() {
 	LoadControllerMappings(controller);
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
-
 	audioEngine = &AudioEngine::Instance();
 
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
-	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+
+	//uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
-
-
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -118,22 +128,6 @@ void TutorialGame::InitialiseAssets() {
 
 TutorialGame::~TutorialGame()	
 {
-	MaterialManager::CleanUp();
-	ComponentManager::CleanUp();
-
-	delete audioEngine;
-	delete physics;
-	delete renderer;
-	delete world;
-	delete controller;
-	delete navMesh;
-
-	delete framerate;
-	delete mainMenuUI;
-	delete audioSliders;
-	delete healthbar;
-	delete lobbySearchField;
-	delete inventoryUI;
 }
 
 void TutorialGame::UpdateGame(float dt)
@@ -149,6 +143,7 @@ void TutorialGame::UpdateGame(float dt)
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {
+	LoadDropZone(Vector3(85, 22, -60), Vector3(5,5,5));
 	world->Load(assetPath);
 }
 
@@ -157,7 +152,13 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 
-	Loaditem(Vector3(5, 0, 5));
+	//GameObject* room = LoadRoomPfab("room_A.pfab", Vector3(90, 90, -50));
+	//GameObject* roomB = room->CopyGameObject();
+	//room->SetEnabled(true);
+	//roomB->GetTransform().SetPosition(Vector3(90, 60, -50));
+	//roomB->SetEnabled(true);
+	//world->AddGameObject(roomB);
+
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 }
@@ -175,10 +176,8 @@ void TutorialGame::UpdateUI() {
 		mainMenu->SetOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
-		uiSystem->RemoveStack("Inventory");
-		uiSystem->PushNewStack(healthbar->healthbar, "Healthbar");
 	}
-
+	
 	uiSystem->RenderFrame();
 }
 

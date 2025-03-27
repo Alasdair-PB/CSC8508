@@ -4,6 +4,8 @@
 
 #include "IComponent.h"
 #include "ItemComponent.h"
+#include "UISystem.h"
+#include "InventoryUI.h"
 #include <vector>
 
 namespace NCL {
@@ -13,19 +15,23 @@ namespace NCL {
         public:
             InventoryManagerComponent(GameObject& gameObject, int maxStorage, float itemCarryOffset, float itemDropOffset)
                 : IComponent(gameObject), transform(gameObject.GetTransform()), 
-                itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset){
+                itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset)
+            {
                 maxItemStorage = std::max(1, maxStorage);
+
+                UI::UISystem::GetInstance()->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+                inventoryUI->PushInventoryElement(InventoryMenu());
             }
 
             bool PushItemToInventory(ItemComponent* item) {
-                    if (!item) return false;
-                    if (storedItems.size() >= maxItemStorage) return false;
+                if (!item) return false;
+                if (storedItems.size() >= maxItemStorage) return false;
 
-                    item->SetEnabledComponentStates(false);
-                    storedItems.push_back(item);
-                    item->GetGameObject().SetEnabled(true);
-                    scrollIndex = storedItems.size() - 1;
-                    return true;
+                item->SetEnabledComponentStates(false);
+                storedItems.push_back(item);
+                item->GetGameObject().SetEnabled(true);
+                scrollIndex = storedItems.size() - 1;
+                return true;
             }
 
             bool ItemInHand() {
@@ -57,13 +63,44 @@ namespace NCL {
                 PopItemFromInventory(inventoryIndex);
             }
 
-            float SellAllItems() {
+            void DisableItemInWorld(ItemComponent* item) {
+                item->SetSaleValue(0);
+                item->GetGameObject().SetEnabled(false);
+            }
+
+            std::function<CSC8508::PushdownState::PushdownResult()> InventoryMenu() {
+                std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
+                    int index = 0;
+                    for (auto const& item : storedItems) {
+                        std::string name = item->GetName();
+                        std::string sellVal = std::to_string(item->GetSaleValue());
+                        if (index == scrollIndex) {
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.00f, 0.60f, 0.00f, 1.00f));
+                            ImGui::Text(("Item: " + name).c_str());
+                            ImGui::Text(("Sell Value: " + sellVal).c_str());
+                            ImGui::PopStyleColor();
+                        }
+                        else {
+                            ImGui::Text(("Item: " + name).c_str());
+                            ImGui::Text(("Sell Value: " + sellVal).c_str());
+                        }
+                    }
+                    index += 1;
+                    return CSC8508::PushdownState::PushdownResult::NoChange;
+                    };
+                return func;
+            }
+
+           virtual float SellAllItems() {
                 float itemTotal = 0;
                 for (ItemComponent* item : storedItems) {
                     itemTotal += item->GetSaleValue();
-                    item->GetGameObject().SetEnabled(false);
+                    DisableItemInWorld(item);
                 }
                 storedItems.clear();
+                wallet += itemTotal;
+                std::cout << "Sold::" << itemTotal << std::endl;
+                return itemTotal;
             }
 
             /// <summary>
@@ -73,15 +110,30 @@ namespace NCL {
 
             void Load(std::string assetPath, size_t allocationStart) override;
             size_t Save(std::string assetPath, size_t* allocationStart) override;
-                
-        protected:
+            
+            void RemoveItemEntry(ItemComponent* item) {
+                for (int i = 0; i < storedItems.size(); i++) {
+                    if (storedItems[i] == item) {
+                        RemoveItemEntry(i);
+                        return;
+                    }
+                }
+            }
 
+            void RemoveItemEntry(int inventoryIndex) {
+                storedItems.erase(storedItems.begin() + inventoryIndex);
+            }
+
+        protected:
             int maxItemStorage;
             int scrollIndex = 0;
             float itemCarryOffset;
             float itemDropOffset;
             float carryYOffset = 3;
+            float wallet; 
             Transform& transform;
+
+            UI::InventoryUI* inventoryUI = new UI::InventoryUI;
             
             std::vector<ItemComponent*> storedItems;
              bool ItemAtScrollIndex() { return storedItems.size() > scrollIndex; }
@@ -101,8 +153,7 @@ namespace NCL {
                 item->SetEnabledComponentStates(true);
                 item->GetGameObject().SetEnabled(true);
                 ReturnItemToWorld(inventoryIndex);
-
-                storedItems.erase(storedItems.begin() + inventoryIndex);
+                RemoveItemEntry(inventoryIndex);
                 return item;
             }
         };

@@ -28,7 +28,7 @@ namespace NCL::CSC8508
 		void SetBoundingVolume(CollisionVolume* vol) { boundingVolume = vol;}
 
 		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}		
-		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
+		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize, CollisionVolume* volume);
 		const PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
 
 		bool GetBroadphaseAABB(Vector3& outsize) const;
@@ -52,6 +52,8 @@ namespace NCL::CSC8508
 		/// </summary>
 		struct BoundsComponentDataStruct;
 
+		void CopyComponent(GameObject* gameObject) override;
+
 		/// <summary>
 		/// Loads the PhysicsComponent save data into this PhysicsComponent
 		/// </summary>
@@ -65,6 +67,7 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+		CollisionVolume* CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		auto GetDerivedSerializedFields() const;
 
 	protected:

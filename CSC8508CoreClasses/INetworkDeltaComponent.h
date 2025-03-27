@@ -43,7 +43,7 @@ namespace NCL::CSC8508
 	class INetworkDeltaComponent : public INetworkComponent
 	{
 	public:
-		INetworkDeltaComponent(int objId, int ownId, int componentId, bool clientOwned, INetworkState* state = nullptr);
+		INetworkDeltaComponent(int objId, int ownId, int componentId, int pfabID, bool clientOwned, INetworkState* state = nullptr);
 		virtual ~INetworkDeltaComponent() { delete lastFullState; }
 
 		vector<GamePacket*> WriteDeltaFullPacket(bool deltaFrame);

@@ -18,6 +18,8 @@ void IComponent::SetEnabled(bool enabled) {
 	this->enabled = enabled;
 }
 
+void IComponent::CopyComponent(GameObject* gameObject) {}
+
 struct IComponent::ComponentDataStruct : public ISerializedData {
 	ComponentDataStruct() : enabled(1) {}
 	ComponentDataStruct(bool enabled) : enabled(enabled) {}

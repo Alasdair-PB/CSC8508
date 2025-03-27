@@ -21,7 +21,7 @@ GameObject::GameObject(const bool newIsStatic): isStatic(newIsStatic), parent(nu
 	worldID = -1;
 	isEnabled = true;
 	layerID = Layers::LayerID::Default;
-	tag = Tags::Tag::Default;
+	tags.push_back(Tags::Tag::Default);
 	renderObject = nullptr;
 	components = vector<IComponent*>();
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
@@ -93,7 +93,7 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 	transform.SetPosition(loadedSaveData.position);
 	transform.SetScale(loadedSaveData.scale);
 	SetEnabled(loadedSaveData.isEnabled);
-
+	tags = loadedSaveData.tags;
 	Mesh* mesh = MaterialManager::GetMesh(loadedSaveData.meshPointer);
 	Texture* basicTex = MaterialManager::GetTexture(loadedSaveData.texturePointer);
 	Shader* basicShader = MaterialManager::GetShader(loadedSaveData.shaderPointer);
@@ -107,9 +107,9 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 
 void GameObject::Load(std::string assetPath, size_t allocationStart) {
 	GameObjDataStruct loadedSaveData = ISerializedData::LoadISerializable<GameObjDataStruct>(assetPath, allocationStart);
+	LoadGameObjectInstanceData(loadedSaveData);
 	components.size() > 0 ? LoadInto(loadedSaveData, assetPath) : LoadClean(loadedSaveData, assetPath);
 	LoadChildInstanceData(loadedSaveData, assetPath);
-	LoadGameObjectInstanceData(loadedSaveData);
 }
 
 void GameObject::InitializeComponentMaps(
@@ -224,10 +224,50 @@ void GameObject::GetChildData(GameObjDataStruct& saveInfo, std::string assetPath
 
 void GameObject::LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath){
 	for (int i = 0; i < loadedSaveData.childrenPointers.size(); i++) {
-		GameObject* object = new GameObject();
+		GameObject* object = new GameObject(isStatic);
 		object->Load(assetPath, loadedSaveData.childrenPointers[i]);
 		AddChild(object);
 	}
+}
+
+void GameObject::CopyChildrenData(GameObject* gameObject)
+{
+	for (GameObject* child : children)
+		gameObject->AddChild(child->CopyGameObject());
+}
+
+void GameObject::CopyIcomponentData(GameObject* gameObject)
+{
+	for (IComponent* component : components)
+		component->CopyComponent(gameObject);
+}
+
+void GameObject::CopyInstanceData(GameObject* gameObject) {
+	gameObject->GetTransform().SetPosition(transform.GetLocalPosition());
+	gameObject->GetTransform().SetScale(transform.GetLocalScale());
+	gameObject->GetTransform().SetOrientation(transform.GetLocalOrientation());
+	gameObject->SetEnabled(isEnabled);
+
+	for (Tags::Tag tag:tags)
+		gameObject->SetTag(tag);
+
+	if (renderObject) {
+		RenderObject* copyRend = new RenderObject(&gameObject->GetTransform(),
+			renderObject->GetMesh(),
+			renderObject->GetDefaultTexture(),
+			renderObject->GetShader());
+		copyRend->SetColour(renderObject->GetColour());
+		gameObject->SetRenderObject(copyRend);
+	}
+}
+
+GameObject* GameObject::CopyGameObject() {
+	OrderComponentsByDependencies();
+	GameObject* copy = new GameObject(isStatic);
+	CopyInstanceData(copy);
+	CopyIcomponentData(copy);
+	CopyChildrenData(copy);
+	return copy;
 }
 
 size_t GameObject::Save(std::string assetPath, size_t* allocationStart)

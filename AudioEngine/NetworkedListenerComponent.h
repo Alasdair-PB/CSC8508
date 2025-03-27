@@ -35,8 +35,8 @@ namespace NCL::CSC8508 {
 	class NetworkedListenerComponent : public AudioListenerComponent, public INetworkComponent {
 
 	public:
-		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, bool clientOwned) :
-			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, clientOwned) {}
+		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, int pFabId, bool clientOwned) :
+			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, pFabId, clientOwned) {}
 
 		~NetworkedListenerComponent() {
 			if (clientOwned) {
@@ -273,10 +273,8 @@ namespace NCL::CSC8508 {
 			// if no valid packet or packet is outdated, insert silence
 			if (packet != nullptr && packet->historyStamp >= recieveHistoryCounter) {
 				 // Decode valid packet and increment history counter
-				std::cout << "Decoding Packet: " << packet->historyStamp << "/" << recieveHistoryCounter << std::endl;
 				DecodePersistentPlayback(audioPacketQueue[nextIndex]);
 			}
-
 
 			{
 				std::lock_guard<std::mutex> lock(audioQueueMutex);
@@ -392,7 +390,7 @@ namespace NCL::CSC8508 {
 			encodeThread = std::thread([this]() {
 				// Set the update interval to 20ms
 				auto nextUpdateTime = std::chrono::steady_clock::now();
-				while (encodeThreadRunning) {
+				while (encodeThreadRunning && audioEngine->GetIsSystemValid()) {
 					// Schedule the next update
 					nextUpdateTime += std::chrono::milliseconds(20);
 

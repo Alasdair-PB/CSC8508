@@ -95,7 +95,6 @@ set(Header_Files
     "GameWorld.h"
     "RenderObject.h"
     "MaterialManager.h"
-    "BindingManager.h"
     "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -137,6 +136,9 @@ set(Components
     "AnimationComponent.h"
     "SightComponent.h"
     "SightComponent.cpp"
+    "FallDamageComponent.h"
+    "FallDamageComponent.cpp"
+    "TimerComponent.h"
 )
 source_group("Components" FILES ${Components})
 
@@ -144,6 +146,7 @@ set(NetworkComponents
     "InputNetworkComponent.h"
     "TransformNetworkComponent.h"
     "FullTransformNetworkComponent.h"
+    "TimerNetworkComponent.h"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 
@@ -248,6 +251,7 @@ include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
 include_directories("../ImGui/")
+include_directories("../UISystem/")
 include_directories("../SerializedSave/")
 
 if(MSVC)

@@ -14,12 +14,12 @@ namespace NCL::CSC8508
 		int health;
 	};
 
-	struct FullPacket : public IFullNetworkPacket {
+	struct DamFullPacket : public IFullNetworkPacket {
 		DamageableNetworkState fullState;
 
-		FullPacket() {
+		DamFullPacket() {
 			type = Full_State;
-			size = sizeof(FullPacket) - sizeof(GamePacket);
+			size = sizeof(DamFullPacket) - sizeof(GamePacket);
 		}
 	};
 
@@ -27,8 +27,8 @@ namespace NCL::CSC8508
 	class DamageableNetworkComponent : public DamageableComponent, public INetworkDeltaComponent {
 	public:
 
-		DamageableNetworkComponent(GameObject& gameObject, int initialHealth, int initialMaxHealth, int objId, int ownId, int componId, bool clientOwned) :
-			INetworkDeltaComponent(objId, ownId, componId, clientOwned, new DamageableNetworkState),
+		DamageableNetworkComponent(GameObject& gameObject, int initialHealth, int initialMaxHealth, int objId, int ownId, int componId, int pfab, bool clientOwned) :
+			INetworkDeltaComponent(objId, ownId, componId, pfab, clientOwned, new DamageableNetworkState),
 			DamageableComponent(gameObject, initialHealth, initialMaxHealth) {
 		}
 
@@ -55,7 +55,7 @@ namespace NCL::CSC8508
 		vector<GamePacket*> WriteFullPacket() override
 		{
 			vector<GamePacket*> packets;
-			FullPacket* fp = new FullPacket();
+			DamFullPacket* fp = new DamFullPacket();
 			DamageableNetworkState* state = static_cast<DamageableNetworkState*>(lastFullState);
 
 			state->health = health;
@@ -79,9 +79,9 @@ namespace NCL::CSC8508
 
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override {
 			int newStateId = 0;
-			FullPacket p = ((FullPacket&)ifp);
+			DamFullPacket p = ((DamFullPacket&)ifp);
 
-			if (!UpdateFullStateHistory<DamageableNetworkState, FullPacket>(p, &newStateId))
+			if (!UpdateFullStateHistory<DamageableNetworkState, DamFullPacket>(p, &newStateId))
 				return false;
 
 			((DamageableNetworkState*)lastFullState)->health = p.fullState.health;

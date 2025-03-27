@@ -70,7 +70,7 @@ namespace NCL::CSC8508
         size_t Save(std::string assetPath, size_t* allocationStart) override;
             
 
-    private:
+    protected:
         int health;
         int maxHealth;
         GameObject& owner;

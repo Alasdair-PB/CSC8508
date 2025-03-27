@@ -14,7 +14,7 @@ using std::vector;
 namespace NCL::CSC8508 {
 
 	namespace Tags {
-		enum Tag { Default, Player, Enemy, DropZone, CursorCast, Ground };
+		enum Tag { Default, Player, Enemy, DropZone, CursorCast, Ground, DepositZone, Exit };
 	}
 
 	namespace Layers {

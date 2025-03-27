@@ -53,6 +53,12 @@ void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
     if (CheckTag(Tag::DropZone, collisionEvent)) {
         collidedTags.push(Tag::DropZone);
     }
+    if (CheckTag(Tag::DepositZone, collisionEvent)) {
+        collidedTags.push(Tag::DepositZone);
+    }
+	if (CheckTag(Tag::Exit, collisionEvent)) {
+		collidedTags.push(Tag::Exit);
+	}
 }
 
 void PlayerComponent::OnEvent(DeathEvent* deathEvent) {
@@ -72,6 +78,7 @@ void PlayerComponent::OnAwake()
     staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();
     inventoryComponent = GetGameObject().TryGetComponent<InventoryManagerComponent>();
     sightComponent = GetGameObject().TryGetComponent<SightComponent>();
+	gameManagerComponent = GameManagerComponent::GetInstance();
 
     EventManager::RegisterListener<InputButtonEvent>(this);
     EventManager::RegisterListener<CollisionEvent>(this);
@@ -122,10 +129,22 @@ bool PlayerComponent::DropItemToDropZone() {
     return true;
 }
 
+bool PlayerComponent::DropItemToDepositZone() {
+	if (inventoryComponent->GetWallet() <= 0) return false;
+
+    float walletValue = inventoryComponent->ResetWallet();
+    gameManagerComponent->AddToBank(walletValue);
+
+    return true;
+}
+
 bool PlayerComponent::DropItem() {
     if (inventoryComponent->ItemInHand()) {
         if (inDropZone) return DropItemToDropZone();
         else return DropItemToFloor();
+    }
+    else if (inBank){
+        return DropItemToDepositZone();
     }
     return false;
 }
@@ -147,10 +166,19 @@ void PlayerComponent::TryPickUp() {
     PickUpItem(item);
 }
 
+bool PlayerComponent::InteractExit() {
+	if (inExit) {
+		gameManagerComponent->OnMissionEnd();
+		return true;
+	}
+	return false;
+}
+
 void PlayerComponent::OnItemInteract() {
     if (!inventoryComponent) return;
     if (timeSinceLastPickUp < pickUpDelay) return;
     if (DropItem()) return;
+	if (InteractExit()) return;
     TryPickUp();
 }
 
@@ -174,6 +202,10 @@ void PlayerComponent::CheckTagStack() {
     while (!collidedTags.empty()) {
         if (collidedTags.top() == Tags::DropZone)
             inDropZone = true;
+		else if (collidedTags.top() == Tags::DepositZone)
+			inBank = true;
+		else if (collidedTags.top() == Tags::Exit)
+			inExit = true;
         else if (collidedTags.top() == Tags::Ground)
             isGrounded = true;
         collidedTags.pop();
@@ -196,6 +228,8 @@ void PlayerComponent::UpdateStates(float deltaTime) {
     isDashing = false;
     isGrounded = false;
     inDropZone = false;
+	inBank = false;
+	inExit = false;
     timeSinceLastPickUp += deltaTime;
 }
 

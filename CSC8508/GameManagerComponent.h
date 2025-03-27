@@ -10,8 +10,9 @@ namespace NCL::CSC8508 {
 		int quota;
 		int bankedCurrency;
 		int terminationFee;
+		int casualties;
 
-		static GameManagerComponent* instance;
+		inline static GameManagerComponent* instance = nullptr;
 
 	public:
 		GameManagerComponent(GameObject& gameObject)
@@ -23,7 +24,10 @@ namespace NCL::CSC8508 {
 			return instance;
 		}
 
+
+		//listen for event
 		void OnMissionEnd() {
+			std::cout << "Mission ended! Game Over!" << std::endl;
 			if (bankedCurrency >= quota) {
 				OnMissionSuccessful();
 			}
@@ -48,6 +52,16 @@ namespace NCL::CSC8508 {
 		void OnMissionFailure() {
 			std::cout << "Mission failed! You lost!" << std::endl;
 		}
+
+		void AddToBank(int amount) {
+			bankedCurrency += amount;
+		}
+
+		int GetBankedCurrency() const {
+			return bankedCurrency;
+		}
+
+
 	};
 }
 #endif

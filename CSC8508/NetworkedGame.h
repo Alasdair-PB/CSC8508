@@ -8,7 +8,7 @@ namespace NCL {
 		class GameServer;
 		class GameClient;
 		class NetworkPlayer;
-		enum Prefab { Player, Enemy, Item };
+		enum Prefab { Player, Enemy, Item, Manager };
 
 		class HostLobbyConnectEvent : public Event {};
 		class ClientLobbyConnectEvent : public Event 
@@ -77,6 +77,7 @@ namespace NCL {
 			GameObject* GetObjectFromPfab(size_t pfab, NetworkSpawnData data);
 			GameObject* GetPlayerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 			GameObject* GetItemPrefab(NetworkSpawnData* spawnPacket = nullptr);
+			GameObject* GetGameManagerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 
 
 		};

@@ -11,6 +11,7 @@
 #include "ComponentManager.h"
 #include "EventManager.h"
 #include "GameClient.h"
+#include "GameManagerComponent.h"
 
 
 #define COLLISION_MSG 30
@@ -40,6 +41,7 @@ struct SpawnPacket : public GamePacket {
 void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { 
+	TutorialGame::LoadGameManager(Vector3(93, 22, -53));
 	TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); 
 	TutorialGame::Loaditem(Vector3(93, 22, -53));
 }
@@ -82,6 +84,8 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
+	
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Manager);
 	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
 	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Item);
 }
@@ -198,11 +202,16 @@ GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket)
 GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket)
 	{ return TutorialGame::Loaditem(Vector3(93, 22, -53), spawnPacket);}
 
+GameObject* NetworkedGame::GetGameManagerPrefab(NetworkSpawnData* spawnPacket)
+	{ return TutorialGame::LoadGameManager(Vector3(93, 22, -53), spawnPacket);}
+
 GameObject* NetworkedGame::GetObjectFromPfab(size_t pfab, NetworkSpawnData data) {
-	GameObject* object;
+	GameObject* object = nullptr;
 	if (pfab == Prefab::Player)
 		object = GetPlayerPrefab(&data);
-	else
+	else if (pfab == Prefab::Manager)
+		object = GetGameManagerPrefab(&data);
+	else if (pfab == Prefab::Item)
 		object = GetItemPrefab(&data);
 	return object;
 }

@@ -10,6 +10,7 @@
 #include "EventManager.h"
 #include "CollisionDetection.h"
 #include "../InventoryNetworkManagerComponent.h"
+#include "../CSC8508/GameManagerComponent.h"
 
 namespace NCL {
     namespace CSC8508 {
@@ -46,6 +47,8 @@ namespace NCL {
 
             bool DropItemToFloor();
             bool DropItemToDropZone();
+			bool DropItemToDepositZone();
+            bool InteractExit();
             void PickUpItem(ItemComponent* item);
             void CheckTagStack();
             void CheckInputStack();
@@ -69,6 +72,8 @@ namespace NCL {
             bool isJumping;
             bool isDashing;
             bool inDropZone;
+            bool inBank;
+            bool inExit;
 
             Vector3 visionHeight = Vector3(0, 0.3f, 0);
             Vector3 maxVelocity = Vector3(15.0f, 15.0f, 15.0f);
@@ -83,6 +88,7 @@ namespace NCL {
             PhysicsComponent* physicsComponent = nullptr;
             PhysicsObject* physicsObj = nullptr;
             InventoryManagerComponent* inventoryComponent = nullptr;
+			GameManagerComponent* gameManagerComponent = nullptr;
 
             uint32_t onJumpBinding;
             uint32_t onDashBinding;

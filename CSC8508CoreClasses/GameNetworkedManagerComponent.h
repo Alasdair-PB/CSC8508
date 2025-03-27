@@ -41,6 +41,7 @@ namespace NCL::CSC8508 {
 		}
 
 		void Update(float dt) override {
+
 		}
 
 
@@ -49,12 +50,16 @@ namespace NCL::CSC8508 {
 
 				GameManagerPacket* packet = &(GameManagerPacket&)p;
 
-				//todo read packet data
+				casualties = packet->casualties;
+				bankedCurrency = packet->bankedCurrency;
+
 
 				return true;
 			}
 			return false;
 		}
+
+		void CheckPlayerInstance(DeathEvent* e) override;
 
 	};
 }

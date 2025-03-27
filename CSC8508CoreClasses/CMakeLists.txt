@@ -146,6 +146,7 @@ set(NetworkComponents
     "FullTransformNetworkComponent.h"
     "TimerNetworkComponent.h"
     "GameNetworkedManagerComponent.h"
+    "GameNetworkedManagerComponent.cpp"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 

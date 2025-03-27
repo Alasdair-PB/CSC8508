@@ -105,6 +105,11 @@ namespace NCL {
                 storedItems.erase(storedItems.begin() + inventoryIndex);
             }
 
+            void DepositWalletToQuota() {
+				deposited += wallet;
+				wallet = 0;
+            }
+
         protected:
             int maxItemStorage;
             int scrollIndex = 0;

@@ -129,12 +129,9 @@ bool PlayerComponent::DropItemToDropZone() {
     return true;
 }
 
-bool PlayerComponent::DropItemToDepositZone() {
+bool PlayerComponent::DropItemToDepositZone() { // this is the bank
 	if (inventoryComponent->GetWallet() <= 0) return false;
-
-    float walletValue = inventoryComponent->ResetWallet();
-    gameManagerComponent->AddToBank(walletValue);
-
+	inventoryComponent->DepositWalletToQuota();
     return true;
 }
 

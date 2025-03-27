@@ -3,14 +3,16 @@
 
 #include "IComponent.h"
 #include <iostream>
+#include "EventManager.h"
+#include "DamageableComponent.h"
 
 namespace NCL::CSC8508 {
-	class GameManagerComponent : public IComponent {
-	private:
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent> {
+	protected:
 		int quota;
 		int bankedCurrency;
 		int terminationFee;
-		int casualties;
+		int casualties = 0;
 
 		inline static GameManagerComponent* instance = nullptr;
 
@@ -24,8 +26,22 @@ namespace NCL::CSC8508 {
 			return instance;
 		}
 
+		void OnAwake() override {
+			EventManager::RegisterListener<DeathEvent>(this);
+		}
 
-		//listen for event
+		void Update(float dt) override {
+
+		}
+
+		
+		void OnEvent(DeathEvent* e) override {
+			CheckPlayerInstance(e);
+		}
+
+		virtual void CheckPlayerInstance(DeathEvent* e);
+
+
 		void OnMissionEnd() {
 			std::cout << "Mission ended! Game Over!" << std::endl;
 			if (bankedCurrency >= quota) {
@@ -35,6 +51,8 @@ namespace NCL::CSC8508 {
 				OnMissionFailure();
 			}
 		}
+
+		int GetTotalQuota();
 
 		bool TryRespawnPlayer() {
 			bankedCurrency -= terminationFee;
@@ -59,6 +77,10 @@ namespace NCL::CSC8508 {
 
 		int GetBankedCurrency() const {
 			return bankedCurrency;
+		}
+
+		void IncrementCasualties() {
+			casualties++;
 		}
 
 

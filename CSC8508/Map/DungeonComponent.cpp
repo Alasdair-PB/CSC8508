@@ -20,6 +20,20 @@ void DungeonComponent::Generate(int const roomCount) const {
     entryRoom->AddComponent<RoomComponent>(prefab);
     GetGameObject().AddChild(entryRoom);
 
+    // Line up the entry room with the dungeon entrance
+    DoorLocation const doorLoc = prefab->GetDoorLocations().at(0);
+    Quaternion const orientationDifference = Quaternion::VectorsToQuaternion(doorLoc.dir, -entrancePosition.dir);
+    Transform entryTransform = entryRoom->GetTransform();
+    entryTransform.SetOrientation(orientationDifference);
+    entryTransform.SetPosition(
+        GetGameObject().GetTransform().GetPosition()
+        + GetGameObject().GetTransform().GetOrientation() * entrancePosition.pos * GetGameObject().GetTransform().GetScale()
+        - entryTransform.GetOrientation() * doorLoc.pos * entryTransform.GetScale()
+        );
+
+    Quaternion rotation = entryRoom->GetTransform().GetOrientation();
+    std::cout << "Rotation = " << rotation.x << ", " << rotation.y << ", " << rotation.z << ", w = " << rotation.w << '\n';
+
     // Generate subsequent rooms
     for (int i = 0; i < roomCount - 1; i++) {
         if (!GenerateRoom()) {

@@ -40,7 +40,8 @@ struct SpawnPacket : public GamePacket {
 void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { 
-	TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); 
+	//TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
+	TutorialGame::AddPlayerToWorld(Vector3(0, 20.0f, 0));
 	TutorialGame::Loaditem(Vector3(93, 22, -53));
 }
 

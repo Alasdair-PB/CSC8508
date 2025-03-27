@@ -157,7 +157,9 @@ TutorialGame::~TutorialGame()
 void TutorialGame::UpdateGame(float dt)
 {
 	world->UpdateWorld(dt);
-	Debug::DrawLine(Vector3(100.0f, 0.0f, 100.0f), Vector3(100.0f, 1000.0f, 100.0f)); // TODO: Remove
+	//Debug::DrawLine(Vector3(100.0f, 0.0f, 100.0f), Vector3(100.0f, 1000.0f, 100.0f)); // TODO: Remove
+	//Debug::DrawLine(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 100.0f, 0.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	//Debug::DrawLine(Vector3(100.0f, 0.0f, 0.0f), Vector3(100.0f, 100.0f, 0.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f));
 	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
@@ -180,7 +182,7 @@ void TutorialGame::LoadDungeon(Vector3 const offset) {
 	auto t = Transform();
 	t.SetPosition(offset);
 	DoorLocation const loc(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
-	auto x = AddDungeonToWorld(t, loc, 3); // TODO: Add back in
+	AddDungeonToWorld(t, loc, 3); // TODO: Add back in
 
 	// for (auto child : x->GetChildren()) {
 	// 	for (auto childling : child->GetChildren()) {
@@ -197,8 +199,8 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-	std::string assetPath = GetAssetPath("myScene.pfab");
-	LoadWorld(assetPath);
+	//std::string assetPath = GetAssetPath("myScene.pfab");
+	//LoadWorld(assetPath);
 
 	LoadDungeon(Vector3());
 }

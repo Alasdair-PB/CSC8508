@@ -11,7 +11,7 @@
 #include "ComponentManager.h"
 #include "EventManager.h"
 #include "GameClient.h"
-
+#include "GameManagerComponent.h"
 
 #define COLLISION_MSG 30
 
@@ -40,10 +40,50 @@ struct SpawnPacket : public GamePacket {
 void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { 
+	TutorialGame::LoadGameManager(Vector3(93, 22, -53));
 	TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); 
 	TutorialGame::Loaditem(Vector3(93, 22, -53));
 }
 
+#if EOSBUILD
+
+void NetworkedGame::StartEOSCallBack() { HostGame(); }
+void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
+void NetworkedGame::StartEOSLobbySearchCallBack(const std::string& lobbyID) {EOSLobbySearchFunc(lobbyID);}
+void NetworkedGame::StartAsHostCallBack() {EOSStartAsHost();}
+
+void NetworkedGame::StartAsJoinCallBack(const std::string& ip) {
+	std::stringstream ss(ip);
+	std::string segment;
+	std::vector<uint8_t> bytes;
+
+	while (std::getline(ss, segment, '.')) {
+		int num = std::stoi(segment);
+		if (num < 0 || num > 255) {
+			std::cout << "Invalid IP segment: " << segment << std::endl;
+			return;
+		}
+		bytes.push_back(static_cast<uint8_t>(num));
+	}
+
+	if (bytes.size() != 4) {
+		std::cout << "Invalid IP format: " << ip << std::endl;
+		return;
+	}
+
+	std::cout << "Parsed IP: " << ip << std::endl;
+
+	uint8_t a = bytes[0];
+	uint8_t b = bytes[1];
+	uint8_t c = bytes[2];
+	uint8_t d = bytes[3];
+
+	EOSStartAsJoin(a, b, c, d);
+}
+
+void NetworkedGame::StartEOSLobbyUpdateCallBack() { EOSLobbyDetailsUpdate(); }
+
+#endif
 
 void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
 void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
@@ -55,10 +95,30 @@ NetworkedGame::NetworkedGame()	{
 	thisServer = nullptr;
 	thisClient = nullptr;
 
-	mainMenu = new MainMenu([&](bool state) -> void {world->SetPausedWorld(state); },
+#if !EOSBUILD
+	mainMenu = new MainMenu(
+		[&](bool state) -> void { world->SetPausedWorld(state); },
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
-		[&]() -> void { this->StartOfflineCallBack();});
+		[&]() -> void { this->StartOfflineCallBack(); }
+	);
+#else
+	mainMenu = new MainMenu(
+		[&](bool state) -> void { world->SetPausedWorld(state); },
+		[&]() -> void { this->StartClientCallBack(); },
+		[&]() -> void { this->StartServerCallBack(); },
+		[&]() -> void { this->StartOfflineCallBack(); },
+		[&]() -> void { this->StartEOSCallBack(); },
+		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
+		[&](std::string id) -> void { this->StartEOSLobbySearchCallBack(id); },
+		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); },
+		[&]() -> std::string { return this->GetOwnerIP(); },
+		[&]() -> std::string { return this->GetLobbyID(); },
+		[&]() -> int { return this->GetPlayerCount(); },
+		[&]() -> void { this->StartAsHostCallBack(); },
+		[&](const std::string& code) -> void { this->StartAsJoinCallBack(code); }
+	);
+#endif
 
 	NetworkBase::Initialise();
 	timeToNextPacket  = 0.0f;
@@ -82,6 +142,8 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
+	
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Manager);
 	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
 	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Item);
 }
@@ -101,6 +163,70 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
 }
 
+#if EOSBUILD
+void NetworkedGame::HostGame()
+{
+
+	eosManager->StartEOS();
+}
+
+void NetworkedGame::EOSLobbyCreation()
+{
+	eosLobbyManager->CreateLobby();
+	eosLobbySearch->CreateLobbySearch(eosLobbyManager->LobbyId);
+
+	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
+}
+
+void NetworkedGame::EOSLobbySearchFunc(const std::string& lobbyID)
+{
+
+	eosLobbySearch->CreateLobbySearch(lobbyID.c_str()); // <-- convert std::string to const char*
+
+	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
+	eosLobbyFunctions->JoinLobby();
+
+}
+
+void NetworkedGame::EOSLobbyDetailsUpdate()
+{
+
+	eosLobbyFunctions->UpdateLobbyDetails();
+
+}
+
+void NetworkedGame::EOSStartAsHost()
+{
+
+	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
+	thisServer->RegisterPacketHandler(Received_State, this);
+	thisServer->RegisterPacketHandler(Spawn_Object, this);
+	thisServer->RegisterPacketHandler(Component_Event, this);
+
+	thisServer->RegisterPacketHandler(Delta_State, this);
+	thisServer->RegisterPacketHandler(Full_State, this);
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
+
+}
+
+void NetworkedGame::EOSStartAsJoin(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
+	std::cout << static_cast<int>(a) << std::endl;
+	std::cout << static_cast<int>(b) << std::endl;
+	std::cout << static_cast<int>(c) << std::endl;
+	std::cout << static_cast<int>(d) << std::endl;
+
+	thisClient = new GameClient();
+	thisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
+
+	thisClient->RegisterPacketHandler(Delta_State, this);
+	thisClient->RegisterPacketHandler(Full_State, this);
+	thisClient->RegisterPacketHandler(Component_Event, this);
+	thisClient->RegisterPacketHandler(Player_Connected, this);
+	thisClient->RegisterPacketHandler(Player_Disconnected, this);
+	thisClient->RegisterPacketHandler(Spawn_Object, this);
+}
+
+#endif
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 
 {
 	int id = e->GetClientId();
@@ -198,11 +324,16 @@ GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket)
 GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket)
 	{ return TutorialGame::Loaditem(Vector3(93, 22, -53), spawnPacket);}
 
+GameObject* NetworkedGame::GetGameManagerPrefab(NetworkSpawnData* spawnPacket)
+	{ return TutorialGame::LoadGameManager(Vector3(93, 22, -53), spawnPacket);}
+
 GameObject* NetworkedGame::GetObjectFromPfab(size_t pfab, NetworkSpawnData data) {
-	GameObject* object;
+	GameObject* object = nullptr;
 	if (pfab == Prefab::Player)
 		object = GetPlayerPrefab(&data);
-	else
+	else if (pfab == Prefab::Manager)
+		object = GetGameManagerPrefab(&data);
+	else if (pfab == Prefab::Item)
 		object = GetItemPrefab(&data);
 	return object;
 }

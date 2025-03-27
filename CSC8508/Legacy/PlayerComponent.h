@@ -13,7 +13,14 @@
 
 namespace NCL {
     namespace CSC8508 {
-        using namespace NCL::CSC8508::Tags;
+        using namespace Tags;
+
+        class ExitEvent : public Event {
+        public:
+            ExitEvent() {}
+        };
+
+
         class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent>, public EventListener<DeathEvent> {
         public:
 
@@ -32,6 +39,10 @@ namespace NCL {
             void OnAwake() override;
             void Update(float deltaTime) override;
 
+			bool IsGrounded() { return isGrounded; }
+            bool IsJumping() { return isJumping; }
+            bool IsMoving() { return isMoving; }
+
         protected:
             void OnDashInput();
             void OnJumpInput();
@@ -46,6 +57,8 @@ namespace NCL {
 
             bool DropItemToFloor();
             bool DropItemToDropZone();
+			bool DropItemToDepositZone();
+            bool InteractExit();
             void PickUpItem(ItemComponent* item);
             void CheckTagStack();
             void CheckInputStack();
@@ -68,7 +81,11 @@ namespace NCL {
             bool isGrounded;
             bool isJumping;
             bool isDashing;
+            bool isMoving;
             bool inDropZone;
+            bool inBank;
+            bool inExit;
+
 
             Vector3 visionHeight = Vector3(0, 0.3f, 0);
             Vector3 maxVelocity = Vector3(15.0f, 15.0f, 15.0f);

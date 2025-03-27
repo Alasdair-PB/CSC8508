@@ -1,4 +1,7 @@
 #include "PlayerComponent.h"
+#include "../Event/EventManager.h"
+#include "../Event/Event.h"
+
 using namespace NCL;
 using namespace CSC8508;
 
@@ -53,6 +56,12 @@ void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
     if (CheckTag(Tag::DropZone, collisionEvent)) {
         collidedTags.push(Tag::DropZone);
     }
+    if (CheckTag(Tag::DepositZone, collisionEvent)) {
+        collidedTags.push(Tag::DepositZone);
+    }
+	if (CheckTag(Tag::Exit, collisionEvent)) {
+		collidedTags.push(Tag::Exit);
+	}
 }
 
 void PlayerComponent::OnEvent(DeathEvent* deathEvent) {
@@ -122,10 +131,19 @@ bool PlayerComponent::DropItemToDropZone() {
     return true;
 }
 
+bool PlayerComponent::DropItemToDepositZone() { // this is the bank
+	if (inventoryComponent->GetWallet() <= 0) return false;
+	inventoryComponent->DepositWalletToQuota();
+    return true;
+}
+
 bool PlayerComponent::DropItem() {
     if (inventoryComponent->ItemInHand()) {
         if (inDropZone) return DropItemToDropZone();
         else return DropItemToFloor();
+    }
+    else if (inBank){
+        return DropItemToDepositZone();
     }
     return false;
 }
@@ -147,17 +165,29 @@ void PlayerComponent::TryPickUp() {
     PickUpItem(item);
 }
 
+bool PlayerComponent::InteractExit() {
+	if (inExit) {
+        ExitEvent* e = new ExitEvent();
+        EventManager::Call<ExitEvent>(e);
+		std::cout << "Exit" << std::endl;
+		return true;
+	}
+	return false;
+}
+
 void PlayerComponent::OnItemInteract() {
     if (!inventoryComponent) return;
     if (timeSinceLastPickUp < pickUpDelay) return;
     if (DropItem()) return;
+	if (InteractExit()) return;
     TryPickUp();
 }
 
 void PlayerComponent::OnPlayerMove() {
+    isMoving = false;
     if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
         return;
-
+    isMoving = true;
     Vector3 dir;
     Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
 
@@ -174,6 +204,10 @@ void PlayerComponent::CheckTagStack() {
     while (!collidedTags.empty()) {
         if (collidedTags.top() == Tags::DropZone)
             inDropZone = true;
+		else if (collidedTags.top() == Tags::DepositZone)
+			inBank = true;
+		else if (collidedTags.top() == Tags::Exit)
+			inExit = true;
         else if (collidedTags.top() == Tags::Ground)
             isGrounded = true;
         collidedTags.pop();
@@ -194,8 +228,11 @@ void PlayerComponent::CheckInputStack() {
 
 void PlayerComponent::UpdateStates(float deltaTime) {
     isDashing = false;
-    isGrounded = false;
+
+    isGrounded = !isJumping ? true : false;
     inDropZone = false;
+	inBank = false;
+	inExit = false;
     timeSinceLastPickUp += deltaTime;
 }
 

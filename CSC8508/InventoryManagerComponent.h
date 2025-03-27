@@ -72,7 +72,9 @@ namespace NCL {
             std::function<CSC8508::PushdownState::PushdownResult()> InventoryMenu() {
                 std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
                     int index = 0;
+                    ImGui::Text(("Wallet: " + std::to_string(wallet)).c_str());
                     for (auto const& item : storedItems) {
+                        ImGui::SetCursorPosY(0.04 * Window::GetWindow()->GetScreenSize().y);
                         std::string name = item->GetName();
                         std::string sellVal = std::to_string(item->GetSaleValue());
                         if (index == scrollIndex) {
@@ -104,6 +106,16 @@ namespace NCL {
                 return itemTotal;
             }
 
+           float ResetWallet() {
+			   float walletValue = wallet;
+			   wallet = 0;
+			   return walletValue;
+		   }
+
+           float GetWallet() {
+			   return wallet;
+           }
+
             /// <summary>
             /// IComponent Save data struct definition
             /// </summary>
@@ -125,6 +137,11 @@ namespace NCL {
                 storedItems.erase(storedItems.begin() + inventoryIndex);
             }
 
+            void DepositWalletToQuota() {
+				deposited += wallet;
+				wallet = 0;
+            }
+
         protected:
             int maxItemStorage;
             int scrollIndex = 0;
@@ -132,6 +149,7 @@ namespace NCL {
             float itemDropOffset;
             float carryYOffset = 3;
             float wallet; 
+            float deposited;
             Transform& transform;
 
             UI::InventoryUI* inventoryUI = new UI::InventoryUI;

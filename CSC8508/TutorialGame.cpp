@@ -21,6 +21,10 @@
 #include "KeyboardMouseController.h"
 #endif // USE_PS5
 
+#if EOSBUILD
+#include "EOSLobbyFunctions.h"
+#endif
+
 
 using namespace NCL;
 using namespace CSC8508;
@@ -69,20 +73,17 @@ void TutorialGame::InitialiseGame() {
 
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
-
-	std::string vectorIntPath = GetAssetPath("vector_data.pfab");
-	SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
-
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 	audioEngine = &AudioEngine::Instance();
 
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
-	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 
+	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+
+	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 	inSelectionMode = false;
 	physics->UseGravity(true);
 }
@@ -116,8 +117,8 @@ void TutorialGame::InitialiseAssets() {
 	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
 	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
 	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
+	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
 	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
-
 	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
 	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));
@@ -145,7 +146,9 @@ void TutorialGame::UpdateGame(float dt)
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {
-	LoadDropZone(Vector3(85, 22, -60), Vector3(5,5,5));
+	LoadDropZone(Vector3(85, 15, -60), Vector3(3,1,3), Tags::DropZone);
+	LoadDropZone(Vector3(75, 15, -60), Vector3(3,1,3), Tags::DepositZone);
+	LoadDropZone(Vector3(65, 15, -60), Vector3(3,1,3), Tags::Exit);
 	world->Load(assetPath);
 }
 
@@ -173,14 +176,63 @@ void TutorialGame::UpdateUI() {
 		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
 	}
-
+#if !EOSBUILD
 	if (mainMenuUI->GetMenuOption() != 0) {
-		mainMenu->SetOption(mainMenuUI->GetMenuOption());
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
 	}
-	
+
+#else
+
+	//This needs to change back to how it was
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() == 0)
+	{
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
+		uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu");
+		mainMenu->lobbyCodeInput = lobbySearchField->GetInputText();
+	}
+
+	if (mainMenuUI->GetMenuOption() != 0 && mainMenuUI->GetMenuOption() != 4)
+	{
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+	}
+
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->RemoveStack("EOS Menu");
+
+		std::string ip = mainMenu->getOwnerIPFunc();
+		std::string lobbyID = mainMenu->getLobbyIDFunc();
+		int playerCount = mainMenu->getPlayerCountFunc();
+
+		bool isLobbyOwner = eosMenuUI->GetMenuOption() == 1;
+
+		if (lobbyID != "")
+		{
+			if (!eosLobbyMenuCreated)
+			{
+				eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount + 1);
+				eosLobbyMenuCreated = true;
+			}
+			uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
+		}
+	}
+
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("EOS Lobby Menu");
+		uiSystem->RemoveStack("Inventory");
+	}
+
+#endif
+
 	uiSystem->RenderFrame();
 }
-
-

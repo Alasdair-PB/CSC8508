@@ -1,45 +1,53 @@
 #include "StateComponent.h"
+#include "StateTransition.h"
+#include "StateMachine.h"
+#include "State.h"
+#include "PhysicsObject.h"
 
+using namespace NCL;
+using namespace CSC8508;
 
-using namespace NCL::CSC8508;
+StateComponent::StateComponent(GameObject& gameObject) : IComponent(gameObject)
+{
 
-StateComponent::StateComponent(GameObject& gameObject) : IComponent(gameObject){
-	activeState = nullptr;
-	counter = 0.0f;
+    counter = 0.0f;
+    stateMachine = new StateMachine();
+
+    State* stateA = new State([&](float dt) -> void {
+        this->MoveLeft(dt);
+        });
+
+    State* stateB = new State([&](float dt) -> void {
+        this->MoveRight(dt);
+        });
+
+    stateMachine->AddState(stateA);
+    stateMachine->AddState(stateB);
+
+    stateMachine->AddTransition(new StateTransition(stateA, stateB, [&]() -> bool {
+        return this->counter > 3.0f;
+        }));
+
+    stateMachine->AddTransition(new StateTransition(stateB, stateA, [&]() -> bool {
+        return this->counter < 0.0f;
+        }));
 }
+
 
 StateComponent::~StateComponent() {
-	for (auto& i : allStates) {
-		delete i;
-	}
-	for (auto& i : allTransitions) {
-		delete i.second;
-	}
+	delete stateMachine;
 }
 
-void StateComponent::AddState(IState* s) {
-	allStates.emplace_back(s);
-	if (activeState == nullptr) {
-		activeState = s;
-	}
+void StateComponent::Update(float dt) {
+    stateMachine -> Update(dt);
 }
 
-void StateComponent::AddTransition(IStateTransition* t) {
-	allTransitions.insert(std::make_pair(t->GetSourceState(), t));
+void StateComponent::MoveLeft(float dt) {
+    physics->GetPhysicsObject()->AddForce({ -100, 0, 0 });
+    counter += dt;
 }
 
-
-void StateComponent::Update(float dt, GameObject& gamneObject) {
-	if (activeState) {
-		activeState->Update(dt, gamneObject);
-
-		std::pair<ITransitionIterator, ITransitionIterator> range = allTransitions.equal_range(activeState);
-
-		for (auto& i = range.first; i != range.second; ++i) {
-			if (i->second->CanTransition()) {
-				IState* newState = i->second->GetDestinationState();
-				activeState = newState;
-			}
-		}
-	}
+void StateComponent::MoveRight(float dt) {
+    physics->GetPhysicsObject()->AddForce({ 100, 0, 0 });
+    counter -= dt;
 }

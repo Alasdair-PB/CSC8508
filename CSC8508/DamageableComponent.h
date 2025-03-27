@@ -69,6 +69,11 @@ namespace NCL::CSC8508
         int GetMaxHealth() const {
             return maxHealth;
         }
+
+		GameObject* GetOwner() {
+			return &owner;
+		}
+
         /// <summary>
         /// IComponent Save data struct definition
         /// </summary>

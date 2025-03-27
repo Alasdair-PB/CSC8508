@@ -1,10 +1,6 @@
 #pragma once
 #include "../OpenGLRendering/OGLRenderer.h"
-#ifdef USE_PS5
-#include "../ImGui/PS5/imgui.h"
-#else
-#include "../ImGui/WIN/imgui.h"
-#endif // USE_PS5
+#include "imgui.h"
 #include "../CSC8508CoreClasses/PushdownMachine.h"
 #include "../CSC8508CoreClasses/PushdownState.h"
 #include <iostream>
@@ -17,7 +13,7 @@ namespace NCL {
 
 			class UIElement {
 			public:
-				std::string elemenetName = "";
+				std::string elementName = "";
 				virtual CSC8508::PushdownState::PushdownResult UpdateElement() {
 					return CSC8508::PushdownState::PushdownResult::NoChange;
 				};
@@ -130,15 +126,15 @@ namespace NCL {
 					func = f;
 				}
 				CSC8508::PushdownState::PushdownResult UpdateElement()override {
-					strncpy_s(inputData, input.c_str(), 16);
-					ImGui::InputText(fieldName.c_str(), inputData, 16);
+					strncpy_s(inputData, input.c_str(), 64);
+					ImGui::InputText(fieldName.c_str(), inputData, 64);
 					input = std::string(inputData);
 					return func(inputData);
 				}
 			protected:
 				std::string fieldName;
 				std::string input;
-				char inputData[16];
+				char inputData[64];
 				std::function<CSC8508::PushdownState::PushdownResult(std::string)> func;
 			};
 

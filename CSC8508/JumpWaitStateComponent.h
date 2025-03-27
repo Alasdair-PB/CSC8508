@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "PhysicsComponent.h"
-#include "..\CSC8508CoreClasses\StateComponent.h"
+#include "IStateComponent.h"
 #include "WaitState.h"
 #include "JumpState.h"
 #include "IStateTransition.h"
@@ -13,9 +13,9 @@ namespace NCL {
         class IStateTransition;
         
 
-        class JumpWaitStateComponent : public StateComponent {
+        class JumpWaitStateComponent : public IStateComponent {
         public:
-            JumpWaitStateComponent(GameObject& gameObject) : StateComponent(gameObject){
+            JumpWaitStateComponent(GameObject& gameObject) : IStateComponent(gameObject){
                 activeState = nullptr;
 
                 IState* stateA = new WaitState(10.0f);

@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 
 namespace NCL {
 	namespace CSC8508 {

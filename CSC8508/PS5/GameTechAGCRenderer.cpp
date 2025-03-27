@@ -563,7 +563,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 					}
 					
 					AGCMesh* m = (AGCMesh*)g->GetMesh();
-					if (m && m->GetJointCount() > 0) {//It's a skeleton mesh, need to update transformed vertices buffer
+					if (m && m->GetJointCount() > 0 && o->TryGetComponent<AnimationComponent>() != nullptr) {//It's a skeleton mesh, need to update transformed vertices buffer
 
 						Buffer* b = g->GetGPUBuffer();
 						if (!b) {

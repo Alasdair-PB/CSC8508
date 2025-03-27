@@ -58,7 +58,7 @@ namespace NCL {
             float jumpForce = 10.0f;
             float jumpDuration = 0;
             float downwardsVelocityMod = 50.0f;
-            float dashTickStam = 2.0f;
+            float dashTickStam = 0.1f;
             float jumpStamCost = 10.0f;
             float visibleRange = 5.0f;
 

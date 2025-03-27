@@ -155,9 +155,10 @@ void PlayerComponent::OnItemInteract() {
 }
 
 void PlayerComponent::OnPlayerMove() {
+    isMoving = false;
     if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
         return;
-
+    isMoving = true;
     Vector3 dir;
     Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
 
@@ -194,7 +195,8 @@ void PlayerComponent::CheckInputStack() {
 
 void PlayerComponent::UpdateStates(float deltaTime) {
     isDashing = false;
-    isGrounded = false;
+
+    isGrounded = !isJumping ? true : false;
     inDropZone = false;
     timeSinceLastPickUp += deltaTime;
 }

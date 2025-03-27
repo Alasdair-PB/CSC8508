@@ -40,13 +40,17 @@ void PlayerComponent::OnEvent(InputButtonEvent* buttonEvent) {
     inputStack.push(buttonEvent->buttonId);
 }
 
+bool PlayerComponent::CheckTag(Tag tag, CollisionEvent* collisionEvent) {
+    return (collisionEvent->object1.HasTag(tag) && &collisionEvent->object2 == &GetGameObject()) ||
+        (collisionEvent->object2.HasTag(tag) && &collisionEvent->object1 == &GetGameObject());
+}
+
 void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
 {
-    bool hasTag = (collisionEvent->object1.HasTag(Tags::Ground) && &collisionEvent->object2 == &GetGameObject()) ||
-        (collisionEvent->object2.HasTag(Tags::Ground) && &collisionEvent->object1 == &GetGameObject());
-    if (hasTag) {
-        isGrounded = true;
-    }
+    if (CheckTag(Tag::Ground, collisionEvent))
+        collidedTags.push(Tag::Ground);
+    if (CheckTag(Tag::DropZone, collisionEvent))
+        collidedTags.push(Tag::DropZone);
 }
 
 /**
@@ -99,11 +103,21 @@ void PlayerComponent::OnJump(float deltaTime) {
     }
 }
 
+bool PlayerComponent::DropItemToFloor() {
+    inventoryComponent->DropItem();
+    timeSinceLastPickUp = 0;
+    return true;
+}
+
+bool PlayerComponent::DropItemToDropZone() {
+    float sellValue = inventoryComponent->SellAllItems();
+    return true;
+}
+
 bool PlayerComponent::DropItem() {
     if (inventoryComponent->ItemInHand()) {
-        inventoryComponent->DropItem();
-        timeSinceLastPickUp = 0;
-        return true;
+        if (inDropZone) DropItemToDropZone();
+        else DropItemToFloor();
     }
     return false;
 }
@@ -148,6 +162,16 @@ void PlayerComponent::OnPlayerMove() {
     physicsObj->RotateTowardsVelocity();
 }
 
+void PlayerComponent::CheckTagStack() {
+    while (!collidedTags.empty()) {
+        if (collidedTags.top() == Tags::DropZone)
+            inDropZone = true;
+        else if (collidedTags.top() == Tags::Ground)
+            isGrounded = true;
+        collidedTags.pop();
+    }
+}
+
 void PlayerComponent::CheckInputStack() {
     while (!inputStack.empty()) {
         if (inputStack.top() == onDashBinding)
@@ -163,6 +187,7 @@ void PlayerComponent::CheckInputStack() {
 void PlayerComponent::UpdateStates(float deltaTime) {
     isDashing = false;
     isGrounded = false;
+    inDropZone = false;
     timeSinceLastPickUp += deltaTime;
 }
 
@@ -170,6 +195,7 @@ void PlayerComponent::Update(float deltaTime)
 {
     if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
         return;
+    CheckTagStack();
     OnPlayerMove();
     CheckInputStack();
     OnJump(deltaTime);

@@ -273,10 +273,8 @@ namespace NCL::CSC8508 {
 			// if no valid packet or packet is outdated, insert silence
 			if (packet != nullptr && packet->historyStamp >= recieveHistoryCounter) {
 				 // Decode valid packet and increment history counter
-				std::cout << "Decoding Packet: " << packet->historyStamp << "/" << recieveHistoryCounter << std::endl;
 				DecodePersistentPlayback(audioPacketQueue[nextIndex]);
 			}
-
 
 			{
 				std::lock_guard<std::mutex> lock(audioQueueMutex);

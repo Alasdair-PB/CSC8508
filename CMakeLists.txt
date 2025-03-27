@@ -14,6 +14,10 @@ else ()
     endif()
 endif()
 
+if(EOSBuild)
+    add_compile_definitions("EOSBUILD")
+endif()
+
 
 set(CMAKE_CXX_STANDARD 20)
 add_compile_options(-std=c++20)
@@ -73,6 +77,20 @@ add_compile_definitions(ASSETROOTLOCATION="${DEBUG_ASSET_ROOT}")
 if(MSVC) 
     add_compile_definitions("NOMINMAX")
     add_compile_definitions("WIN32_LEAN_AND_MEAN") 
+endif()
+
+################################################################################
+# IP Address
+################################################################################
+if(NOT PS5)
+execute_process(
+    COMMAND powershell -Command "(Invoke-WebRequest -Uri 'https://api64.ipify.org' -UseBasicParsing).Content"
+    OUTPUT_VARIABLE PUBLIC_IP
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+message(STATUS "Public IP Address: ${PUBLIC_IP}")
+add_definitions(-DPUBLIC_IP_ADDRESS=${PUBLIC_IP})
 endif()
 
 ################################################################################
@@ -191,6 +209,7 @@ add_subdirectory(CSC8508)
 add_subdirectory(CSC8508CoreClasses)
 add_subdirectory(ImGui)
 add_subdirectory(Event)
+add_subdirectory(EOSFramework)
 add_subdirectory(SerializedSave)
 add_subdirectory(UISystem)
 add_subdirectory(AudioEngine)
@@ -221,7 +240,7 @@ target_include_directories(CSC8508 PRIVATE "${FMOD_DIR}/inc")
 target_link_libraries(AudioEngine PRIVATE ${OPUS_LIBRARY})
 
 # Link EOS Engine
-if(NOT PS5)
+if(EOSBuild)
 target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")
 else()
 target_link_libraries(CSC8508 PRIVATE "${EOS_DIR}/Lib/EOSSDK-Win64-Shipping.lib")

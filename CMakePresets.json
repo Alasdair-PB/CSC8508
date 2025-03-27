@@ -5,7 +5,7 @@
       "name": "ps5-build",
       "hidden": false,
       "generator": "Visual Studio 17 2022",
-	  "architecture": "Prospero",
+      "architecture": "Prospero",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "C:/Program Files (x86)/SCE/Prospero/Tools/CMake/PS5.cmake",
@@ -18,13 +18,17 @@
         "Editor": {
           "type": "INTERNAL",
           "value": "FALSE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
+          "value": "FALSE"
         }
       }
     },
     {
       "name": "windows-build",
       "hidden": false,
-      "generator": "Visual Studio 17 2022",  
+      "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/build_windows",
       "cacheVariables": {
         "PS5": {
@@ -33,6 +37,10 @@
         },
         "Editor": {
           "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
           "value": "FALSE"
         }
       }
@@ -40,7 +48,7 @@
     {
       "name": "windows-editor-build",
       "hidden": false,
-      "generator": "Visual Studio 17 2022",  
+      "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/build_windows",
       "cacheVariables": {
         "PS5": {
@@ -49,6 +57,30 @@
         },
         "Editor": {
           "type": "INTERNAL",
+          "value": "TRUE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
+          "value": "FALSE"
+        }
+      }
+    },
+    {
+      "name": "windows-eos-build",
+      "hidden": false,
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build_windows_eos",
+      "cacheVariables": {
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
           "value": "TRUE"
         }
       }

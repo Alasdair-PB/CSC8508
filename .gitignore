@@ -81,6 +81,7 @@ Testing/
 enet-master/
 *.zip
 /build_windows
+/build_windows_eos
 
 **/Untracked
 **/PSSL

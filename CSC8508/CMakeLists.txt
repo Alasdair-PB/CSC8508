@@ -302,6 +302,7 @@ if(PS5)
     PUBLIC ${CMAKE_SOURCE_DIR}/GLTFLoader
     PUBLIC ${CMAKE_SOURCE_DIR}/NCLCoreClasses
 	PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
+	PUBLIC ${CMAKE_SOURCE_DIR}/EOSFramework
 	PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
 	PUBLIC ${CMAKE_SOURCE_DIR}/Event
     PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
@@ -313,6 +314,7 @@ else()
 	PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
     PUBLIC ${CMAKE_SOURCE_DIR}/NCLCoreClasses
 	PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
+	PUBLIC ${CMAKE_SOURCE_DIR}/EOSFramework
 	PUBLIC ${CMAKE_SOURCE_DIR}/Event
     PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
 	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
@@ -369,6 +371,7 @@ if(PS5)
 		GLTFLoader
 		Event
 		AudioEngine
+		EOSFramework
 		ImGui
 		UISystem
 		enet
@@ -406,6 +409,7 @@ else()
 		NCLCoreClasses
 		OpenGLRendering
 		CSC8508CoreClasses
+		EOSFramework
 		Event
 		AudioEngine
 		ImGui

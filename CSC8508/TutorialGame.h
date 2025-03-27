@@ -16,9 +16,18 @@
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
+
+#if EOSBUILD
+#include "MainMenuUI.h"
+#include "EOSMenuUI.h"
+#include "LobbySearch.h"
+#include "EOSLobbyMenuUI.h"
+#endif
+
 #include "AudioSliders.h"
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
+#include "StaminaBar.h"
 #include "LobbySearch.h"
 //#include "PauseUI.h"
 
@@ -40,7 +49,6 @@ namespace NCL {
 			TutorialGame();
 			~TutorialGame();
 			virtual void UpdateGame(float dt);
-
 		protected:
 			void InitialiseAssets();
 			void InitWorld();
@@ -77,6 +85,8 @@ namespace NCL {
 			MainMenu* mainMenu = nullptr;
 			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset = Vector3(0, 14, 20);
+			
+
 
 			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
@@ -88,10 +98,18 @@ namespace NCL {
 			UI::FramerateUI* framerate = new UI::FramerateUI;
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
+			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
 			UI::AudioSliders* audioSliders = new UI::AudioSliders;
 			/*UI::PauseUI* pauseUI = new UI::PauseUI;*/
 
 			float framerateDelay = 0;
+
+#if EOSBUILD
+			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;
+			UI::EOSLobbyMenuUI* eosLobbyMenuUI = new UI::EOSLobbyMenuUI(false, "", "", 0);
+
+			bool eosLobbyMenuCreated = false;
+#endif
 		};
 	}
 }

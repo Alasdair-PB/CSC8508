@@ -32,10 +32,10 @@ std::string TutorialGame::GetAssetPath(std::string pfabName) {
 }
 
 GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
-	GameObject* myObjectToLoad = new GameObject();
+	GameObject* myObjectToLoad = new GameObject(true);
 	std::string pfabPath = GetAssetPath(assetPath);
 	myObjectToLoad->Load(pfabPath);
-	myObjectToLoad->GetTransform().SetPosition(myObjectToLoad->GetTransform().GetPosition() + offset);
+	myObjectToLoad->GetTransform().SetPosition(offset);
 	world->AddGameObject(myObjectToLoad);
 	return myObjectToLoad;
 }
@@ -76,7 +76,6 @@ void TutorialGame::InitialiseGame() {
 
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
-
 	audioEngine = &AudioEngine::Instance();
 
 	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
@@ -84,8 +83,6 @@ void TutorialGame::InitialiseGame() {
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
 	uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
-
-
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -158,9 +155,12 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 
-	GameObject* room = LoadRoomPfab("room_A.pfab", Vector3(0, 26, 0));
-	auto roomB = room->CopyGameObject();
-	roomB->GetTransform().SetPosition(Vector3(-26, 26, 0));
+	//GameObject* room = LoadRoomPfab("room_A.pfab", Vector3(90, 90, -50));
+	//GameObject* roomB = room->CopyGameObject();
+	//room->SetEnabled(true);
+	//roomB->GetTransform().SetPosition(Vector3(90, 60, -50));
+	//roomB->SetEnabled(true);
+	//world->AddGameObject(roomB);
 
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);

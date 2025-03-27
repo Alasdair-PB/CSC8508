@@ -223,7 +223,7 @@ void GameObject::GetChildData(GameObjDataStruct& saveInfo, std::string assetPath
 
 void GameObject::LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath){
 	for (int i = 0; i < loadedSaveData.childrenPointers.size(); i++) {
-		GameObject* object = new GameObject();
+		GameObject* object = new GameObject(isStatic);
 		object->Load(assetPath, loadedSaveData.childrenPointers[i]);
 		AddChild(object);
 	}
@@ -250,12 +250,8 @@ void GameObject::CopyInstanceData(GameObject* gameObject) {
 	for (Tags::Tag tag:tags)
 		gameObject->SetTag(tag);
 
-	auto meshCopy = MaterialManager::GetMeshPointer(renderObject->GetMesh()); 
-	auto textureCopy = MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture());
-	auto shaderCopy = MaterialManager::GetShaderPointer(renderObject->GetShader());
-
 	if (renderObject) {
-		RenderObject* copyRend = new RenderObject(&GetTransform(),
+		RenderObject* copyRend = new RenderObject(&gameObject->GetTransform(),
 			renderObject->GetMesh(),
 			renderObject->GetDefaultTexture(),
 			renderObject->GetShader());
@@ -266,7 +262,7 @@ void GameObject::CopyInstanceData(GameObject* gameObject) {
 
 GameObject* GameObject::CopyGameObject() {
 	OrderComponentsByDependencies();
-	GameObject* copy = new GameObject();
+	GameObject* copy = new GameObject(isStatic);
 	CopyInstanceData(copy);
 	CopyIcomponentData(copy);
 	CopyChildrenData(copy);

@@ -3,6 +3,8 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "NetworkObject.h"
+#include "INetworkDeltaComponent.h"
+
 
 using namespace NCL::CSC8508;
 

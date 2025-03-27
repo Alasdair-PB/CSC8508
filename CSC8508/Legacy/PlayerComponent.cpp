@@ -201,7 +201,7 @@ void PlayerComponent::UpdateStates(float deltaTime) {
 
 void PlayerComponent::AddDownWardsVelocity() {
     if (isGrounded) return;
-    if (physicsObj->GetLinearVelocity().y <= 0.0f)
+    if (physicsObj->GetLinearVelocity().y <= -0.2f)
         physicsObj->AddForce(Vector3(0, -1, 0) * downwardsVelocityMod);
 
     Vector3 force = physicsObj->GetForce();

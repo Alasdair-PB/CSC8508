@@ -26,8 +26,8 @@ namespace NCL::CSC8508
 	class TimerNetworkComponent : public TimerComponent, public INetworkComponent
 	{
 	public:
-		TimerNetworkComponent(GameObject & gameObject, int objId, int ownId, int componId, int pFabId, bool clientOwned) :
-			TimerComponent(gameObject), INetworkComponent(objId, ownId, componId, pFabId, clientOwned) {}
+		TimerNetworkComponent(GameObject & gameObject, float timeRemaining, int objId, int ownId, int componId, int pFabId, bool clientOwned) :
+			TimerComponent(gameObject, timeRemaining), INetworkComponent(objId, ownId, componId, pFabId, clientOwned) {}
 
 		~TimerNetworkComponent() {
 		}
@@ -55,7 +55,6 @@ namespace NCL::CSC8508
 		bool ReadEventPacket(INetworkPacket& p) override {
 			if (p.packetSubType == None) {
 				TimerPacket* timerPacket = (TimerPacket*)&p;
-				isPaused = timerPacket->isPaused;
 				isComplete = timerPacket->isComplete;
 				remainingTime = timerPacket->remainingTime;
 				return true;
@@ -65,7 +64,6 @@ namespace NCL::CSC8508
 
 		void SendTimerPacket() {
 			TimerPacket* timerPacket = new TimerPacket();
-			timerPacket->isPaused = isPaused;
 			timerPacket->isComplete = isComplete;
 			timerPacket->remainingTime = remainingTime;
 			SendEventPacket(timerPacket);

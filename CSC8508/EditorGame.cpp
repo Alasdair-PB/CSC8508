@@ -153,11 +153,11 @@ void EditorGame::InitialiseAssets() {
 
 EditorGame::~EditorGame()
 {
-	MaterialManager::CleanUp();
+	//MaterialManager::CleanUp();
 	ComponentManager::CleanUp();
 
 	delete physics;
-	delete renderer;
+	//delete renderer;
 	delete world;
 	delete controller;
 	delete navMesh;

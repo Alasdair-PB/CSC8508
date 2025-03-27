@@ -34,6 +34,8 @@ namespace NCL::CSC8508
             healthbar->UpdateHealth(health);
         }
 
+        ~DamageableComponent() = default;
+
         void Damage(int damage) {
             if (damage > 0) {
                 health = std::max(0, health - damage);

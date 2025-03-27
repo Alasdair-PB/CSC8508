@@ -100,13 +100,6 @@ namespace NCL {
 
 			GameObject* objClosest = nullptr;
 			UI::UISystem* uiSystem;
-
-			UI::FramerateUI* framerate = new UI::FramerateUI;
-			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
-			UI::AudioSliders* audioSliders = new UI::AudioSliders;
-			UI::Healthbar* healthbar = new UI::Healthbar;
-
-			float framerateDelay = 0;
 		};
 	}
 }

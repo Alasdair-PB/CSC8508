@@ -135,60 +135,6 @@ int GetUniqueId(int objectId, int& componentCount) {
 	return unqiueId;
 }
 
-GameObject* EditorGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
-	float meshSize = 1.0f;
-	float inverseMass = 0.5f;
-
-	GameObject* player = new GameObject();
-	GameObject* sphereB = AddSphereToWorld(Vector3(0,5,0), 1, 0);
-	
-	player->AddChild(sphereB);
-
-	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
-	Mesh* capsuleMesh = MaterialManager::GetMesh("capsule");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
-
-	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100,100, 3);
-	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
-	pc->SetBindingDash(KeyCodes::SHIFT, stamina);
-	pc->SetBindingJump(KeyCodes::SPACE, stamina);
-
-	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-	int componentIdCount = 0;
-
-	if (spawnData)
-	{
-		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
-		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
-			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
-
-		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
-			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), spawnData->clientOwned);
-
-		if (spawnData->clientOwned) 
-			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
-	}
-	else {
-		InputComponent* input = player->AddComponent<InputComponent>(controller);
-		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
-	}
-
-	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
-	player->SetLayerID(Layers::LayerID::Player);
-	player->SetTag(Tags::Player);
-
-	player->SetRenderObject(new RenderObject(&player->GetTransform(), capsuleMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
-
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
-	phys->GetPhysicsObject()->InitSphereInertia();
-
-	world->AddGameObject(player);
-	return player;
-}
-
 GameObject* EditorGame::AddFloorToWorld(const Vector3& position)
 {
 	GameObject* floor = new GameObject();

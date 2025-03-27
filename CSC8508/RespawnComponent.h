@@ -16,6 +16,7 @@ namespace NCL::CSC8508 {
 	public:
 		RespawnComponent(GameObject& gameObject, const std::vector<Vector3>& points = {})
 			: IComponent(gameObject), spawnPoints(points) {}
+		~RespawnComponent() = default;
 
 		void SetSpawnPoints(const std::vector<Vector3>& points) {
 			spawnPoints = points;

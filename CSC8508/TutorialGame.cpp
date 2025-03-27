@@ -21,6 +21,10 @@
 #include "KeyboardMouseController.h"
 #endif // USE_PS5
 
+#if EOSBUILD
+#include "EOSLobbyFunctions.h"
+#endif
+
 
 using namespace NCL;
 using namespace CSC8508;
@@ -80,7 +84,6 @@ void TutorialGame::InitialiseGame() {
 	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
 
 	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
-
 	inSelectionMode = false;
 	physics->UseGravity(true);
 }
@@ -171,14 +174,63 @@ void TutorialGame::UpdateUI() {
 		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 		framerateDelay = 0;
 	}
-
+#if !EOSBUILD
 	if (mainMenuUI->GetMenuOption() != 0) {
-		mainMenu->SetOption(mainMenuUI->GetMenuOption());
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
 		uiSystem->RemoveStack("Main Menu");
 		uiSystem->RemoveStack("Audio Sliders");
 	}
-	
+
+#else
+
+	//This needs to change back to how it was
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() == 0)
+	{
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
+		uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu");
+		mainMenu->lobbyCodeInput = lobbySearchField->GetInputText();
+	}
+
+	if (mainMenuUI->GetMenuOption() != 0 && mainMenuUI->GetMenuOption() != 4)
+	{
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+	}
+
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->RemoveStack("EOS Menu");
+
+		std::string ip = mainMenu->getOwnerIPFunc();
+		std::string lobbyID = mainMenu->getLobbyIDFunc();
+		int playerCount = mainMenu->getPlayerCountFunc();
+
+		bool isLobbyOwner = eosMenuUI->GetMenuOption() == 1;
+
+		if (lobbyID != "")
+		{
+			if (!eosLobbyMenuCreated)
+			{
+				eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount + 1);
+				eosLobbyMenuCreated = true;
+			}
+			uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
+		}
+	}
+
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("EOS Lobby Menu");
+		uiSystem->RemoveStack("Inventory");
+	}
+
+#endif
+
 	uiSystem->RenderFrame();
 }
-
-

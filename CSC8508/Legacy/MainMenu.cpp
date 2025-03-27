@@ -21,12 +21,46 @@ namespace NCL {
 			}
 		};
 
-		MainMenu::MainMenu(SetPauseGame setPauseFunc, StartClient startClient, StartServer startServer, StartOffline startOffline)
+#if !EOSBUILD
+		MainMenu::MainMenu(SetPauseGame setPauseFunc,
+			StartClient startClient,
+			StartServer startServer,
+			StartOffline startOffline)
 		{
 			setPause = setPauseFunc;
 			this->startClient = startClient;
 			this->startServer = startServer;
 			this->startOffline = startOffline;
+#else
+		MainMenu::MainMenu(SetPauseGame setPauseFunc,
+			StartClient startClient,
+			StartServer startServer,
+			StartOffline startOffline,
+			StartEOS startEOS,
+			StartEOSLobbyCreation startEOSLobbyCreation,
+			StartEOSLobbySearch startEOSLobbySearch,
+			StartEOSLobbyUpdate startEOSLobbyUpdate,
+			GetStringFunc getOwnerIP,
+			GetStringFunc getLobbyID,
+			GetIntFunc getPlayerCount,
+			EOSStartAsHost eosStartAsHost,
+			EOSStartAsJoin eosStartAsJoin)
+		{
+			setPause = setPauseFunc;
+			this->startClient = startClient;
+			this->startServer = startServer;
+			this->startOffline = startOffline;
+			this->startEOS = startEOS;
+			this->startEOSLobbyCreation = startEOSLobbyCreation;
+			this->startEOSLobbySearch = startEOSLobbySearch;
+			this->startEOSLobbyUpdate = startEOSLobbyUpdate;
+			getOwnerIPFunc = getOwnerIP;
+			getLobbyIDFunc = getLobbyID;
+			getPlayerCountFunc = getPlayerCount;
+			this->EOSStartAsHostFunc = eosStartAsHost;
+			this->EOSStartAsJoinFunc = eosStartAsJoin;
+#endif
+			
 
 			machine = new PushdownMachine(new OverlayScreen(
 				[&]() -> void { this->OnStateAwake(); },
@@ -81,27 +115,119 @@ namespace NCL {
 		PushdownState::PushdownResult MainMenu::IntroScreenOnUpdate(float dt, PushdownState** newState)
 		{
 			Debug::Print("Main Menu", Vector2(5, 85));
-			/*Debug::Print(" C->Start as client", Vector2(5, 65));
-			Debug::Print("V->Start as server", Vector2(5, 55));
-			Debug::Print("B->Start Offline", Vector2(5, 45));*/
 
-			if (menuOption == startClientOpt) {
+#if EOSBUILD
+
+			if (eosFlowFinished)
+			{
+				std::cout << "Popping Success";
+				return PushdownState::Pop;
+			}
+#endif
+
+			if (mainMenuOption == startClientOpt) {
+				std::cout << "Start Client Pressed";
 				setPause(false);
 				startClient();
-				return PushdownState::PushdownResult::Pop;
+				return PushdownState::Pop;
 			}
-			if (menuOption == startServerOpt) {
+			if (mainMenuOption == startServerOpt) {
 				setPause(false);
 				startServer();
-				return PushdownState::PushdownResult::Pop;
+				return PushdownState::Pop;
 			}
-			if (menuOption == startOfflineOpt) {
+			if (mainMenuOption == startOfflineOpt) {
 				setPause(false);
 				startOffline();
-				return PushdownState::PushdownResult::Pop;
+				return PushdownState::Pop;
 			}
-			return PushdownState::PushdownResult::NoChange;
+#if EOSBUILD
+			if (mainMenuOption == eosOption) {
+				startEOS();
+				*newState = new OverlayScreen(
+					[&]() -> void { this->OnStateAwakePause(); },
+					[&](float dt, PushdownState** newState) -> PushdownState::PushdownResult {
+						return this->LobbyScreenOnUpdate(dt, newState);
+					}
+				);
+				return PushdownState::Push;
+			}
+#endif
+			return PushdownState::NoChange;
 		}
+
+#if EOSBUILD
+		PushdownState::PushdownResult MainMenu::LobbyScreenOnUpdate(float dt, PushdownState** newState)
+		{
+			Debug::Print("Duplicate Main Menu", Vector2(5, 85));
+
+			if (eosFlowFinished)
+			{
+				return PushdownState::Pop;
+			}
+
+			if (eosMenuOption == hostLobby) {
+				setPause(false);
+				startEOSLobbyCreation();
+
+				*newState = new OverlayScreen(
+					[&]() -> void { this->OnStateAwakePause(); },
+					[&](float dt, PushdownState** newState) -> PushdownState::PushdownResult {
+						return this->LobbyDetailsOnUpdate(dt, newState);
+					}
+				);
+				return PushdownState::Push;
+			}
+			if (eosMenuOption == joinLobby) {
+				setPause(false);
+				startEOSLobbySearch(lobbyCodeInput);
+
+				*newState = new OverlayScreen(
+					[&]() -> void { this->OnStateAwakePause(); },
+					[&](float dt, PushdownState** newState) -> PushdownState::PushdownResult {
+						return this->LobbyDetailsOnUpdate(dt, newState);
+					}
+				);
+				return PushdownState::Push;
+			}
+			return PushdownState::NoChange;
+		}
+
+		PushdownState::PushdownResult MainMenu::LobbyDetailsOnUpdate(float dt, PushdownState** newState)
+		{
+			lobbyUpdateTimer += dt;
+			if (lobbyUpdateTimer >= updateInterval)
+			{
+				startEOSLobbyUpdate();
+				lobbyUpdateTimer = 0.0f;
+			}
+
+			if (eosLobbyOption == startGameAsHost)
+			{
+				setPause(false);
+				EOSStartAsHostFunc();
+				eosFlowFinished = true;
+				return PushdownState::Pop;
+			}
+			
+			if (eosLobbyOption == startGameAsJoin)
+			{
+				setPause(false);
+				EOSStartAsJoinFunc(getOwnerIPFunc());
+				eosFlowFinished = true;
+				return PushdownState::Pop;
+			}
+
+			return PushdownState::NoChange;
+		}
+
+		PushdownState::PushdownResult LobbyScreenOnUpdate(float dt, PushdownState** newState) {
+			Debug::Print("Waiting for players...", Vector2(5, 80));
+
+			return PushdownState::NoChange;
+		}
+
+#endif
 
 		MainMenu::~MainMenu() {
 			delete activeController;

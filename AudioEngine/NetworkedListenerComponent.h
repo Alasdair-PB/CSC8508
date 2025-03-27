@@ -35,8 +35,8 @@ namespace NCL::CSC8508 {
 	class NetworkedListenerComponent : public AudioListenerComponent, public INetworkComponent {
 
 	public:
-		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, bool clientOwned) :
-			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, clientOwned) {}
+		NetworkedListenerComponent(GameObject& gameObject, PerspectiveCamera& camera, int objId, int ownId, int componId, int pFabId, bool clientOwned) :
+			AudioListenerComponent(gameObject, camera), INetworkComponent(objId, ownId, componId, pFabId, clientOwned) {}
 
 		~NetworkedListenerComponent() {
 			if (clientOwned) {
@@ -392,7 +392,7 @@ namespace NCL::CSC8508 {
 			encodeThread = std::thread([this]() {
 				// Set the update interval to 20ms
 				auto nextUpdateTime = std::chrono::steady_clock::now();
-				while (encodeThreadRunning) {
+				while (encodeThreadRunning && audioEngine->GetIsSystemValid()) {
 					// Schedule the next update
 					nextUpdateTime += std::chrono::milliseconds(20);
 

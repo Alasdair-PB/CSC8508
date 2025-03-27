@@ -93,6 +93,12 @@ int main(int argc, char** argv)
 		Debug::UpdateRenderables(dt);
 	}
 	Window::DestroyGameWindow();
+
+	#if EDITOR
+		g->~EditorGame();
+	#else 
+		g->~NetworkedGame();
+	#endif
 #endif
 	
 }

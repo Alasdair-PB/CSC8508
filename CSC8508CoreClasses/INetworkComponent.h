@@ -39,7 +39,7 @@ namespace NCL::CSC8508
 	class INetworkComponent
 	{
 	public:
-		INetworkComponent(int objId, int ownId, int componentID, bool clientOwned);
+		INetworkComponent(int objId, int ownId, int componentID, int pfabId, bool clientOwned);
 
 		virtual ~INetworkComponent() = default;
 		virtual bool ReadEventPacket(INetworkPacket& p) { return false; }
@@ -47,6 +47,7 @@ namespace NCL::CSC8508
 		int GetObjectID() { return objectID; }
 		int GetComponentID() { return componentID; }
 		int GetOwnerID() { return ownerID; }
+		int GetPfabID() { return pfabID;  }
 		bool IsOwner() { return clientOwned; }
 
 	protected:
@@ -55,6 +56,7 @@ namespace NCL::CSC8508
 		int ownerID;
 		bool clientOwned;
 		int componentID;
+		int pfabID;
 
 		void SendEventPacket(INetworkPacket* packet)
 		{

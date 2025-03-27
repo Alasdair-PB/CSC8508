@@ -42,6 +42,15 @@ GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
 
 void LoadControllerMappings(Controller* controller)
 {
+#ifdef USE_PS5
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(2, "Forward");
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
+	controller->MapButton(KeyCodes::SHIFT, "Dash"); //Ps5 relevant buttons
+	controller->MapButton(KeyCodes::SPACE, "Jump"); // Keep names
+	controller->MapButton(KeyCodes::E, "Interact");
+#else
 	controller->MapAxis(0, "Sidestep");
 	controller->MapAxis(2, "Forward");
 	controller->MapAxis(3, "XLook");
@@ -49,6 +58,8 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
 	controller->MapButton(KeyCodes::E, "Interact");
+#endif
+	controller->BindMappingsToHashIds();
 }
 
 void TutorialGame::InitialiseGame() {
@@ -123,23 +134,6 @@ void TutorialGame::InitialiseAssets() {
 
 TutorialGame::~TutorialGame()	
 {
-	MaterialManager::CleanUp();
-	ComponentManager::CleanUp();
-
-	delete audioEngine;
-	delete physics;
-	delete renderer;
-	delete world;
-	delete controller;
-	delete navMesh;
-
-	delete framerate;
-	delete mainMenuUI;
-	delete audioSliders;
-	delete healthbar;
-	delete staminaBar;
-	delete lobbySearchField;
-	/*delete inventoryUI;*/
 }
 
 void TutorialGame::UpdateGame(float dt)
@@ -162,8 +156,6 @@ void TutorialGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-
-	Loaditem(Vector3(5, 0, 5));
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	LoadWorld(assetPath);
 }

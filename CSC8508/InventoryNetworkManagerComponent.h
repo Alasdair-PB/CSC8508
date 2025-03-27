@@ -24,10 +24,10 @@ namespace NCL::CSC8508 {
 	class InventoryNetworkManagerComponent : public InventoryManagerComponent, public INetworkDeltaComponent {
 
 	public:
-		InventoryNetworkManagerComponent(GameObject& gameObject, int maxStorage, float carryOffset, float dropOffset, int objId, int ownId, int componId, bool clientOwned)
+		InventoryNetworkManagerComponent(GameObject& gameObject, int maxStorage, float carryOffset, float dropOffset, int objId, int ownId, int componId, int pfabID, bool clientOwned)
 			:
 			InventoryManagerComponent(gameObject, maxStorage, carryOffset, dropOffset),
-			INetworkDeltaComponent(objId, ownId, componId, clientOwned, new InventoryNetworkState()) {
+			INetworkDeltaComponent(objId, ownId, componId, pfabID, clientOwned, new InventoryNetworkState()) {
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {

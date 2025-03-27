@@ -22,7 +22,7 @@ namespace NCL {
                     AddComponent(e->GetEntry(), e->GetGameObject());
                 }
             protected:
-                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable };
+                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable, RoomPrefab };
                 std::unordered_map<size_t, ComponentMapId> componentMap;
                 bool AddComponent(size_t t, GameObject& object);
 

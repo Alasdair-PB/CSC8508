@@ -6,6 +6,7 @@
 #include "INetworkDeltaComponent.h"
 #include "INetworkComponent.h"
 #include "DamageableComponent.h"
+#include "Map/RoomPrefab.h"
 
 
 using namespace NCL;
@@ -30,6 +31,10 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
         object.AddComponent<AnimationComponent>();
         break;
 
+    }case ComponentMapId::RoomPrefab: {
+        object.AddComponent<::RoomPrefab>();
+        break;
+
     }case ComponentMapId::Error:
             std::cout << "Error adding component" << std::endl;
             break;
@@ -45,4 +50,5 @@ void ComponentAssemblyDefiner::InitializeMap() {
     EventManager::RegisterListener<AddComponentEvent>(this, EARLY);
     SetHash<BoundsComponent>(Bounds);
     SetHash<PhysicsComponent>(Physics);
+    SetHash<::RoomPrefab>(RoomPrefab);
 }

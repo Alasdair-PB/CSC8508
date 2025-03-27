@@ -47,7 +47,9 @@ Transform& Transform::SetOrientation(const Quaternion& worldOrientation) {
 }
 
 Vector3 Transform::GetPosition() const {
-	return parentTransform == nullptr ? position : position + parentTransform->GetPosition();
+	//return parentTransform == nullptr ? position : CalculateParentOffset();
+	//return parentTransform == nullptr ? position : position + parentTransform->GetPosition();
+	return parentTransform == nullptr ? position : parentTransform->GetOrientation() * (parentTransform->GetScale() * position)  + parentTransform->GetPosition();
 }
 
 Vector3 Transform::GetScale() const {

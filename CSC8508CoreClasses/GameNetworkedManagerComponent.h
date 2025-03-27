@@ -60,6 +60,7 @@ namespace NCL::CSC8508 {
 		}
 
 		void CheckPlayerInstance(DeathEvent* e) override;
+		void OnExitEvent(ExitEvent* e) override;
 
 	};
 }

@@ -31,3 +31,14 @@ int GameManagerComponent::GetTotalQuota() {
 
 	return amount;
 }
+
+
+void GameManagerComponent::OnExitEvent(ExitEvent* e) {
+	std::cout << "Mission ended! Game Over!" << std::endl;
+	if (bankedCurrency >= quota) {
+		OnMissionSuccessful();
+	}
+	else {
+		OnMissionFailure();
+	}
+}

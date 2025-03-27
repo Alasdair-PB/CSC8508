@@ -16,6 +16,7 @@
 #include "InventoryManagerComponent.h"
 #include "FallDamageComponent.h"
 #include "DamageableComponent.h"
+#include "GameManagerComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 

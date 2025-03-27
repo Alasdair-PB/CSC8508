@@ -10,11 +10,17 @@
 #include "EventManager.h"
 #include "CollisionDetection.h"
 #include "../InventoryNetworkManagerComponent.h"
-#include "../CSC8508/GameManagerComponent.h"
 
 namespace NCL {
     namespace CSC8508 {
-        using namespace NCL::CSC8508::Tags;
+        using namespace Tags;
+
+        class ExitEvent : public Event {
+        public:
+            ExitEvent() {}
+        };
+
+
         class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent>, public EventListener<DeathEvent> {
         public:
 
@@ -88,7 +94,6 @@ namespace NCL {
             PhysicsComponent* physicsComponent = nullptr;
             PhysicsObject* physicsObj = nullptr;
             InventoryManagerComponent* inventoryComponent = nullptr;
-			GameManagerComponent* gameManagerComponent = nullptr;
 
             uint32_t onJumpBinding;
             uint32_t onDashBinding;

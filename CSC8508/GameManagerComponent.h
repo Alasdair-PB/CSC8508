@@ -4,10 +4,11 @@
 #include "IComponent.h"
 #include <iostream>
 #include "EventManager.h"
+#include "../CSC8508/Legacy/PlayerComponent.h"
 #include "DamageableComponent.h"
 
 namespace NCL::CSC8508 {
-	class GameManagerComponent : public IComponent, public EventListener<DeathEvent> {
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent> {
 	protected:
 		int quota;
 		int bankedCurrency;
@@ -28,6 +29,7 @@ namespace NCL::CSC8508 {
 
 		void OnAwake() override {
 			EventManager::RegisterListener<DeathEvent>(this);
+			EventManager::RegisterListener<ExitEvent>(this);
 		}
 
 		void Update(float dt) override {
@@ -39,7 +41,14 @@ namespace NCL::CSC8508 {
 			CheckPlayerInstance(e);
 		}
 
+		void OnEvent(ExitEvent* e) override {
+			OnExitEvent(e);
+		}
+
+
 		virtual void CheckPlayerInstance(DeathEvent* e);
+
+		virtual void OnExitEvent(ExitEvent* e);
 
 
 		void OnMissionEnd() {

@@ -1,4 +1,7 @@
 #include "PlayerComponent.h"
+#include "../Event/EventManager.h"
+#include "../Event/Event.h"
+
 using namespace NCL;
 using namespace CSC8508;
 
@@ -78,7 +81,6 @@ void PlayerComponent::OnAwake()
     staminaComponent = GetGameObject().TryGetComponent<StaminaComponent>();
     inventoryComponent = GetGameObject().TryGetComponent<InventoryManagerComponent>();
     sightComponent = GetGameObject().TryGetComponent<SightComponent>();
-	gameManagerComponent = GameManagerComponent::GetInstance();
 
     EventManager::RegisterListener<InputButtonEvent>(this);
     EventManager::RegisterListener<CollisionEvent>(this);
@@ -165,7 +167,9 @@ void PlayerComponent::TryPickUp() {
 
 bool PlayerComponent::InteractExit() {
 	if (inExit) {
-		gameManagerComponent->OnMissionEnd();
+        ExitEvent* e = new ExitEvent();
+        EventManager::Call<ExitEvent>(e);
+		std::cout << "Exit" << std::endl;
 		return true;
 	}
 	return false;

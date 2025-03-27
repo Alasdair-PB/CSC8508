@@ -19,3 +19,15 @@ void GameNetworkedManagerComponent::CheckPlayerInstance(DeathEvent* e) {
 		}
 	);
 }
+
+
+void GameNetworkedManagerComponent::OnExitEvent(ExitEvent* e) {
+	if (!clientOwned) { return; }
+	std::cout << "Mission ended! Game Over! But Networked This time!" << std::endl;
+	if (bankedCurrency >= quota) {
+		OnMissionSuccessful();
+	}
+	else {
+		OnMissionFailure();
+	}
+}

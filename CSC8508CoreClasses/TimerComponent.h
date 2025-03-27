@@ -12,10 +12,13 @@ namespace NCL::CSC8508
 	{
 	public:
 
-		TimerComponent(GameObject& gameObject) : IComponent(gameObject) {}
+		TimerComponent(GameObject& gameObject) : IComponent(gameObject) {
+			isComplete = false;
+			isPaused = false;
+			remainingTime = -1.0f;
+		}
 
 		~TimerComponent() {
-			std::cout << "TimerComponent destroyed" << std::endl;
 		}
 
 
@@ -34,9 +37,6 @@ namespace NCL::CSC8508
 		}
 
 		void OnAwake() override {
-			isComplete = true;
-			isPaused = false;
-			remainingTime = -1.0f;
 		}
 
 		void SetTime(float time) {
@@ -58,7 +58,19 @@ namespace NCL::CSC8508
 			isPaused ? Unpause() : Pause();
 		}
 
-	private:
+		float GetRemainingTime() const {
+			return remainingTime;
+		}
+
+		bool IsComplete() const {
+			return isComplete;
+		}
+
+		bool IsPaused() const {
+			return isPaused;
+		}
+
+	protected:
 
 		bool isComplete;
 		bool isPaused;

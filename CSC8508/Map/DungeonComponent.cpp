@@ -32,7 +32,7 @@ void DungeonComponent::Generate(int const roomCount) const {
         );
 
     Quaternion rotation = entryRoom->GetTransform().GetOrientation();
-    std::cout << "Rotation = " << rotation.x << ", " << rotation.y << ", " << rotation.z << ", w = " << rotation.w << '\n';
+
 
     // Generate subsequent rooms
     for (int i = 0; i < roomCount - 1; i++) {
@@ -40,7 +40,7 @@ void DungeonComponent::Generate(int const roomCount) const {
             i--;
             failures++;
         }
-        if (failures >= 5) {
+        if (failures >= MAX_FAILURES) {
             std::cout << "DungeonComponent::Generate roomCount exceeded max attempts!\n";
             return;
         }

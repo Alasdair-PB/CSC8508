@@ -5,6 +5,8 @@
 #ifndef DUNGEONCOMPONENT_H
 #define DUNGEONCOMPONENT_H
 
+#define MAX_FAILURES 10
+
 #include "DoorLocation.h"
 #include "IComponent.h"
 #include "RoomComponent.h"

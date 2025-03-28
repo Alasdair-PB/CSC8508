@@ -105,7 +105,8 @@ void PlayerComponent::OnDashInput() {
 
 void PlayerComponent::SetLinearVelocity(float jumpDuration) {
     Vector3 velocity = physicsObj->GetLinearVelocity();
-    physicsObj->SetLinearVelocity(Vector3(velocity.x, jumpForce * (1 + (0.2f - jumpDuration)), velocity.z));
+    GetWeightModifier();
+    physicsObj->SetLinearVelocity(Vector3(velocity.x, jumpForce * weightModifier * (1 + (0.2f - jumpDuration)), velocity.z));
 }
 
 void PlayerComponent::OnJumpInput() {

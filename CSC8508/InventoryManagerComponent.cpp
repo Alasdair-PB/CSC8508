@@ -13,7 +13,6 @@ struct InventoryManagerComponent::InventoryManagerComponentDataStruct : public I
     int maxItemStorage;
     float itemCarryOffset;
     float itemDropOffset;
-    float ite
 
     static auto GetSerializedFields() {
         return std::make_tuple(

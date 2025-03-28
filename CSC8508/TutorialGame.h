@@ -70,6 +70,8 @@ namespace NCL {
 			MainMenu* GetMainMenu() { return mainMenu; }
 			ComponentAssemblyDefiner* componentAssembly;
 
+			Vector3 GetSpawnLocation(int item);
+
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;
 #else

@@ -168,12 +168,10 @@ void GameWorld::GetObjectIterators(
 	last	= gameObjects.end();
 }
 
-
 void GameWorld::OperateOnContents(GameObjectFunc f) {
 	for (GameObject* g : gameObjects)
 		f(g);
 }
-
 
 void GameWorld::UpdateWorld(float dt){
 	if (paused) return;

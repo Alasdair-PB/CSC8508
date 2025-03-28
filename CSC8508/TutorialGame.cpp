@@ -186,9 +186,9 @@ void TutorialGame::InitWorld()
 	//LoadWorld(assetPath);
 
 	LoadDungeon(Vector3());
-	LoadDropZone(Vector3(10.0f, 15.0f, 0.0f), Vector3(3, 1, 3), Tags::DropZone);
-	LoadDropZone(Vector3(0.0f, 15.0f, 10.0f), Vector3(3, 1, 3), Tags::DepositZone);
-	LoadDropZone(Vector3(10.0f, 15.0f, 10.0f), Vector3(3, 1, 3), Tags::Exit);
+	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::DropZone);
+	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::DepositZone);
+	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::Exit);
 }
 
 void TutorialGame::RefreshSpawnLocals() {
@@ -205,7 +205,8 @@ void TutorialGame::RefreshSpawnLocals() {
 }
 
 Vector3 TutorialGame::GetSpawnLocation(int index) {
-	if (locals.empty()) RefreshSpawnLocals();
+	if (locals.empty())
+		RefreshSpawnLocals();
 	if (locals.empty()) return Vector3();
 
 	std::mt19937 rng(seed + index);
@@ -214,7 +215,7 @@ Vector3 TutorialGame::GetSpawnLocation(int index) {
 
 	Vector3 local = locals[selectedIndex];
 	locals.erase(locals.begin() + selectedIndex);
-
+	std::cout << "lc" << local.x << ", " << local.y << std::endl;
 	return local;
 }
 

@@ -109,6 +109,8 @@ namespace NCL {
 			/*UI::PauseUI* pauseUI = new UI::PauseUI;*/
 
 			float framerateDelay = 0;
+			int seed;
+			int itemCount; 
 
 #if EOSBUILD
 			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;

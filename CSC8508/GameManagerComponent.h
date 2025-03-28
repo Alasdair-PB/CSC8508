@@ -3,15 +3,19 @@
 
 #include "IComponent.h"
 #include <iostream>
+#include "EventManager.h"
+#include "../CSC8508/Legacy/PlayerComponent.h"
+#include "DamageableComponent.h"
 
 namespace NCL::CSC8508 {
-	class GameManagerComponent : public IComponent {
-	private:
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent> {
+	protected:
 		int quota;
 		int bankedCurrency;
 		int terminationFee;
+		int casualties = 0;
 
-		static GameManagerComponent* instance;
+		inline static GameManagerComponent* instance = nullptr;
 
 	public:
 		GameManagerComponent(GameObject& gameObject)
@@ -23,7 +27,32 @@ namespace NCL::CSC8508 {
 			return instance;
 		}
 
+		void OnAwake() override {
+			EventManager::RegisterListener<DeathEvent>(this);
+			EventManager::RegisterListener<ExitEvent>(this);
+		}
+
+		void Update(float dt) override {
+
+		}
+
+		
+		void OnEvent(DeathEvent* e) override {
+			CheckPlayerInstance(e);
+		}
+
+		void OnEvent(ExitEvent* e) override {
+			OnExitEvent(e);
+		}
+
+
+		virtual void CheckPlayerInstance(DeathEvent* e);
+
+		virtual void OnExitEvent(ExitEvent* e);
+
+
 		void OnMissionEnd() {
+			std::cout << "Mission ended! Game Over!" << std::endl;
 			if (bankedCurrency >= quota) {
 				OnMissionSuccessful();
 			}
@@ -31,6 +60,8 @@ namespace NCL::CSC8508 {
 				OnMissionFailure();
 			}
 		}
+
+		int GetTotalQuota();
 
 		bool TryRespawnPlayer() {
 			bankedCurrency -= terminationFee;
@@ -48,6 +79,20 @@ namespace NCL::CSC8508 {
 		void OnMissionFailure() {
 			std::cout << "Mission failed! You lost!" << std::endl;
 		}
+
+		void AddToBank(int amount) {
+			bankedCurrency += amount;
+		}
+
+		int GetBankedCurrency() const {
+			return bankedCurrency;
+		}
+
+		void IncrementCasualties() {
+			casualties++;
+		}
+
+
 	};
 }
 #endif

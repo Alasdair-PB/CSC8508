@@ -129,6 +129,8 @@ set(Components
     "BoundsComponent.cpp"
     "StateComponent.cpp"
     "StateComponent.h"
+	"IStateComponent.cpp"
+    "IStateComponent.h"
     "StaminaComponent.h"
     "StaminaComponent.cpp"
     "AnimationComponent.cpp"
@@ -145,7 +147,11 @@ set(NetworkComponents
     "InputNetworkComponent.h"
     "TransformNetworkComponent.h"
     "FullTransformNetworkComponent.h"
+    "DamageableNetworkComponent.h"
+    "DamageableNetworkComponent.cpp"
     "TimerNetworkComponent.h"
+    "GameNetworkedManagerComponent.h"
+    "GameNetworkedManagerComponent.cpp"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 
@@ -246,10 +252,19 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
 )
 add_subdirectory(enet)
 
+target_include_directories (${PROJECT_NAME} 
+    PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
+	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
+	)
+target_link_libraries(
+	${PROJECT_NAME}
+	PUBLIC UISystem
+	PUBLIC ImGui
+	) 
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")
-include_directories("../ImGui/")
+#include_directories("../ImGui/")
 include_directories("../SerializedSave/")
 
 if(MSVC)

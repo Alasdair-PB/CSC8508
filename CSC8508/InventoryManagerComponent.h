@@ -4,6 +4,8 @@
 
 #include "IComponent.h"
 #include "ItemComponent.h"
+#include "UISystem.h"
+#include "InventoryUI.h"
 #include <vector>
 
 namespace NCL {
@@ -13,8 +15,12 @@ namespace NCL {
         public:
             InventoryManagerComponent(GameObject& gameObject, int maxStorage, float itemCarryOffset, float itemDropOffset)
                 : IComponent(gameObject), transform(gameObject.GetTransform()), 
-                itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset){
+                itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset)
+            {
                 maxItemStorage = std::max(1, maxStorage);
+
+                UI::UISystem::GetInstance()->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+                inventoryUI->PushInventoryElement(InventoryMenu());
             }
 
             bool PushItemToInventory(ItemComponent* item) {
@@ -62,6 +68,31 @@ namespace NCL {
                 item->GetGameObject().SetEnabled(false);
             }
 
+            std::function<CSC8508::PushdownState::PushdownResult()> InventoryMenu() {
+                std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
+                    int index = 0;
+                    ImGui::Text(("Wallet: " + std::to_string(wallet)).c_str());
+                    for (auto const& item : storedItems) {
+                        ImGui::SetCursorPosY(0.04 * Window::GetWindow()->GetScreenSize().y);
+                        std::string name = item->GetName();
+                        std::string sellVal = std::to_string(item->GetSaleValue());
+                        if (index == scrollIndex) {
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.00f, 0.60f, 0.00f, 1.00f));
+                            ImGui::Text(("Item: " + name).c_str());
+                            ImGui::Text(("Sell Value: " + sellVal).c_str());
+                            ImGui::PopStyleColor();
+                        }
+                        else {
+                            ImGui::Text(("Item: " + name).c_str());
+                            ImGui::Text(("Sell Value: " + sellVal).c_str());
+                        }
+                    }
+                    index += 1;
+                    return CSC8508::PushdownState::PushdownResult::NoChange;
+                    };
+                return func;
+            }
+
            virtual float SellAllItems() {
                 float itemTotal = 0;
                 for (ItemComponent* item : storedItems) {
@@ -73,6 +104,16 @@ namespace NCL {
                 std::cout << "Sold::" << itemTotal << std::endl;
                 return itemTotal;
             }
+
+           float ResetWallet() {
+			   float walletValue = wallet;
+			   wallet = 0;
+			   return walletValue;
+		   }
+
+           float GetWallet() {
+			   return wallet;
+           }
 
             /// <summary>
             /// IComponent Save data struct definition
@@ -95,6 +136,11 @@ namespace NCL {
                 storedItems.erase(storedItems.begin() + inventoryIndex);
             }
 
+            void DepositWalletToQuota() {
+				deposited += wallet;
+				wallet = 0;
+            }
+
         protected:
             int maxItemStorage;
             int scrollIndex = 0;
@@ -102,7 +148,10 @@ namespace NCL {
             float itemDropOffset;
             float carryYOffset = 3;
             float wallet; 
+            float deposited;
             Transform& transform;
+
+            UI::InventoryUI* inventoryUI = new UI::InventoryUI;
             
             std::vector<ItemComponent*> storedItems;
              bool ItemAtScrollIndex() { return storedItems.size() > scrollIndex; }

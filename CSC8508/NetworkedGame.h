@@ -3,12 +3,20 @@
 #include "NetworkBase.h"
 #include "EventListener.h"
 
+#if EOSBUILD
+
+#include "EOSLobbyManager.h"
+#include "EOSLobbySearch.h"
+#include "EOSLobbyFunctions.h"
+
+#endif
+
 namespace NCL {
 	namespace CSC8508 {
 		class GameServer;
 		class GameClient;
 		class NetworkPlayer;
-		enum Prefab { Player, Enemy, Item };
+		enum Prefab { Player, Enemy, Item, Manager };
 
 		class HostLobbyConnectEvent : public Event {};
 		class ClientLobbyConnectEvent : public Event 
@@ -33,8 +41,25 @@ namespace NCL {
 			NetworkedGame();
 			~NetworkedGame();
 
+#if EOSBUILD
+			std::string GetOwnerIP() const { return eosLobbyFunctions ? eosLobbyFunctions->ownerIP : ""; }
+			std::string GetLobbyID() const { return eosLobbyFunctions ? eosLobbyFunctions->lobbyID : ""; }
+			int GetPlayerCount() const { return eosLobbyFunctions ? eosLobbyFunctions->playerCount : 0; }
+#endif
+
 			void StartAsServer();
 			void StartAsClient(char a, char b, char c, char d);
+
+			void HostGame();
+
+#if EOSBUILD
+			void EOSLobbyCreation();
+			void EOSLobbySearchFunc(const std::string& lobbyID);
+			void EOSLobbyDetailsUpdate();
+			void EOSStartAsHost();
+			void EOSStartAsJoin(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+#endif
+
 
 			void UpdateGame(float dt) override;
 
@@ -55,6 +80,20 @@ namespace NCL {
 			void StartClientCallBack();
 			void StartServerCallBack();
 			void StartOfflineCallBack();
+
+#if EOSBUILD
+			void StartEOSCallBack();
+			void StartAsHostCallBack();
+			void StartAsJoinCallBack(const std::string& code);
+			void StartEOSLobbyCreationCallBack();
+			void StartEOSLobbySearchCallBack(const std::string& lobbyID);
+			void StartEOSLobbyUpdateCallBack();
+
+			EOSInitialisationManager* eosManager = new EOSInitialisationManager();
+			EOSLobbyManager* eosLobbyManager = new EOSLobbyManager(*eosManager);
+			EOSLobbySearch* eosLobbySearch = new EOSLobbySearch(*eosManager);
+			EOSLobbyFunctions* eosLobbyFunctions = nullptr;
+#endif
 
 			void SendSpawnPacketsOnClientConnect(int clientId);
 			void BroadcastOwnedObjects(bool deltaFrame);
@@ -77,8 +116,7 @@ namespace NCL {
 			GameObject* GetObjectFromPfab(size_t pfab, NetworkSpawnData data);
 			GameObject* GetPlayerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 			GameObject* GetItemPrefab(NetworkSpawnData* spawnPacket = nullptr);
-
-
+			GameObject* GetGameManagerPrefab(NetworkSpawnData* spawnPacket = nullptr);
 		};
 	}
 }

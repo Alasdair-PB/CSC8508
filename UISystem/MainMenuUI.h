@@ -1,5 +1,4 @@
 #pragma once
-#include "imgui.h"
 #include "UIElementsGroup.h"
 
 namespace NCL {
@@ -19,7 +18,7 @@ namespace NCL {
 
 		protected:
 			int menuOption = none;
-			enum menuOptions { none, startOffline, startServer, startClient };
+			enum menuOptions { none, startOffline, startServer, startClient, startEOS };
 		};
 	}
 }

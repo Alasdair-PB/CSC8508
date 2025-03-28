@@ -12,6 +12,9 @@ LobbySearch::LobbySearch() {
 		};
 
 	lobbySearchField->PushInputFieldElement("Lobby", inputText, func);
+
+
+
 }
 
 LobbySearch::~LobbySearch() {

@@ -18,6 +18,20 @@
 #include "UIElementsGroup.h"
 #include "Map/DoorLocation.h"
 
+#if EOSBUILD
+#include "MainMenuUI.h"
+#include "EOSMenuUI.h"
+#include "LobbySearch.h"
+#include "EOSLobbyMenuUI.h"
+#endif
+
+#include "AudioSliders.h"
+#include "FramerateUI.h"
+#include "MainMenuUI.h"
+#include "StaminaBar.h"
+#include "LobbySearch.h"
+//#include "PauseUI.h"
+
 using std::vector;
 
 namespace NCL {
@@ -36,7 +50,6 @@ namespace NCL {
 			TutorialGame();
 			~TutorialGame();
 			virtual void UpdateGame(float dt);
-
 		protected:
 			void InitialiseAssets();
 			void InitWorld();
@@ -49,7 +62,8 @@ namespace NCL {
 			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
-			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions);
+			GameObject* LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
+			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag);
 			GameObject* AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int roomCount);
 
 			MainMenu* GetMainMenu() { return mainMenu; }
@@ -75,6 +89,8 @@ namespace NCL {
 			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset = Vector3(0, 14, 20);
 
+
+
 			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
 			}
@@ -84,12 +100,19 @@ namespace NCL {
 
 			UI::FramerateUI* framerate = new UI::FramerateUI;
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
-			UI::AudioSliders* audioSliders = new UI::AudioSliders;
-			UI::Healthbar* healthbar = new UI::Healthbar;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
+			UI::AudioSliders* audioSliders = new UI::AudioSliders;
+			/*UI::PauseUI* pauseUI = new UI::PauseUI;*/
 
 			float framerateDelay = 0;
+
+#if EOSBUILD
+			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;
+			UI::EOSLobbyMenuUI* eosLobbyMenuUI = new UI::EOSLobbyMenuUI(false, "", "", 0);
+
+			bool eosLobbyMenuCreated = false;
+#endif
 		};
 	}
 }

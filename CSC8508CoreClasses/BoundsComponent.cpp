@@ -1,12 +1,17 @@
 //
-// Contributors: Alasdair, Alfie
+// Contributors: Alasdair
 //
 
 #include "BoundsComponent.h"
 
 #include "Axis.h"
 #include "CollisionDetection.h"
+#include "PhysicsObject.h"
+#include "RenderObject.h"
+#include "NetworkObject.h"
+#include "INetworkDeltaComponent.h"
 
+using namespace NCL::Maths;
 using namespace NCL::CSC8508;
 
 BoundsComponent::BoundsComponent(GameObject& gameObject, CollisionVolume* collisionVolume, PhysicsComponent* physicsComponent) : IComponent(gameObject) {
@@ -90,6 +95,19 @@ struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 	}
 };
 
+void BoundsComponent::CopyComponent(GameObject* gameObject) {
+	BoundsComponent* component = gameObject->AddComponent<BoundsComponent>(nullptr, nullptr);
+	component->SetEnabled(IsEnabled());
+	CollisionVolume* volume;
+	if (boundingVolume) {
+		volume = CopyVolume(boundingVolume->isTrigger, boundingVolume->type, GetBoundsScale());
+		if (volume) component->SetBoundingVolume(volume);
+	}
+	if (physicsComponent)
+		component->SetPhysicsComponent(gameObject->TryGetComponent<PhysicsComponent>());
+}
+
+
 Vector3 BoundsComponent::GetBoundsScale() {
 	switch (boundingVolume->type) {
 	case VolumeType::AABB: {
@@ -123,7 +141,44 @@ Vector3 BoundsComponent::GetBoundsScale() {
 	}
 }
 
-void BoundsComponent::LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize) {		
+NCL::CollisionVolume* BoundsComponent::CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize) {
+
+	NCL::CollisionVolume* volume = nullptr;
+	switch (volumeType) {
+	case VolumeType::AABB: {
+		volume = new AABBVolume(boundsSize);
+		break;
+	}
+	case VolumeType::OBB: {
+		volume = new OBBVolume(boundsSize);
+		break;
+	}
+	case VolumeType::Sphere: {
+		volume = new SphereVolume(boundsSize.x);
+		break;
+	}
+	case VolumeType::Capsule: {
+		volume = new CapsuleVolume(boundsSize.y, boundsSize.x);
+		break;
+	}
+	case VolumeType::Mesh: {
+		break;
+	}
+	case VolumeType::Compound: {
+		break;
+	}
+	case VolumeType::Invalid: {
+		break;
+	}
+	default: {
+		break;
+	}
+	}
+	volume->isTrigger = isTrigger;
+	return volume;
+}
+
+void BoundsComponent::LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize, CollisionVolume* volume) {
 	switch (volumeType) {
 	case VolumeType::AABB: {
 		boundingVolume = new AABBVolume(boundsSize);
@@ -161,7 +216,6 @@ auto BoundsComponent::GetDerivedSerializedFields() const {
 	return BoundsComponentDataStruct::GetSerializedFields();
 }
 
-
 size_t BoundsComponent::Save(std::string assetPath, size_t* allocationStart)
 {
 	BoundsComponentDataStruct saveInfo;
@@ -173,7 +227,7 @@ size_t BoundsComponent::Save(std::string assetPath, size_t* allocationStart)
 
 void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 	BoundsComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<BoundsComponentDataStruct>(assetPath, allocationStart);
-	LoadVolume(loadedSaveData.isTrigger, loadedSaveData.volumeType, loadedSaveData.boundsSize);
+	LoadVolume(loadedSaveData.isTrigger, loadedSaveData.volumeType, loadedSaveData.boundsSize, boundingVolume);
 	SetEnabled(loadedSaveData.enabled);
 
 	if (loadedSaveData.hasPhysics)

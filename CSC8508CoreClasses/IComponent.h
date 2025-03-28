@@ -123,6 +123,9 @@ namespace NCL::CSC8508
 		/// <param name="assetPath">The loaded IComponent save data </param>
 		/// <param name="allocationStart">The location this IComponent is saved in the asset file </param>
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+
+		virtual void CopyComponent(GameObject* gameObject);
+
 	protected:
 		virtual void OnAwake() {}
 		virtual void Update(float deltaTime) {}

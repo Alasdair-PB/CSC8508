@@ -2,8 +2,10 @@
 #define DAMAGEABLE_COMPONENT_H
 
 #include "IComponent.h"
-#include "Event.h"
-#include "EventManager.h"
+#include "../Event/Event.h"
+#include "../Event/EventManager.h"
+#include "Healthbar.h"
+#include "UISystem.h"
 
 namespace NCL::CSC8508
 {
@@ -25,13 +27,17 @@ namespace NCL::CSC8508
         DamageableComponent(GameObject& gameObject, int initialHealth, int initialMaxHealth)
             : IComponent(gameObject), owner(gameObject),
             health(std::max(0, initialHealth)),
-            maxHealth(std::max(1, initialMaxHealth)) {
+            maxHealth(std::max(1, initialMaxHealth)) 
+        {
+            UI::UISystem::GetInstance()->PushNewStack(healthbar->healthbar, "Healthbar");
             health = std::min(health, maxHealth);
+            healthbar->UpdateHealth(health);
         }
 
         void Damage(int damage) {
             if (damage > 0) {
                 health = std::max(0, health - damage);
+                healthbar->UpdateHealth(health);
                 if (health <= 0)
                     InvokeDeathEvent();
             }
@@ -61,6 +67,11 @@ namespace NCL::CSC8508
         int GetMaxHealth() const {
             return maxHealth;
         }
+
+		GameObject* GetOwner() {
+			return &owner;
+		}
+
         /// <summary>
         /// IComponent Save data struct definition
         /// </summary>
@@ -70,10 +81,11 @@ namespace NCL::CSC8508
         size_t Save(std::string assetPath, size_t* allocationStart) override;
             
 
-    private:
+    protected:
         int health;
         int maxHealth;
         GameObject& owner;
+        UI::Healthbar* healthbar = new UI::Healthbar;
 
         void InvokeDeathEvent() {
             auto event = DeathEvent(owner);

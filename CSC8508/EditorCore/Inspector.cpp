@@ -4,35 +4,45 @@
 #include <tuple>
 #include <string>
 
-Inspector::Inspector(){
+Inspector::Inspector() : positionInfo(new Vector3()), 
+	scaleInfo(new Vector3()), orientationInfo(new Vector4()), isEnabled(new bool()), saveDestination(new std::string("Deafult.pfab"))
+{
 	inspectorBar = new UIElementsGroup(
 		ImVec2(0.6f, 0.3f), 
-		ImVec2(0.3f, 0.15f),
+		ImVec2(0.3f, 0.5f),
 		1.0f, 
 		"Inspector",
 		0.0f, 
 		ImGuiWindowFlags_NoResize);
 
-	transformInfo = new Vector3(0, 0, 0);
+	inspectorBar->PushToggle("GameObject:", isEnabled, 0.05f);
+	inspectorBar->PushStatelessInputFieldElement("GameObject:", saveDestination);
+	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.05f), "Save Pfab", 
+		[this]() {
+			std::cout << "Button down" << std::endl;
+			if (focus) {
+				focus->Save(*saveDestination);
+				std::cout << "saved?" << std::endl;
 
-	std::function<CSC8508::PushdownState::PushdownResult()> funcC =
-		[this]()-> CSC8508::PushdownState::PushdownResult {
-			return CSC8508::PushdownState::PushdownResult::NoChange;
-		};
-
-	inspectorBar->PushButtonElement(ImVec2(0.2f, 0.05f), "Save Pfab", funcC);
-	inspectorBar->PushVectorElement(transformInfo, 0.05f);
-
-	// Component Names
-	//inspectorBar->PushTextElement("");
+			}
+		});
+	inspectorBar->PushVectorElement(positionInfo, 0.05f);
+	inspectorBar->PushVectorElement(scaleInfo, 0.05f);
+	inspectorBar->PushQuaternionElement(orientationInfo, 0.05f);
 }
 
-Inspector::~Inspector() { delete inspectorBar; delete transformInfo; }
+Inspector::~Inspector() { 
+	delete inspectorBar; 
+	delete positionInfo; 
+	delete scaleInfo;
+	delete orientationInfo;
+}
 
 void Inspector::RenderIComponents() {
 	if (!focus) return;
+	inspectorBar->RemoveElementsFromIndex(6);
 
 	for (IComponent* component : focus->GetAllComponents()) {
-
+		component->PushIComponentElementsInspector(*inspectorBar, 0.05f);
 	}
 }

@@ -77,6 +77,10 @@ namespace NCL {
 				return worldStateCounter;
 			}
 
+			void SetWorldPauseState(bool paused) {
+				this->paused = paused;
+			}
+
 			int GetGameObjectCount() const { return gameObjects.size(); }
 			struct WorldSaveData;
 
@@ -93,6 +97,7 @@ namespace NCL {
 
 			PerspectiveCamera mainCamera;
 
+			bool paused = false;
 			bool shuffleConstraints;
 			bool shuffleObjects;
 			int worldIDCounter;

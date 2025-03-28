@@ -18,14 +18,21 @@ public:
 		focus = object;
 
 		Vector3 posData = object->GetTransform().GetPosition();		
-		transformInfo->x = posData.x;
-		transformInfo->y = posData.y;
-		transformInfo->z = posData.z;
+		SetVector(positionInfo, object->GetTransform().GetLocalPosition());
+		SetVector(scaleInfo, object->GetTransform().GetLocalScale());
+		SetQuaternion(orientationInfo, object->GetTransform().GetLocalOrientation());
+		*isEnabled = object->IsEnabled();
 	}
 
 	void RenderFocus() {
 		if (!focus) return;
-		focus->GetTransform().SetPosition(*transformInfo);
+		focus->GetTransform().SetPosition(*positionInfo);
+		focus->GetTransform().SetScale(*scaleInfo);
+		focus->GetTransform().SetOrientation(
+			Quaternion(
+				orientationInfo->x, orientationInfo->y, 
+				orientationInfo->z, orientationInfo->w).Normalised());
+		focus->SetEnabled(*isEnabled);
 		RenderIComponents();
 	}
 
@@ -33,17 +40,33 @@ public:
 
 	void EndFocus() {
 		focus = nullptr;
-		transformInfo->x = 0;
-		transformInfo->y = 0;
-		transformInfo->z = 0;
+		*isEnabled = true;
+		SetVector(positionInfo);
+		SetVector(scaleInfo);
+		SetQuaternion(orientationInfo);
 	}
 
 	UIElementsGroup* inspectorBar;
-
 private:
 	GameObject* focus;
-	Vector3* transformInfo;
-	vector<IComponent*> componentsList;
+	Vector3* positionInfo;
+	Vector3* scaleInfo;
+	Vector4* orientationInfo;
+	bool* isEnabled;
+	std::string* saveDestination;
+
+	void SetVector(Vector3* vector, Vector3 values = Vector3()) {
+		vector->x = values.x;
+		vector->y = values.y;
+		vector->z = values.z;
+	}
+
+	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion()) {
+		quaternion->x = values.x;
+		quaternion->y = values.y;
+		quaternion->z = values.z;
+		quaternion->w = values.w;
+	}
 
 	template <typename T, typename... Args>
 	void DebugSerializedFields(const T& instance, const std::tuple<Args...>& fields) {

@@ -184,33 +184,6 @@ GameObject* EditorGame::AddSphereToWorld(const Vector3& position, float radius, 
 	return sphere;
 }
 
-GameObject* EditorGame::AddRoleTToWorld(const Vector3& position, float inverseMass)
-{	
-	GameObject* roleT = new GameObject();
-	Vector3 size = Vector3(10.0f, 10.0f, 10.0f);
-	CapsuleVolume* volume = new CapsuleVolume(4.0f, 2.5f);
-	Mesh* roleTMesh = MaterialManager::GetMesh("Role_T");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* animShader = MaterialManager::GetShader("anim");
-
-	PhysicsComponent* phys = roleT->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = roleT->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	roleT->GetTransform().SetScale(size).SetPosition(position);
-
-	roleT->SetRenderObject(new RenderObject(&roleT->GetTransform(), roleTMesh, basicTex, animShader));
-	phys->SetPhysicsObject(new PhysicsObject(&roleT->GetTransform()));
-	roleT->AddComponent<AnimationComponent>(new Rendering::MeshAnimation("Role_T.anm"));
-
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
-	phys->GetPhysicsObject()->InitSphereInertia();
-	phys->GetPhysicsObject()->SetRestitution(0.5f);
-
-	world->AddGameObject(roleT);
-	return roleT;
-}
-
 GameObject* EditorGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
 	GameObject* cube = new GameObject();
 	OBBVolume* volume = new OBBVolume(dimensions);

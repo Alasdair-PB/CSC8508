@@ -9,7 +9,7 @@ namespace NCL {
 	namespace CSC8508 {
 		class Transform;
 
-		class PhysicsObject	{
+		class PhysicsObject {
 		public:
 			PhysicsObject(Transform* parentTransform);
 			~PhysicsObject();
@@ -47,7 +47,7 @@ namespace NCL {
 
 			void ApplyAngularImpulse(const Vector3& force);
 			void ApplyLinearImpulse(const Vector3& force);
-			
+
 			void AddForce(const Vector3& force);
 
 			void AddForceAtPosition(const Vector3& force, const Vector3& position);
@@ -79,6 +79,10 @@ namespace NCL {
 			Matrix3 GetInertiaTensor() const {
 				return inverseInteriaTensor;
 			}
+
+			float* GetInverseMassRef() {return &inverseMass;}
+			float* GetFrictionRef() { return &friction; }
+			float* GetcRestRef() { return &cRestitution; }
 
 		protected:
 			Transform* transform;

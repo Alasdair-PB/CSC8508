@@ -192,7 +192,6 @@ void EditorGame::InitWorld()
 	physics->Clear();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
-	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }
 
 void EditorGame::SelectObject(BoundsComponent* newSelection) {

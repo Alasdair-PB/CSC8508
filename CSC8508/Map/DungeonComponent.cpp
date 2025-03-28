@@ -15,7 +15,7 @@ void DungeonComponent::Generate(int const roomCount) const {
     int failures = 0;
 
     // Generate the first room
-    auto* entryRoom = new GameObject();
+    auto* entryRoom = new GameObject(true);
     RoomPrefab* prefab = RoomManager::GetRandom();
     entryRoom->AddComponent<RoomComponent>(prefab);
     GetGameObject().AddChild(entryRoom);
@@ -50,7 +50,7 @@ void DungeonComponent::Generate(int const roomCount) const {
 bool DungeonComponent::GenerateRoom() const {
 
     // 1: Pick a random prefab and create the game object for it
-    auto* roomB = new GameObject();
+    auto* roomB = new GameObject(true);
     RoomPrefab* prefab = RoomManager::GetRandom();
     auto* component = roomB->AddComponent<RoomComponent>(prefab);
 

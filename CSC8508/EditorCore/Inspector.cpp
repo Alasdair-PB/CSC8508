@@ -128,7 +128,9 @@ void Inspector::PushAddComponentField() {
 	{reinterpret_cast<int*>(&mapId), "Physics"},
 	{reinterpret_cast<int*>(&mapId), "NavMesh"},
 	{reinterpret_cast<int*>(&mapId), "Animation"},
-	{reinterpret_cast<int*>(&mapId), "Damageable"}
+	{reinterpret_cast<int*>(&mapId), "Damageable"},
+	{reinterpret_cast<int*>(&mapId), "Room"}
+
 	};
 	inspectorBar->PushEnumElement("Component to add", enumOptions);
 	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",

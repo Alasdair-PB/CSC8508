@@ -70,7 +70,6 @@ namespace NCL::CSC8508
 		size_t Save(std::string assetPath, size_t* allocationStart) override;
 		CollisionVolume* CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		auto GetDerivedSerializedFields() const;
-
 		void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
 
 

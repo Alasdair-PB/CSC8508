@@ -37,10 +37,10 @@ void	PS5Controller::Update(float dt) {
 	if (ret == SCE_OK) {
 		if (data.connected) {
 			axes[0] = ConvertAxis(data.leftStick.x, padInfo.stickInfo.deadZoneLeft);
-			axes[1] = ConvertAxis(data.leftStick.y, padInfo.stickInfo.deadZoneLeft);
+			axes[1] = -ConvertAxis(data.leftStick.y, padInfo.stickInfo.deadZoneLeft);
 
-			axes[2] = ConvertAxis(data.rightStick.x, padInfo.stickInfo.deadZoneRight);
-			axes[3] = -ConvertAxis(data.rightStick.y, padInfo.stickInfo.deadZoneRight);
+			axes[2] = -ConvertAxis(data.rightStick.x, padInfo.stickInfo.deadZoneRight);
+			axes[3] = ConvertAxis(data.rightStick.y, padInfo.stickInfo.deadZoneRight);
 
 			axes[4] = 0.0f;
 			axes[4] += ((data.buttons & SCE_PAD_BUTTON_RIGHT) ? 1.0f : 0.0f);
@@ -63,6 +63,9 @@ void	PS5Controller::Update(float dt) {
 
 			buttons[8] = ((data.buttons & SCE_PAD_BUTTON_L3) ? 1.0f : 0.0f);
 			buttons[9] = ((data.buttons & SCE_PAD_BUTTON_R3) ? 1.0f : 0.0f);
+
+			buttons[10] = ((data.buttons & SCE_PAD_BUTTON_OPTIONS) ? 1.0f : 0.0f);
+			buttons[11] = ((data.buttons & SCE_PAD_BUTTON_TOUCH_PAD) ? 1.0f : 0.0f);
 		}
 	}
 };

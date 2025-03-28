@@ -7,8 +7,13 @@
 
 #include "Transform.h"
 #include "GameObject.h"
+#include "UIElementsGroup.h"
 #include <unordered_set>
 #include <tuple>
+
+using namespace NCL;
+using namespace CSC8508;
+using namespace UI;
 
 namespace NCL::CSC8508 
 {
@@ -123,6 +128,8 @@ namespace NCL::CSC8508
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
 
 		virtual void CopyComponent(GameObject* gameObject);
+
+		virtual void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale);
 
 	protected:
 		virtual void OnAwake() {}

@@ -91,3 +91,24 @@ void PhysicsComponent::Load(std::string assetPath, size_t allocationStart) {
 	physicsObject->SetRestitution(loadedSaveData.cRestitution);	
 	SetInitType(loadedSaveData.initType, physicsObject);
 }
+
+void PhysicsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
+	IComponent::PushIComponentElementsInspector(elementsGroup, scale);
+
+	if (physicsObject){
+		elementsGroup.PushFloatElement(physicsObject->GetcRestRef(), scale, "CRestitution:");
+		elementsGroup.PushFloatElement(physicsObject->GetFrictionRef(), scale, "Friction:");
+		elementsGroup.PushFloatElement(physicsObject->GetInverseMassRef(), scale, "InverseMass:");
+	}
+	else {
+		PhysicsComponent* phys = this;
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale), "AddPhysicsObject", 
+			[phys](){phys->SetPhysicsObject(new PhysicsObject(&phys->GetGameObject().GetTransform()));});
+	}
+	std::vector<std::pair<int*, std::string>> enumOptions = {
+		{reinterpret_cast<int*>(&initiType), "None"},
+		{reinterpret_cast<int*>(&initiType), "Sphere"},
+		{reinterpret_cast<int*>(&initiType), "Cube"}
+	};
+	elementsGroup.PushEnumElement("Select Option", enumOptions);
+}

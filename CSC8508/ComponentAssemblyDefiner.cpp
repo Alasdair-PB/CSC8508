@@ -8,11 +8,17 @@
 #include "DamageableComponent.h"
 #include "Map/RoomPrefab.h"
 
-
 using namespace NCL;
 using namespace CSC8508;
 bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
-    switch (componentMap[t])
+    return AddComponentByMap(componentMap[t], object);
+}
+bool ComponentAssemblyDefiner::AddComponentFromEnum(ComponentMapId mapId, GameObject& object) {
+    return AddComponentByMap(mapId, object);
+}
+
+bool ComponentAssemblyDefiner::AddComponentByMap(ComponentMapId mapId, GameObject& object) {
+    switch (mapId)
     {
     case ComponentMapId::Bounds: {
         object.AddComponent<BoundsComponent>(nullptr, nullptr);
@@ -26,7 +32,7 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
     }case ComponentMapId::Damageable: {
         object.AddComponent<DamageableComponent>(1, 1);
         break;
-    
+
     }case ComponentMapId::Animation: {
         object.AddComponent<AnimationComponent>();
         break;
@@ -36,8 +42,8 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
         break;
 
     }case ComponentMapId::Error:
-            std::cout << "Error adding component" << std::endl;
-            break;
+        std::cout << "Error adding component" << std::endl;
+        break;
     default: {
         std::cout << "adding undefined" << std::endl;
         break;
@@ -45,6 +51,7 @@ bool ComponentAssemblyDefiner::AddComponent(size_t t, GameObject& object) {
     }
     return true;
 }
+
 
 void ComponentAssemblyDefiner::InitializeMap() {
     EventManager::RegisterListener<AddComponentEvent>(this, EARLY);

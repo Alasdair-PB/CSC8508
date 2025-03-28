@@ -91,6 +91,7 @@ namespace NCL::CSC8508 {
 
         template <typename T> requires std::is_base_of_v<IComponent, T>
         using Action = std::function<void(std::function<void(T*)> func)>;
+        using Operation = std::function<void()>;
 
         /// <summary>
         /// Executes func on all IComponents derived from IComponent TParameters
@@ -137,6 +138,8 @@ namespace NCL::CSC8508 {
             AddOperatorBuffer<T, IComponent>(IComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkComponent>(INetworkComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
+            //AddDeallocator<T>(component);
+            AddDeallocatorBuffer<T>();
             allComponents[typeid(T)].push_back(component);
 
             return component;
@@ -147,10 +150,11 @@ namespace NCL::CSC8508 {
         /// </summary>
         static void CleanUp()
         {
-            for (auto& [type, componentsList] : allComponents) {
-                for (auto* comp : componentsList)
-                    delete comp;
+            for (Operation* myAction : deallocationOperations) {
+                (*myAction)();
+                delete myAction;
             }
+            deallocationOperations.clear();
             allComponents.clear();
         }
 
@@ -170,6 +174,51 @@ namespace NCL::CSC8508 {
         inline static std::vector<Action<IComponent>*> INetworkComponentBufferOperators;
         inline static std::vector<Action<IComponent>*> IComponentBufferOperators;
         inline static std::vector<Action<IComponent>*> INetworkDeltaComponentBufferOperators;
+        inline static std::vector<Operation*> deallocationOperations;
+
+        template <typename T> requires std::is_base_of_v<IComponent, T>
+        static void InvokeDeconstructor(T* component)
+        {
+            if (component) {
+                std::cout << component->GetName() << std::endl;
+                component->~T();
+            }
+        }
+
+        template <typename T> requires std::is_base_of_v<IComponent, T>
+        static void FreeComponentsBuffer()
+        {
+            T* buffer = GetComponentsBuffer<T>();
+            size_t count = componentCount<T>;
+            for (size_t i = 0; i < count; i++)
+                (buffer + i)->~T();
+            componentCount<T> = 0;
+        }
+
+        template <typename T> requires std::is_base_of_v<IComponent, T>
+        static void AddDeallocatorBuffer()
+        {
+            if (allComponents.find(typeid(T)) != allComponents.end())
+                return;
+
+            deallocationOperations.push_back(
+                new Operation(
+                    []() {
+                        FreeComponentsBuffer<T>();
+                    }
+                ));
+        }
+
+        template <typename T> requires std::is_base_of_v<IComponent, T>
+        static void AddDeallocator(T* component)
+        {
+            deallocationOperations.push_back(
+                new Operation(
+                    [component](){
+                       InvokeDeconstructor<T>(component);
+                    }
+             ));
+        }
 
         /// <summary>
         /// Adds a component to a buffer operator as type T

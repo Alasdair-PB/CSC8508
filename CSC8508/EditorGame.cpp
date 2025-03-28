@@ -88,9 +88,15 @@ void EditorGame::TestSave() {
 	TestLoadGameObject(gameObjectPath);
 }
 
+
+ComponentAssemblyDefiner* EditorGame::GetDefiner() {
+	return componentAssembly;
+}
+
 void LoadControllerMappings(Controller* controller)
 {
 	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(1, "Up");
 	controller->MapAxis(2, "Forward");
 	controller->MapAxis(3, "XLook");
 	controller->MapAxis(4, "YLook");
@@ -102,15 +108,19 @@ void LoadControllerMappings(Controller* controller)
 void EditorGame::InitialiseGame() {
 
 	componentAssembly = new ComponentAssemblyDefiner();
+
 	componentAssembly->InitializeMap();
 
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
 
+	editorCamera = new EditorCamera(&world->GetMainCamera(), controller);
+
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 	inspectorBar = new Inspector();
 	uiSystem->PushNewStack(inspectorBar->inspectorBar, "InpsectorBar");
+	uiSystem->PushNewStack(inspectorBar->toolsBar, "ToolsBar");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -118,7 +128,8 @@ void EditorGame::InitialiseGame() {
 
 EditorGame::EditorGame()
 {
-	world = new GameWorld();
+	instance = this;
+	world = &GameWorld::Instance(); 
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	controller = w->GetController();
@@ -153,12 +164,13 @@ void EditorGame::InitialiseAssets() {
 
 EditorGame::~EditorGame()
 {
-	MaterialManager::CleanUp();
+	uiSystem->RemoveStack("InpsectorBar");
+	uiSystem->RemoveStack("InpsectorBar");
+
+	//MaterialManager::CleanUp();
 	ComponentManager::CleanUp();
 
 	delete physics;
-	delete renderer;
-	delete world;
 	delete controller;
 	delete navMesh;
 }
@@ -166,6 +178,7 @@ EditorGame::~EditorGame()
 void EditorGame::UpdateGame(float dt)
 {	
 	TrySelectObject();
+	editorCamera->Update(dt);
 	UpdateUI();
 	renderer->Render();
 	inspectorBar->RenderFocus();
@@ -184,6 +197,11 @@ void EditorGame::SaveWorld(std::string assetPath) {
 	world->Save(assetPath);
 }
 
+void EditorGame::DeleteSelectionObject() {
+	selectionObject = nullptr;
+	physics->Clear();
+}
+
 const bool load = true;
 
 void EditorGame::InitWorld()
@@ -192,7 +210,6 @@ void EditorGame::InitWorld()
 	physics->Clear();
 	std::string assetPath = GetAssetPath("myScene.pfab"); 
 	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
-	AddRoleTToWorld(Vector3(90, 30, -52)); //PS5
 }
 
 void EditorGame::SelectObject(BoundsComponent* newSelection) {

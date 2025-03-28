@@ -12,11 +12,12 @@ namespace NCL {
         class ItemComponent : public IComponent , public EventListener<DeathEvent> {
         private:
             int saleValue;
+            float itemWeight;
             vector<IComponent*> disabledOnPickup;
 
         public:
-            ItemComponent(GameObject& gameObject, int initialSaleValue)
-                : IComponent(gameObject), saleValue(initialSaleValue) {
+            ItemComponent(GameObject& gameObject, int initialSaleValue, float initialWeight)
+                : IComponent(gameObject), saleValue(initialSaleValue), itemWeight(initialWeight) {
                 EventManager::RegisterListener<DeathEvent>(this);
             }
 
@@ -36,9 +37,19 @@ namespace NCL {
                 saleValue = std::max(0, value);
             }
 
+            float GetItemWeight() const {
+                return itemWeight;
+            }
+
+            void SetItemWeight(float weight) {
+                itemWeight = std::max(0.0f, weight);
+            }
+
             void OnEvent(DeathEvent* event) override {
-                if (&event->GetGameObject() == &GetGameObject())
+                if (&event->GetGameObject() == &GetGameObject()) {
                     SetSaleValue(0);
+                    SetItemWeight(0.0f);
+                }
             }
 
             void DisableIComponentOnPickup(IComponent* component) {

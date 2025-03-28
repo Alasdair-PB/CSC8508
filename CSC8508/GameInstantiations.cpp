@@ -20,6 +20,8 @@
 #include "DamageableComponent.h"
 #include "GameManagerComponent.h"
 #include "DamageableNetworkComponent.h"
+#include "TimerNetworkComponent.h"
+
 #include "../CSC8508CoreClasses/GameNetworkedManagerComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
@@ -29,7 +31,6 @@ int GetUniqueId(int objectId, int& componentCount) {
 	componentCount++;
 	return unqiueId;
 }
-
 
 GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
 	std::string gameObjectPath = GetAssetPath("object_data.pfab");
@@ -46,27 +47,24 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 	}
 	world->AddGameObject(myObjectToLoad);
-
 	return myObjectToLoad;
 }
 
-
-
 GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
 	GameObject* gm = new GameObject();
-	
 	if (spawnData)
 	{
-		gm->AddComponent<TimerComponent>(300);
-
 		int componentIdCount = 0;
 		int pFabId = spawnData->pfab;
 		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
 		gm->AddComponent<GameNetworkedManagerComponent>(spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+
+		gm->AddComponent<TimerNetworkComponent>(300, spawnData->objId,
+			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 	}
 	else {
-
+		gm->AddComponent<TimerComponent>(300);
 		gm->AddComponent<GameManagerComponent>();
 	}
 	world->AddGameObject(gm);

@@ -126,7 +126,7 @@ namespace NCL::CSC8508 {
 
 		std::function<CSC8508::PushdownState::PushdownResult()> PauseReturnButton() {
 			std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
-				GameWorld::Instance().SetWorldPauseState(false);
+				GameWorld::Instance().ToggleWorldPauseState();
 				return CSC8508::PushdownState::PushdownResult::NoChange;
 				};
 			return func;

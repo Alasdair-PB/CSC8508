@@ -294,7 +294,7 @@ private:
 
 	std::map<EntitySoundGroup, std::map<std::string, FMOD::Sound*>> soundGroups;
 
-	float minDistance = 0.5f;
+	float minDistance = 10.0f;
 	float maxDistance = 500.0f;
 
 	bool isSystemValid;

@@ -191,20 +191,30 @@ void TutorialGame::InitWorld()
 	LoadDropZone(Vector3(10.0f, 15.0f, 10.0f), Vector3(3, 1, 3), Tags::Exit);
 }
 
-Vector3 TutorialGame::GetSpawnLocation(int index) {
-	Vector3 local;
+void TutorialGame::RefreshSpawnLocals() {
+	vector<Vector3> locals;
+	int seed;
 	ComponentManager::OperateOnBufferContents<DungeonComponent>(
-		[&local, &index](DungeonComponent* o) {
-			vector<Vector3> locals;
+		[&locals, &seed](DungeonComponent* o) {
 			o->GetAllItemSpawnLocations(locals);
-
-			std::mt19937 rng(o->GetSeed() + index);
-			std::uniform_int_distribution<int> dist(0, locals.size() - 1);
-			local = locals[dist(rng)];
-			local += o->GetGameObject().GetTransform().GetPosition();
-			std::cout << local.x << "," << local.y << "," << local.z << std::endl;
+			seed = o->GetSeed();
 		}
 	);
+	this->locals = locals;
+	this->seed = seed;
+}
+
+Vector3 TutorialGame::GetSpawnLocation(int index) {
+	if (locals.empty()) RefreshSpawnLocals();
+	if (locals.empty()) return Vector3();
+
+	std::mt19937 rng(seed + index);
+	std::uniform_int_distribution<int> dist(0, locals.size() - 1);
+	int selectedIndex = dist(rng);
+
+	Vector3 local = locals[selectedIndex];
+	locals.erase(locals.begin() + selectedIndex);
+
 	return local;
 }
 

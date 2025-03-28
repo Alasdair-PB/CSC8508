@@ -8,7 +8,7 @@
 #include "DamageableComponent.h"
 
 namespace NCL::CSC8508 {
-	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent> {
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent> {
 	protected:
 		int quota;
 		int bankedCurrency;
@@ -35,6 +35,7 @@ namespace NCL::CSC8508 {
 			EventManager::RegisterListener<DeathEvent>(this);
 			EventManager::RegisterListener<ExitEvent>(this);
 			EventManager::RegisterListener<PauseEvent>(this);
+			EventManager::RegisterListener<DebugEvent>(this);
 		}
 
 		void Update(float dt) override {
@@ -52,6 +53,10 @@ namespace NCL::CSC8508 {
 
 		void OnEvent(PauseEvent* e) override {
 			OnPauseEvent(e);
+		}
+
+		void OnEvent(DebugEvent* e) override {
+			std::cout << "Debug event!" << std::endl;
 		}
 
 

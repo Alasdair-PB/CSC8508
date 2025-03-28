@@ -56,6 +56,7 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SPACE, "Jump"); // Keep names
 	controller->MapButton(KeyCodes::E, "Interact");
 	controller->MapButton(KeyCodes::P, "Pause");
+	controller->MapButton(KeyCodes::L, "Debug");
 #else
 	controller->MapAxis(0, "Sidestep");
 	controller->MapAxis(2, "Forward");
@@ -65,6 +66,7 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SPACE, "Jump");
 	controller->MapButton(KeyCodes::E, "Interact");
 	controller->MapButton(KeyCodes::P, "Pause");
+	controller->MapButton(KeyCodes::L, "Debug");
 #endif
 	controller->BindMappingsToHashIds();
 }

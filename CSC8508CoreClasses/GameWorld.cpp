@@ -34,6 +34,8 @@ GameWorld& GameWorld::Instance() {
 void GameWorld::Clear() {
 	gameObjects.clear();
 	constraints.clear();
+	boundsComponents.clear();
+	physicsComponents.clear();
 	worldIDCounter		= 0;
 	worldStateCounter	= 0;
 }

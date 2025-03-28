@@ -95,7 +95,6 @@ void PhysicsComponent::Load(std::string assetPath, size_t allocationStart) {
 void PhysicsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
 	IComponent::PushIComponentElementsInspector(elementsGroup, scale);
 
-	InitType initType;
 	if (physicsObject){
 		elementsGroup.PushFloatElement(physicsObject->GetcRestRef(), scale, "CRestitution:");
 		elementsGroup.PushFloatElement(physicsObject->GetFrictionRef(), scale, "Friction:");
@@ -112,5 +111,4 @@ void PhysicsComponent::PushIComponentElementsInspector(UIElementsGroup& elements
 		{reinterpret_cast<int*>(&initiType), "Cube"}
 	};
 	elementsGroup.PushEnumElement("Select Option", enumOptions);
-
 }

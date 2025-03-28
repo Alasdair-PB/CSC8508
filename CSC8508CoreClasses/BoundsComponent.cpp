@@ -18,7 +18,13 @@ BoundsComponent::BoundsComponent(GameObject& gameObject, CollisionVolume* collis
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
 }
 
-BoundsComponent::~BoundsComponent() { delete boundingVolume; }
+BoundsComponent::~BoundsComponent() { 
+	delete boundingVolume; 
+#if EDITOR
+	delete expectingBoundsSize;
+	delete isTrigger;
+#endif
+}
 
 bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) const {
 	if (!boundingVolume) {
@@ -206,3 +212,72 @@ void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 	if (loadedSaveData.hasPhysics)
 		physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
 }
+
+void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
+	IComponent::PushIComponentElementsInspector(elementsGroup, scale);
+#if EDITOR
+	if (!physicsComponent) {
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Link PhysicsComponent",
+			[this]() {SetPhysicsComponent(GetGameObject().TryGetComponent<PhysicsComponent>()); });
+	}
+	else {
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "UnLink PhysicsComponent",
+			[this]() {SetPhysicsComponent(nullptr); });
+	}
+
+	if (boundingVolume) {
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Remove Bounding Volume",
+			[this]() {SetBoundingVolume(nullptr); });
+	}
+	else {
+		std::set<std::pair<int*, std::string>> enumOptions = {
+			{reinterpret_cast<int*>(&expectingVolumeType), "AABB"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "OBB"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Sphere"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Mesh"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Capsule"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Compound"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Invalid"}
+		};
+		elementsGroup.PushEnumElement("VolumeType", enumOptions);
+		elementsGroup.PushToggle("Is Trigger", isTrigger, scale);
+
+		switch (expectingVolumeType) {
+
+		case VolumeType::AABB: {
+			elementsGroup.PushVectorElement(expectingBoundsSize, scale);
+			break;
+		}
+		case VolumeType::OBB: {
+			elementsGroup.PushVectorElement(expectingBoundsSize, scale);
+			break;
+		}
+		case VolumeType::Sphere: {
+			elementsGroup.PushFloatElement(&expectingBoundsSize->x, scale, "Radius:");
+			break;
+		}
+		case VolumeType::Capsule: {
+			elementsGroup.PushFloatElement(&expectingBoundsSize->x, scale, "HalfHeight:");
+			elementsGroup.PushFloatElement(&expectingBoundsSize->y, scale, "Radius:");
+			break;
+		}
+		case VolumeType::Mesh: {
+			return;
+		}
+		case VolumeType::Compound: {
+			return;
+		}
+		case VolumeType::Invalid: {
+			return;
+		}
+		default: {
+			return;
+		}
+		}
+
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Add Bounding Volume",
+			[this]() {LoadVolume(*isTrigger, expectingVolumeType, *expectingBoundsSize, boundingVolume); });
+	}
+#endif
+}
+

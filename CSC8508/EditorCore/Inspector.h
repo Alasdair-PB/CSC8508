@@ -23,8 +23,11 @@ public:
 		SetQuaternion(orientationInfo, object->GetTransform().GetLocalOrientation());
 		*isEnabled = object->IsEnabled();
 	}
+	
+	void ClearGameWorld();
 
 	void RenderFocus() {
+		if (clearWorld) ClearGameWorld();
 		if (!focus) return;
 		focus->GetTransform().SetPosition(*positionInfo);
 		focus->GetTransform().SetScale(*scaleInfo);
@@ -53,33 +56,13 @@ private:
 	Vector3* scaleInfo;
 	Vector4* orientationInfo;
 	bool* isEnabled;
+	bool clearWorld;
 	std::string* saveDestination;
 
-	void SetVector(Vector3* vector, Vector3 values = Vector3()) {
-		vector->x = values.x;
-		vector->y = values.y;
-		vector->z = values.z;
-	}
+	std::string GetAssetPath(std::string pfabName);
+	void SetVector(Vector3* vector, Vector3 values = Vector3());
+	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
 
-	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion()) {
-		quaternion->x = values.x;
-		quaternion->y = values.y;
-		quaternion->z = values.z;
-		quaternion->w = values.w;
-	}
-
-	template <typename T, typename... Args>
-	void DebugSerializedFields(const T& instance, const std::tuple<Args...>& fields) {
-		std::apply([&](const auto&... fieldTuple) {
-			([&](const auto& entry) {
-				auto fieldName = std::get<0>(entry);
-				auto fieldPtr = std::get<1>(entry);
-
-				std::cout << fieldName << std::endl;
-
-				}(fieldTuple), ...);
-			}, fields);
-	}
 };
 
 

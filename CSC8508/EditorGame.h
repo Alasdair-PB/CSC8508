@@ -20,7 +20,6 @@
 #include "MainMenuUI.h"
 #include "EditorCore/Inspector.h"
 
-
 using std::vector;
 
 namespace NCL {
@@ -45,8 +44,15 @@ namespace NCL {
 			bool LoadGameObjectAsPrefab(std::string assetPath);
 			bool LoadScene(std::string assetPath);
 			bool SaveScene(std::string assetPath);
+			void DeleteSelectionObject();
+
+			static EditorGame* GetInstance() {
+				return instance;
+			}
+
 
 		protected:
+			inline static EditorGame* instance = nullptr;
 			void InitialiseAssets();
 			void InitWorld();
 			void InitialiseGame();

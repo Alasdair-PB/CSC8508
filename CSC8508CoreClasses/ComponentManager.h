@@ -154,6 +154,7 @@ namespace NCL::CSC8508 {
                 (*myAction)();
                 delete myAction;
             }
+            deallocationOperations.clear();
             allComponents.clear();
         }
 

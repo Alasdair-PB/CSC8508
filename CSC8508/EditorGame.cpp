@@ -118,7 +118,8 @@ void EditorGame::InitialiseGame() {
 
 EditorGame::EditorGame()
 {
-	world = new GameWorld();
+	instance = this;
+	world = &GameWorld::Instance(); 
 #ifdef USE_PS5
 	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
 	controller = w->GetController();
@@ -157,8 +158,6 @@ EditorGame::~EditorGame()
 	ComponentManager::CleanUp();
 
 	delete physics;
-	//delete renderer;
-	delete world;
 	delete controller;
 	delete navMesh;
 }
@@ -182,6 +181,10 @@ void EditorGame::SaveWorld(std::string assetPath) {
 	auto x = AddNavMeshToWorld("NavMeshObject.msh", "smalltest.navmesh", Vector3(0, 0, 0), Vector3(1, 1, 1));
 	delete x;
 	world->Save(assetPath);
+}
+
+void EditorGame::DeleteSelectionObject() {
+	selectionObject = nullptr;
 }
 
 const bool load = true;

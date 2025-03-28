@@ -11,6 +11,7 @@
 #include "BoundsComponent.h"
 #include "ItemComponent.h"
 #include "Map/RoomManager.h"
+#include "Map/DungeonComponent.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -150,9 +151,9 @@ void TutorialGame::UpdateGame(float dt)
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {
-	LoadDropZone(Vector3(85, 15, -60), Vector3(3,1,3), Tags::DropZone);
-	LoadDropZone(Vector3(75, 15, -60), Vector3(3,1,3), Tags::DepositZone);
-	LoadDropZone(Vector3(65, 15, -60), Vector3(3,1,3), Tags::Exit);
+	LoadDropZone(GetSpawnLocation(1), Vector3(3, 1, 3), Tags::DropZone);
+	LoadDropZone(GetSpawnLocation(2), Vector3(3,1,3), Tags::DepositZone);
+	LoadDropZone(GetSpawnLocation(3), Vector3(3,1,3), Tags::Exit);
 	world->Load(assetPath);
 }
 
@@ -161,17 +162,7 @@ void TutorialGame::LoadDungeon(Vector3 const offset) {
 	auto t = Transform();
 	t.SetPosition(offset);
 	DoorLocation const loc(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
-	AddDungeonToWorld(t, loc, 3); // TODO: Add back in
-
-	// for (auto child : x->GetChildren()) {
-	// 	for (auto childling : child->GetChildren()) {
-	// 		auto b = childling->TryGetComponent<BoundsComponent>();
-	// 		auto p = childling->TryGetComponent<PhysicsComponent>();
-	//
-	// 		if (b) b->SetEnabled(false);
-	// 		if (p)p->SetEnabled(false);
-	// 	}
-	// }
+	AddDungeonToWorld(t, loc, 3);
 }
 
 void TutorialGame::InitWorld()
@@ -190,7 +181,26 @@ void TutorialGame::InitWorld()
 	//LoadWorld(assetPath);
 
 	LoadDungeon(Vector3());
+	//LoadDropZone(GetSpawnLocation(1), Vector3(3, 1, 3), Tags::DropZone);
+	//LoadDropZone(GetSpawnLocation(2), Vector3(3, 1, 3), Tags::DepositZone);
+	//LoadDropZone(GetSpawnLocation(3), Vector3(3, 1, 3), Tags::Exit);
 }
+
+Vector3 TutorialGame::GetSpawnLocation(int index) {
+	Vector3 local;
+	ComponentManager::OperateOnBufferContents<DungeonComponent>(
+		[&local, &index](DungeonComponent* o) {
+			vector<Vector3> locals;
+			o->GetAllItemSpawnLocations(locals);
+
+			std::mt19937 rng(o->GetSeed() + index);
+			std::uniform_int_distribution<int> dist(0, locals.size() - 1);
+			local = locals[dist(rng)];
+		}
+	);
+	return local;
+}
+
 
 void TutorialGame::UpdateUI() {
 	uiSystem->StartFrame();

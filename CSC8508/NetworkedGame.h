@@ -16,7 +16,7 @@ namespace NCL {
 		class GameServer;
 		class GameClient;
 		class NetworkPlayer;
-		enum Prefab { Player, Enemy, Item, Manager };
+		enum Prefab { Player, Enemy, Item, Manager};
 
 		class HostLobbyConnectEvent : public Event {};
 		class ClientLobbyConnectEvent : public Event 

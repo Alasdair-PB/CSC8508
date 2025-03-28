@@ -325,7 +325,9 @@ GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket)
 { return TutorialGame::AddPlayerToWorld(Vector3(0.0f, 20.0f, 0.0f), spawnPacket);}
 
 GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket)
-	{ return TutorialGame::Loaditem(Vector3(93, 22, -53), spawnPacket);}
+	{ 
+	return TutorialGame::Loaditem(Vector3(93, 22, -53), spawnPacket);
+}
 
 GameObject* NetworkedGame::GetGameManagerPrefab(NetworkSpawnData* spawnPacket)
 	{ return TutorialGame::LoadGameManager(Vector3(93, 22, -53), spawnPacket);}

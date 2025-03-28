@@ -230,7 +230,7 @@ void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsG
 			[this]() {SetBoundingVolume(nullptr); });
 	}
 	else {
-		std::set<std::pair<int*, std::string>> enumOptions = {
+		std::vector<std::pair<int*, std::string>> enumOptions = {
 			{reinterpret_cast<int*>(&expectingVolumeType), "AABB"},
 			{reinterpret_cast<int*>(&expectingVolumeType), "OBB"},
 			{reinterpret_cast<int*>(&expectingVolumeType), "Sphere"},

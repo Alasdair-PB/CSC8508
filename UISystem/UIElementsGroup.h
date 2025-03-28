@@ -36,8 +36,9 @@ namespace NCL {
 			void PushToggle(std::string name, bool* toggle, float scale);
 			void PushVectorElement(Vector3* value, float scale, std::string name);
 			void PushFloatElement(float* value, float scale, std::string name);
-			void PushEnumElement(std::string name, std::set<std::pair<int*, std::string>> pair);
+			void PushEnumElement(std::string name, std::vector<std::pair<int*, std::string>> pair);
 			void PushQuaternionElement(Vector4* value, float scale, std::string name);
+			void PushEnumVectorElement(std::string name, std::vector<int> values, std::vector<std::pair<int, std::string>> enumMap);
 
 			void PushTextElement(std::string* text);
 			void PushStaticTextElement(std::string text);

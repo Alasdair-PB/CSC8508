@@ -105,7 +105,7 @@ void PhysicsComponent::PushIComponentElementsInspector(UIElementsGroup& elements
 		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale), "AddPhysicsObject", 
 			[phys](){phys->SetPhysicsObject(new PhysicsObject(&phys->GetGameObject().GetTransform()));});
 	}
-	std::set<std::pair<int*, std::string>> enumOptions = {
+	std::vector<std::pair<int*, std::string>> enumOptions = {
 		{reinterpret_cast<int*>(&initiType), "None"},
 		{reinterpret_cast<int*>(&initiType), "Sphere"},
 		{reinterpret_cast<int*>(&initiType), "Cube"}

@@ -88,6 +88,11 @@ void EditorGame::TestSave() {
 	TestLoadGameObject(gameObjectPath);
 }
 
+
+ComponentAssemblyDefiner* EditorGame::GetDefiner() {
+	return componentAssembly;
+}
+
 void LoadControllerMappings(Controller* controller)
 {
 	controller->MapAxis(0, "Sidestep");
@@ -111,6 +116,7 @@ void EditorGame::InitialiseGame() {
 	uiSystem = UI::UISystem::GetInstance();
 	inspectorBar = new Inspector();
 	uiSystem->PushNewStack(inspectorBar->inspectorBar, "InpsectorBar");
+	uiSystem->PushNewStack(inspectorBar->toolsBar, "ToolsBar");
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
@@ -154,6 +160,9 @@ void EditorGame::InitialiseAssets() {
 
 EditorGame::~EditorGame()
 {
+	uiSystem->RemoveStack("InpsectorBar");
+	uiSystem->RemoveStack("InpsectorBar");
+
 	//MaterialManager::CleanUp();
 	ComponentManager::CleanUp();
 

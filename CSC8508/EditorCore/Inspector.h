@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
+#include "../ComponentAssemblyDefiner.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -50,11 +51,15 @@ public:
 	}
 
 	UIElementsGroup* inspectorBar;
+	UIElementsGroup* toolsBar;
+
 private:
 	GameObject* focus;
 	Vector3* positionInfo;
 	Vector3* scaleInfo;
 	Vector4* orientationInfo;
+	ComponentAssemblyDefiner::ComponentMapId mapId;
+	Tags::Tag tagId;
 	bool* isEnabled;
 	bool clearWorld;
 	std::string* saveDestination;
@@ -62,7 +67,13 @@ private:
 	std::string GetAssetPath(std::string pfabName);
 	void SetVector(Vector3* vector, Vector3 values = Vector3());
 	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
-
+	void PushLoadPfab();
+	void PushAddChild();
+	void PushAddComponentField();
+	void PushTagField();
+	void PushFocusParent();
+	void PushAddParent();
+	void PushLoadChild();
 };
 
 

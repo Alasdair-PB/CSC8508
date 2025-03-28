@@ -45,11 +45,11 @@ namespace NCL {
 			bool LoadScene(std::string assetPath);
 			bool SaveScene(std::string assetPath);
 			void DeleteSelectionObject();
+			ComponentAssemblyDefiner* GetDefiner();
 
 			static EditorGame* GetInstance() {
 				return instance;
 			}
-
 
 		protected:
 			inline static EditorGame* instance = nullptr;
@@ -90,6 +90,7 @@ namespace NCL {
 			Inspector* inspectorBar;
 
 			bool inSelectionMode;
+
 
 			BoundsComponent* selectionObject = nullptr;
 			NavigationPath outPath;

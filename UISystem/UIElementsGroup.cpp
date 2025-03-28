@@ -63,7 +63,7 @@ void UIElementsGroup::PushButtonElement(ImVec2 size, std::string name,
 	elements.push_back(buttonElem);
 }
 
-void UIElementsGroup::PushEnumElement(std::string name, std::set<std::pair<int*, std::string>> pair) {
+void UIElementsGroup::PushEnumElement(std::string name, std::vector<std::pair<int*, std::string>> pair) {
 	EnumElement* enumElem = new EnumElement(name, pair);
 	elements.push_back(enumElem);
 }
@@ -90,6 +90,11 @@ void UIElementsGroup::PushSliderElement(std::string name, float& val, float valM
 
 void UIElementsGroup::PushVectorElement(Vector3* value, float scale, std::string name) {
 	VectorElement* vectorElem = new VectorElement(value, scale * winWidth, name);
+	elements.push_back(vectorElem);
+}
+
+void UIElementsGroup::PushEnumVectorElement(std::string name, std::vector<int> values, std::vector<std::pair<int, std::string>> enumMap) {
+	EnumVectorElement* vectorElem = new EnumVectorElement(name, values, enumMap);
 	elements.push_back(vectorElem);
 }
 

@@ -285,25 +285,56 @@ namespace NCL {
 		};
 
 		class EnumElement : public UIElement {
-		public:
-			EnumElement(std::string name, std::set<std::pair<int*, std::string>> options)
-				: name(name), options(options) {
-			}
-			CSC8508::PushdownState::PushdownResult UpdateElement() override {
-				int currentItem = *options.begin()->first;
-				std::vector<const char*> labels;
-				for (auto& option : options)
-					labels.push_back(option.second.c_str());
+			public:
+				EnumElement(std::string name, std::vector<std::pair<int*, std::string>> options)
+					: name(name), options(options) {
+				}
 
-				if (ImGui::Combo(name.c_str(), &currentItem, labels.data(), labels.size()))
-					*options.begin()->first = currentItem;
+				CSC8508::PushdownState::PushdownResult UpdateElement() override {
+					int currentItem = *options.front().first;
+					std::vector<const char*> labels;
+
+					for (auto& option : options)
+						labels.push_back(option.second.c_str());
+
+					if (ImGui::Combo(name.c_str(), &currentItem, labels.data(), static_cast<int>(labels.size())))
+						*options[currentItem].first = currentItem;
+					return CSC8508::PushdownState::PushdownResult::NoChange;
+				}
+			private:
+				std::string name;
+				std::vector<std::pair<int*, std::string>> options;
+			};
+
+		class EnumVectorElement : public UIElement {
+		public:
+			EnumVectorElement(std::string name, std::vector<int> values, std::vector<std::pair<int, std::string>> volumeMap)
+				: name(name), values(values), volumeMap(volumeMap) {
+			}
+
+			CSC8508::PushdownState::PushdownResult UpdateElement() override {
+				ImGui::Text("%s:", name.c_str());
+				ImGui::SameLine();
+				std::string displayText;
+				for (int val : values) {
+					for (const auto& pair : volumeMap) {
+						if (pair.first == val) {
+							if (!displayText.empty()) {
+								displayText += ", ";
+							}
+							displayText += pair.second;
+							break;
+						}
+					}
+				}
+				ImGui::Text("%s", displayText.c_str());
 				return CSC8508::PushdownState::PushdownResult::NoChange;
 			}
 
 		private:
 			std::string name;
-			std::set<std::pair<int*, std::string>> options;
+			std::vector<int> values;
+			std::vector<std::pair<int, std::string>> volumeMap;
 		};
-
 	}
 }

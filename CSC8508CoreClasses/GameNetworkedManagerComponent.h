@@ -64,6 +64,7 @@ namespace NCL::CSC8508 {
 			GameManagerPacket* packet = new GameManagerPacket();
 			packet->casualties = this->casualties;
 			packet->bankedCurrency = this->bankedCurrency;
+			packet->successState = successState;
 			SendEventPacket(packet);
 		}
 

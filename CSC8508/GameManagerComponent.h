@@ -9,6 +9,7 @@
 #include "PauseUI.h"
 #include "FramerateUI.h"
 #include "GameOverUI.h"
+#include "GameVictoryUI.h"
 #include "UISystem.h"
 #include "TimerComponent.h"
 
@@ -18,7 +19,6 @@ namespace NCL::CSC8508 {
 	public:
 		GameOverEvent() {};
 	};
-
 
 	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent>, public EventListener<OverTimeEvent> {
 	protected:
@@ -36,6 +36,8 @@ namespace NCL::CSC8508 {
 		UI::PauseUI* pauseUI = new UI::PauseUI;
 		UI::FramerateUI* framerate = new UI::FramerateUI;
 		UI::GameOverUI* gameOverUI = new UI::GameOverUI;
+		UI::GameVictoryUI* gameVicUI = new UI::GameVictoryUI;
+
 
 		void OnEvent(DeathEvent* e) override {
 			CheckPlayerInstance(e);
@@ -98,6 +100,7 @@ namespace NCL::CSC8508 {
 
 		virtual void OnPauseEvent(PauseEvent* e);
 		virtual void CheckPlayerInstance(DeathEvent* e);
+
 		virtual void OnMissionEnd() {
 			if (bankedCurrency >= quota)
 				OnMissionSuccessful();
@@ -118,14 +121,14 @@ namespace NCL::CSC8508 {
 
 		void OnMissionFeedBack() {
 			GameWorld::Instance().ToggleWorldPauseState();
-			UI::UISystem::GetInstance()->PushNewStack(gameOverUI->gameOverUI, "Game Over");
-			gameOverUI->PushElement(GameOverCurrency());
 		}
 
 		void OnMissionSuccessful() {
 			successState = Win;
 			GameOverEvent* e = new GameOverEvent();
 			EventManager::Call<GameOverEvent>(e);
+			UI::UISystem::GetInstance()->PushNewStack(gameVicUI->gameOverUI, "Game victory");
+			gameVicUI->PushElement(GameOverCurrency());
 			OnMissionFeedBack();
 		}
 
@@ -133,6 +136,8 @@ namespace NCL::CSC8508 {
 			successState = Loss;
 			GameOverEvent* e = new GameOverEvent();
 			EventManager::Call<GameOverEvent>(e);
+			UI::UISystem::GetInstance()->PushNewStack(gameOverUI->gameOverUI, "Game Over");
+			gameOverUI->PushElement(GameOverCurrency());
 			OnMissionFeedBack();
 		}
 

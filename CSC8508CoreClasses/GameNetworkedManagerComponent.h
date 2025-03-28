@@ -37,21 +37,8 @@ namespace NCL::CSC8508 {
 			return types;
 		}
 
-		void OnAwake() override {
-			EventManager::RegisterListener<DeathEvent>(this);
-			EventManager::RegisterListener<ExitEvent>(this);
-			EventManager::RegisterListener<PauseEvent>(this);
-			EventManager::RegisterListener<DebugEvent>(this);
-			EventManager::RegisterListener<OverTimeEvent>(this);
-		}
-
-		void Update(float dt) override {
-		}
-
-
 		bool ReadEventPacket(INetworkPacket& p) override {
 			if (p.packetSubType == None) {
-
 				GameManagerPacket* packet = &(GameManagerPacket&)p;
 
 				casualties = packet->casualties;
@@ -59,57 +46,17 @@ namespace NCL::CSC8508 {
 				successState = packet->successState;
 
 				if (successState == Win)
-					std::cout << "You Win " << std::endl;
-				else if (successState == Loss)
-					std::cout << "You Lose " << std::endl;
+					OnMissionSuccessful();
 				else
-					std::cout << "In Game " << std::endl;
-				
-
+					OnMissionFailure();
 				return true;
 			}
 			return false;
 		}
 
-		void OnEvent(DeathEvent* e) override {
-			if (!clientOwned) return;
-			CheckPlayerInstance(e);
-		}
-
-		void OnEvent(ExitEvent* e) override {
-			if (!clientOwned) return;
-			OnMissionEnd();
-		}
-
-		void OnEvent(PauseEvent* e) override {
-			if (!clientOwned) return;
-			OnPauseEvent(e);
-		}
-
-		void OnEvent(DebugEvent* e) override {
-			if (!clientOwned) return;
-			std::cout << "Debug event!" << std::endl;
-		}
-
-		void OnEvent(OverTimeEvent* e) override {
-			if (!clientOwned) return;
-			OnMissionEnd();
-		}
-
 		void OnMissionEnd() override{
-			if (bankedCurrency >= quota) {
-				OnMissionSuccessful();
-			}
-			else {
-				OnMissionFailure();
-			}
-
-			if (successState == Win)
-				std::cout << "You Win " << std::endl;
-			else if (successState == Loss)
-				std::cout << "You Lose " << std::endl;
-			else
-				std::cout << "In Game " << std::endl;
+			if (!IsOwner()) return;
+			GameManagerComponent::OnMissionEnd();
 			SendManagerPacket();
 		}
 
@@ -120,6 +67,15 @@ namespace NCL::CSC8508 {
 			SendEventPacket(packet);
 		}
 
+		void OnPauseEvent(PauseEvent* e) override {
+			if (!IsOwner()) return;
+			GameManagerComponent::OnPauseEvent(e);
+		}
+
+		void CheckPlayerInstance(DeathEvent* e) override {
+			if (!IsOwner()) return;
+			GameManagerComponent::CheckPlayerInstance(e);
+		}
 	};
 }
 

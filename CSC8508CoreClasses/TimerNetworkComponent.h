@@ -67,7 +67,6 @@ namespace NCL::CSC8508
 			timerPacket->isComplete = isComplete;
 			timerPacket->remainingTime = remainingTime;
 			SendEventPacket(timerPacket);
-			std::cout << "Timer Packet Sent" << std::endl;
 		}
 	};
 

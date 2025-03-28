@@ -159,7 +159,7 @@ GameObject* EditorGame::AddFloorToWorld(const Vector3& position)
 	return floor;
 }
 
-GameObject* EditorGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass, bool addToWorld)
+GameObject* EditorGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass)
 {
 	GameObject* sphere = new GameObject();
 	Vector3 sphereSize = Vector3(radius, radius, radius);
@@ -179,8 +179,6 @@ GameObject* EditorGame::AddSphereToWorld(const Vector3& position, float radius, 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
 	phys->SetInitType(PhysicsComponent::Sphere);
-
-	if (addToWorld) world->AddGameObject(sphere);
 	return sphere;
 }
 
@@ -202,7 +200,5 @@ GameObject* EditorGame::AddCubeToWorld(const Vector3& position, Vector3 dimensio
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitCubeInertia();
-
-	world->AddGameObject(cube);
 	return cube;
 }

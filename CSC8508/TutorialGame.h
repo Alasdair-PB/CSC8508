@@ -58,6 +58,8 @@ namespace NCL {
 
 			void LoadWorld(std::string assetPath);
 			void UpdateUI();
+			void RefreshSpawnLocals();
+
 			std::string GetAssetPath(std::string pfabName);
 			void LoadDungeon(Vector3 offset);
 			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
@@ -91,9 +93,6 @@ namespace NCL {
 			MainMenu* mainMenu = nullptr;
 			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset = Vector3(0, 14, 20);
-
-
-
 			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
 			}
@@ -101,6 +100,8 @@ namespace NCL {
 			GameObject* objClosest = nullptr;
 			UI::UISystem* uiSystem;
 
+			vector<Vector3> locals = vector<Vector3>();
+			UI::FramerateUI* framerate = new UI::FramerateUI;
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
@@ -108,6 +109,8 @@ namespace NCL {
 			/*UI::PauseUI* pauseUI = new UI::PauseUI;*/
 
 			float framerateDelay = 0;
+			int seed;
+			int itemCount; 
 
 #if EOSBUILD
 			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;

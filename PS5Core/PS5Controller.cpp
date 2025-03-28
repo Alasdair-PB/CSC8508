@@ -87,3 +87,7 @@ bool	PS5Controller::GetButton(uint32_t button) const {
 	}
 	return buttons[button] > 0.1f ? true : false;
 };
+
+bool PS5Controller::GetBoundButton(uint32_t button)  const {
+	return GetButton(button);
+}

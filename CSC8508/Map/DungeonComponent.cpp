@@ -71,10 +71,13 @@ std::vector<RoomComponent*> DungeonComponent::GetRooms() const {
 }
 
 void DungeonComponent::GetAllItemSpawnLocations(std::vector<Vector3>& locations) const {
-    for (GameObject const* r : GetGameObject().GetChildren()) {
+    for (GameObject* r : GetGameObject().GetChildren()) {
+        Transform const& transform = r->GetTransform();
         RoomComponent const* roomComponent = r->TryGetComponent<RoomComponent>();
         if (!roomComponent) continue;
-        for (RoomPrefab prefab = roomComponent->GetPrefab(); Vector3 loc : prefab.GetItemSpawnLocations())
-            locations.push_back(loc);
+        for (RoomPrefab prefab = roomComponent->GetPrefab(); Vector3 const loc : prefab.GetItemSpawnLocations()) {
+            Vector3 const outLoc = transform.GetOrientation() * (transform.GetScale() * loc)  + transform.GetPosition();
+            locations.push_back(outLoc);
+        }
     }
 }

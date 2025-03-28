@@ -49,15 +49,15 @@ GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
 void LoadControllerMappings(Controller* controller)
 {
 #ifdef USE_PS5
-	controller->MapAxis(2, "Sidestep");
-	controller->MapAxis(3, "Forward");
-	controller->MapAxis(0, "XLook");
-	controller->MapAxis(1, "YLook");
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(1, "Forward");
+	controller->MapAxis(2, "XLook");
+	controller->MapAxis(3 , "YLook");
 	controller->MapButton(8, "Dash"); //Ps5 relevant buttons
 	controller->MapButton(2, "Jump"); // Keep names
 	controller->MapButton(1, "Interact");
-  controller->MapButton(KeyCodes::P, "Pause");
-	controller->MapButton(KeyCodes::L, "Debug");
+  controller->MapButton(10, "Pause");
+	controller->MapButton(11, "Debug");
 
 #else
 	controller->MapAxis(0, "Sidestep");
@@ -84,9 +84,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem = UI::UISystem::GetInstance();
 	audioEngine = &AudioEngine::Instance();
 
-	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
 
@@ -211,12 +209,6 @@ Vector3 TutorialGame::GetSpawnLocation(int index) {
 
 void TutorialGame::UpdateUI() {
 	uiSystem->StartFrame();
-	framerateDelay += 1;
-
-	if (framerateDelay > 10) {
-		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
-		framerateDelay = 0;
-	}
 #if !EOSBUILD
 	if (mainMenuUI->GetMenuOption() != 0) {
 		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());

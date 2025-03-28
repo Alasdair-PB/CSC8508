@@ -10,6 +10,7 @@
 #include "EventManager.h"
 #include "CollisionDetection.h"
 #include "../InventoryNetworkManagerComponent.h"
+#include "../UISystem/UISystem.h"
 
 namespace NCL {
     namespace CSC8508 {
@@ -79,6 +80,7 @@ namespace NCL {
             void UpdateStates(float deltaTime);
             bool CheckTag(Tag tag, CollisionEvent* collisionEvent);
             Vector3 GetForwardsDirection();
+            void GetWeightModifier();
 
             float speed = 15.0f;
             float dashMultiplier = 2.5f;
@@ -88,6 +90,7 @@ namespace NCL {
             float dashTickStam = 0.3f;
             float jumpStamCost = 10.0f;
             float visibleRange = 5.0f;
+            float weightModifier = 1.0f;
 
             float timeSinceLastPickUp;
             float pickUpDelay;

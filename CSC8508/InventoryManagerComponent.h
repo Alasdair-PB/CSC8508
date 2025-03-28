@@ -116,6 +116,14 @@ namespace NCL {
 			   return wallet;
            }
 
+           float GetItemCombinedWeight() {
+               float itemCombinedWeight = 0.0f;
+               for (ItemComponent* item : storedItems) {
+                   itemCombinedWeight += item->GetItemWeight();
+               }
+               return itemCombinedWeight;
+           }
+
             /// <summary>
             /// IComponent Save data struct definition
             /// </summary>

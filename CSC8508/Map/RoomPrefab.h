@@ -41,6 +41,8 @@ public:
 
     size_t Save(std::string assetPath, size_t* allocationStart) override;
     void Load(std::string assetPath, size_t allocationStart) override;
+    void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
+
 
 protected:
     std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>();

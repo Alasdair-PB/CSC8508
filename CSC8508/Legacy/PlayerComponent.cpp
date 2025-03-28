@@ -105,7 +105,8 @@ void PlayerComponent::OnDashInput() {
 
 void PlayerComponent::SetLinearVelocity(float jumpDuration) {
     Vector3 velocity = physicsObj->GetLinearVelocity();
-    physicsObj->SetLinearVelocity(Vector3(velocity.x, jumpForce * (1 + (0.2f - jumpDuration)), velocity.z));
+    GetWeightModifier();
+    physicsObj->SetLinearVelocity(Vector3(velocity.x, jumpForce * weightModifier * (1 + (0.2f - jumpDuration)), velocity.z));
 }
 
 void PlayerComponent::OnJumpInput() {
@@ -201,6 +202,17 @@ void PlayerComponent::OnItemInteract() {
     TryPickUp();
 }
 
+void PlayerComponent::GetWeightModifier() {
+    weightModifier = 1.0f;
+    float weight = inventoryComponent->GetItemCombinedWeight();
+    if (weight == 0) { 
+        weightModifier = 1.0f; }
+    else {
+        weightModifier = 1.0 - (weight / 100);
+    }
+    return;
+}
+
 void PlayerComponent::OnPlayerMove() {
     isMoving = false;
     if (inputComponent->GetNamedAxis("Forward") == 0 && inputComponent->GetNamedAxis("Sidestep") == 0)
@@ -208,13 +220,12 @@ void PlayerComponent::OnPlayerMove() {
     isMoving = true;
     Vector3 dir;
     Matrix3 yawRotation = inputComponent->GetMouseGameWorldYawMatrix();
-
+    GetWeightModifier();
     dir += yawRotation * Vector3(0, 0, -inputComponent->GetNamedAxis("Forward"));
     dir += yawRotation * Vector3(inputComponent->GetNamedAxis("Sidestep"), 0, 0);
-
     Matrix3 offsetRotation = Matrix::RotationMatrix3x3(0.0f, Vector3(0, 1, 0));
     dir = offsetRotation * dir;
-    physicsObj->AddForce(dir * speed * (isDashing ? dashMultiplier : 1.0f));
+    physicsObj->AddForce(dir * speed * weightModifier * (isDashing ? dashMultiplier : 1.0f));
     physicsObj->RotateTowardsVelocity();
 }
 

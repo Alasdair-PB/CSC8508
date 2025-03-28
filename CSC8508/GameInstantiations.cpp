@@ -130,6 +130,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
 	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
 	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
+	pc->SetBindingDebug(controller->GetButtonHashId("Debug"));
 	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
 
 	AnimationComponent* animator = player->AddComponent<AnimationComponent>();

@@ -15,12 +15,13 @@
 #include <functional>
 
 #include "CollisionEvent.h"
+#include "KDTree/KDTree.h"
 using namespace NCL;
 using namespace CSC8508;
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	applyGravity	= false;
-	useBroadPhase	= false;	
+	useBroadPhase	= true;
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
 	SetGravity(Vector3(0.0f, -9.8f, 0.0f));
@@ -250,22 +251,65 @@ void PhysicsSystem::ImpulseResolveCollision(BoundsComponent& a, BoundsComponent&
 
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
-	QuadTree<BoundsComponent*> tree(Vector2(1024, 1024), 7, 6);
+	QuadTree<BoundsComponent*> dynTree(Vector2(1024, 1024), 7, 6);
+	QuadTree<BoundsComponent*> staticTree(Vector2(1024, 1024), 7, 6);
+	//auto staticTree = KDTree<BoundsComponent>();
 
 	std::vector<BoundsComponent*>::const_iterator first;
 	std::vector<BoundsComponent*>::const_iterator last;
 	gameWorld.GetBoundsIterators(first, last);
 
+	// Make the trees
 	for (auto i = first; i != last; ++i) {
 		Vector3 halfSizes;
 		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
 			continue;
 		}
 		Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
-		tree.Insert(*i, pos, halfSizes);
+		if ((*i)->GetGameObject().IsStatic()) staticTree.Insert(*i, pos, halfSizes);
+		else dynTree.Insert(*i, pos, halfSizes);
 	}
-	tree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& data) 
+
+	// // Check for static collisions
+	// for (auto i = first; i != last; ++i) {
+	// 	if ((*i)->GetGameObject().IsStatic()) return;
+	//
+	// 	Vector3 halfSizes;
+	// 	if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
+	// 		continue;
+	// 	}
+	// 	Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
+	// 	auto query = KDTreeQuery(pos, halfSizes);
+	// 	//auto out = kdTree.Get(query);
+	// 	for (KDTreeEntry<BoundsComponent> e : staticTree.Get(query)) {
+	// 		CollisionDetection::CollisionInfo info;
+	// 		info.a = std::min(*i, e.value);
+	// 		info.b = std::max(*i, e.value);
+	// 		broadphaseCollisions.insert(info);
+	// 	}
+	// }
+
+	// Check non-static
+	staticTree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& staticData)
 	{
+		dynTree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& dynData) {
+			for (auto i = staticData.begin(); i != staticData.end(); ++i)
+		{
+			for (auto j = dynData.begin(); j != dynData.end(); ++j)
+			{
+				CollisionDetection::CollisionInfo info;
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
+				broadphaseCollisions.insert(info);
+			}
+		}
+		});
+	});
+
+	// Check non-static
+	dynTree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& data)
+	{
+
 		CollisionDetection::CollisionInfo info;
 		for (auto i = data.begin(); i != data.end(); ++i) 
 		{
@@ -280,8 +324,10 @@ void PhysicsSystem::BroadPhase() {
 }
 
 void PhysicsSystem::NarrowPhase() {
+	int collisionTestCount = 0;
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = broadphaseCollisions.begin(); i != broadphaseCollisions.end(); ++i) {
 		CollisionDetection::CollisionInfo info = *i;
+		collisionTestCount++;
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			auto e = CollisionEvent(info.a->GetGameObject(), info.b->GetGameObject(), info);
 			EventManager::Call(&e);

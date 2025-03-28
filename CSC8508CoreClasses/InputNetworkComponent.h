@@ -23,7 +23,7 @@ namespace NCL::CSC8508
 	};
 
 	const int MAX_AXIS_COUNT = 5;
-	const int MAX_BUTTON_COUNT = 5;
+	const int MAX_BUTTON_COUNT = 8;
 
 	struct InputDeltaPacket : INetworkPacket {
 		uint32_t axisIDs[MAX_AXIS_COUNT];

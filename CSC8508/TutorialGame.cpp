@@ -48,13 +48,16 @@ GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
 void LoadControllerMappings(Controller* controller)
 {
 #ifdef USE_PS5
-	controller->MapAxis(0, "Sidestep");
-	controller->MapAxis(2, "Forward");
-	controller->MapAxis(3, "XLook");
-	controller->MapAxis(4, "YLook");
-	controller->MapButton(KeyCodes::SHIFT, "Dash"); //Ps5 relevant buttons
-	controller->MapButton(KeyCodes::SPACE, "Jump"); // Keep names
-	controller->MapButton(KeyCodes::E, "Interact");
+	controller->MapAxis(2, "Sidestep");
+	controller->MapAxis(3, "Forward");
+	controller->MapAxis(0, "XLook");
+	controller->MapAxis(1, "YLook");
+	controller->MapButton(8, "Dash"); //Ps5 relevant buttons
+	controller->MapButton(2, "Jump"); // Keep names
+	controller->MapButton(1, "Interact");
+  controller->MapButton(KeyCodes::P, "Pause");
+	controller->MapButton(KeyCodes::L, "Debug");
+
 #else
 	controller->MapAxis(0, "Sidestep");
 	controller->MapAxis(2, "Forward");
@@ -63,6 +66,8 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(KeyCodes::SHIFT, "Dash");
 	controller->MapButton(KeyCodes::SPACE, "Jump");
 	controller->MapButton(KeyCodes::E, "Interact");
+	controller->MapButton(KeyCodes::P, "Pause");
+	controller->MapButton(KeyCodes::L, "Debug");
 #endif
 	controller->BindMappingsToHashIds();
 }

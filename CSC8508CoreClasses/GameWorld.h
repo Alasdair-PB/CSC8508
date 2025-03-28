@@ -77,8 +77,12 @@ namespace NCL {
 				return worldStateCounter;
 			}
 
-			void SetWorldPauseState(bool paused) {
+			void SetWorldPauseState(bool pause) {
 				this->paused = paused;
+			}
+
+			void ToggleWorldPauseState() {
+				paused = !paused;
 			}
 
 			int GetGameObjectCount() const { return gameObjects.size(); }

@@ -7,6 +7,7 @@
 #include "../CSC8508/Legacy/PlayerComponent.h"
 #include "DamageableComponent.h"
 #include "PauseUI.h"
+#include "FramerateUI.h"
 #include "UISystem.h"
 
 namespace NCL::CSC8508 {
@@ -23,12 +24,16 @@ namespace NCL::CSC8508 {
 		int bankedCurrency;
 		int terminationFee;
 		int casualties = 0;
+		int framerateDelay;
+		
+		bool debugMode = false;
 
 		inline static GameManagerComponent* instance = nullptr;
 
 		void OnPauseEvent(PauseEvent* e);
 
 		UI::PauseUI* pauseUI = new UI::PauseUI;
+		UI::FramerateUI* framerate = new UI::FramerateUI;
 
 	public:
 		GameManagerComponent(GameObject& gameObject)
@@ -52,7 +57,12 @@ namespace NCL::CSC8508 {
 		}
 
 		void Update(float dt) override {
+			framerateDelay += 1;
 
+			if (framerateDelay > 10) {
+				framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
+				framerateDelay = 0;
+			}
 		}
 
 		
@@ -70,6 +80,14 @@ namespace NCL::CSC8508 {
 
 		void OnEvent(DebugEvent* e) override {
 			std::cout << "Debug event!" << std::endl;
+			if (debugMode == false) {
+				debugMode = true;
+				UI::UISystem::GetInstance()->PushNewStack(framerate->frameUI, "Framerate");
+			}
+			else {
+				debugMode = false;
+				UI::UISystem::GetInstance()->RemoveStack("Framerate");
+			}
 		}
 
 
@@ -122,6 +140,10 @@ namespace NCL::CSC8508 {
 
 		void IncrementCasualties() {
 			casualties++;
+		}
+
+		void UpdateFramerate(float f) {
+			framerate->UpdateFramerate(f);
 		}
 
 		std::function<CSC8508::PushdownState::PushdownResult()> PauseReturnButton() {

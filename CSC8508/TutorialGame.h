@@ -99,7 +99,6 @@ namespace NCL {
 			GameObject* objClosest = nullptr;
 			UI::UISystem* uiSystem;
 
-			UI::FramerateUI* framerate = new UI::FramerateUI;
 			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
 			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
 			UI::InventoryUI* inventoryUI = new UI::InventoryUI;

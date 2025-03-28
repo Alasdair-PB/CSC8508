@@ -83,9 +83,7 @@ void TutorialGame::InitialiseGame() {
 	uiSystem = UI::UISystem::GetInstance();
 	audioEngine = &AudioEngine::Instance();
 
-	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
-
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
 	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
 
@@ -199,12 +197,6 @@ void TutorialGame::InitWorld()
 
 void TutorialGame::UpdateUI() {
 	uiSystem->StartFrame();
-	framerateDelay += 1;
-
-	if (framerateDelay > 10) {
-		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
-		framerateDelay = 0;
-	}
 #if !EOSBUILD
 	if (mainMenuUI->GetMenuOption() != 0) {
 		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());

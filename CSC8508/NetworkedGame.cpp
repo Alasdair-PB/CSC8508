@@ -43,7 +43,8 @@ void NetworkedGame::StartOfflineCallBack() {
 	TutorialGame::LoadGameManager(Vector3(93, 22, -53));
 	//TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
 	TutorialGame::AddPlayerToWorld(Vector3(0.0f, 20.0f, 0.0f));
-	TutorialGame::Loaditem(Vector3(93, 22, -53));
+	TutorialGame::Loaditem(Vector3(0.0f, 25.0f, 0.0f));
+	TutorialGame::Loaditem(Vector3(0.0f, 25.0f, 0.0f));
 }
 
 #if EOSBUILD

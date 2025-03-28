@@ -10,6 +10,7 @@
 #include "EventManager.h"
 #include "CollisionDetection.h"
 #include "../InventoryNetworkManagerComponent.h"
+#include "../UISystem/UISystem.h"
 
 namespace NCL {
     namespace CSC8508 {

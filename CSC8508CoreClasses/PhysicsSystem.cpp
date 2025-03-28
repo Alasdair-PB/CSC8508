@@ -15,6 +15,7 @@
 #include <functional>
 
 #include "CollisionEvent.h"
+#include "KDTree/KDTree.h"
 using namespace NCL;
 using namespace CSC8508;
 
@@ -251,21 +252,49 @@ void PhysicsSystem::ImpulseResolveCollision(BoundsComponent& a, BoundsComponent&
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
 	QuadTree<BoundsComponent*> tree(Vector2(1024, 1024), 7, 6);
+	auto kdTree = KDTree<BoundsComponent>();
 
 	std::vector<BoundsComponent*>::const_iterator first;
 	std::vector<BoundsComponent*>::const_iterator last;
 	gameWorld.GetBoundsIterators(first, last);
 
+	// Make the trees
 	for (auto i = first; i != last; ++i) {
 		Vector3 halfSizes;
 		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
 			continue;
 		}
 		Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
-		tree.Insert(*i, pos, halfSizes);
+		if ((*i)->GetGameObject().IsStatic()) {
+			std::cout << "Insert into tree!\n";
+			kdTree.Insert(KDTreeEntry((*i), pos, halfSizes));
+		}
+		else tree.Insert(*i, pos, halfSizes);
 	}
+
+	// Check for static collisions
+	for (auto i = first; i != last; ++i) {
+		if ((*i)->GetGameObject().IsStatic()) return;
+
+		Vector3 halfSizes;
+		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
+			continue;
+		}
+		Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
+		auto query = KDTreeQuery(pos, halfSizes);
+		//auto out = kdTree.Get(query);
+		for (KDTreeEntry<BoundsComponent> e : kdTree.Get(query)) {
+			CollisionDetection::CollisionInfo info;
+			info.a = std::min(*i, e.value);
+			info.b = std::max(*i, e.value);
+			broadphaseCollisions.insert(info);
+		}
+	}
+
+	// Check non-static
 	tree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& data) 
 	{
+
 		CollisionDetection::CollisionInfo info;
 		for (auto i = data.begin(); i != data.end(); ++i) 
 		{

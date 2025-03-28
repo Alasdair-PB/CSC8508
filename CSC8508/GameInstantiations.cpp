@@ -49,11 +49,9 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 	return myObjectToLoad;
 }
 
-
-
 GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
 	GameObject* myObjectToLoad = new GameObject();
-#
+
 	myObjectToLoad->AddComponent<GameManagerComponent>();/*
 	if (spawnData)
 	{

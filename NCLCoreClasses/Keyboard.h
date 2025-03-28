@@ -7,6 +7,7 @@ Comments and queries to: richard-gordon.davison AT ncl.ac.uk
 https://research.ncl.ac.uk/game/
 */
 #pragma once
+#include <stdint.h>
 
 namespace NCL {
 	//http://msdn.microsoft.com/en-us/library/ms645540(VS.85).aspx
@@ -167,6 +168,11 @@ namespace NCL {
 		bool KeyDown(KeyCodes::Type key) const {
 			return keyStates[key];
 		}
+
+		bool KeyDown(uint32_t key) const {
+			return keyStates[key];
+		}
+
 		//Has this key been held down for multiple frames?
 		bool KeyHeld(KeyCodes::Type key) const {
 			if (KeyDown(key) && holdStates[key]) {

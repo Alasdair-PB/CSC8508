@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\PS5Starter.dir\cmake_pch.hxx.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\GameTechAGCRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\GameTechAGCRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\PS5Starter.dir\Debug\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\PS5Starter.dir\Release\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\PS5Starter.dir\MinSizeRel\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeFiles\PS5Starter.dir\RelWithDebInfo\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\PS5Starter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0001.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0002.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0003.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0004.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0005.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Cubemap\skyrender0006.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\PressStart2P.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\checkerboard.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\doge.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Textures\Skybox.dds">
+      <Filter>Texture Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\DebugLine_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\DebugLine_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\DebugText_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\DebugText_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\PixelShader_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\Shadow_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\Shadow_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\Skybox_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\Skybox_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\Tech_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\Tech_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\VertexShader_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\gamma_c.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\c0011935\OneDrive - Newcastle University\MASTERS\Group Leth\PS5\Assets\Shaders\PSSL\skinning_c.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{F12218EC-9F57-3743-B99E-F14B78487950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Precompile Header File">
+      <UniqueIdentifier>{43BAE8BF-26B0-3E68-A52C-F962B0C9C405}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{7786C110-A472-3B91-A19C-A9D93032351A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{621742AB-EB97-3B8C-8A15-9AED7F78FD54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture Files">
+      <UniqueIdentifier>{14A36725-3376-361C-B569-6B1F1CE763E5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

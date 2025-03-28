@@ -3,380 +3,236 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "TextureLoader.h"
-#include "Legacy/EnemyGameObject.h"
-#include "Legacy/Kitten.h"
 
-#include "PositionConstraint.h"
-#include "OrientationConstraint.h"
-#include "Legacy/StateGameObject.h"
+#include "GameObject.h"
+#include "MaterialManager.h"
+#include "Assets.h"
+#include "PhysicsComponent.h"
+#include "BoundsComponent.h"
+#include "ItemComponent.h"
+
+#ifdef USE_PS5
+#include "../PS5Starter/GameTechAGCRenderer.h"
+#include "../PS5Core/PS5Window.h"
+#include "../PS5Core/PS5Controller.h"
+#include "../UISystem/UIPlayStation.h"
+#else
+#include "GameTechRenderer.h"
+#include "KeyboardMouseController.h"
+#endif // USE_PS5
+
+#if EOSBUILD
+#include "EOSLobbyFunctions.h"
+#endif
 
 
 using namespace NCL;
 using namespace CSC8508;
 
-TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) 
+const static std::string folderPath = NCL::Assets::PFABDIR;
+
+std::string TutorialGame::GetAssetPath(std::string pfabName) {
+	return folderPath + pfabName;
+}
+
+GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
+	GameObject* myObjectToLoad = new GameObject(true);
+	std::string pfabPath = GetAssetPath(assetPath);
+	myObjectToLoad->Load(pfabPath);
+	myObjectToLoad->GetTransform().SetPosition(offset);
+	world->AddGameObject(myObjectToLoad);
+	return myObjectToLoad;
+}
+
+void LoadControllerMappings(Controller* controller)
 {
-	world = new GameWorld();
+#ifdef USE_PS5
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(2, "Forward");
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
+	controller->MapButton(KeyCodes::SHIFT, "Dash"); //Ps5 relevant buttons
+	controller->MapButton(KeyCodes::SPACE, "Jump"); // Keep names
+	controller->MapButton(KeyCodes::E, "Interact");
+#else
+	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(2, "Forward");
+	controller->MapAxis(3, "XLook");
+	controller->MapAxis(4, "YLook");
+	controller->MapButton(KeyCodes::SHIFT, "Dash");
+	controller->MapButton(KeyCodes::SPACE, "Jump");
+	controller->MapButton(KeyCodes::E, "Interact");
+#endif
+	controller->BindMappingsToHashIds();
+}
+
+void TutorialGame::InitialiseGame() {
+
+	componentAssembly = new ComponentAssemblyDefiner();
+	componentAssembly->InitializeMap();
+
+	world->GetMainCamera().SetController(*controller);
+	LoadControllerMappings(controller);
+	InitialiseAssets();
+	uiSystem = UI::UISystem::GetInstance();
+	audioEngine = &AudioEngine::Instance();
+
+	uiSystem->PushNewStack(framerate->frameUI, "Framerate");
+	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
+
+	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
+	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
+
+	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
+	inSelectionMode = false;
+	physics->UseGravity(true);
+}
+
+TutorialGame::TutorialGame()
+{
+	world = &GameWorld::Instance();
+#ifdef USE_PS5
+	NCL::PS5::PS5Window* w = (NCL::PS5::PS5Window*)Window::GetWindow();
+	controller = w->GetController();
+	renderer = new GameTechAGCRenderer(*world);
+	UI::UIPlayStation::GetInstance()->SetPadHandle(static_cast<NCL::PS5::PS5Controller*>(controller)->GetHandle());
+	UI::UIPlayStation::GetInstance()->InitMouse(static_cast<NCL::PS5::PS5Controller*>(controller)->GetUserId());
+#else
+	controller = new KeyboardMouseController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse());
 #ifdef USEVULKAN
-	renderer	= new GameTechVulkanRenderer(*world);
+	renderer = new GameTechVulkanRenderer(*world);
 	renderer->Init();
 	renderer->InitStructures();
-#else 
+#else
 	renderer = new GameTechRenderer(*world);
 #endif
-
+#endif
+	
 	physics = new PhysicsSystem(*world);
 
-	forceMagnitude	= 10.0f;
-	useGravity		= false;
-	inSelectionMode = false;
-
-	world->GetMainCamera().SetController(controller);
-	world->GetMainCamera().SetGetPlayer([&]() -> Vector3 { return GetPlayerPos(); });
-
-	controller.MapAxis(0, "Sidestep");
-	controller.MapAxis(1, "UpDown");
-	controller.MapAxis(2, "Forward");
-
-	controller.MapAxis(3, "XLook");
-	controller.MapAxis(4, "YLook");
-
-	InitialiseAssets();	
-	
-	physics->UseGravity(true);
-	world->UpdateWorld(0.1f);
-	physics->Update(0.1f);
-}
-
-void TutorialGame::SetPause(bool state) {
-	inPause = state;
-}
-
-void TutorialGame::EndGame(bool hasWon) {
-	inPause = true;
-	endGame = true;
-	this->hasWon = hasWon;
-	Debug::Print(hasWon ? "Victory" : "Game Over", Vector2(5, 85));
+	InitialiseGame();
 }
 
 void TutorialGame::InitialiseAssets() {
-	cubeMesh	= renderer->LoadMesh("cube.msh");
-	navigationMesh = renderer->LoadMesh("NavMeshObject.msh");
-	capsuleMesh = renderer->LoadMesh("capsule.msh");
-	sphereMesh = renderer->LoadMesh("sphere.msh");
+	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
+	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
+	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
+	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
+	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
+	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
+	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
+	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));
+	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
+	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
 
-
-	basicTex	= renderer->LoadTexture("checkerboard.png");
-	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
-
-	InitCamera();
+	lockedObject = nullptr;
 	InitWorld();
 }
 
 TutorialGame::~TutorialGame()	
 {
-	delete cubeMesh;	
-	delete capsuleMesh;
-	delete sphereMesh;
-
-
-	delete basicTex;
-	delete basicShader;
-
-	delete physics;
-	delete renderer;
-	delete world;
-
-	delete navigationMesh;
-	delete navMesh;
-
-	delete players;
 }
 
-Vector3 TutorialGame::GetPlayerPos() {
-	return players == nullptr ? Vector3(0,0,0) : players->GetTransform().GetPosition();
-}
-
-void TutorialGame::UpdateCamera(float dt) {
-
-	if (!inSelectionMode)
-		world->GetMainCamera().UpdateCamera(dt);
-
-}
-
-void TutorialGame::UpdateObjectSelectMode(float dt) {
-
-	RayCollision closestCollision;
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && selectionObject) {
-		Vector3 rayPos;
-		Vector3 rayDir;
-
-		rayDir = selectionObject->GetGameObject().GetTransform().GetOrientation() * Vector3(0, 0, -1);
-		rayPos = selectionObject->GetGameObject().GetTransform().GetPosition();
-
-		Ray r = Ray(rayPos, rayDir);
-		bool hit = world->Raycast(r, closestCollision, true, selectionObject, new std::vector<Layers::LayerID>({ Layers::LayerID::Player,  Layers::LayerID::Enemy }));
-
-		if (hit)
-		{
-			if (objClosest) {
-				objClosest->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-			}
-			objClosest = (GameObject*)closestCollision.node;
-			objClosest->GetRenderObject()->SetColour(Vector4(1, 0, 1, 1));
-		}
-	}
-
-	SelectObject();
-	MoveSelectedObject();
-}
-
-bool TutorialGame::OnEndGame(float dt) {
-	if (endGame) {
-		renderer->Render();
-		renderer->Update(dt);
-		Debug::UpdateRenderables(dt);
-		return true;
-	}
-
-	return false;
-}
-
-void TutorialGame::UpdateScore(float score) {
-	this->score += score;
-}
-
-void TutorialGame::UpdateDrawScreen(float dt) {
-	time += dt;
-	Debug::Print("Score: " + std::to_string(score), Vector2(70, 20));
-	Debug::Print("Time: " + std::to_string(time), Vector2(70, 10));
-}
-
-void TutorialGame::UpdateGame(float dt) 
-{
-	if (OnEndGame(dt))
-		return;
-
+void TutorialGame::UpdateGame(float dt)
+{	
+	world->UpdateWorld(dt);
+	UpdateUI();
 	mainMenu->Update(dt);
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
-
-	if (inPause)
-		return;
-
-	UpdateDrawScreen(dt);
-	world->UpdateWorld(dt);
-
 	Window::GetWindow()->ShowOSPointer(true);
-	//Window::GetWindow()->LockMouseToWindow(true);
-
 	physics->Update(dt);
-	UpdateCamera(dt);
+	audioEngine->Update();
 }
 
-void TutorialGame::LockedObjectMovement() 
-{
-	Matrix4 view = world->GetMainCamera().BuildViewMatrix();
-	Matrix4 camWorld = Matrix::Inverse(view);
-	Vector3 rightAxis = Vector3(camWorld.GetColumn(0)); 
-	Vector3 fwdAxis = Vector::Cross(Vector3(0, 1, 0), rightAxis);
-
-	fwdAxis.y = 0.0f;
-	fwdAxis = Vector::Normalise(fwdAxis);
-
-	auto phys = selectionObject->GetPhysicsComponent();
-
-	if(!phys)
-		return;
-
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::UP)) 
-		phys->GetPhysicsObject()->AddForce(fwdAxis);
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::DOWN)) 
-		phys->GetPhysicsObject()->AddForce(-fwdAxis);
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::NEXT)) 
-		phys->GetPhysicsObject()->AddForce(Vector3(0,-10,0));
-}
-
-void TutorialGame::InitCamera() {
-	world->GetMainCamera().SetNearPlane(0.1f);
-	world->GetMainCamera().SetFarPlane(500.0f);
-	world->GetMainCamera().SetPitch(-15.0f);
-	world->GetMainCamera().SetYaw(315.0f);
-	world->GetMainCamera().SetPosition(Vector3(-60, 40, 60));
-	lockedObject = nullptr;
+void TutorialGame::LoadWorld(std::string assetPath) {
+	LoadDropZone(Vector3(85, 15, -60), Vector3(3,1,3), Tags::DropZone);
+	LoadDropZone(Vector3(75, 15, -60), Vector3(3,1,3), Tags::DepositZone);
+	LoadDropZone(Vector3(65, 15, -60), Vector3(3,1,3), Tags::Exit);
+	world->Load(assetPath);
 }
 
 void TutorialGame::InitWorld() 
 {
 	world->ClearAndErase();
 	physics->Clear();
-	InitGameExamples();
+
+	//GameObject* room = LoadRoomPfab("room_A.pfab", Vector3(90, 90, -50));
+	//GameObject* roomB = room->CopyGameObject();
+	//room->SetEnabled(true);
+	//roomB->GetTransform().SetPosition(Vector3(90, 60, -50));
+	//roomB->SetEnabled(true);
+	//world->AddGameObject(roomB);
+
+	std::string assetPath = GetAssetPath("myScene.pfab"); 
+	LoadWorld(assetPath);
 }
 
-std::vector<Vector3> TutorialGame::GetVertices(Mesh* navigationMesh, int i)
-{
-	const SubMesh* subMesh = navigationMesh->GetSubMesh(i);
-	const std::vector<unsigned int>& indices = navigationMesh->GetIndexData();
-	const std::vector<Vector3>& positionData = navigationMesh->GetPositionData();
-	std::vector<Vector3> vertices;
+void TutorialGame::UpdateUI() {
+	uiSystem->StartFrame();
+	framerateDelay += 1;
 
-	for (size_t j = subMesh->start; j < subMesh->start + subMesh->count; j += 3) {
-		unsigned int idx0 = indices[j];
-		unsigned int idx1 = indices[j + 1];
-		unsigned int idx2 = indices[j + 2];
-
-		vertices.push_back(positionData[idx0]);
-		vertices.push_back(positionData[idx1]);
-		vertices.push_back(positionData[idx2]);
+	if (framerateDelay > 10) {
+		framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
+		framerateDelay = 0;
 	}
-	return vertices;
-}
-
-
-bool TutorialGame::RayCastNavWorld(Ray& r, float rayLength)
-{
-
-	Vector3 intersection = Vector3(0, 0, 0);
-	Vector3 dir = Vector::Normalise(r.GetDirection());
-	Vector3 pos = r.GetPosition();
-
-	for (size_t i = 0; i < navigationMesh->GetSubMeshCount(); ++i) {
-		const SubMesh* subMesh = navigationMesh->GetSubMesh(i);
-
-		for (size_t j = subMesh->start; j < subMesh->start + subMesh->count; ++j) {
-			Vector3 a, b, c;
-			if (!navigationMesh->GetTriangle(j, a, b, c))
-				continue;
-
-			float t, u, v;
-			if (RayIntersectsTriangle(pos, dir, a, b, c, t, u, v) && t <= rayLength) 
-				return true;
-		}
-	}
-	return false;
-}
-
-
-const bool DebugCubeTransforms = false;
-
-void  TutorialGame::CalculateCubeTransformations(const std::vector<Vector3>& vertices, Vector3& position, Vector3& scale, Quaternion& rotation)
-{
-	Vector3 minBound(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-	Vector3 maxBound(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-
-	for (const auto& vertex : vertices) {
-		minBound = Vector::Min(minBound, vertex);
-		maxBound = Vector::Max(maxBound, vertex);
+#if !EOSBUILD
+	if (mainMenuUI->GetMenuOption() != 0) {
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
 	}
 
-	position = (minBound + maxBound) * 0.5f;
-	Vector3 extent = maxBound - minBound;
+#else
 
-	Vector3 a, b, c;
-	a = vertices[1] - vertices[2];
-	b = vertices[4] - vertices[5];
-	c = vertices[8] - vertices[9];
-
-	if (DebugCubeTransforms) {
-		Debug::DrawLine(vertices[1], vertices[2], Vector4(1, 0, 0, 1));
-		Debug::DrawLine(vertices[4], vertices[5], Vector4(0, 0, 1, 1));
-		Debug::DrawLine(vertices[8], vertices[9], Vector4(0, 1, 0, 1));
-	}
-
-	extent = Vector3(Vector::Length(a),Vector::Length(b),Vector::Length(c));
-
-	Vector3 localX = Vector::Normalise(a); 
-	Vector3 localY = Vector::Normalise(b); 
-	Vector3 localZ = -Vector::Normalise(c); 
-
-	Matrix3 rotationMatrix = Matrix3();
-
-	rotationMatrix.SetColumn(2, Vector4(localZ, 0));
-	rotationMatrix.SetColumn(1, Vector4(localY, 0));
-	rotationMatrix.SetColumn(0, Vector4(-localX, 0));
-
-	rotation = Quaternion(rotationMatrix);
-	scale = extent * 0.5f;
-}
-
-
-void TutorialGame::InitGameExamples() 
-{	
-	AddNavMeshToWorld(Vector3(0, 0, 0), Vector3(1, 1, 1));
-}
-
-void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
-	for (int x = 0; x < numCols; ++x) {
-		for (int z = 0; z < numRows; ++z) {
-			Vector3 position = Vector3(x * colSpacing, 100.0f, z * rowSpacing);
-			AddSphereToWorld(position, radius, 1.0f);
-		}
-	}
-	AddFloorToWorld(Vector3(0, -2, 0));
-}
-
-bool TutorialGame::SelectObject() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
-		inSelectionMode = !inSelectionMode;
-	}
-	if (inSelectionMode) {
-
-		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::Left)) {
-
-			RenderObject* ro = selectionObject->GetGameObject().GetRenderObject();
-
-			if (selectionObject)
-			{
-				ro->SetColour(Vector4(1, 1, 1, 1));
-				selectionObject = nullptr;
-			}
-
-			Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
-
-			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true)) 
-			{
-				selectionObject = (BoundsComponent*)closestCollision.node;
-				ro->SetColour(Vector4(0, 1, 0, 1));
-				return true;
-			}
-			else 
-				return false;
-		}
-		if (Window::GetKeyboard()->KeyPressed(NCL::KeyCodes::L)) {
-			if (selectionObject) {
-				if (lockedObject == selectionObject) 
-					lockedObject = nullptr;
-				else 
-					lockedObject = selectionObject;
-			}
-		}
-	}
-
-	return false;
-}
-
-void TutorialGame::MoveSelectedObject() {
-	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
-
-	if (!selectionObject) 
-		return;
-
-	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::Right)) 
+	//This needs to change back to how it was
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() == 0)
 	{
-		Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
-		RayCollision closestCollision;
+		mainMenu->SetMainMenuOption(mainMenuUI->GetMenuOption());
+		uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+		uiSystem->PushNewStack(eosMenuUI->eosMenuUI, "EOS Menu");
+		mainMenu->lobbyCodeInput = lobbySearchField->GetInputText();
+	}
 
-		if (world->Raycast(ray, closestCollision, true)) {
-			if (closestCollision.node == selectionObject) {
+	if (mainMenuUI->GetMenuOption() != 0 && mainMenuUI->GetMenuOption() != 4)
+	{
+		uiSystem->RemoveStack("Main Menu");
+		uiSystem->RemoveStack("Audio Sliders");
+	}
 
-				auto phys = selectionObject->GetPhysicsComponent();
-				if (phys)
-					phys->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSMenuOption(eosMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("Lobby Search Field");
+		uiSystem->RemoveStack("EOS Menu");
+
+		std::string ip = mainMenu->getOwnerIPFunc();
+		std::string lobbyID = mainMenu->getLobbyIDFunc();
+		int playerCount = mainMenu->getPlayerCountFunc();
+
+		bool isLobbyOwner = eosMenuUI->GetMenuOption() == 1;
+
+		if (lobbyID != "")
+		{
+			if (!eosLobbyMenuCreated)
+			{
+				eosLobbyMenuUI = new UI::EOSLobbyMenuUI(isLobbyOwner, ip, lobbyID, playerCount + 1);
+				eosLobbyMenuCreated = true;
 			}
+			uiSystem->PushNewStack(eosLobbyMenuUI->eosLobbyMenuUI, "EOS Lobby Menu");
 		}
 	}
+
+	if (mainMenuUI->GetMenuOption() == 4 && eosMenuUI->GetMenuOption() != 0 && eosLobbyMenuUI->GetMenuOption() != 0)
+	{
+		mainMenu->SetEOSLobbyOption(eosLobbyMenuUI->GetMenuOption());
+		uiSystem->RemoveStack("EOS Lobby Menu");
+		uiSystem->RemoveStack("Inventory");
+	}
+
+#endif
+
+	uiSystem->RenderFrame();
 }
-
-
-

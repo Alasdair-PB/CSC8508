@@ -4,16 +4,14 @@
 //
 
 #include "NetworkedGame.h"
-#include "NetworkPlayer.h"
-#include "NetworkObject.h"
 #include "GameServer.h"
-#include "GameClient.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "ComponentManager.h"
 #include "EventManager.h"
-
+#include "GameClient.h"
+#include "GameManagerComponent.h"
 
 #define COLLISION_MSG 30
 
@@ -27,12 +25,11 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
-
 struct SpawnPacket : public GamePacket {
 
 	short ownerId;
 	short objectId;
-	// add a prefab reference in the future
+	short pfabId;
 
 	SpawnPacket() {
 		type = Spawn_Object;
@@ -40,9 +37,56 @@ struct SpawnPacket : public GamePacket {
 	}
 };
 
-void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); }
+void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
-void NetworkedGame::StartOfflineCallBack() { TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); }
+void NetworkedGame::StartOfflineCallBack() { 
+	TutorialGame::LoadGameManager(Vector3(93, 22, -53));
+	TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50)); 
+	TutorialGame::Loaditem(Vector3(93, 22, -53));
+}
+
+#if EOSBUILD
+
+void NetworkedGame::StartEOSCallBack() { HostGame(); }
+void NetworkedGame::StartEOSLobbyCreationCallBack() { EOSLobbyCreation(); }
+void NetworkedGame::StartEOSLobbySearchCallBack(const std::string& lobbyID) {EOSLobbySearchFunc(lobbyID);}
+void NetworkedGame::StartAsHostCallBack() {EOSStartAsHost();}
+
+void NetworkedGame::StartAsJoinCallBack(const std::string& ip) {
+	std::stringstream ss(ip);
+	std::string segment;
+	std::vector<uint8_t> bytes;
+
+	while (std::getline(ss, segment, '.')) {
+		int num = std::stoi(segment);
+		if (num < 0 || num > 255) {
+			std::cout << "Invalid IP segment: " << segment << std::endl;
+			return;
+		}
+		bytes.push_back(static_cast<uint8_t>(num));
+	}
+
+	if (bytes.size() != 4) {
+		std::cout << "Invalid IP format: " << ip << std::endl;
+		return;
+	}
+
+	std::cout << "Parsed IP: " << ip << std::endl;
+
+	uint8_t a = bytes[0];
+	uint8_t b = bytes[1];
+	uint8_t c = bytes[2];
+	uint8_t d = bytes[3];
+
+	EOSStartAsJoin(a, b, c, d);
+}
+
+void NetworkedGame::StartEOSLobbyUpdateCallBack() { EOSLobbyDetailsUpdate(); }
+
+#endif
+
+void NetworkedGame::OnEvent(HostLobbyConnectEvent* e) { StartAsServer(); }
+void NetworkedGame::OnEvent(ClientLobbyConnectEvent* e) { StartAsClient(e->a, e->b, e->c, e->d); }
 
 NetworkedGame::NetworkedGame()	{
 	EventManager::RegisterListener<NetworkEvent>(this);
@@ -51,20 +95,42 @@ NetworkedGame::NetworkedGame()	{
 	thisServer = nullptr;
 	thisClient = nullptr;
 
-	mainMenu = new MainMenu([&](bool state) -> void { this->SetPause(state); },
+#if !EOSBUILD
+	mainMenu = new MainMenu(
+		[&](bool state) -> void { world->SetPausedWorld(state); },
 		[&]() -> void { this->StartClientCallBack(); },
 		[&]() -> void { this->StartServerCallBack(); },
-		[&]() -> void { this->StartOfflineCallBack();});
+		[&]() -> void { this->StartOfflineCallBack(); }
+	);
+#else
+	mainMenu = new MainMenu(
+		[&](bool state) -> void { world->SetPausedWorld(state); },
+		[&]() -> void { this->StartClientCallBack(); },
+		[&]() -> void { this->StartServerCallBack(); },
+		[&]() -> void { this->StartOfflineCallBack(); },
+		[&]() -> void { this->StartEOSCallBack(); },
+		[&]() -> void { this->StartEOSLobbyCreationCallBack(); },
+		[&](std::string id) -> void { this->StartEOSLobbySearchCallBack(id); },
+		[&]() -> void { this->StartEOSLobbyUpdateCallBack(); },
+		[&]() -> std::string { return this->GetOwnerIP(); },
+		[&]() -> std::string { return this->GetLobbyID(); },
+		[&]() -> int { return this->GetPlayerCount(); },
+		[&]() -> void { this->StartAsHostCallBack(); },
+		[&](const std::string& code) -> void { this->StartAsJoinCallBack(code); }
+	);
+#endif
 
 	NetworkBase::Initialise();
 	timeToNextPacket  = 0.0f;
 	packetsToSnapshot = 0;
 	playerStates = std::vector<int>();
+
 }
 
 NetworkedGame::~NetworkedGame()	{
-	delete thisServer;
-	delete thisClient;
+	if(thisServer) delete thisServer;
+	if (thisClient) delete thisClient;
+	TutorialGame::~TutorialGame();
 }
 
 void NetworkedGame::StartAsServer() 
@@ -76,8 +142,10 @@ void NetworkedGame::StartAsServer()
 
 	thisServer->RegisterPacketHandler(Delta_State, this);
 	thisServer->RegisterPacketHandler(Full_State, this);
-
-	SpawnPlayerServer(thisServer->GetPeerId(), Prefab::Player);
+	
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Manager);
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Item);
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) 
@@ -95,11 +163,75 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 	thisClient->RegisterPacketHandler(Spawn_Object, this);
 }
 
+#if EOSBUILD
+void NetworkedGame::HostGame()
+{
+
+	eosManager->StartEOS();
+}
+
+void NetworkedGame::EOSLobbyCreation()
+{
+	eosLobbyManager->CreateLobby();
+	eosLobbySearch->CreateLobbySearch(eosLobbyManager->LobbyId);
+
+	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
+}
+
+void NetworkedGame::EOSLobbySearchFunc(const std::string& lobbyID)
+{
+
+	eosLobbySearch->CreateLobbySearch(lobbyID.c_str()); // <-- convert std::string to const char*
+
+	eosLobbyFunctions = new EOSLobbyFunctions(*eosManager, *eosLobbySearch);
+	eosLobbyFunctions->JoinLobby();
+
+}
+
+void NetworkedGame::EOSLobbyDetailsUpdate()
+{
+
+	eosLobbyFunctions->UpdateLobbyDetails();
+
+}
+
+void NetworkedGame::EOSStartAsHost()
+{
+
+	thisServer = new GameServer(NetworkBase::GetDefaultPort(), 4);
+	thisServer->RegisterPacketHandler(Received_State, this);
+	thisServer->RegisterPacketHandler(Spawn_Object, this);
+	thisServer->RegisterPacketHandler(Component_Event, this);
+
+	thisServer->RegisterPacketHandler(Delta_State, this);
+	thisServer->RegisterPacketHandler(Full_State, this);
+	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
+
+}
+
+void NetworkedGame::EOSStartAsJoin(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
+	std::cout << static_cast<int>(a) << std::endl;
+	std::cout << static_cast<int>(b) << std::endl;
+	std::cout << static_cast<int>(c) << std::endl;
+	std::cout << static_cast<int>(d) << std::endl;
+
+	thisClient = new GameClient();
+	thisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
+
+	thisClient->RegisterPacketHandler(Delta_State, this);
+	thisClient->RegisterPacketHandler(Full_State, this);
+	thisClient->RegisterPacketHandler(Component_Event, this);
+	thisClient->RegisterPacketHandler(Player_Connected, this);
+	thisClient->RegisterPacketHandler(Player_Disconnected, this);
+	thisClient->RegisterPacketHandler(Spawn_Object, this);
+}
+
+#endif
 void NetworkedGame::OnEvent(ClientConnectedEvent* e) 
 {
 	int id = e->GetClientId();
 	SendSpawnPacketsOnClientConnect(id);	
-	SpawnPlayerServer(id, Prefab::Player);
+	SpawnObjectServer(id, Prefab::Player);
 }
 
 void NetworkedGame::OnEvent(NetworkEvent* e)
@@ -117,8 +249,9 @@ void NetworkedGame::UpdateGame(float dt)
 	timeToNextPacket -= dt;
 	if (timeToNextPacket < 0) {
 		UpdatePackets(dt);
-		timeToNextPacket += 1.0f / 20.0f; 
+		timeToNextPacket += 1.0f; // 1.0f / 20.0f;
 	}
+
 	if (thisServer) 
 		thisServer->UpdateServer();
 	else if (thisClient) 
@@ -140,9 +273,7 @@ void NetworkedGame::UpdatePackets(float dt)
 
 bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
 {
-	if (!thisServer)
-		return false;
-
+	if (!thisServer) return false;
 	for (const auto& player : thisServer->playerPeers)
 	{
 		int playerID = player.first;
@@ -153,9 +284,7 @@ bool NetworkedGame::SendToAllClients(GamePacket* dataPacket)
 
 bool NetworkedGame::SendToAllOtherClients(GamePacket* dataPacket, int ownerId)
 {
-	if (!thisServer)
-		return false;
-
+	if (!thisServer) return false;
 	for (const auto& player : thisServer->playerPeers)
 	{
 		int playerID = player.first;
@@ -172,7 +301,7 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		{
 			INetworkDeltaComponent* c = dynamic_cast<INetworkDeltaComponent*>(ic);
 			if (!c) return;
-			if ((thisClient && c->IsOwner()) || thisServer) {
+			if (c->IsOwner()) {
 				vector<GamePacket*> packets = c->WriteDeltaFullPacket(deltaFrame);
 				for (GamePacket* packet : packets)
 				{
@@ -187,34 +316,54 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 		});
 }
 
+// To change to Pfab managed system in the future where all pfabs 
+// are loaded as disabled GameObjects that can be copied to new objects during runtime
 GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) 
 	{ return TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50), spawnPacket);}
 
-void NetworkedGame::SpawnPlayerClient(int ownerId, int objectId, Prefab prefab)
+GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket)
+	{ return TutorialGame::Loaditem(Vector3(93, 22, -53), spawnPacket);}
+
+GameObject* NetworkedGame::GetGameManagerPrefab(NetworkSpawnData* spawnPacket)
+	{ return TutorialGame::LoadGameManager(Vector3(93, 22, -53), spawnPacket);}
+
+GameObject* NetworkedGame::GetObjectFromPfab(size_t pfab, NetworkSpawnData data) {
+	GameObject* object = nullptr;
+	if (pfab == Prefab::Player)
+		object = GetPlayerPrefab(&data);
+	else if (pfab == Prefab::Manager)
+		object = GetGameManagerPrefab(&data);
+	else if (pfab == Prefab::Item)
+		object = GetItemPrefab(&data);
+	return object;
+}
+
+void NetworkedGame::SpawnObjectClient(int ownerId, int objectId, size_t pfab)
 {
-	// Will be prefab reference in the future	
 	bool clientOwned = ownerId == thisClient->GetPeerId();
 	NetworkSpawnData data = NetworkSpawnData();
 
 	data.clientOwned = clientOwned;
 	data.objId = objectId;
 	data.ownId = ownerId;
-	auto object = GetPlayerPrefab(&data);
+	data.pfab = pfab;
+	GameObject* object = GetObjectFromPfab(pfab, data);
 
 	if (clientOwned)
 		ownedObjects.emplace_back(object);
 }
 
-void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
+void NetworkedGame::SpawnObjectServer(int ownerId, size_t pfab)
 {
-	// Will be prefab reference in the future
 	bool serverOwned = ownerId == thisServer->GetPeerId();
 	NetworkSpawnData data = NetworkSpawnData();
 
 	data.clientOwned = serverOwned;
 	data.objId = nextObjectId;
 	data.ownId = ownerId;
-	auto object = GetPlayerPrefab(&data);
+	data.pfab = pfab;
+
+	GameObject* object = GetObjectFromPfab(pfab, data);
 
 	if (serverOwned)
 		ownedObjects.emplace_back(object);
@@ -222,6 +371,7 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 	SpawnPacket* newPacket = new SpawnPacket();
 	newPacket->ownerId = ownerId;
 	newPacket->objectId = nextObjectId;
+	newPacket->pfabId = pfab;
 
 	SendToAllClients(newPacket);
 
@@ -229,7 +379,8 @@ void NetworkedGame::SpawnPlayerServer(int ownerId, Prefab prefab)
 	nextObjectId++;
 }
 
-bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId) {
+// Change to addNetworkObject component in the future so this info does not need to be included on every GameObject
+bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId, int& pFabId) {
 	if (!object)
 		return false;
 
@@ -241,6 +392,7 @@ bool HasNetworkComponent(GameObject* object, int& objectId, int& ownerId) {
 				std::cout << "NetworkComponent is not derived type" << std::endl;
 			objectId = networkComponent->GetObjectID();
 			ownerId = networkComponent->GetOwnerID();
+			pFabId = networkComponent->GetPfabID();
 			return true;
 		}
 	}
@@ -255,13 +407,16 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 
 	int ownerId;
 	int objectId;
+	int pfabId;
+
 	for (auto i = first; i != last; ++i)
 	{
-		if (HasNetworkComponent(*i, objectId, ownerId))
+		if (HasNetworkComponent(*i, objectId, ownerId, pfabId))
 		{
 			SpawnPacket* newPacket = new SpawnPacket();
 			newPacket->ownerId = ownerId;
 			newPacket->objectId = objectId;
+			newPacket->pfabId = pfabId;
 			thisServer->SendPacketToPeer(newPacket, clientId);
 			delete newPacket;
 		}
@@ -270,8 +425,7 @@ void NetworkedGame::SendSpawnPacketsOnClientConnect(int clientId)
 
 void NetworkedGame::StartLevel() {}
 
-void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
-{
+void NetworkedGame::ReceiveFullDeltaStatePacket(int type, GamePacket* payload) {
 	if (type == Full_State || type == Delta_State) {
 		INetworkPacket* p = (INetworkPacket*)payload;
 		ComponentManager::OperateOnAllINetworkDeltaComponentBufferOperators(
@@ -285,12 +439,15 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 				}
 			});
 	}
+}
+
+void NetworkedGame::ReceiveComponentEventPacket(int type, GamePacket* payload) {
 	if (type == Component_Event) {
-		INetworkPacket* p = (INetworkPacket*) payload;
+		INetworkPacket* p = (INetworkPacket*)payload;
 		ComponentManager::OperateOnAllINetworkComponentBufferOperators(
-			[&](IComponent* ic) {	
+			[&](IComponent* ic) {
 				INetworkComponent* c = dynamic_cast<INetworkComponent*>(ic);
-				if (p->componentID == (c->GetComponentID())) 
+				if (p->componentID == (c->GetComponentID()))
 				{
 					c->ReadEventPacket(*p);
 					if (thisServer)
@@ -298,30 +455,22 @@ void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 				}
 			});
 	}
+}
 
+void NetworkedGame::ReceiveSpawnPacket(int type, GamePacket* payload) {
 	if (type == Spawn_Object) {
 		if (thisClient) {
 			SpawnPacket* ackPacket = (SpawnPacket*)payload;
-			SpawnPlayerClient(ackPacket->ownerId, ackPacket->objectId, Prefab::Player);
+			SpawnObjectClient(ackPacket->ownerId, ackPacket->objectId, ackPacket->pfabId);
 		}
 	}
-	if (thisClient) 
-		thisClient->ReceivePacket(type, payload, source);
-	else if (thisServer) 
-		thisServer->ReceivePacket(type, payload, source);
 }
 
-void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
-	if (thisServer) 
-	{ 
-		MessagePacket newPacket;
-		newPacket.messageID = COLLISION_MSG;
-		newPacket.playerID  = a->GetPlayerNum();
-
-		thisClient->SendPacket(newPacket);
-
-		newPacket.playerID = b->GetPlayerNum();
-		thisClient->SendPacket(newPacket);
-
-	}
+void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
+{
+	ReceiveFullDeltaStatePacket(type, payload);
+	ReceiveComponentEventPacket(type, payload);
+	ReceiveSpawnPacket(type, payload);
+	if (thisClient) thisClient->ReceivePacket(type, payload, source);
+	else if (thisServer) thisServer->ReceivePacket(type, payload, source);
 }

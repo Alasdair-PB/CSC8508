@@ -1,161 +1,222 @@
 #include "TutorialGame.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-
-#include "INetworkComponent.h"
+#include "../AudioEngine/AudioSourceComponent.h"
 #include "InputNetworkComponent.h"
+#include "StaminaComponent.h"
+#include "CameraComponent.h"
+#include "MaterialManager.h"
+#include "../AudioEngine/AudioListenerComponent.h"
+#include "../AudioEngine/NetworkedListenerComponent.h"
+#include "AnimationComponent.h"
+#include "MeshAnimation.h"
 #include "TransformNetworkComponent.h"
-
-
-using namespace NCL;
-using namespace CSC8508;
-
-
-GameObject* TutorialGame::AddNavMeshToWorld(const Vector3& position, Vector3 dimensions)
-{
-	navMesh = new NavigationMesh("smalltest.navmesh");
-	GameObject* navMeshObject = new GameObject();
-
-	for (size_t i = 0; i < navigationMesh->GetSubMeshCount(); ++i)
-	{
-		if (navigationMesh->GetSubMesh(i)->count != 36)
-			continue;
-
-		std::vector<Vector3> vertices = GetVertices(navigationMesh, i);
-
-		Vector3 dimensions, localPosition;
-		Quaternion rotationMatrix;
-		CalculateCubeTransformations(vertices, localPosition, dimensions, rotationMatrix);
-
-		GameObject* colliderObject = new GameObject();
-		OBBVolume* volume = new OBBVolume(dimensions);
-
-		PhysicsComponent* phys = colliderObject->AddComponent<PhysicsComponent>();
-		BoundsComponent* bounds = colliderObject->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-		colliderObject->GetTransform().SetScale(dimensions * 2.0f).SetPosition(localPosition).SetOrientation(rotationMatrix);
-		colliderObject->SetRenderObject(new RenderObject(&colliderObject->GetTransform(), cubeMesh, basicTex, basicShader));
-
-		phys->SetPhysicsObject(new PhysicsObject(&colliderObject->GetTransform(), bounds->GetBoundingVolume()));
-		phys->GetPhysicsObject()->SetInverseMass(0);
-		phys->GetPhysicsObject()->InitCubeInertia();
-		colliderObject->SetLayerID(Layers::LayerID::Default);
-
-		world->AddGameObject(colliderObject);
-	}
-	return navMeshObject;
-}
+#include "FullTransformNetworkComponent.h"
+#include "SightComponent.h"
+#include "InventoryNetworkManagerComponent.h"
+#include "InventoryManagerComponent.h"
+#include "FallDamageComponent.h"
+#include "DamageableComponent.h"
+#include "GameManagerComponent.h"
+#include "DamageableNetworkComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
+int GetUniqueId(int objectId, int& componentCount) {
+	int unqiueId = CantorPairing(objectId, componentCount);
+	componentCount++;
+	return unqiueId;
+}
+
+
+GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
+	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* myObjectToLoad = new GameObject();
+	myObjectToLoad->Load(gameObjectPath);
+	myObjectToLoad->GetTransform().SetPosition(position);
+	myObjectToLoad->AddComponent<ItemComponent>(10);
+	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+	if (spawnData)
+	{	
+		int pFabId = spawnData->pfab;
+		int componentIdCount = 0;
+		FullTransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<FullTransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+	}
+	world->AddGameObject(myObjectToLoad);
+
+	return myObjectToLoad;
+}
+
+
+
+GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
+	GameObject* myObjectToLoad = new GameObject();
+#
+	myObjectToLoad->AddComponent<GameManagerComponent>();/*
+	if (spawnData)
+	{
+		int pFabId = spawnData->pfab;
+		int componentIdCount = 0;
+		FullTransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<FullTransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+	}*/
+	world->AddGameObject(myObjectToLoad);
+
+	return myObjectToLoad;
+}
+
+GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag) {
+
+	//std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	GameObject* dropZone = new GameObject();
+	//myObjectToLoad->Load(gameObjectPath);
+
+	OBBVolume* volume = new OBBVolume(dimensions);
+	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
+	Texture* basicTex = MaterialManager::GetTexture("basic");
+	Shader* basicShader = MaterialManager::GetShader("basic");
+
+	PhysicsComponent* phys = dropZone->AddComponent<PhysicsComponent>();
+	BoundsComponent* bounds = dropZone->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+
+	bounds->AddToIgnoredLayers(Layers::LayerID::Player);
+	bounds->SetBoundingVolume((CollisionVolume*)volume);
+	dropZone->GetTransform().SetPosition(position).SetScale(dimensions * 2.0f);
+
+	dropZone->SetRenderObject(new RenderObject(&dropZone->GetTransform(), cubeMesh, basicTex, basicShader));
+	phys->SetPhysicsObject(new PhysicsObject(&dropZone->GetTransform()));
+	phys->GetPhysicsObject()->SetInverseMass(0);
+	phys->GetPhysicsObject()->InitCubeInertia();
+	dropZone->SetTag(tag);
+	if (tag == Tags::DropZone)
+		dropZone->GetRenderObject()->SetColour(Vector4(0, 1, 0, 0.3f));
+	else if (tag == Tags::Exit)
+		dropZone->GetRenderObject()->SetColour(Vector4(1, 0, 0, 0.3f));
+	else if (tag == Tags::DepositZone)
+		dropZone->GetRenderObject()->SetColour(Vector4(0, .2, 1, 0.3f));
+	else
+		dropZone->GetRenderObject()->SetColour(Vector4(1, 0, 1, 0.3f));
+
+	world->AddGameObject(dropZone);
+	return dropZone;
+}
+
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
-	float meshSize = 1.0f;
+	float meshSize = 0.25f;
 	float inverseMass = 0.5f;
 
-	players = new PlayerGameObject();
+	GameObject* player = new GameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 
-	PhysicsComponent* phys = players->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = players->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
+	Mesh* playerMesh = MaterialManager::GetMesh("player");
+	Texture* basicTex = MaterialManager::GetTexture("player");
+	Shader* playerShader = MaterialManager::GetShader("anim");
+
+	float carryOffset = 0.5f;
+	float dropOffset = 3.0f;
+
+	player->SetLayerID(Layers::Player);
+	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
+	player->SetLayerID(Layers::LayerID::Player);
+	player->SetTag(Tags::Player);
+	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
+
+	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100, 100, 3);
+	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
+	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24,20);
+
+	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
+	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
+	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
+	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
+
+	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
+	
+	AnimState* walk = new AnimState(new Rendering::MeshAnimation("Walk.anm"));
+	AnimState* stance = new AnimState(new Rendering::MeshAnimation("Stance.anm"));
+	AnimState* onjump = new AnimState(new Rendering::MeshAnimation("OnJump.anm"), false);
+	AnimState* jumping = new AnimState(new Rendering::MeshAnimation("Jumping.anm"));
+	AnimState* jumpland = new AnimState(new Rendering::MeshAnimation("JumpLand.anm"), false);
+		
+	animator->AddState(walk);
+	animator->AddState(onjump);
+	animator->AddState(jumping);
+	animator->AddState(jumpland);
+	animator->AddState(stance);
+
+	animator->AddTransition(new IStateTransition(stance, walk, [pc]()->bool {
+		return pc->IsMoving();
+		}));
+	animator->AddTransition(new IStateTransition(walk, stance, [pc]()->bool {
+		return !pc->IsMoving();
+		}));
+	animator->AddTransition(new IStateTransition(stance, onjump, [pc]()->bool {
+		return pc->IsJumping();
+		}));
+	animator->AddTransition(new IStateTransition(walk, onjump, [pc]()->bool {
+		return pc->IsJumping();
+		}));
+	animator->AddTransition(new IStateTransition(onjump, jumping, [onjump]()->bool {
+		return onjump->IsComplete();
+		}));
+	animator->AddTransition(new IStateTransition(jumping, jumpland, [pc]()->bool {
+		return pc->IsGrounded();
+		}));
+	animator->AddTransition(new IStateTransition(jumpland , stance, [jumpland]()->bool {
+		return jumpland->IsComplete();
+		}));
+
+	SightComponent* sight = player->AddComponent<SightComponent>();
+	PhysicsComponent* phys = player->AddComponent<PhysicsComponent>();
+	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	int componentIdCount = 0;
 
 	if (spawnData)
 	{
-		int unqiueId = CantorPairing(spawnData->objId, componentIdCount);
-		componentIdCount++;
-		InputNetworkComponent* input = players->AddComponent<InputNetworkComponent>(
-			&controller, spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+		int pFabId = spawnData->pfab;
+		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
+		InputNetworkComponent* input = player->AddComponent<InputNetworkComponent>(
+			controller, spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
-		unqiueId = CantorPairing(spawnData->objId, componentIdCount);
-		componentIdCount++;
-		TransformNetworkComponent* networkTransform = players->AddComponent<TransformNetworkComponent>(
-			spawnData->objId, spawnData->ownId, unqiueId, spawnData->clientOwned);
+		InventoryNetworkManagerComponent* inventoryManager = player->AddComponent<InventoryNetworkManagerComponent>(2, carryOffset, dropOffset,
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+
+		TransformNetworkComponent* networkTransform = player->AddComponent<TransformNetworkComponent>(
+			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+		
+		NetworkedListenerComponent* listenerComp = player->AddComponent<NetworkedListenerComponent>(
+			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+
+		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
+		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::POLLO));
+		sourceComp->RandomSound();
+		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+		DamageableNetworkComponent* dc = player->AddComponent<DamageableNetworkComponent>(100, 100, spawnData->objId,
+			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+
+		if (spawnData->clientOwned)
+			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
+		else
+			listenerComp->SetPersistentSound(sourceComp->GetPersistentPair());
 	}
 	else {
-		InputComponent* input = players->AddComponent<InputComponent>(&controller);
+		InventoryManagerComponent* inventoryManager = player->AddComponent<InventoryManagerComponent>(2, carryOffset, dropOffset);
+		InputComponent* input = player->AddComponent<InputComponent>(controller);
+		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
+		DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
+		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
+		listenerComp->RecordMic();
 	}
 
-	players->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
-	players->SetLayerID(Layers::LayerID::Player);
-	players->SetTag(Tags::Player);
 
-	players->SetRenderObject(new RenderObject(&players->GetTransform(), capsuleMesh, nullptr, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&players->GetTransform(), bounds->GetBoundingVolume()));
+	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
-	players->SetEndGame([&](bool hasWon) {EndGame(hasWon); });
 
-	bounds->AddToIgnoredLayers(Layers::Enemy);
+	world->AddGameObject(player);
 
-	players->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1.0f));
-
-	world->AddGameObject(players);
-	return players;
-}
-
-GameObject* TutorialGame::AddFloorToWorld(const Vector3& position)
-{
-	GameObject* floor = new GameObject();
-	Vector3 floorSize = Vector3(200, 2, 200);
-	AABBVolume* volume = new AABBVolume(floorSize);
-
-
-	PhysicsComponent* phys = floor->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = floor->AddComponent<BoundsComponent>((CollisionVolume*) volume, phys);
-
-	floor->GetTransform().SetScale(floorSize * 2.0f).SetPosition(position);
-
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), bounds->GetBoundingVolume()));
-
-	phys->GetPhysicsObject()->SetInverseMass(0);
-	phys->GetPhysicsObject()->InitCubeInertia();
-
-	world->AddGameObject(floor);
-	return floor;
-}
-
-GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass)
-{
-	GameObject* sphere = new GameObject();
-	Vector3 sphereSize = Vector3(radius, radius, radius);
-	SphereVolume* volume = new SphereVolume(radius);
-
-	PhysicsComponent* phys = sphere->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = sphere->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	sphere->GetTransform().SetScale(sphereSize).SetPosition(position);
-
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), bounds->GetBoundingVolume()));
-
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
-	phys->GetPhysicsObject()->InitSphereInertia();
-	phys->GetPhysicsObject()->SetRestitution(0.5f);
-
-	world->AddGameObject(sphere);
-	return sphere;
-}
-
-GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
-	GameObject* cube = new GameObject();
-	OBBVolume* volume = new OBBVolume(dimensions);
-
-	PhysicsComponent* phys = cube->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = cube->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	cube->GetTransform().SetPosition(position).SetScale(dimensions * 2.0f);
-
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), bounds->GetBoundingVolume()));
-
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
-	phys->GetPhysicsObject()->InitCubeInertia();
-
-	world->AddGameObject(cube);
-	return cube;
+	return player;
 }

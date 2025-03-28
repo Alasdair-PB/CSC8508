@@ -9,7 +9,7 @@
 #include "IComponent.h"
 #include "CollisionVolume.h"
 #include "PhysicsComponent.h"
-#include "GameObject.h" // Just for layers namespace
+#include "GameObject.h"
 
 using std::vector;
 
@@ -20,34 +20,62 @@ namespace NCL::CSC8508
 	public:
 
 		BoundsComponent(GameObject& gameObject, CollisionVolume* collisionVolume, PhysicsComponent* physicsComponent = nullptr);
-
 		~BoundsComponent();
 
-		void SetBoundingVolume(CollisionVolume* vol) {
-			boundingVolume = vol;
-		}
+		static const char* Name() { return "Bounds"; }
+		const char* GetName() const override { return Name(); }
 
-		const CollisionVolume* GetBoundingVolume() const {
-			return boundingVolume;
-		}
+		void SetBoundingVolume(CollisionVolume* vol) { boundingVolume = vol;}
 
-
-		const PhysicsComponent* GetPhysicsComponent() const {
-			return physicsComponent;
-		}
+		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}		
+		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize, CollisionVolume* volume);
+		const PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
 
 		bool GetBroadphaseAABB(Vector3& outsize) const;
-
 		void UpdateBroadphaseAABB();
+		void SetPhysicsComponent(PhysicsComponent* physicsComponent) { this->physicsComponent = physicsComponent; }
 
 		void AddToIgnoredLayers(Layers::LayerID layerID) { ignoreLayers.push_back(layerID); }
 		const std::vector<Layers::LayerID>& GetIgnoredLayers() const { return ignoreLayers; }
+
+		/// <summary>
+		/// Get all types this IComponent may depend on when loading
+		/// </summary>
+		/// <returns>An unordered set of dependent IComponents</returns>
+		std::unordered_set<std::type_index>& GetDependentTypes() const override {
+			static std::unordered_set<std::type_index> types = { std::type_index(typeid(PhysicsComponent)) };
+			return types;
+		}
+
+		/// <summary>
+		/// IComponent Save data struct definition
+		/// </summary>
+		struct BoundsComponentDataStruct;
+
+		void CopyComponent(GameObject* gameObject) override;
+
+		/// <summary>
+		/// Loads the PhysicsComponent save data into this PhysicsComponent
+		/// </summary>
+		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
+		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
+		virtual void Load(std::string assetPath, size_t allocationStart) override;
+#
+		/// <summary>
+		/// Saves the PhysicsComponent data into the assetPath file. 
+		/// </summary>
+		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
+		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
+		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+		CollisionVolume* CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
+		auto GetDerivedSerializedFields() const;
 
 	protected:
 		CollisionVolume* boundingVolume;
 		PhysicsComponent* physicsComponent;
 		Vector3 broadphaseAABB;
 		vector<Layers::LayerID> ignoreLayers;
+		Vector3 GetBoundsScale();
 	};
 }
 

@@ -5,8 +5,24 @@
 #ifndef AUDIOENGINE_H
 #define AUDIOENGINE_H
 
+#ifndef ASSETROOTLOCATION
+#define ASSETROOTLOCATION "../Assets/"
+#endif
 
 #include <fmod.hpp>
+#include <map>
+#ifdef USE_PS5
+#include <kernel.h>
+#endif
+#include <deque>
+#include <vector>
+#include <thread>
+#include <string>
+#include <filesystem>
+#include <iostream>
+
+class AudioListenerComponent;
+class AudioSourceComponent;
 
 /**
 * Type of Channel Group
@@ -18,8 +34,17 @@
 enum class ChannelGroupType {
 	SFX,
 	MUSIC,
-	VOICE,
+	CHAT,
 	MASTER
+};
+
+enum class EntitySoundGroup {
+	PLAYER,
+	ENEMY,
+	ENVIRONMENT,
+	WEAPON,
+	ITEM,
+	POLLO
 };
 
 
@@ -35,11 +60,7 @@ public:
     */
     static AudioEngine& Instance();
 
-    /**
-	* Instantiate static singleton instance of Audio Engine
-	* Call this to get the instance of the Audio Engine
-    */
-    void Init();
+	~AudioEngine();
 
 	/**
 	* Update Audio Engine
@@ -60,6 +81,99 @@ public:
 	* Handle Destruction of Audio Engine
     */
     void Shutdown();
+
+	#pragma region Input/Output Device Management
+	/**
+	* Update input device list
+	* Removes output loopback devices
+	*/
+	void UpdateInputList();
+
+	/**
+	* Get List of input devices
+	* @return std::map<int, std::string>
+	*/
+	std::map<int, std::string> GetInputDeviceList() {
+		UpdateInputList();
+		return inputDeviceList;
+	}
+
+	/**
+	* Print input device list
+	* [Used for debugging]
+	*/
+	void PrintInputList();
+
+	/**
+	* Update output Device List
+	*/
+	void UpdateOutputList();
+
+	/**
+	* Get List of output devices
+	* @return std::map<int, std::string>
+	*/
+
+	std::map<int, std::string> GetOutputDeviceList() {
+		UpdateOutputList();
+		return outputDeviceList;
+	}
+
+	/**
+	* Print output device list
+	* [Used for debugging]
+	*/
+	void PrintOutputList();
+	
+	/**
+	* Get current input device index
+	* @return int index of input device
+	*/
+	int GetInputDeviceIndex() {
+		return inputDeviceIndex;
+	}
+
+	/**
+	* Set input device index
+	* Ensures FMOD uses the intended input device
+	*/
+	void SetInputDeviceIndex(int index) {
+		if (IsRecording()) {
+			StopRecording();
+		}
+		inputDeviceIndex = index;
+	}
+
+	/**
+	* Get current output device index
+	* @return int index of output device
+	*/
+	int GetOutputDeviceIndex() {
+		return outputDeviceIndex;
+	}
+
+	/**
+	* Set output device index
+	* Ensures FMOD uses the intended output device
+	*/
+	void SetOutputDeviceIndex(int index) {
+		outputDeviceIndex = index;
+		audioSystem->setDriver(outputDeviceIndex);
+	}
+
+	/**
+	* Checks if current input device is recording
+	*/
+	bool IsRecording();
+
+	/**
+	* Stop Microphone recording of selected input device
+	*/
+	void StopRecording() {
+		audioSystem->recordStop(inputDeviceIndex);
+	}
+
+	#pragma endregion
 
 	/**
 	* Get pointer to a channel group
@@ -92,12 +206,69 @@ public:
 	}
 
 
+	/**
+	* Loads all sounds from specified directory into a map
+	* @return true if successful
+	* @param directory path (inside Assets/Audio/)
+	* @param entity sound group
+	*/
+	bool LoadSoundDirectory(const char* directory, EntitySoundGroup group);
+
+	/**
+	* Initialise all sound assets into sound groups
+	*/
+	void LoadSoundAssets() {
+		LoadSoundDirectory("player", EntitySoundGroup::PLAYER);
+		LoadSoundDirectory("enemy", EntitySoundGroup::ENEMY);
+		LoadSoundDirectory("environment", EntitySoundGroup::ENVIRONMENT);
+		LoadSoundDirectory("weapon", EntitySoundGroup::WEAPON);
+		LoadSoundDirectory("item", EntitySoundGroup::ITEM);
+		LoadSoundDirectory("pollo", EntitySoundGroup::POLLO);
+	}
+
+	/**
+	* Prints all sounds in a specific entity sound group
+	* - For debugging purposes
+	*/
+	void printSoundsInGroup(EntitySoundGroup group) {
+		std::map<std::string, FMOD::Sound*> sounds = soundGroups[group];
+		for (auto& sound : sounds) {
+			std::cout << sound.first << std::endl;
+		}
+	}
+
+	/**
+	* Get fmod sound map for specific entity sound group
+	* @return map of fmod sounds
+	* @param entity sound group
+	*/
+	std::map<std::string, FMOD::Sound*>* GetSoundGroup(EntitySoundGroup group) {
+		return &soundGroups[group];
+	}
+
+	float GetMinDistance() {
+		return minDistance;
+	}
+
+	float GetMaxDistance() {
+		return maxDistance;
+	}
+
+	bool GetIsSystemValid() {
+		return isSystemValid;
+	}
+
+
 private:
     AudioEngine();
-    ~AudioEngine();
 
     FMOD::System* audioSystem;
 
+	std::map<int, std::string> inputDeviceList;
+	int inputDeviceIndex;
+
+	std::map<int, std::string> outputDeviceList;
+	int outputDeviceIndex;
 
 	std::map<ChannelGroupType, FMOD::ChannelGroup*> channelGroups;
 
@@ -109,6 +280,26 @@ private:
 
 	FMOD::ChannelGroup* CreateChannelGroups(ChannelGroupType type, const char* name);
 	
+	#ifdef USE_PS5	
+	SceKernelModule	libfmodHandle;
+	SceKernelModule	libfmodLHandle;
+
+	#endif // USE_PS5
+
+	std::string soundDir;
+
+	std::map<std::string, FMOD::Sound*> playerSounds;
+	std::map<std::string, FMOD::Sound*> enemySounds;
+	std::map<std::string, FMOD::Sound*> environmentSounds;
+	std::map<std::string, FMOD::Sound*> weaponSounds;
+	std::map<std::string, FMOD::Sound*> itemSounds;
+
+	std::map<EntitySoundGroup, std::map<std::string, FMOD::Sound*>> soundGroups;
+
+	float minDistance = 0.5f;
+	float maxDistance = 500.0f;
+
+	bool isSystemValid;
 };
 
 #endif

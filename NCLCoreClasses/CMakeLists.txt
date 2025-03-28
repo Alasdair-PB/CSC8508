@@ -123,9 +123,10 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     <thread>
     <filesystem>
     <functional>
-	<algorithm>
-	<assert.h>  
+    <algorithm>
+    <assert.h>  
 )
+include_directories("../SerializedSave/")
 
 ################################################################################
 # Compile and link options

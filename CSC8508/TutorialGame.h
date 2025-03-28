@@ -1,22 +1,37 @@
-#include "../NCLCoreClasses/KeyboardMouseController.h"
+#pragma once
+#include "Controller.h"
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
 #include "Legacy/MainMenu.h"
 #include "Math.h"
-#include "Legacy/UpdateObject.h"
-
-
-#pragma once
-#include "GameTechRenderer.h"
+#include "GameTechRendererInterface.h"
+#include "UISystem.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
-#include "Legacy/PlayerGameObject.h"
+#include "Legacy/PlayerComponent.h"
 #include "BoundsComponent.h"
 #include <vector>
-using std::vector;
+#include "SaveManager.h"
+#include "ComponentAssemblyDefiner.h"
+#include "UIElementsGroup.h"
 
+#if EOSBUILD
+#include "MainMenuUI.h"
+#include "EOSMenuUI.h"
+#include "LobbySearch.h"
+#include "EOSLobbyMenuUI.h"
+#endif
+
+#include "AudioSliders.h"
+#include "FramerateUI.h"
+#include "MainMenuUI.h"
+#include "StaminaBar.h"
+#include "LobbySearch.h"
+//#include "PauseUI.h"
+
+using std::vector;
 
 namespace NCL {
 	namespace CSC8508 {
@@ -25,116 +40,76 @@ namespace NCL {
 		{
 			int objId;
 			int ownId;
+			size_t pfab;
 			bool clientOwned;
 		};
 
-
-		class TutorialGame		{
+		class TutorialGame {
 		public:
 			TutorialGame();
 			~TutorialGame();
-
 			virtual void UpdateGame(float dt);
-
 		protected:
 			void InitialiseAssets();
-
-			void InitCamera();
-
-			void SetPause(bool state);
 			void InitWorld();
-			void BridgeConstraintTest();
-			void InitGameExamples();
+			void InitialiseGame();
 
-			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
-			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
-			void UpdateCamera(float dt);
-			void UpdateObjectSelectMode(float dt);
-			bool SelectObject();
-			void MoveSelectedObject();
-			void LockedObjectMovement();
+			void LoadWorld(std::string assetPath);
+			void UpdateUI();
+			std::string GetAssetPath(std::string pfabName);
 
-
-
-
-			GameObject* AddFloorToWorld(const Vector3& position);
-			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
-			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
-
-			GameObject* AddNavMeshToWorld(const Vector3& position, Vector3 dimensions);
+			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
-
-			void EndGame(bool hasWon);
-
-			Vector3 GetPlayerPos();
-			void SphereCastWorld();
-			void UpdateScore(float points);
-
-			bool RayCastNavWorld(Ray& r, float rayDistance);
-			void UpdateDrawScreen(float dt);
-			bool OnEndGame(float dt);
-
-			void  CalculateCubeTransformations(const std::vector<Vector3>& vertices, Vector3& position, Vector3& scale, Quaternion& rotation);
-			std::vector<Vector3>  GetVertices(Mesh* navigationMesh, int i);
-
+			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
+			GameObject* LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
+			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag);
 			MainMenu* GetMainMenu() { return mainMenu; }
-
+			ComponentAssemblyDefiner* componentAssembly;
 
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;
 #else
-			GameTechRenderer* renderer;
+			GameTechRendererInterface* renderer;
 #endif
-			PhysicsSystem*		physics;
-			GameWorld*			world;
+			PhysicsSystem* physics;
+			AudioEngine* audioEngine = nullptr;
+			GameWorld* world;
+			Controller* controller;
 
-			KeyboardMouseController controller;
-
-			bool useGravity;
-			bool inPause = false;
 			bool inSelectionMode;
 
-			bool endGame = false;
-			bool hasWon = false;
-
-			float		forceMagnitude;
-			float time = 0;
-			int score = 0;
-
 			BoundsComponent* selectionObject = nullptr;
-
-			Mesh* navigationMesh = nullptr;
 			NavigationPath outPath;
 			NavigationMesh* navMesh = nullptr;
 
-			Texture*	basicTex	= nullptr;
-			Shader*		basicShader = nullptr;
-
-			Mesh*	capsuleMesh = nullptr;
-			Mesh*	cubeMesh	= nullptr;
-			Mesh*	sphereMesh	= nullptr;
-
 			MainMenu* mainMenu = nullptr;
-
 			BoundsComponent* lockedObject	= nullptr;
-			Vector3 lockedOffset		= Vector3(0, 14, 20);
+			Vector3 lockedOffset = Vector3(0, 14, 20);
+			
+
 
 			void LockCameraToObject(BoundsComponent* o) {
 				lockedObject = o;
 			}
 
-
-			std::vector<Vector4> colors = {
-				Vector4(1.0f, 0.0f, 0.0f, 1.0f), // Red
-				Vector4(0.0f, 1.0f, 0.0f, 1.0f), // Green
-				Vector4(0.0f, 0.0f, 1.0f, 1.0f), // Blue
-				Vector4(1.0f, 1.0f, 0.0f, 1.0f), // Yellow
-				Vector4(1.0f, 0.0f, 1.0f, 1.0f), // Magenta
-				Vector4(0.0f, 1.0f, 1.0f, 1.0f)  // Cyan
-			};
-
 			GameObject* objClosest = nullptr;
-			PlayerGameObject* players = nullptr;
+			UI::UISystem* uiSystem;
+
+			UI::FramerateUI* framerate = new UI::FramerateUI;
+			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
+			UI::LobbySearch* lobbySearchField = new UI::LobbySearch;
+			UI::InventoryUI* inventoryUI = new UI::InventoryUI;
+			UI::AudioSliders* audioSliders = new UI::AudioSliders;
+			/*UI::PauseUI* pauseUI = new UI::PauseUI;*/
+
+			float framerateDelay = 0;
+
+#if EOSBUILD
+			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;
+			UI::EOSLobbyMenuUI* eosLobbyMenuUI = new UI::EOSLobbyMenuUI(false, "", "", 0);
+
+			bool eosLobbyMenuCreated = false;
+#endif
 		};
 	}
 }

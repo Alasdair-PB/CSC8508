@@ -2,6 +2,9 @@
 // Contributors: Max Bolton
 //
 
+#ifndef AUDIOSOURCECOMPONENT_H
+#define AUDIOSOURCECOMPONENT_H
+
 #ifndef ASSETROOTLOCATION
 #define ASSETROOTLOCATION "../Assets/"
 #endif
@@ -13,10 +16,8 @@
 #include "Maths.h"
 #include "Debug.h"
 #include <Transform.h>
-
-using namespace NCL;
-using namespace NCL::Maths;
-using namespace NCL::CSC8508;
+#include "PhysicsComponent.h"
+#include "PhysicsObject.h"
 
 /**
 * Audio Source class for audio engine
@@ -37,9 +38,54 @@ public:
 		defaultChannelGroup = type;
 		fVolume = 1.0f;
 
+
+		// Initialise Persistent Sound
+		InitPersistentSound();
 	}
 
 	/**
+	* Destructor for Audio Source
+	*/
+	~AudioSourceComponent() {
+		fChannel ? fChannel->stop() : 0;
+		delete persistentSound;
+	}
+
+	void OnAwake() override {}
+
+
+	/**
+	* Update position vectors of source for use by FMOD
+	*/
+	void Update(float deltaTime) override {
+
+		Vector3 pos = transform->GetPosition();
+		fPosition = VecToFMOD(pos);
+
+		
+		PhysicsComponent* physComp = GetGameObject().TryGetComponent<PhysicsComponent>();
+
+		if (physComp) {
+			Vector3 vel = physComp->GetPhysicsObject()->GetLinearVelocity();
+			fVelocity = VecToFMOD(vel);
+		}
+		else if(debug) {
+			std::cout << "No Physics Component found for AudioSourceComponentComponent!" << std::endl;
+		}
+		
+		fChannel->set3DAttributes(&fPosition, &fVelocity);
+		persistentChannel->set3DAttributes(&fPosition, &fVelocity);
+
+		if (debug) {
+			std::cout << "Source Pos: " << std::to_string(pos.x) << ", " + std::to_string(pos.y) << ", " << std::to_string(pos.z) << std::endl;
+		}
+
+	}
+
+	#pragma region FMOD Sound Loading
+
+	/**
+	* [No longer used as audio engine stores all sounds]
 	* Load sound from file
 	* Different modes include FMOD_3D, FMOD_2D, FMOD_DEFAULT, FMOD_LOOP_NORMAL
 	* FMOD_3D is defualt for spacial audio
@@ -69,10 +115,12 @@ public:
 		return true;
 	}
 
+	void setSoundCollection(std::map<std::string, FMOD::Sound*> sounds) {
+		fSoundCol = sounds;
+	}
 
 	/**
 	* Play created sound
-	* Sets selected sound to play
 	* @return sound played status (true if successful)
 	* @param name of sound
 	*/
@@ -100,15 +148,51 @@ public:
 	}
 
 	/**
-	* Cycle through sounds in collection
+	* Play sound object
+	* @return sound played status (true if successful)
+	* @param sound object to play
 	*/
-	void cycleSounds();
+	bool PlaySoundObj(FMOD::Sound* sound) {
+		if (!sound) {
+			std::cerr << "Error: fSound is nullptr, cannot play sound!" << std::endl;
+			return false;
+		}
+		FMOD_RESULT result = fSystem->playSound(sound, audioEngine->GetChannelGroup(ChannelGroupType::CHAT), false, &fChannel);
+		if (result != FMOD_OK) {
+			std::cerr << "Error playing sound: " << result << std::endl;
+			return false;
+		}
+		if (fChannel) {
+			fChannel->setPaused(false);
+			fChannel->setVolume(fVolume);
+			return true;
+		}
+	}
+
+	/**
+	* Cycle through sounds in collection
+	* @param delay between sounds
+	* @return true if successfully cycled through all sounds
+	*/
+	bool CycleSounds(float delay) {
+		for (auto& sound : fSoundCol) {
+			PlaySound(sound.first.c_str());
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)(delay * 1000))); //TODO - Find a way to delay sounds without pausing the thread
+		}
+		return true;
+	}
 
 
 	/**
-	* Play random sound from collection using specified delay
+	* Play random sound from collection
+	* @return sound played status (true if successful)
 	*/
-	void randomSounds(int delay);
+	bool RandomSound() {
+		int randomIndex = rand() % fSoundCol.size();
+		auto it = fSoundCol.begin();
+		std::advance(it, randomIndex);
+		return PlaySound(it->first.c_str());
+	}
 
 	/**
 	* Stop Playback
@@ -117,43 +201,44 @@ public:
 		fChannel ? fChannel->stop() : 0;
 	};
 
-	/**
-	* Update position vectors of source for use by FMOD  
-	*/
-	void Update(float deltaTime) override {
+	#pragma endregion
 
-		Vector3 pos = transform->GetPosition();
-		fPosition = VecToFMOD(pos);
+	void InitPersistentSound() {
+		FMOD_CREATESOUNDEXINFO exinfo = {};
+		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		exinfo.numchannels = channels;
+		exinfo.format = FMOD_SOUND_FORMAT_PCM16;
+		exinfo.defaultfrequency = sampleRate;
+		exinfo.length = persistentBufferSize * sizeof(short); // total buffer size in bytes
 
-		PhysicsComponent* physComp = GetGameObject().TryGetComponent<PhysicsComponent>();
+		FMOD_RESULT result = fSystem->createSound(nullptr, FMOD_OPENUSER | FMOD_LOOP_NORMAL | FMOD_3D, &exinfo, &persistentSound);
 
-		if (physComp) {
-			Vector3 vel = physComp->GetPhysicsObject()->GetLinearVelocity();
-			fVelocity = VecToFMOD(vel);
+		if (result != FMOD_OK) {
+			std::cerr << "[ERROR] InitPersistentSound() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+			persistentSound = nullptr;
+			return;
 		}
-		else if(debug) {
-			std::cout << "No Physics Component found for AudioSourceComponentComponent!" << std::endl;
+
+		result = fSystem->playSound(persistentSound, audioEngine->GetChannelGroup(ChannelGroupType::MASTER), true, &persistentChannel); // NOTE-STARTS PAUSED
+
+		if (result != FMOD_OK) {
+			std::cerr << "[ERROR] InitPersistentSound() FMOD Error: " << FMOD_ErrorString(result) << std::endl;
+			return;
 		}
 
+		persistentChannel->setPaused(false);
+		persistentChannel->setMode(FMOD_3D);
+		persistentChannel->set3DMinMaxDistance(audioEngine->GetMinDistance(), audioEngine->GetMaxDistance());
 
-
-		fChannel->set3DAttributes(&fPosition, &fVelocity);
-
-		fSystem->update();
- 
-		if (debug) {
-			Debug::Print("Source Pos: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z), Vector2(5, 5));
-		}
 	}
+
+	std::pair<FMOD::Sound*, FMOD::Channel*> GetPersistentPair() {
+		return std::make_pair(persistentSound, persistentChannel);
+	}
+
 
 private:
 
-	/**
-	* Destructor for Audio Source
-	*/
-	~AudioSourceComponent() {
-		fChannel ? fChannel->stop() : 0;
-	}
 
 	FMOD::Channel* fChannel;
 	ChannelGroupType defaultChannelGroup;
@@ -162,4 +247,12 @@ private:
 	std::map<std::string, FMOD::Sound*> fSoundCol;
 
 	float fVolume;
+
+	// VOIP Playback
+	FMOD::Channel* persistentChannel = nullptr;
+	FMOD::Sound* persistentSound = nullptr;
+	unsigned int persistentBufferSize = sampleRate / 2; // 0.5 second
+
 };
+
+#endif // AUDIOSOURCECOMPONENT_H

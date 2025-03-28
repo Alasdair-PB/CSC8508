@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.16.0)
 project(AudioEngine CXX)
 
-# Set FMOD base path
-set(FMOD_DIR "${CMAKE_SOURCE_DIR}/ThirdParty/FMOD/api/core")
-
 ################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################
@@ -12,17 +9,18 @@ if(NOT CMAKE_VS_PLATFORM_NAME)
 endif()
 
 if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
-    message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
+    #message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
 endif()
 
 # Define AudioEngine library
 add_library(AudioEngine STATIC
     AudioEngine.cpp
     AudioEngine.h
-    AudioObject.cpp
     AudioObject.h
     AudioListenerComponent.h
+    AudioListenerComponent.cpp
     AudioSourceComponent.h
+    NetworkedListenerComponent.h
 )
 
 # Include directories
@@ -30,6 +28,7 @@ target_include_directories(AudioEngine PRIVATE
     "../NCLCoreClasses"
     "../CSC8508CoreClasses"
     "${FMOD_DIR}/inc"
+	"${CMAKE_SOURCE_DIR}/ThirdParty/opus_source/include"
 )
 
 # include Maths headers from NCLCore
@@ -60,16 +59,43 @@ target_precompile_headers(AudioEngine PRIVATE
 # Dependencies
 ################################################################################
 
-
 target_link_libraries(AudioEngine LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(AudioEngine LINK_PUBLIC CSC8508CoreClasses)
+
 
 # Ensure FMOD_LIB_DIR exists
 message(STATUS "FMOD Include Dir: ${FMOD_DIR}/inc")
 target_include_directories(AudioEngine PRIVATE "${FMOD_DIR}/inc")
-
+if(NOT PS5)
 message(STATUS "FMOD Library Dir: ${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}")
 target_link_directories(AudioEngine PRIVATE "${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}")
 
 message(STATUS "FMOD Library File: ${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
 target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/x64/fmod_vc.lib)
+else()
+target_link_directories(AudioEngine PRIVATE "${FMOD_DIR}/lib")
+target_link_directories(AudioEngine PRIVATE "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source/include")
+target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/libfmod_stub_weak.a)
+target_link_libraries(AudioEngine PRIVATE ${FMOD_DIR}/lib/libfmodL_stub_weak.a)
+
+message(STATUS "FMOD Library File: ${FMOD_DIR}/lib/${CMAKE_VS_PLATFORM_NAME}/fmod_vc.lib")
+endif()
+
+# Set Opus Install Path
+set(OPUS_SOURCE_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_source")
+set(OPUS_INSTALL_PATH "${CMAKE_SOURCE_DIR}/ThirdParty/opus_install")
+
+
+# Include Opus headers from the install folder.
+target_include_directories(AudioEngine PRIVATE "${OPUS_INSTALL_PATH}/include")
+
+
+# Bypass any configuration-time file check (using SKIP_OPUS_CHECK)
+# and link directly against the imported target (OpusLib) defined in the top-level file.
+if(NOT SKIP_OPUS_CHECK)
+    set(SKIP_OPUS_CHECK TRUE)
+endif()
+
+target_link_libraries(AudioEngine PRIVATE OpusLib)
+
+

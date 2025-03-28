@@ -8,6 +8,7 @@
 #include "INetworkComponent.h"
 #include "INetworkDeltaComponent.h"
 #include "InputComponent.h"
+#include <queue>
 
 using std::vector;
 
@@ -17,65 +18,50 @@ namespace NCL::CSC8508
 		None,
 		Axis,
 		Button,
+		Delta,
 		Bound
 	};
 
-	struct InputAxisPacket : INetworkPacket
-	{
-		uint32_t axisID = -1;
-		float axisValue = 0; 
+	const int MAX_AXIS_COUNT = 5;
+	const int MAX_BUTTON_COUNT = 5;
 
-		InputAxisPacket() {
+	struct InputDeltaPacket : INetworkPacket {
+		uint32_t axisIDs[MAX_AXIS_COUNT];
+		uint32_t buttonIDs[MAX_BUTTON_COUNT];
+
+		float axisValues[MAX_AXIS_COUNT];
+		float deltaTime = 0;
+		float mouseYaw = 0;
+		float mousePitch = 0;
+		int historyStamp = 0;
+
+		InputDeltaPacket() {
 			type = Component_Event;
-			packetSubType = Axis;
-			size = sizeof(InputAxisPacket) - sizeof(GamePacket);
-		}
-	};
-
-	struct BoundPacket : INetworkPacket
-	{
-		uint32_t axisID_A = -1;		
-		uint32_t axisID_B = -1;
-		float axisValue_A = 0;
-		float axisValue_B = 0;
-
-		BoundPacket() {
-			type = Component_Event;
-			packetSubType = Bound;
-			size = sizeof(BoundPacket) - sizeof(GamePacket);
-		}
-	};
-
-	struct InputButtonPacket : INetworkPacket
-	{
-		uint32_t buttonID = -1;
-		bool held = false;
-
-		InputButtonPacket() {
-			type = Component_Event;
-			packetSubType = Button;
-			size = sizeof(InputButtonPacket) - sizeof(GamePacket);
+			packetSubType = Delta;
+			historyStamp = 0;
+			size = sizeof(InputDeltaPacket) - sizeof(GamePacket);
 		}
 	};
 
 	class InputNetworkComponent :public InputComponent, public INetworkComponent
 	{
 	public:
-		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, bool clientOwned) :
+		InputNetworkComponent(GameObject& gameObject, Controller* controller, int objId, int ownId, int componId, int pfabID, bool clientOwned) :
 			InputComponent(gameObject, controller), 
-			INetworkComponent(objId, ownId, componId, clientOwned)
-		{}
+			INetworkComponent(objId, ownId, componId, pfabID, clientOwned), reset(true) {}
 
 		~InputNetworkComponent() = default;
 
-		void OnAwake() override {
-			for (uint32_t binding : activeController->GetBoundButtons()) {
-				lastBoundState[binding] = false;
-			}
-
+		void OnAwake() override {	
+			InputComponent::OnAwake();
 			boundAxis = activeController->GetBoundAxis();
+			for (uint32_t binding : boundButtons){
+				uint32_t hashBinding = activeController->GetButtonHashId(binding);
+				lastBoundState[hashBinding] = false;
+			}
 			for (uint32_t binding : boundAxis) {
-				lastAxisState[binding] = false;
+				uint32_t hashBinding = activeController->GetAxisHashId(binding);
+				lastAxisState[hashBinding] = 0;
 			}
 		}
 
@@ -83,88 +69,194 @@ namespace NCL::CSC8508
 			static std::unordered_set<std::type_index> types = {
 				std::type_index(typeid(IComponent)),				
 				std::type_index(typeid(InputComponent)),				
-				std::type_index(typeid(INetworkComponent)),
-
+				std::type_index(typeid(INetworkComponent))
 			};
 			return types;
 		}
 
-	
+		/// <summary>
+		/// Manages the tracking of skippedFrames (frames where multiple packets have arrived simultaneously)
+		/// Keeps previous frames in history for each skipped frame counted where an input has not arrived. 
+		/// </summary>
+		void ManageFramePrediction() {
+			if (reset) {
+				if (skippedFrames > skipLimit) skippedFrames /= 2;
+				if (frameCount < skippedFrames) {
+					frameCount++;
+					skippedFrames--;
+					reset = false;
+				}
+			}
+			else 
+				frameCount = 0;
+		}
 
-		void Update(float deltaTime) override
+		/// <summary>
+		/// Set lastAxisState and mouseGameWorldYaw using history data recieved over the network
+		/// In cases where multiple packets arrive simultaneously only set a single frames worth of data is set
+		/// when this happens skippedFrames is incremented to notify ManageFramePrediction() of skippedFrames/ lostFrames
+		/// </summary>
+		void PredictUpdate() {
+			reset = true;
+			if (!historyQueue.empty()) {
+				skippedFrames--;
+				while (!historyQueue.empty()) {
+					HistoryData data = historyQueue.front();
+
+					while (!data.buttonMap.empty()) {
+						uint32_t id = data.buttonMap.top();
+						lastBoundState[id] = true;
+						data.buttonMap.pop();
+					}
+					
+					if (data.historyStamp >= lastHistoryEntry) {
+						lastHistoryEntry = data.historyStamp;
+						lastAxisState = data.axisMap;
+						mouseGameWorldYaw = data.mouseGameWorldYaw;
+						mouseGameWorldPitch = data.mouseGameWorldYaw;
+						reset = false;
+					}
+					skippedFrames++;
+					historyQueue.pop();
+				}
+			}
+		}
+
+		void PredictButtonInput() {
+			for (const auto& [key, value] : lastBoundState) {
+				if (lastBoundState[key]) {
+					CallInputEvent(key);
+					lastBoundState[key] = false;
+				}
+			}
+		}
+
+		void EarlyUpdate(float deltaTime) override
 		{
-			if (clientOwned)
-				UpdateBoundAxis();
+			if (clientOwned) {				
+				CheckButtonBindings();
+				UpdateMouseGameWorldPitchYaw();
+				UpdateDeltaAxis(deltaTime);
+			}
+			else {
+				PredictUpdate();
+				PredictButtonInput();
+				ManageFramePrediction();
+			}
 		}
 
 		float GetNamedAxis(const std::string& name) override
 		{
-			if (clientOwned) 
-				return activeController->GetNamedAxis(name);
+			if (clientOwned) return activeController->GetNamedAxis(name);
 			else {
-				auto binding = activeController->GetNamedAxisBinding(name);
-				return lastAxisState[binding];
+				uint32_t hashBinding = activeController->GetAxisHashId(name);
+				return reset ? 0 : lastAxisState[hashBinding];
 			}
 		}
 
+	private:
+		bool reset;
+		int frameCount;
+		int skippedFrames;
+		const int skipLimit = 10;
 	protected:
+
+		struct HistoryData
+		{
+			float deltaTime;
+			float mouseGameWorldYaw;
+			float mouseGameWorldPitch;
+			int historyStamp;
+			std::map<uint32_t, float> axisMap;
+			std::stack<uint32_t> buttonMap;
+
+			HistoryData(std::map<uint32_t, float> axisMap, std::stack<uint32_t> buttonMap, float mouseGameWorldYaw, float mouseGameWorldPitch, float deltaTime, int historyStamp) {
+				this->axisMap = axisMap;
+				this->buttonMap = buttonMap;
+				this->deltaTime = deltaTime;
+				this->mouseGameWorldYaw = mouseGameWorldYaw; 
+				this->mouseGameWorldPitch = mouseGameWorldPitch;
+				this->historyStamp = historyStamp;
+			}
+		};
+
 		vector<uint32_t> boundAxis;
-		std::map<uint32_t, bool> lastBoundState;
 		std::map<uint32_t, float> lastAxisState;
+		std::map<uint32_t, bool> lastBoundState;
+		std::queue<HistoryData> historyQueue;
+		int lastHistoryEntry = 0;
+		
+		bool ReadDeltaPacket(InputDeltaPacket pck) 
+		{
+			std::map<uint32_t, float> elements = std::map<uint32_t, float>();
+			std::stack<uint32_t> buttonElements = std::stack<uint32_t>();
+
+			for (int i = 0; i < MAX_AXIS_COUNT; i++)
+				elements[pck.axisIDs[i]] = pck.axisValues[i];
+			for (int i = 0; i < MAX_BUTTON_COUNT; i++)
+				if (pck.buttonIDs[i] > 0) buttonElements.push(pck.buttonIDs[i]);
+			HistoryData data = HistoryData(elements, buttonElements, pck.mouseYaw, pck.mousePitch, pck.deltaTime, pck.historyStamp);
+			historyQueue.push(data);
+			return true;
+		}
 
 		bool ReadEventPacket(INetworkPacket& p) override
 		{
-			if (p.packetSubType == InputTypes::Axis) {
-				InputAxisPacket pck = (InputAxisPacket&)p;
-				lastAxisState[pck.axisID] = pck.axisValue;
-			}
-			else if (p.packetSubType == InputTypes::Button) {
-				InputButtonPacket pck = (InputButtonPacket&)p;
+			if (p.packetSubType == InputTypes::Delta) 
+				return ReadDeltaPacket((InputDeltaPacket&)p);
+			return false;
+		}
 
-				if (pck.held)
-					EventManager::Call(boundButtons[pck.buttonID]);
-				// May add events for on release
-				lastBoundState[pck.buttonID] = pck.held;
-			}
+		void ReadBoundAxis(bool& hasChanged, InputDeltaPacket* deltaPacket) {
+			int t = boundAxis.size();
+			for (int i = 0; i < t; i += MAX_AXIS_COUNT) {
+				for (int j = 0; j < MAX_AXIS_COUNT && (i + j) < t; j++) {
+					uint32_t binding = boundAxis[i + j];
+					float axisValue = activeController->GetAxis(binding);
 
-			return true;
-		}	
-		
-		void UpdateBoundAxis() {
-			for (auto binding : boundAxis)
-			{
-				float axisValue = activeController->GetAxis(binding);
-				if (axisValue != lastAxisState[binding]) {
+					if (axisValue != 0)
+						hasChanged = true;
 
-					InputAxisPacket* axisPacket = new InputAxisPacket();
-					axisPacket->axisID = binding;
-					axisPacket->axisValue = axisValue;
-
-					SendEventPacket(axisPacket);
-					lastAxisState[binding] = axisValue;
-					delete axisPacket;
+					uint32_t hashBinding = activeController->GetAxisHashId(binding);
+					deltaPacket->axisIDs[j] = hashBinding;
+					deltaPacket->axisValues[j] = axisValue;
+					lastAxisState[hashBinding] = axisValue;
 				}
 			}
 		}
 
-		void UpdateBoundButtons() 
-		{
-			for (auto binding : boundButtons)
-			{
-				bool buttonDown = activeController->GetButton(binding.first);
-				if (buttonDown || lastBoundState[binding.first]);
-				{
-					InputButtonPacket* buttonPacket = new InputButtonPacket();
-					buttonPacket->buttonID = binding.first;
-					buttonPacket->held = buttonDown;
-
-					SendEventPacket(buttonPacket);
-					EventManager::Call(binding.second);
-
-					lastBoundState[binding.first] = buttonDown;
-					delete buttonPacket;
+		void ReadBoundButtons(bool& hasChanged, InputDeltaPacket* deltaPacket) {			
+			int tB = boundButtons.size();
+			for (int i = 0; i < tB; i += MAX_BUTTON_COUNT) {
+				for (int j = 0; j < MAX_BUTTON_COUNT && (i + j) < tB; j++) {
+					uint32_t binding = boundButtons[i + j];
+					bool pressed = activeController->GetBoundButton(binding);
+					if (pressed) {
+						hasChanged = true;
+						uint32_t hashBinding = activeController->GetButtonHashId(binding);
+						deltaPacket->buttonIDs[j] = hashBinding;
+					}
 				}
 			}
+		}
+
+		void UpdateDeltaAxis(float deltaTime) {
+			InputDeltaPacket* deltaPacket = new InputDeltaPacket();
+			bool hasChanged = false;
+
+			ReadBoundAxis(hasChanged, deltaPacket);
+			ReadBoundButtons(hasChanged, deltaPacket);
+
+			deltaPacket->deltaTime = deltaTime;
+			deltaPacket->mouseYaw = mouseGameWorldYaw;
+			deltaPacket->mousePitch = mouseGameWorldPitch;
+			deltaPacket->historyStamp = lastHistoryEntry;
+
+			if (hasChanged) {				
+				lastHistoryEntry++;
+				SendEventPacket(deltaPacket);
+			}
+			delete deltaPacket;
 		}
 	};
 }

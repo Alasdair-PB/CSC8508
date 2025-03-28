@@ -1,0 +1,89 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "ps5-build",
+      "hidden": false,
+      "generator": "Visual Studio 17 2022",
+      "architecture": "Prospero",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "C:/Program Files (x86)/SCE/Prospero/Tools/CMake/PS5.cmake",
+        "DEBUG_ASSET_ROOT": "/app0/Assets/",
+        "CMAKE_CXX_FLAGS": "-Wno-unknown-warning-option",
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "TRUE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
+          "value": "FALSE"
+        }
+      }
+    },
+    {
+      "name": "windows-build",
+      "hidden": false,
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build_windows",
+      "cacheVariables": {
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
+          "value": "FALSE"
+        }
+      }
+    },
+    {
+      "name": "windows-editor-build",
+      "hidden": false,
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build_windows",
+      "cacheVariables": {
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "TRUE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
+          "value": "FALSE"
+        }
+      }
+    },
+    {
+      "name": "windows-eos-build",
+      "hidden": false,
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build_windows_eos",
+      "cacheVariables": {
+        "PS5": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "Editor": {
+          "type": "INTERNAL",
+          "value": "FALSE"
+        },
+        "EOSBuild": {
+          "type": "BOOL",
+          "value": "TRUE"
+        }
+      }
+    }
+  ]
+}

@@ -35,7 +35,7 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
 	myObjectToLoad->GetTransform().SetPosition(position);
-	myObjectToLoad->AddComponent<ItemComponent>(10);
+	myObjectToLoad->AddComponent<ItemComponent>(10, 10.0f);
 	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	if (spawnData)
 	{

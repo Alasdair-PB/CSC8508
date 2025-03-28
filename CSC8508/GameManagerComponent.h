@@ -8,6 +8,7 @@
 #include "DamageableComponent.h"
 #include "PauseUI.h"
 #include "FramerateUI.h"
+#include "GameOverUI.h"
 #include "UISystem.h"
 
 namespace NCL::CSC8508 {
@@ -21,7 +22,7 @@ namespace NCL::CSC8508 {
 	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent> {
 	protected:
 		int quota;
-		int bankedCurrency;
+		int bankedCurrency = 0;
 		int terminationFee;
 		int casualties = 0;
 		int framerateDelay;
@@ -34,6 +35,7 @@ namespace NCL::CSC8508 {
 
 		UI::PauseUI* pauseUI = new UI::PauseUI;
 		UI::FramerateUI* framerate = new UI::FramerateUI;
+		UI::GameOverUI* gameOverUI = new UI::GameOverUI;
 
 	public:
 		GameManagerComponent(GameObject& gameObject)
@@ -67,10 +69,14 @@ namespace NCL::CSC8508 {
 
 		
 		void OnEvent(DeathEvent* e) override {
+			UI::UISystem::GetInstance()->PushNewStack(gameOverUI->gameOverUI, "Game Over");
+			gameOverUI->PushElement(GameOverCurrency());
 			CheckPlayerInstance(e);
 		}
 
 		void OnEvent(ExitEvent* e) override {
+			UI::UISystem::GetInstance()->PushNewStack(gameOverUI->gameOverUI, "Game Over");
+			gameOverUI->PushElement(GameOverCurrency());
 			OnExitEvent(e);
 		}
 
@@ -149,6 +155,15 @@ namespace NCL::CSC8508 {
 		std::function<CSC8508::PushdownState::PushdownResult()> PauseReturnButton() {
 			std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
 				GameWorld::Instance().ToggleWorldPauseState();
+				return CSC8508::PushdownState::PushdownResult::NoChange;
+				};
+			return func;
+		}
+
+		std::function<CSC8508::PushdownState::PushdownResult()> GameOverCurrency() {
+			std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
+				std::string text = "You earned: " + std::to_string(bankedCurrency) + " credits!";
+				ImGui::Text(text.c_str());
 				return CSC8508::PushdownState::PushdownResult::NoChange;
 				};
 			return func;

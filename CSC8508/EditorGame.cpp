@@ -96,6 +96,7 @@ ComponentAssemblyDefiner* EditorGame::GetDefiner() {
 void LoadControllerMappings(Controller* controller)
 {
 	controller->MapAxis(0, "Sidestep");
+	controller->MapAxis(1, "Up");
 	controller->MapAxis(2, "Forward");
 	controller->MapAxis(3, "XLook");
 	controller->MapAxis(4, "YLook");
@@ -107,10 +108,13 @@ void LoadControllerMappings(Controller* controller)
 void EditorGame::InitialiseGame() {
 
 	componentAssembly = new ComponentAssemblyDefiner();
+
 	componentAssembly->InitializeMap();
 
 	world->GetMainCamera().SetController(*controller);
 	LoadControllerMappings(controller);
+
+	editorCamera = new EditorCamera(&world->GetMainCamera(), controller);
 
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
@@ -174,6 +178,7 @@ EditorGame::~EditorGame()
 void EditorGame::UpdateGame(float dt)
 {	
 	TrySelectObject();
+	editorCamera->Update(dt);
 	UpdateUI();
 	renderer->Render();
 	inspectorBar->RenderFocus();

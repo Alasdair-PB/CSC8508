@@ -19,6 +19,7 @@
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
 #include "EditorCore/Inspector.h"
+#include "EditorCore/EditorCamera.h"
 
 using std::vector;
 
@@ -88,7 +89,7 @@ namespace NCL {
 			GameWorld* world;
 			Controller* controller;
 			Inspector* inspectorBar;
-
+			EditorCamera* editorCamera;
 			bool inSelectionMode;
 
 

@@ -20,6 +20,11 @@ namespace NCL {
             ExitEvent() {}
         };
 
+		class PauseEvent : public Event {
+		public:
+			PauseEvent() {}
+		};
+
 
         class PlayerComponent : public IComponent, public EventListener<InputButtonEvent>, public EventListener<CollisionEvent>, public EventListener<DeathEvent> {
         public:
@@ -31,6 +36,7 @@ namespace NCL {
             void SetBindingDash(uint32_t d, StaminaComponent* component);
             void SetBindingInteract(uint32_t p);
             void SetBindingScrollInventory(uint32_t p);
+            void SetBindingPause(uint32_t p);
 
             void OnEvent(InputButtonEvent* buttonEvent) override;
             void OnEvent(CollisionEvent* collisionEvent) override;
@@ -48,6 +54,7 @@ namespace NCL {
             void OnJumpInput();
             void OnItemInteract();
             void OnPlayerMove();
+            void OnPauseInput();
 
             void SetLinearVelocity(float jumpDuration);
             void OnJump(float deltaTime);
@@ -105,6 +112,7 @@ namespace NCL {
             uint32_t onDashBinding;
             uint32_t onItemInteractBinding;
             uint32_t onInvScrollBinding;
+			uint32_t onPauseBinding;
         };
     }
 }

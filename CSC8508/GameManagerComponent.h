@@ -8,7 +8,7 @@
 #include "DamageableComponent.h"
 
 namespace NCL::CSC8508 {
-	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent> {
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent> {
 	protected:
 		int quota;
 		int bankedCurrency;
@@ -16,6 +16,8 @@ namespace NCL::CSC8508 {
 		int casualties = 0;
 
 		inline static GameManagerComponent* instance = nullptr;
+
+		void OnPauseEvent(PauseEvent* e);
 
 	public:
 		GameManagerComponent(GameObject& gameObject)
@@ -32,6 +34,7 @@ namespace NCL::CSC8508 {
 		void OnAwake() override {
 			EventManager::RegisterListener<DeathEvent>(this);
 			EventManager::RegisterListener<ExitEvent>(this);
+			EventManager::RegisterListener<PauseEvent>(this);
 		}
 
 		void Update(float dt) override {
@@ -45,6 +48,10 @@ namespace NCL::CSC8508 {
 
 		void OnEvent(ExitEvent* e) override {
 			OnExitEvent(e);
+		}
+
+		void OnEvent(PauseEvent* e) override {
+			OnPauseEvent(e);
 		}
 
 

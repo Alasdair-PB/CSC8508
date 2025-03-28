@@ -42,3 +42,7 @@ void GameManagerComponent::OnExitEvent(ExitEvent* e) {
 		OnMissionFailure();
 	}
 }
+
+void GameManagerComponent::OnPauseEvent(PauseEvent* e) {
+	GameWorld::Instance().SetWorldPauseState(true);
+}

@@ -210,6 +210,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
 		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
 		listenerComp->RecordMic();
+		pc->SetBindingPause(controller->GetButtonHashId("Pause"));
 	}
 
 

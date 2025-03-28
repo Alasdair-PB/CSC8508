@@ -138,7 +138,6 @@ namespace NCL::CSC8508 {
             AddOperatorBuffer<T, IComponent>(IComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkComponent>(INetworkComponentBufferOperators, component);
             AddOperatorBuffer<T, INetworkDeltaComponent>(INetworkDeltaComponentBufferOperators, component);
-            //AddDeallocator<T>(component);
             AddDeallocatorBuffer<T>();
             allComponents[typeid(T)].push_back(component);
 

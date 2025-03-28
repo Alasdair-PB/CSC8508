@@ -15,8 +15,6 @@ public:
 
     bool Remove(KDTreeEntry<T> const& entry) override;
 
-    void Print() override; // TODO: Remove
-
 protected:
     KDTreeEntry<T> entries[MAX_ITEMS] = {};
 };
@@ -56,16 +54,6 @@ bool KDTreeLeaf<T>::Remove(KDTreeEntry<T> const& entry) {
         }
     }
     return found;
-}
-
-
-template<typename T>
-void KDTreeLeaf<T>::Print() {
-    std::cout << "Leaf!\n";
-    for (KDTreeEntry<T> e : entries)
-        if (!e.IsEmpty()) std::cout << "Item found! Position = " << e.position.x << ", " << e.position.y << ", " << e.position.z
-            << ", half dimensions = " << e.halfDimensions.x << ", " << e.halfDimensions.y << ", " << e.halfDimensions.z << "!\n";
-        else std::cout << "____\n";
 }
 
 #endif //KDTREELEAF_H

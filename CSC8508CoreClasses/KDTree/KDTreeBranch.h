@@ -56,19 +56,15 @@ protected:
     bool IsBeneathOrOnDivision(KDTreeQuery const& query) const;
     [[nodiscard]]
     static bool IsBeneathOrOnDivision(KDTreeQuery const& query, float const& division, Axis const& axis);
-
-    void Print() override;
 };
 
 
 template<typename T>
 bool KDTreeBranch<T>::Insert(KDTreeEntry<T> const entry) {
-    Print();
 
     if (IsAboveDivision(entry)) {
         if (!moreNode->Insert(entry)) {
             moreNode = Split(moreNode);
-            moreNode->Print();
             moreNode->Insert(entry);
         }
     }
@@ -76,7 +72,6 @@ bool KDTreeBranch<T>::Insert(KDTreeEntry<T> const entry) {
     if (IsBeneathOrOnDivision(entry))  // In an indivisible branch, it'll always go here
         if (!lessNode->Insert(entry)) {
             lessNode = Split(lessNode);
-            lessNode->Print();
             lessNode->Insert(entry);
         }
 
@@ -173,7 +168,6 @@ KDTreeBranch<T>* KDTreeBranch<T>::Split(KDTreeNode<T>* node) {
     }
 
     if (bestOverlaps == MAX_ITEMS) {
-        std::cout << "Splitting indivisibly\n";
         auto* newLessNode = new KDTreeLeaf<T>();
         auto* newMoreNode = node;
         auto* newBranch = new KDTreeBranch(newMoreNode, newLessNode);
@@ -184,7 +178,6 @@ KDTreeBranch<T>* KDTreeBranch<T>::Split(KDTreeNode<T>* node) {
     auto* newLessNode = new KDTreeLeaf<T>();
     auto* newMoreNode = new KDTreeLeaf<T>();
     auto* newBranch = new KDTreeBranch(bestAxis, bestDivision, newMoreNode, newLessNode);
-    std::cout << "Split made with best overlaps: " << bestOverlaps << " and best split: " << bestSplit << "!\n";
     for (KDTreeEntry<T> e : vec) newBranch->Insert(e);
     return newBranch;
 }
@@ -211,13 +204,6 @@ bool KDTreeBranch<T>::IsBeneathOrOnDivision(KDTreeQuery const& query) const {
 template<typename T>
 bool KDTreeBranch<T>::IsBeneathOrOnDivision(KDTreeQuery const& query, float const& division, Axis const& axis) {
     return query.position[axis] - query.halfDimensions[axis] <= division;
-}
-
-template<typename T>
-void KDTreeBranch<T>::Print() {
-    std::cout << "Branch! With division (" << division << ") on axis (" << static_cast<int>(divisionAxis) << ") and is_less_locked = " << isIndivisible << "!\n";
-    lessNode->Print();
-    moreNode->Print();
 }
 
 

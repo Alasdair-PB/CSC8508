@@ -5,7 +5,7 @@
 #ifndef KDTREENODE_H
 #define KDTREENODE_H
 
-#define MAX_ITEMS 4
+#define MAX_ITEMS 10
 
 #include <vector>
 
@@ -38,8 +38,6 @@ public:
      * FALSE
      */
     virtual bool Remove(KDTreeEntry<T> const& entry) = 0;
-
-    virtual void Print() = 0;
 };
 
 #endif //KDTREENODE_H

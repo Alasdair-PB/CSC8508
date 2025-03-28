@@ -29,11 +29,6 @@ public:
 
     void Remove(KDTreeEntry<T> const& entry) { root->Remove(entry); }
 
-    void Print() {
-        std::cout << "Tree!\n";
-        root->Print();
-    }
-
 protected:
     KDTreeNode<T>* root;
 };

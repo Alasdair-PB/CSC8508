@@ -6,6 +6,8 @@
 #include "EventManager.h"
 #include "../CSC8508/Legacy/PlayerComponent.h"
 #include "DamageableComponent.h"
+#include "PauseUI.h"
+#include "UISystem.h"
 
 namespace NCL::CSC8508 {
 
@@ -26,10 +28,14 @@ namespace NCL::CSC8508 {
 
 		void OnPauseEvent(PauseEvent* e);
 
+		UI::PauseUI* pauseUI = new UI::PauseUI;
+
 	public:
 		GameManagerComponent(GameObject& gameObject)
 			: IComponent(gameObject), quota(0), bankedCurrency(0), terminationFee(50) {
 			instance = this;
+			pauseUI->PushButtonElement(PauseReturnButton(), "Unpause");
+			/*pauseUI->PushButtonElement(ExitButton(), "Exit");*/
 		}
 
 		~GameManagerComponent() = default;
@@ -118,6 +124,21 @@ namespace NCL::CSC8508 {
 			casualties++;
 		}
 
+		std::function<CSC8508::PushdownState::PushdownResult()> PauseReturnButton() {
+			std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
+				GameWorld::Instance().ToggleWorldPauseState();
+				return CSC8508::PushdownState::PushdownResult::NoChange;
+				};
+			return func;
+		}
+
+		/*std::function<CSC8508::PushdownState::PushdownResult()> ExitButton() {
+			std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
+				
+				return CSC8508::PushdownState::PushdownResult::NoChange;
+				};
+			return func;
+		}*/
 
 	};
 }

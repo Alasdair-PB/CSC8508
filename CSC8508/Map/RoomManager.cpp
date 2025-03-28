@@ -10,8 +10,8 @@ std::vector<std::string> RoomManager::prefabPaths = std::vector<std::string>();
 
 void RoomManager::LoadPrefabs() {
 
-    std::string const pfabPath = NCL::Assets::PFABDIR + "rooms/RP_A.pfab";
-    prefabPaths.push_back(pfabPath);
+    prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RP_A.pfab");
+    prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RP_B.pfab");
 }
 
 RoomPrefab* RoomManager::GetRandom() {

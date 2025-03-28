@@ -177,6 +177,7 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 
 void GameWorld::UpdateWorld(float dt){
 	if (paused) return;
+	UI::UISystem::GetInstance()->RemoveStack("Pause");
 	ComponentManager::OperateOnAllIComponentBufferOperators(
 		[&](IComponent* c) {
 			if (c->IsEnabled())

@@ -30,6 +30,7 @@ bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
 
             // Put the roomB GameObject in the test position
             Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
+            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue; // Enforce flipping around the Y axis (no tilting the rooms)
             transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
             //transformB.SetOrientation(orientationDifference);
             transformB.SetPosition(

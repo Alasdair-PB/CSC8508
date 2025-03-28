@@ -22,6 +22,7 @@ namespace NCL {
                 UI::UISystem::GetInstance()->PushNewStack(inventoryUI->inventoryUI, "Inventory");
                 inventoryUI->PushInventoryElement(InventoryMenu());
             }
+            ~InventoryManagerComponent() = default;
 
             bool PushItemToInventory(ItemComponent* item) {
                 if (!item) return false;

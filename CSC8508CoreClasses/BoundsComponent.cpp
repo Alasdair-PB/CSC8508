@@ -3,6 +3,8 @@
 //
 
 #include "BoundsComponent.h"
+
+#include "Axis.h"
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -18,14 +20,43 @@ BoundsComponent::BoundsComponent(GameObject& gameObject, CollisionVolume* collis
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
 }
 
-BoundsComponent::~BoundsComponent() { delete boundingVolume; }
+BoundsComponent::~BoundsComponent() { 
+	delete boundingVolume; 
+#if EDITOR
+	delete expectingBoundsSize;
+	delete isTrigger;
+#endif
+}
 
-bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) const {
+bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) {
 	if (!boundingVolume) {
 		return false;
 	}
+	if (broadphaseAABB.IsEmpty()) UpdateBroadphaseAABB();
 	outSize = broadphaseAABB;
 	return true;
+}
+
+Vector3 GetOBBBroadphaseAABB(Quaternion const& orientation, Vector3 const& halfDimensions) {
+	auto max = Vector3();
+
+	// Get all world-orientated vertices (not repositioned)
+	Vector3 array[8];
+	for (int i = 0; i < 8; i++) {
+		array[i] = orientation * (halfDimensions * Vector3(
+			i & 1 ? 1 : -1,
+			i & 2 ? 1 : -1,
+			i & 4 ? 1 : -1
+			));
+	}
+
+	// Check for max bounds
+	for (Vector3 c : array) {
+		for (Axis a = x; a <= z; a++) {
+			if (fabs(c[a]) > max[a]) max[a] = c[a];
+		}
+	}
+	return max;
 }
 
 void BoundsComponent::UpdateBroadphaseAABB() {
@@ -39,11 +70,13 @@ void BoundsComponent::UpdateBroadphaseAABB() {
 		float r = ((SphereVolume&)*boundingVolume).GetRadius();
 		broadphaseAABB = Vector3(r, r, r);
 	}
+	else if (static_cast<int>(boundingVolume->type) & static_cast<int>(VolumeType::Capsule)) {
+		auto const vol = dynamic_cast<CapsuleVolume&>(*boundingVolume);
+		float const r = vol.GetRadius();
+		broadphaseAABB = Vector3(r, r + vol.GetHalfHeight(), r);
+	}
 	else if (static_cast<int>(boundingVolume->type) == static_cast<int>(VolumeType::OBB)) {
-		/*Matrix3 mat = Quaternion::RotationMatrix<Matrix3>(transform.GetOrientation());
-		mat = Matrix::Absolute(mat);
-		Vector3 halfSizes = ((OBBVolume&)*boundingVolume).GetHalfDimensions();
-		broadphaseAABB = mat * halfSizes;*/
+		broadphaseAABB = GetOBBBroadphaseAABB(GetGameObject().GetTransform().GetOrientation(), ((OBBVolume&)*boundingVolume).GetHalfDimensions());
 	}
 }
 
@@ -71,7 +104,7 @@ struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 void BoundsComponent::CopyComponent(GameObject* gameObject) {
 	BoundsComponent* component = gameObject->AddComponent<BoundsComponent>(nullptr, nullptr);
 	component->SetEnabled(IsEnabled());
-	CollisionVolume* volume; 
+	CollisionVolume* volume;
 	if (boundingVolume) {
 		volume = CopyVolume(boundingVolume->isTrigger, boundingVolume->type, GetBoundsScale());
 		if (volume) component->SetBoundingVolume(volume);
@@ -115,7 +148,7 @@ Vector3 BoundsComponent::GetBoundsScale() {
 }
 
 NCL::CollisionVolume* BoundsComponent::CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize) {
-	
+
 	NCL::CollisionVolume* volume = nullptr;
 	switch (volumeType) {
 	case VolumeType::AABB: {
@@ -206,3 +239,72 @@ void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 	if (loadedSaveData.hasPhysics)
 		physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
 }
+
+void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
+	IComponent::PushIComponentElementsInspector(elementsGroup, scale);
+#if EDITOR
+	if (!physicsComponent) {
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Link PhysicsComponent",
+			[this]() {SetPhysicsComponent(GetGameObject().TryGetComponent<PhysicsComponent>()); });
+	}
+	else {
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "UnLink PhysicsComponent",
+			[this]() {SetPhysicsComponent(nullptr); });
+	}
+
+	if (boundingVolume) {
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Remove Bounding Volume",
+			[this]() {SetBoundingVolume(nullptr); });
+	}
+	else {
+		std::vector<std::pair<int*, std::string>> enumOptions = {
+			{reinterpret_cast<int*>(&expectingVolumeType), "AABB"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "OBB"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Sphere"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Mesh"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Capsule"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Compound"},
+			{reinterpret_cast<int*>(&expectingVolumeType), "Invalid"}
+		};
+		elementsGroup.PushEnumElement("VolumeType", enumOptions);
+		elementsGroup.PushToggle("Is Trigger", isTrigger, scale);
+
+		switch (expectingVolumeType) {
+
+		case VolumeType::AABB: {
+			elementsGroup.PushVectorElement(expectingBoundsSize, scale, "Dimensions");
+			break;
+		}
+		case VolumeType::OBB: {
+			elementsGroup.PushVectorElement(expectingBoundsSize, scale, "Dimensions");
+			break;
+		}
+		case VolumeType::Sphere: {
+			elementsGroup.PushFloatElement(&expectingBoundsSize->x, scale, "Radius:");
+			break;
+		}
+		case VolumeType::Capsule: {
+			elementsGroup.PushFloatElement(&expectingBoundsSize->x, scale, "HalfHeight:");
+			elementsGroup.PushFloatElement(&expectingBoundsSize->y, scale, "Radius:");
+			break;
+		}
+		case VolumeType::Mesh: {
+			return;
+		}
+		case VolumeType::Compound: {
+			return;
+		}
+		case VolumeType::Invalid: {
+			return;
+		}
+		default: {
+			return;
+		}
+		}
+
+		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Add Bounding Volume",
+			[this]() {LoadVolume(*isTrigger, expectingVolumeType, *expectingBoundsSize, boundingVolume); });
+	}
+#endif
+}
+

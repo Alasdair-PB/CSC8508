@@ -81,15 +81,9 @@ namespace NCL {
             static void CleanUp() {
                 for (auto texture : allTextureNameMap)
                     delete texture.second;
-                for (auto texture : allTextureIdMap)
-                    delete texture.second;
                 for (auto shader : allShadersNameMap)
                     delete shader.second;
-                for (auto shader : allShadersIdMap)
-                    delete shader.second;
                 for (auto mesh : allMeshesNameMap)
-                    delete mesh.second;
-                for (auto mesh : allMeshesIdMap)
                     delete mesh.second;
 
                 allMeshesNameMap.clear();

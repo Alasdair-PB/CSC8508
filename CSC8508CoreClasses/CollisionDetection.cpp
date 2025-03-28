@@ -4,8 +4,12 @@
 //
 
 #include "CollisionDetection.h"
+
+#include <Util.cpp>
+
 #include "CollisionVolume.h"
 #include "AABBVolume.h"
+#include "Axis.h"
 #include "OBBVolume.h"
 #include "SphereVolume.h"
 #include "Window.h"
@@ -141,6 +145,32 @@ bool CollisionDetection::RaySphereIntersection(const Ray& r, const Transform& wo
 bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& worldTransform, const CapsuleVolume& volume, RayCollision& collision) {
 	return false;
 }
+
+
+void GetChildBoundsComponent(GameObject* gameObject, std::vector<BoundsComponent*>& out) {
+	for (GameObject* c : gameObject->GetChildren()) {
+		if (auto* boundsComponent = c->TryGetComponent<BoundsComponent>()) out.push_back(boundsComponent);
+		GetChildBoundsComponent(c, out);
+	}
+}
+
+
+bool CollisionDetection::ObjectIntersection(GameObject* gameObjectA, GameObject* gameObjectB, CollisionInfo& collisionInfo) {
+
+	// Gather all bounds components that need checking
+	std::vector<BoundsComponent*> aBounds, bBounds;
+	if (auto* aBoundsComponent = gameObjectA->TryGetComponent<BoundsComponent>()) aBounds.push_back(aBoundsComponent);
+	if (auto* bBoundsComponent = gameObjectB->TryGetComponent<BoundsComponent>()) bBounds.push_back(bBoundsComponent);
+	GetChildBoundsComponent(gameObjectA, aBounds);
+	GetChildBoundsComponent(gameObjectB, bBounds);
+
+	// Check for collision
+	for (BoundsComponent* a : aBounds) for (BoundsComponent* b : bBounds) {
+		if (ObjectIntersection(a, b, collisionInfo)) return true;
+	}
+	return false;
+}
+
 
 bool CollisionDetection::ObjectIntersection(BoundsComponent* a, BoundsComponent* b, CollisionInfo& collisionInfo) {
 	const CollisionVolume* volA = a->GetBoundingVolume();
@@ -279,16 +309,6 @@ bool CollisionDetection::AABBIntersection(
 	return false;
 }
 
-void GetAllOBBVertices(Vector3 array[8], Transform const& worldTransform, Vector3 const& halfDimensions) {
-	for (int i = 0; i < 8; i++) {
-		array[i] = worldTransform.GetPosition() + worldTransform.GetOrientation() * (halfDimensions * Vector3(
-			i & 1 ? 1 : -1,
-			i & 2 ? 1 : -1,
-			i & 4 ? 1 : -1
-			));
-	}
-}
-
 bool CollisionDetection::OBBIntersection(
 	const OBBVolume& volumeA, const Transform& worldTransformA,
 	const OBBVolume& volumeB, const Transform& worldTransformB,
@@ -296,8 +316,8 @@ bool CollisionDetection::OBBIntersection(
 
 	// Get all vertices
 	Vector3 aVertices[8], bVertices[8];
-	GetAllOBBVertices(aVertices, worldTransformA, volumeA.GetHalfDimensions());
-	GetAllOBBVertices(bVertices, worldTransformB, volumeB.GetHalfDimensions());
+	Util::GetAllOBBVertices(aVertices, worldTransformA, volumeA.GetHalfDimensions());
+	Util::GetAllOBBVertices(bVertices, worldTransformB, volumeB.GetHalfDimensions());
 
 	// Translate vertices to be local to the opposite shape
 	for (int i = 0; i < 8; i++) {
@@ -311,11 +331,11 @@ bool CollisionDetection::OBBIntersection(
 	auto minB = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
 	auto maxB = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 	for (int i = 0; i < 8; i++) { // For each vertex in vertex arrays
-		for (int j = 0; j < 3; j++) { // For each axis
-			if (aVertices[i][j] < minA[j]) minA[j] = aVertices[i][j];
-			if (aVertices[i][j] > maxA[j]) maxA[j] = aVertices[i][j];
-			if (bVertices[i][j] < minB[j]) minB[j] = bVertices[i][j];
-			if (bVertices[i][j] > maxB[j]) maxB[j] = bVertices[i][j];
+		for (Axis a = x; a <= z; a++) { // For each axis
+			if (aVertices[i][a] < minA[a]) minA[a] = aVertices[i][a];
+			if (aVertices[i][a] > maxA[a]) maxA[a] = aVertices[i][a];
+			if (bVertices[i][a] < minB[a]) minB[a] = bVertices[i][a];
+			if (bVertices[i][a] > maxB[a]) maxB[a] = bVertices[i][a];
 		}
 	}
 
@@ -324,19 +344,19 @@ bool CollisionDetection::OBBIntersection(
 	Vector3 bHalfDimensions = volumeB.GetHalfDimensions();
 	float minPenetration = FLT_MAX;
 	int axis = 0;
-	for (int i = 0; i < 3; i++) { // For each axis
-		if (minA[i] > bHalfDimensions[i] || maxA[i] < -bHalfDimensions[i]) return false;
-		float hold = std::min(bHalfDimensions[i] - minA[i], maxA[i] + bHalfDimensions[i]);
+	for (Axis a = x; a <= z; a++) { // For each axis
+		if (minA[a] > bHalfDimensions[a] || maxA[a] < -bHalfDimensions[a]) return false;
+		float hold = std::min(bHalfDimensions[a] - minA[a], maxA[a] + bHalfDimensions[a]);
 		if (hold < minPenetration) {
 			minPenetration = hold;
-			axis = i;
+			axis = a;
 		}
 
-		if (minB[i] > aHalfDimensions[i] || maxB[i] < -aHalfDimensions[i]) return false;
-		hold = std::min(aHalfDimensions[i] - minB[i], maxB[i] + aHalfDimensions[i]);
+		if (minB[a] > aHalfDimensions[a] || maxB[a] < -aHalfDimensions[a]) return false;
+		hold = std::min(aHalfDimensions[a] - minB[a], maxB[a] + aHalfDimensions[a]);
 		if (hold < minPenetration) {
 			minPenetration = hold;
-			axis = -i;
+			axis = -a;
 		}
 	}
 

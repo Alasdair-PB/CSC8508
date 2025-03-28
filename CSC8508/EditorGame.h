@@ -19,7 +19,7 @@
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
 #include "EditorCore/Inspector.h"
-
+#include "EditorCore/EditorCamera.h"
 
 using std::vector;
 
@@ -45,8 +45,15 @@ namespace NCL {
 			bool LoadGameObjectAsPrefab(std::string assetPath);
 			bool LoadScene(std::string assetPath);
 			bool SaveScene(std::string assetPath);
+			void DeleteSelectionObject();
+			ComponentAssemblyDefiner* GetDefiner();
+
+			static EditorGame* GetInstance() {
+				return instance;
+			}
 
 		protected:
+			inline static EditorGame* instance = nullptr;
 			void InitialiseAssets();
 			void InitWorld();
 			void InitialiseGame();
@@ -64,10 +71,8 @@ namespace NCL {
 			GameObject* CreateChildInstance(Vector3 offset, bool isStatic);
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool addToWorld = true);
-			GameObject* AddRoleTToWorld(const Vector3& position, float inverseMass = 10.0f); // Anim
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			GameObject* AddNavMeshToWorld(std::string navMeshFilePath, std::string meshId, const Vector3& position, Vector3 dimensions);
-			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			void SaveUnityNavMeshPrefab(std::string assetPath, std::string navMeshObPath, std::string navMeshNavPath);
 
 			void  CalculateCubeTransformations(const std::vector<Vector3>& vertices, Vector3& position, Vector3& scale, Quaternion& rotation);
@@ -84,8 +89,9 @@ namespace NCL {
 			GameWorld* world;
 			Controller* controller;
 			Inspector* inspectorBar;
-
+			EditorCamera* editorCamera;
 			bool inSelectionMode;
+
 
 			BoundsComponent* selectionObject = nullptr;
 			NavigationPath outPath;
@@ -100,13 +106,6 @@ namespace NCL {
 
 			GameObject* objClosest = nullptr;
 			UI::UISystem* uiSystem;
-
-			UI::FramerateUI* framerate = new UI::FramerateUI;
-			UI::MainMenuUI* mainMenuUI = new UI::MainMenuUI;
-			UI::AudioSliders* audioSliders = new UI::AudioSliders;
-			UI::Healthbar* healthbar = new UI::Healthbar;
-
-			float framerateDelay = 0;
 		};
 	}
 }

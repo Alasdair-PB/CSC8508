@@ -94,6 +94,7 @@ set(Physics
     "PhysicsObject.h"
     "PhysicsSystem.cpp"
     "PhysicsSystem.h"
+	"Util.cpp"
 )
 source_group("Physics" FILES ${Physics})
 

@@ -10,6 +10,7 @@
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
 #include "MeshAnimation.h"
+#include "Map/DungeonComponent.h"
 #include "TransformNetworkComponent.h"
 #include "FullTransformNetworkComponent.h"
 #include "SightComponent.h"
@@ -37,7 +38,7 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 	myObjectToLoad->AddComponent<ItemComponent>(10);
 	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	if (spawnData)
-	{	
+	{
 		int pFabId = spawnData->pfab;
 		int componentIdCount = 0;
 		FullTransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<FullTransformNetworkComponent>(
@@ -132,13 +133,13 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
 
 	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
-	
+
 	AnimState* walk = new AnimState(new Rendering::MeshAnimation("Walk.anm"));
 	AnimState* stance = new AnimState(new Rendering::MeshAnimation("Stance.anm"));
 	AnimState* onjump = new AnimState(new Rendering::MeshAnimation("OnJump.anm"), false);
 	AnimState* jumping = new AnimState(new Rendering::MeshAnimation("Jumping.anm"));
 	AnimState* jumpland = new AnimState(new Rendering::MeshAnimation("JumpLand.anm"), false);
-		
+
 	animator->AddState(walk);
 	animator->AddState(onjump);
 	animator->AddState(jumping);
@@ -190,9 +191,10 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
-		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::POLLO));
-		sourceComp->RandomSound();
-		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+
+		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::PLAYER));
+		sourceComp->PlaySound("join");
+
 		DamageableNetworkComponent* dc = player->AddComponent<DamageableNetworkComponent>(100, 100, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
@@ -219,4 +221,15 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	world->AddGameObject(player);
 
 	return player;
+}
+
+GameObject* TutorialGame::AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int const roomCount) {
+	auto* dungeon = new GameObject();
+	dungeon->GetTransform() = transform;
+
+	auto const* dc = dungeon->AddComponent<DungeonComponent>(entryPosition);
+	dc->Generate(roomCount);
+
+	world->AddGameObject(dungeon);
+	return dungeon;
 }

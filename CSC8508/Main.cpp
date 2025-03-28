@@ -13,6 +13,9 @@
 #include <functional>
 #include <cstdlib>
 
+#include "Assets.h"
+#include "Map/RoomPrefab.h"
+
 #ifdef USE_PS5
 #include "./PS5/GameTechAGCRenderer.h"
 #include "PS5Window.h"
@@ -85,6 +88,7 @@ int main(int argc, char** argv)
 #else 
 	NetworkedGame* g = new NetworkedGame();
 #endif
+
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{

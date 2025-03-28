@@ -7,8 +7,13 @@
 
 #include "Transform.h"
 #include "GameObject.h"
+#include "UIElementsGroup.h"
 #include <unordered_set>
 #include <tuple>
+
+using namespace NCL;
+using namespace CSC8508;
+using namespace UI;
 
 namespace NCL::CSC8508 
 {
@@ -54,7 +59,7 @@ namespace NCL::CSC8508
 		* Function gets the GameObject this component is attatched to.
 		* @return the GameObject this component is attatched to.
 		*/
-		GameObject& GetGameObject();
+		GameObject& GetGameObject() const;
 
 		/**
 		* Function Gets the enabled state of the component.
@@ -107,6 +112,7 @@ namespace NCL::CSC8508
 		bool IsDerived(const std::type_info& typeInfo) const {
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
+
 		/// <summary>
 		/// Loads the IComponent save data into this IComponent
 		/// </summary>
@@ -122,6 +128,8 @@ namespace NCL::CSC8508
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
 
 		virtual void CopyComponent(GameObject* gameObject);
+
+		virtual void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale);
 
 	protected:
 		virtual void OnAwake() {}

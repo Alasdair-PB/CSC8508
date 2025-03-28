@@ -52,7 +52,12 @@ set(Collision_Detection
     "CapsuleVolume.cpp"
     "CollisionDetection.h"
     "CollisionDetection.cpp"
-	"CollisionEvent.h"
+    "CollisionEvent.h"
+	"KDTree/KDTree.h"
+	"KDTree/KDTreeBranch.h"
+	"KDTree/KDTreeEntry.h"
+	"KDTree/KDTreeLeaf.h"
+	"KDTree/KDTreeNode.h"
     "OBBVolume.h"
     "QuadTree.h"
     "QuadTree.cpp"
@@ -208,27 +213,27 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     <sstream>
 	<iostream>
 	<iosfwd>
-	
+
     <memory>
 	<string>
 	<thread>
     <filesystem>
     <functional>
-	<assert.h>  
-	<chrono>	
-  
+	<assert.h>
+	<chrono>
+
     <unordered_set>
 	<set>
     <vector>
 	<stack>
 	<unordered_map>
-    <map> 
+    <map>
 	<list>
 	<thread>
     <atomic>
 	<functional>
-	<stack> 
-	
+	<stack>
+
     "../NCLCoreClasses/Vector.h"
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"
@@ -252,7 +257,7 @@ set(ADDITIONAL_LIBRARY_DEPENDENCIES
 )
 add_subdirectory(enet)
 
-target_include_directories (${PROJECT_NAME} 
+target_include_directories (${PROJECT_NAME}
     PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
 	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
 	)
@@ -260,7 +265,7 @@ target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC UISystem
 	PUBLIC ImGui
-	) 
+	)
 include_directories("../NCLCoreClasses/")
 include_directories("./")
 include_directories("../Event/")

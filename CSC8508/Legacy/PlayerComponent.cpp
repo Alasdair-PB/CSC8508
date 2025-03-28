@@ -31,6 +31,14 @@ void PlayerComponent::SetBindingDash(uint32_t d, StaminaComponent* component) {
     if (component) component->SetStaminaAction(d, dashTickStam);
 }
 
+void PlayerComponent::SetBindingPause(uint32_t p) {
+	onPauseBinding = p;
+}
+
+void PlayerComponent::SetBindingDebug(uint32_t d) {
+	onDebugBinding = d;
+}
+
 void PlayerComponent::SetBindingInteract(uint32_t p) {
     onItemInteractBinding = p;
 }
@@ -118,6 +126,16 @@ void PlayerComponent::OnJump(float deltaTime) {
         
         if (isGrounded) { isJumping = false; }
     }
+}
+
+void PlayerComponent::OnPauseInput() {
+		PauseEvent* e = new PauseEvent();
+		EventManager::Call<PauseEvent>(e);
+}
+
+void PlayerComponent::OnDebugInput() {
+	DebugEvent* e = new DebugEvent();
+	EventManager::Call<DebugEvent>(e);
 }
 
 bool PlayerComponent::DropItemToFloor() {
@@ -222,6 +240,12 @@ void PlayerComponent::CheckInputStack() {
             OnJumpInput();
         else if (inputStack.top() == onItemInteractBinding)
             OnItemInteract();
+        else if (inputStack.top() == onPauseBinding) {
+            OnPauseInput();
+        }
+		else if (inputStack.top() == onDebugBinding) {
+			OnDebugInput();
+		}
         inputStack.pop();
     }
 }

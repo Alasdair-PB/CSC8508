@@ -103,7 +103,6 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
 	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
 	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
-	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24, 20);
 
 	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
 	
@@ -164,9 +163,10 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 			world->GetMainCamera(), spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		AudioSourceComponent* sourceComp = player->AddComponent<AudioSourceComponent>();
-		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::POLLO));
-		sourceComp->RandomSound();
-		//sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::ENVIRONMENT));
+
+		sourceComp->setSoundCollection(*AudioEngine::Instance().GetSoundGroup(EntitySoundGroup::PLAYER));
+		sourceComp->PlaySound("join");
+
 		DamageableNetworkComponent* dc = player->AddComponent<DamageableNetworkComponent>(100, 100, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 

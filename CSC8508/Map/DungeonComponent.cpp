@@ -71,3 +71,11 @@ std::vector<RoomComponent*> DungeonComponent::GetRooms() const {
     return out;
 }
 
+void DungeonComponent::GetAllItemSpawnLocations(std::vector<Vector3>& locations) const {
+    for (GameObject const* r : GetGameObject().GetChildren()) {
+        RoomComponent const* roomComponent = r->TryGetComponent<RoomComponent>();
+        if (!roomComponent) continue;
+        for (RoomPrefab prefab = roomComponent->GetPrefab(); Vector3 loc : prefab.GetItemSpawnLocations())
+            locations.push_back(loc);
+    }
+}

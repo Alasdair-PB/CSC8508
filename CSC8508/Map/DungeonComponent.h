@@ -28,6 +28,8 @@ public:
      */
     void Generate(int roomCount) const;
 
+    void GetAllItemSpawnLocations(std::vector<Vector3>& locations) const;
+
     [[nodiscard]] unsigned int GetSeed() const { return seed; }
     [[nodiscard]] std::vector<RoomComponent*> GetRooms() const;
 

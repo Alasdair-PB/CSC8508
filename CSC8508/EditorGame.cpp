@@ -58,14 +58,14 @@ void EditorGame::TestSaveByType() {
 }
 
 GameObject* EditorGame::CreateChildInstance(Vector3 offset, bool isStatic) {
-	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, isStatic ? 0 : 10, false);
+	GameObject* myObjectToSave = AddSphereToWorld(offset, 1, isStatic ? 0 : 10);
 	return myObjectToSave;
 }
 
 void EditorGame::TestSaveGameObject(std::string assetPath) {
 
 	Vector3 position = Vector3(90 + 10, 22, -50);
-	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, 10.0f, false);
+	GameObject* myObjectToSaveA = AddSphereToWorld(position, 1, 10.0f);
 	GameObject* child = CreateChildInstance(Vector3(5, 0, 0), false);
 	child->AddChild(CreateChildInstance(Vector3(5, 0, 0), true));
 

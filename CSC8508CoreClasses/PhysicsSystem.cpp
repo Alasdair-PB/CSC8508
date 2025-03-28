@@ -251,8 +251,9 @@ void PhysicsSystem::ImpulseResolveCollision(BoundsComponent& a, BoundsComponent&
 
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
-	QuadTree<BoundsComponent*> tree(Vector2(1024, 1024), 7, 6);
-	auto kdTree = KDTree<BoundsComponent>();
+	QuadTree<BoundsComponent*> dynTree(Vector2(1024, 1024), 7, 6);
+	QuadTree<BoundsComponent*> staticTree(Vector2(1024, 1024), 7, 6);
+	//auto staticTree = KDTree<BoundsComponent>();
 
 	std::vector<BoundsComponent*>::const_iterator first;
 	std::vector<BoundsComponent*>::const_iterator last;
@@ -265,34 +266,48 @@ void PhysicsSystem::BroadPhase() {
 			continue;
 		}
 		Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
-		if ((*i)->GetGameObject().IsStatic()) {
-			std::cout << "Insert into tree!\n";
-			kdTree.Insert(KDTreeEntry((*i), pos, halfSizes));
-		}
-		else tree.Insert(*i, pos, halfSizes);
+		if ((*i)->GetGameObject().IsStatic()) staticTree.Insert(*i, pos, halfSizes);
+		else dynTree.Insert(*i, pos, halfSizes);
 	}
 
-	// Check for static collisions
-	for (auto i = first; i != last; ++i) {
-		if ((*i)->GetGameObject().IsStatic()) return;
-
-		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
-			continue;
-		}
-		Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
-		auto query = KDTreeQuery(pos, halfSizes);
-		//auto out = kdTree.Get(query);
-		for (KDTreeEntry<BoundsComponent> e : kdTree.Get(query)) {
-			CollisionDetection::CollisionInfo info;
-			info.a = std::min(*i, e.value);
-			info.b = std::max(*i, e.value);
-			broadphaseCollisions.insert(info);
-		}
-	}
+	// // Check for static collisions
+	// for (auto i = first; i != last; ++i) {
+	// 	if ((*i)->GetGameObject().IsStatic()) return;
+	//
+	// 	Vector3 halfSizes;
+	// 	if (!(*i)->GetBroadphaseAABB(halfSizes) || !(*i)->IsEnabled()) {
+	// 		continue;
+	// 	}
+	// 	Vector3 pos = (*i)->GetGameObject().GetTransform().GetPosition();
+	// 	auto query = KDTreeQuery(pos, halfSizes);
+	// 	//auto out = kdTree.Get(query);
+	// 	for (KDTreeEntry<BoundsComponent> e : staticTree.Get(query)) {
+	// 		CollisionDetection::CollisionInfo info;
+	// 		info.a = std::min(*i, e.value);
+	// 		info.b = std::max(*i, e.value);
+	// 		broadphaseCollisions.insert(info);
+	// 	}
+	// }
 
 	// Check non-static
-	tree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& data) 
+	staticTree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& staticData)
+	{
+		dynTree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& dynData) {
+			for (auto i = staticData.begin(); i != staticData.end(); ++i)
+		{
+			for (auto j = dynData.begin(); j != dynData.end(); ++j)
+			{
+				CollisionDetection::CollisionInfo info;
+				info.a = std::min((*i).object, (*j).object);
+				info.b = std::max((*i).object, (*j).object);
+				broadphaseCollisions.insert(info);
+			}
+		}
+		});
+	});
+
+	// Check non-static
+	dynTree.OperateOnContents([&](std::list<QuadTreeEntry<BoundsComponent*>>& data)
 	{
 
 		CollisionDetection::CollisionInfo info;
@@ -321,7 +336,6 @@ void PhysicsSystem::NarrowPhase() {
 			allCollisions.insert(info); // insert into our main set
 		}
 	}
-	std::cout << "Number of collisions tested: " << collisionTestCount << '\n';
 }
 
 void PhysicsSystem::IntegrateAccel(float dt)

@@ -59,7 +59,7 @@ namespace NCL::CSC8508
 		* Function gets the GameObject this component is attatched to.
 		* @return the GameObject this component is attatched to.
 		*/
-		GameObject& GetGameObject();
+		GameObject& GetGameObject() const;
 
 		/**
 		* Function Gets the enabled state of the component.
@@ -112,6 +112,7 @@ namespace NCL::CSC8508
 		bool IsDerived(const std::type_info& typeInfo) const {
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
+
 		/// <summary>
 		/// Loads the IComponent save data into this IComponent
 		/// </summary>

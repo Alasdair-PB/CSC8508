@@ -68,6 +68,11 @@ namespace NCL::Maths {
         T& operator[](int i) {
             return ((T*)this)[i];
         }
+
+        [[nodiscard]] bool IsEmpty() const {
+            for (T i : array) if (i != T()) return false;
+            return true;
+        }
     };
 
     template <typename T>
@@ -98,6 +103,11 @@ namespace NCL::Maths {
         }
         T& operator[](int i) {
             return ((T*)this)[i];
+        }
+
+        [[nodiscard]] bool IsEmpty() const {
+            for (T i : array) if (i != T()) return false;
+            return true;
         }
     };
 
@@ -130,6 +140,11 @@ namespace NCL::Maths {
         }
         T& operator[](int i) {
             return ((T*)this)[i];
+        }
+
+        [[nodiscard]] bool IsEmpty() const {
+            for (T i : array) if (i != T()) return false;
+            return true;
         }
     };
 

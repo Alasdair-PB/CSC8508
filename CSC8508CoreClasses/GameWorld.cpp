@@ -151,6 +151,7 @@ void GameWorld::GetPhysicsIterators(
 	last = physicsComponents.end();
 }
 
+
 void GameWorld::GetBoundsIterators(
 	BoundsIterator& first,
 	BoundsIterator& last) const {

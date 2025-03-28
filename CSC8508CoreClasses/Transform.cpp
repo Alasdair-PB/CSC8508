@@ -16,16 +16,7 @@ void Transform::SetParent(Transform* parentTransform) {
 }
 
 void Transform::UpdateMatrix() {
-	matrix =
-		Matrix::Translation(position) *
-		Quaternion::RotationMatrix<Matrix4>(orientation) *
-		Matrix::Scale(scale);
-	if (parentTransform != nullptr) {
-		matrix =
-			Matrix::Translation(parentTransform->GetPosition() + position) *
-			Quaternion::RotationMatrix<Matrix4>(parentTransform->GetOrientation() * orientation) *
-			Matrix::Scale(parentTransform->GetScale() * scale);
-	}
+	matrix = Matrix::Translation(GetPosition()) * Quaternion::RotationMatrix<Matrix4>(GetOrientation()) * Matrix::Scale(GetScale());
 }
 
 Transform& Transform::SetPosition(const Vector3& worldPos) {
@@ -47,7 +38,9 @@ Transform& Transform::SetOrientation(const Quaternion& worldOrientation) {
 }
 
 Vector3 Transform::GetPosition() const {
-	return parentTransform == nullptr ? position : position + parentTransform->GetPosition();
+	//return parentTransform == nullptr ? position : CalculateParentOffset();
+	//return parentTransform == nullptr ? position : position + parentTransform->GetPosition();
+	return parentTransform == nullptr ? position : parentTransform->GetOrientation() * (parentTransform->GetScale() * position)  + parentTransform->GetPosition();
 }
 
 Vector3 Transform::GetScale() const {
@@ -59,8 +52,11 @@ Quaternion Transform::GetOrientation() const {
 }
 
 Matrix4 Transform::GetMatrix() const {
-	return parentTransform == nullptr ? matrix : Matrix::Translation(parentTransform->GetPosition() + position) *
-		Quaternion::RotationMatrix<Matrix4>(parentTransform->GetOrientation() * orientation) *
-		Matrix::Scale(parentTransform->GetScale() * scale);
+	return Matrix::Translation(GetPosition()) * Quaternion::RotationMatrix<Matrix4>(GetOrientation()) * Matrix::Scale(GetScale());
+	//return parentTransform == nullptr ? matrix : Matrix::Translation(parentTransform->GetPosition() + position) *
+	//	Quaternion::RotationMatrix<Matrix4>(parentTransform->GetOrientation() * orientation) *
+	//	Matrix::Scale(parentTransform->GetScale() * scale);
+	//return Matrix::Translation(GetPosition()) * Quaternion::RotationMatrix<Matrix4>(GetOrientation()) * Matrix::Scale(GetScale());
+	//return Matrix::Scale(GetScale()) * Quaternion::RotationMatrix<Matrix4>(GetOrientation()) * Matrix::Translation(GetPosition());
 }
 

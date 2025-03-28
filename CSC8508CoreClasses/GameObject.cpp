@@ -72,6 +72,7 @@ struct GameObject::GameObjDataStruct : public ISerializedData {
 	}
 };
 
+
 void GameObject::LoadClean(GameObjDataStruct& loadedSaveData, std::string assetPath) {
 	for (int i = 0; i < loadedSaveData.componentPointers.size(); i++) {
 		AddComponentEvent e = AddComponentEvent(*this, loadedSaveData.componentPointers[i].second);

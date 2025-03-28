@@ -5,6 +5,8 @@ Use as you see fit!
 
 Comments and queries to: richard-gordon.davison AT ncl.ac.uk
 https://research.ncl.ac.uk/game/
+
+Additional contributions: Alfie
 */
 #include "Quaternion.h"
 #include "Maths.h"
@@ -217,6 +219,41 @@ Quaternion Quaternion::AxisAngleToQuaterion(const Vector3& vector, float degrees
 	float result	= (float)sin(theta / 2.0f);
 
 	return Quaternion((float)(vector.x * result), (float)(vector.y * result), (float)(vector.z * result), (float)cos(theta / 2.0f));
+}
+
+
+Quaternion Quaternion::VectorsToQuaternion(Vector3 const& fromVector, Vector3 const& toVector) {
+
+	// 1: Normalise the input vectors:
+	Vector3 const from = Vector::Normalise(fromVector);
+	Vector3 const to = Vector::Normalise(toVector);
+
+	// 2: Find axis of rotation
+	Vector3 axis = Vector::Cross(from, to);
+
+	// 3: Find the angle of rotation
+	float const dot = Vector::Dot(from, to);
+
+	// If the orientation is exactly 180 degrees, Quaternions don't work properly so the maths has to be doctored accordingly:
+	if (fabs(dot + 1.0f) < FLT_EPSILON) {
+		// Get an arbitrary axis to re-orientate around that's not parallel
+		axis = Vector::Cross(from, Vector3(0.0f, 1.0f, 0.0f));
+		//if (Vector::Length(axis) == 0.0f) axis = Vector::Cross(from, Vector3(0.0f, 1.0f, 0.0f));
+		axis = Vector::Normalise(axis);
+		return { axis.x, axis.y, axis.z, 0.0f };
+	}
+
+	// If orientation is not 180 degrees, get angle of rotation
+	float const angle = std::acos(dot); // in radians
+
+	// 4: Calculate and return the quaternion
+	float const result	= sin(angle / 2.0f);
+	return {
+		axis.x * result,
+		axis.y * result,
+		axis.z * result,
+		cos(angle / 2.0f)
+	};
 }
 
 

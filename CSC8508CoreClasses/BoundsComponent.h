@@ -20,18 +20,19 @@ namespace NCL::CSC8508
 	public:
 
 		BoundsComponent(GameObject& gameObject, CollisionVolume* collisionVolume, PhysicsComponent* physicsComponent = nullptr);
-		~BoundsComponent();
+
+		~BoundsComponent() override;
 
 		static const char* Name() { return "Bounds"; }
 		const char* GetName() const override { return Name(); }
 
 		void SetBoundingVolume(CollisionVolume* vol) { boundingVolume = vol;}
 
-		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}		
+		const CollisionVolume* GetBoundingVolume() const { return boundingVolume;}
 		void LoadVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize, CollisionVolume* volume);
 		const PhysicsComponent* GetPhysicsComponent() const { return physicsComponent;}
 
-		bool GetBroadphaseAABB(Vector3& outsize) const;
+		bool GetBroadphaseAABB(Vector3& outsize);
 		void UpdateBroadphaseAABB();
 		void SetPhysicsComponent(PhysicsComponent* physicsComponent) { this->physicsComponent = physicsComponent; }
 
@@ -59,14 +60,14 @@ namespace NCL::CSC8508
 		/// </summary>
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
-		virtual void Load(std::string assetPath, size_t allocationStart) override;
+		void Load(std::string assetPath, size_t allocationStart) override;
 #
 		/// <summary>
-		/// Saves the PhysicsComponent data into the assetPath file. 
+		/// Saves the PhysicsComponent data into the assetPath file.
 		/// </summary>
 		/// <param name="assetPath">The loaded PhysicsComponent save data </param>
 		/// <param name="allocationStart">The location this PhysicsComponent is saved in the asset file </param>
-		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
+		size_t Save(std::string assetPath, size_t* allocationStart) override;
 		CollisionVolume* CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		auto GetDerivedSerializedFields() const;
 

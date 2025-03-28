@@ -16,6 +16,7 @@
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
+#include "Map/DoorLocation.h"
 
 #if EOSBUILD
 #include "MainMenuUI.h"
@@ -57,12 +58,14 @@ namespace NCL {
 			void LoadWorld(std::string assetPath);
 			void UpdateUI();
 			std::string GetAssetPath(std::string pfabName);
-
+			void LoadDungeon(Vector3 offset);
 			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag);
+			GameObject* AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int roomCount);
+
 			MainMenu* GetMainMenu() { return mainMenu; }
 			ComponentAssemblyDefiner* componentAssembly;
 
@@ -85,7 +88,7 @@ namespace NCL {
 			MainMenu* mainMenu = nullptr;
 			BoundsComponent* lockedObject	= nullptr;
 			Vector3 lockedOffset = Vector3(0, 14, 20);
-			
+
 
 
 			void LockCameraToObject(BoundsComponent* o) {

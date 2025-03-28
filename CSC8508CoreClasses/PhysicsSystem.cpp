@@ -121,17 +121,13 @@ void PhysicsSystem::Update(float dt) {
 
 void PhysicsSystem::UpdateCollisionList() {
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
-		if ((*i).framesLeft == numCollisionFrames) {
-			i->a->GetGameObject().OnCollisionBegin(i->b);
-			i->b->GetGameObject().OnCollisionBegin(i->a);
-		}
+		//auto e = CollisionEvent(i->a->GetGameObject(), i->b->GetGameObject(), *i);
+		//EventManager::Call(&e); // TODO: I believe this is handled in the collision resolution bit, need to double check
 
 		CollisionDetection::CollisionInfo& in = const_cast<CollisionDetection::CollisionInfo&>(*i);
 		in.framesLeft--;
 
 		if ((*i).framesLeft < 0) {
-			i->a->GetGameObject().OnCollisionEnd(i->b);
-			i->b->GetGameObject().OnCollisionEnd(i->a);
 			i = allCollisions.erase(i);
 		}
 		else {

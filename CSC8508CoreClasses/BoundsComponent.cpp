@@ -3,6 +3,8 @@
 //
 
 #include "BoundsComponent.h"
+
+#include "Axis.h"
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -26,12 +28,35 @@ BoundsComponent::~BoundsComponent() {
 #endif
 }
 
-bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) const {
+bool BoundsComponent::GetBroadphaseAABB(Vector3& outSize) {
 	if (!boundingVolume) {
 		return false;
 	}
+	if (broadphaseAABB.IsEmpty()) UpdateBroadphaseAABB();
 	outSize = broadphaseAABB;
 	return true;
+}
+
+Vector3 GetOBBBroadphaseAABB(Quaternion const& orientation, Vector3 const& halfDimensions) {
+	auto max = Vector3();
+
+	// Get all world-orientated vertices (not repositioned)
+	Vector3 array[8];
+	for (int i = 0; i < 8; i++) {
+		array[i] = orientation * (halfDimensions * Vector3(
+			i & 1 ? 1 : -1,
+			i & 2 ? 1 : -1,
+			i & 4 ? 1 : -1
+			));
+	}
+
+	// Check for max bounds
+	for (Vector3 c : array) {
+		for (Axis a = x; a <= z; a++) {
+			if (fabs(c[a]) > max[a]) max[a] = c[a];
+		}
+	}
+	return max;
 }
 
 void BoundsComponent::UpdateBroadphaseAABB() {
@@ -45,11 +70,13 @@ void BoundsComponent::UpdateBroadphaseAABB() {
 		float r = ((SphereVolume&)*boundingVolume).GetRadius();
 		broadphaseAABB = Vector3(r, r, r);
 	}
+	else if (static_cast<int>(boundingVolume->type) & static_cast<int>(VolumeType::Capsule)) {
+		auto const vol = dynamic_cast<CapsuleVolume&>(*boundingVolume);
+		float const r = vol.GetRadius();
+		broadphaseAABB = Vector3(r, r + vol.GetHalfHeight(), r);
+	}
 	else if (static_cast<int>(boundingVolume->type) == static_cast<int>(VolumeType::OBB)) {
-		/*Matrix3 mat = Quaternion::RotationMatrix<Matrix3>(transform.GetOrientation());
-		mat = Matrix::Absolute(mat);
-		Vector3 halfSizes = ((OBBVolume&)*boundingVolume).GetHalfDimensions();
-		broadphaseAABB = mat * halfSizes;*/
+		broadphaseAABB = GetOBBBroadphaseAABB(GetGameObject().GetTransform().GetOrientation(), ((OBBVolume&)*boundingVolume).GetHalfDimensions());
 	}
 }
 
@@ -77,7 +104,7 @@ struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 void BoundsComponent::CopyComponent(GameObject* gameObject) {
 	BoundsComponent* component = gameObject->AddComponent<BoundsComponent>(nullptr, nullptr);
 	component->SetEnabled(IsEnabled());
-	CollisionVolume* volume; 
+	CollisionVolume* volume;
 	if (boundingVolume) {
 		volume = CopyVolume(boundingVolume->isTrigger, boundingVolume->type, GetBoundsScale());
 		if (volume) component->SetBoundingVolume(volume);
@@ -121,7 +148,7 @@ Vector3 BoundsComponent::GetBoundsScale() {
 }
 
 NCL::CollisionVolume* BoundsComponent::CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize) {
-	
+
 	NCL::CollisionVolume* volume = nullptr;
 	switch (volumeType) {
 	case VolumeType::AABB: {

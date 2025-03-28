@@ -21,11 +21,10 @@ namespace NCL {
                 void OnEvent(AddComponentEvent* e) override {
                     AddComponent(e->GetEntry(), e->GetGameObject());
                 }
-                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable };   
+                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable, RoomPrefab };
                 bool AddComponentFromEnum(ComponentMapId mapId, GameObject& object);
 
             protected:
-                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable, RoomPrefab };
 
                 std::unordered_map<size_t, ComponentMapId> componentMap;
                 bool AddComponent(size_t t, GameObject& object);

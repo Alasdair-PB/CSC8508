@@ -237,8 +237,8 @@ Quaternion Quaternion::VectorsToQuaternion(Vector3 const& fromVector, Vector3 co
 	// If the orientation is exactly 180 degrees, Quaternions don't work properly so the maths has to be doctored accordingly:
 	if (fabs(dot + 1.0f) < FLT_EPSILON) {
 		// Get an arbitrary axis to re-orientate around that's not parallel
-		axis = Vector::Cross(from, Vector3(1.0f, 0.0f, 0.0f));
-		if (Vector::Length(axis) == 0.0f) axis = Vector::Cross(from, Vector3(0.0f, 1.0f, 0.0f));
+		axis = Vector::Cross(from, Vector3(0.0f, 1.0f, 0.0f));
+		//if (Vector::Length(axis) == 0.0f) axis = Vector::Cross(from, Vector3(0.0f, 1.0f, 0.0f));
 		axis = Vector::Normalise(axis);
 		return { axis.x, axis.y, axis.z, 0.0f };
 	}

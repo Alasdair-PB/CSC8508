@@ -185,6 +185,7 @@ void EditorGame::SaveWorld(std::string assetPath) {
 
 void EditorGame::DeleteSelectionObject() {
 	selectionObject = nullptr;
+	physics->Clear();
 }
 
 const bool load = true;

@@ -34,10 +34,10 @@ namespace NCL {
 
 			void PushStatelessButtonElement(ImVec2 size, std::string name, std::function<void()> func);
 			void PushToggle(std::string name, bool* toggle, float scale);
-			void PushVectorElement(Vector3* value, float scale);
+			void PushVectorElement(Vector3* value, float scale, std::string name);
 			void PushFloatElement(float* value, float scale, std::string name);
 			void PushEnumElement(std::string name, std::set<std::pair<int*, std::string>> pair);
-			void PushQuaternionElement(Vector4* value, float scale);
+			void PushQuaternionElement(Vector4* value, float scale, std::string name);
 
 			void PushTextElement(std::string* text);
 			void PushStaticTextElement(std::string text);

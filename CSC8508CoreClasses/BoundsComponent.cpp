@@ -245,11 +245,11 @@ void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsG
 		switch (expectingVolumeType) {
 
 		case VolumeType::AABB: {
-			elementsGroup.PushVectorElement(expectingBoundsSize, scale);
+			elementsGroup.PushVectorElement(expectingBoundsSize, scale, "Dimensions");
 			break;
 		}
 		case VolumeType::OBB: {
-			elementsGroup.PushVectorElement(expectingBoundsSize, scale);
+			elementsGroup.PushVectorElement(expectingBoundsSize, scale, "Dimensions");
 			break;
 		}
 		case VolumeType::Sphere: {

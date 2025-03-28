@@ -29,14 +29,42 @@ Inspector::Inspector() : positionInfo(new Vector3()),
 	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab", 
 		[this]() { if (focus) focus->Save(GetAssetPath(*saveDestination));});
 
+	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load PFab",
+		[this]() { 
+			GameObject* loaded = new GameObject();
+			loaded->Load(GetAssetPath(*saveDestination));
+			GameWorld::Instance().AddGameObject(loaded);
+		});
+
+	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
+		[this]() {
+			if (!focus) return;
+			GameObject* loaded = new GameObject();
+			loaded->Load(GetAssetPath(*saveDestination));
+			focus->AddChild(loaded);
+			GameWorld::Instance().RemoveGameObject(focus);
+			GameWorld::Instance().AddGameObject(focus);
+		});
+
+	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
+		[this]() {
+			GameWorld::Instance().Load(GetAssetPath(*saveDestination));
+		});
+
+	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
+		[this]() {
+			GameWorld::Instance().Save(GetAssetPath(*saveDestination));
+		});
+
 	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Clear World",
 		[this]() { 
 			clearWorld = true;
 		});
 
-	inspectorBar->PushVectorElement(positionInfo, 0.05f);
-	inspectorBar->PushVectorElement(scaleInfo, 0.05f);
-	inspectorBar->PushQuaternionElement(orientationInfo, 0.05f);
+
+	inspectorBar->PushVectorElement(positionInfo, 0.05f, "Position:");
+	inspectorBar->PushVectorElement(scaleInfo, 0.05f, "Scale");
+	inspectorBar->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
 }
 
 void Inspector::ClearGameWorld() {
@@ -57,12 +85,12 @@ Inspector::~Inspector() {
 const static std::string folderPath = ASSETROOTLOCATION;
 
 std::string Inspector::GetAssetPath(std::string pfabName) {
-	return folderPath + pfabName;
+	return folderPath + "/Pfabs/" + pfabName;
 }
 
 void Inspector::RenderIComponents() {
 	if (!focus) return;
-	inspectorBar->RemoveElementsFromIndex(6);
+	inspectorBar->RemoveElementsFromIndex(10);
 
 	for (IComponent* component : focus->GetAllComponents()) {
 		component->PushIComponentElementsInspector(*inspectorBar, 0.05f);

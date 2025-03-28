@@ -88,8 +88,8 @@ void UIElementsGroup::PushSliderElement(std::string name, float& val, float valM
 	elements.push_back(sliderElem);
 }
 
-void UIElementsGroup::PushVectorElement(Vector3* value, float scale) {
-	VectorElement* vectorElem = new VectorElement(value, scale * winWidth);
+void UIElementsGroup::PushVectorElement(Vector3* value, float scale, std::string name) {
+	VectorElement* vectorElem = new VectorElement(value, scale * winWidth, name);
 	elements.push_back(vectorElem);
 }
 
@@ -98,8 +98,8 @@ void UIElementsGroup::PushFloatElement(float* value, float scale, std::string na
 	elements.push_back(floatElem);
 }
 
-void UIElementsGroup::PushQuaternionElement(Vector4* value, float scale) {
-	QuaternionElement* quatElem = new QuaternionElement(value, scale * winWidth);
+void UIElementsGroup::PushQuaternionElement(Vector4* value, float scale, std::string name) {
+	QuaternionElement* quatElem = new QuaternionElement(value, scale * winWidth, name);
 	elements.push_back(quatElem);
 }
 

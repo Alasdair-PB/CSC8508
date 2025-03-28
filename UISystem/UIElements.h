@@ -160,8 +160,8 @@ namespace NCL {
 
 		class QuaternionElement : public UIElement {
 		public:
-			QuaternionElement(Vector4* vector, float scale) :
-				vector(vector), scale(scale) {
+			QuaternionElement(Vector4* vector, float scale, std::string name) :
+				vector(vector), scale(scale), name(name) {
 			}
 
 			CSC8508::PushdownState::PushdownResult UpdateElement() override {
@@ -170,7 +170,7 @@ namespace NCL {
 				float y = vector->y;
 				float z = vector->z;
 				float w = vector->w;
-				ImGui::Text("Position");
+				ImGui::Text(name.c_str());
 				ImGui::PushItemWidth(scale);
 				ImGui::InputFloat("X", &x, 0.1f, 1.0f, "%.2f");
 				ImGui::SameLine();
@@ -190,6 +190,7 @@ namespace NCL {
 		protected:
 			Vector4* vector;
 			float scale;
+			std::string name;
 		};
 
 		class FloatElement : public UIElement {
@@ -213,8 +214,8 @@ namespace NCL {
 
 		class VectorElement : public UIElement {
 		public:
-			VectorElement(Vector3* vector, float scale) :
-				vector(vector), scale(scale) {
+			VectorElement(Vector3* vector, float scale, std::string name) :
+				vector(vector), scale(scale), name(name) {
 			}
 
 			CSC8508::PushdownState::PushdownResult UpdateElement() override {
@@ -222,7 +223,7 @@ namespace NCL {
 				float x = vector->x;
 				float y = vector->y;
 				float z = vector->z;
-				ImGui::Text("Position");
+				ImGui::Text(name.c_str());
 				ImGui::PushItemWidth(scale);
 				ImGui::InputFloat("X", &x, 0.1f, 1.0f, "%.2f");
 				ImGui::SameLine();
@@ -239,6 +240,7 @@ namespace NCL {
 		protected:
 			Vector3* vector;
 			float scale;
+			std::string name;
 		};
 
 		class InputFieldElement : public UIElement {

@@ -8,7 +8,14 @@
 #include "DamageableComponent.h"
 
 namespace NCL::CSC8508 {
-	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent> {
+
+	class GameOverEvent : Event {
+	public:
+		GameOverEvent() {};
+	};
+
+
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent> {
 	protected:
 		int quota;
 		int bankedCurrency;
@@ -16,6 +23,8 @@ namespace NCL::CSC8508 {
 		int casualties = 0;
 
 		inline static GameManagerComponent* instance = nullptr;
+
+		void OnPauseEvent(PauseEvent* e);
 
 	public:
 		GameManagerComponent(GameObject& gameObject)
@@ -32,6 +41,8 @@ namespace NCL::CSC8508 {
 		void OnAwake() override {
 			EventManager::RegisterListener<DeathEvent>(this);
 			EventManager::RegisterListener<ExitEvent>(this);
+			EventManager::RegisterListener<PauseEvent>(this);
+			EventManager::RegisterListener<DebugEvent>(this);
 		}
 
 		void Update(float dt) override {
@@ -45,6 +56,14 @@ namespace NCL::CSC8508 {
 
 		void OnEvent(ExitEvent* e) override {
 			OnExitEvent(e);
+		}
+
+		void OnEvent(PauseEvent* e) override {
+			OnPauseEvent(e);
+		}
+
+		void OnEvent(DebugEvent* e) override {
+			std::cout << "Debug event!" << std::endl;
 		}
 
 
@@ -76,10 +95,15 @@ namespace NCL::CSC8508 {
 
 		void OnMissionSuccessful() {
 			std::cout << "Mission successful! Victory!" << std::endl;
+			GameOverEvent* e = new GameOverEvent();
+			EventManager::Call<GameOverEvent>(e);
+
 		}
 
 		void OnMissionFailure() {
 			std::cout << "Mission failed! You lost!" << std::endl;
+			GameOverEvent* e = new GameOverEvent();
+			EventManager::Call<GameOverEvent>(e);
 		}
 
 		void AddToBank(int amount) {

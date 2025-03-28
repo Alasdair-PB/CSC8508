@@ -47,33 +47,6 @@ void UpdateWindow(Window* w, NetworkedGame* g)
 
 int main(int argc, char** argv) 
 {
-
-	//TutorialGame* tg = new TutorialGame();
-
-	//std::string vectorIntPath = NCL::Assets::PFABDIR + "vector_data.pfab";
-	//SaveManager::SaveGameData(vectorIntPath, SaveManager::CreateSaveDataAsset<std::vector<int>>(std::vector<int>{45}));
-	//std::cout << SaveManager::LoadMyData<std::vector<int>>(vectorIntPath)[0] << std::endl;
-
-	//GameObject* myObjectToLoad = new GameObject();
-	//std::string pfabPath = NCL::Assets::PFABDIR + "room_A.pfab";
-	//std::cout << "Two lines in!\n";
-	//myObjectToLoad->Load(pfabPath);
-	//std::cout << "Made it this far!\n";
-	//myObjectToLoad->Save(NCL::Assets::PFABDIR + "room_A_TEST.pfab");
-	//std::vector<Vector3> possibleItemSpawnLocations = { Vector3(0.0f, 0.0f, 20.0f) };
-	//std::vector<DoorLocation> possibleDoorLocations = { DoorLocation(Vector3(100.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)) };
-	//myObjectToLoad->AddComponent<RoomPrefab>(possibleItemSpawnLocations, possibleDoorLocations);
-	//myObjectToLoad->Save(NCL::Assets::PFABDIR + "room_A_TEST.pfab");
-
-	//GameObject* room = new GameObject();
-	// room->Load(NCL::Assets::PFABDIR + "room_A_TEST.pfab");
-	//
-	// RoomPrefab* prefab = room->TryGetComponent<RoomPrefab>();
-	// std::cout << "Number of children: " << room->GetChildren().size() << '\n';
-	// if (prefab) std::cout << "Found prefab component!\n";
-	// else std::cout << "NOT found!\n";
-
-
 	int wWidth	= 1920;
 	int wHeight = 1200;
 	if (argc == 3) {
@@ -116,44 +89,6 @@ int main(int argc, char** argv)
 	NetworkedGame* g = new NetworkedGame();
 #endif
 
-	// GameObject* myObjectToLoad = new GameObject();
-	// std::string pfabPath = NCL::Assets::PFABDIR + "room_A.pfab";
-	// std::cout << "Two lines in!\n";
-	// myObjectToLoad->Load(pfabPath);
-	// std::cout << "Made it this far!\n";
-	// //myObjectToLoad->Save(NCL::Assets::PFABDIR + "rooms/room_A_TEST.pfab");
-	// std::vector<Vector3> possibleItemSpawnLocations = {
-	// 	Vector3(0.0f, 5.0f, 25.0f),
-	// 	Vector3(50.0f, 0.0f, 25.0f),
-	// 	Vector3(0.0f, 0.0f, -25.0f),
-	// 	Vector3(50.0f, 0.0f, -25.0f)
-	// };
-	// std::vector<DoorLocation> possibleDoorLocations = {
-	// 	//DoorLocation(Vector3(-35.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)),
-	// 	//DoorLocation(Vector3(25.0f, 0.0f, 60.0f), Vector3(0.0f, 0.0f, 1.0f)),
-	// 	DoorLocation(Vector3(-60.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)),
-	// 	DoorLocation(Vector3(0.0f, 0.0f, 60.0f), Vector3(0.0f, 0.0f, 1.0f)),
-	// };
-	// myObjectToLoad->AddComponent<RoomPrefab>(possibleItemSpawnLocations, possibleDoorLocations);
-	// myObjectToLoad->Save(NCL::Assets::PFABDIR + "rooms/RP_A.pfab");
-
-	// GameObject* room = new GameObject();
-	// room->Load(NCL::Assets::PFABDIR + "rooms/RP_A.pfab");
-	// RoomPrefab* prefab = room->TryGetComponent<RoomPrefab>();
-	// if (prefab) {
-	// 	std::cout << "Prefab found!\n";
-	// 	for (Vector3 loc : prefab->GetItemSpawnLocations()) {
-	// 		std::cout << "Item spawn location: " << loc.x << ", " << loc.y << ", " << loc.z << '\n';
-	// 	}
-	// 	for (DoorLocation dl : prefab->GetDoorLocations()) {
-	// 		std::cout << "Door location: " << dl.pos.x << ", " << dl.pos.y << ", " << dl.pos.z << '\n';
-	// 		std::cout << "Door direction: " << dl.dir.x << ", " << dl.dir.y << ", " << dl.dir.z << '\n';
-	// 	}
-	// }
-	// else std::cout << "Prefab NOT found! :(\n";
-
-
-	//return 0;
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE))
 	{

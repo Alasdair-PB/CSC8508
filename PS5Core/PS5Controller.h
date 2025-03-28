@@ -17,6 +17,7 @@ namespace NCL::PS5 {
 	
 		void	Update(float dt)		override;
 		float	GetAxis(uint32_t axis)	const override;
+		bool GetBoundButton(uint32_t button) const override;
 		float	GetButtonAnalogue(uint32_t button) const override;
 		bool	GetButton(uint32_t button) const override;
 		

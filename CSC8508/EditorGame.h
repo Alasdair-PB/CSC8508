@@ -52,6 +52,8 @@ namespace NCL {
 				return instance;
 			}
 
+			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
+			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 		protected:
 			inline static EditorGame* instance = nullptr;
 			void InitialiseAssets();
@@ -70,8 +72,7 @@ namespace NCL {
 
 			GameObject* CreateChildInstance(Vector3 offset, bool isStatic);
 			GameObject* AddFloorToWorld(const Vector3& position);
-			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f, bool addToWorld = true);
-			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
+			
 			GameObject* AddNavMeshToWorld(std::string navMeshFilePath, std::string meshId, const Vector3& position, Vector3 dimensions);
 			void SaveUnityNavMeshPrefab(std::string assetPath, std::string navMeshObPath, std::string navMeshNavPath);
 

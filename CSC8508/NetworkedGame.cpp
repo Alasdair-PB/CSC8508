@@ -42,9 +42,11 @@ void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); } //IP 
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { 
 	TutorialGame::LoadGameManager(Vector3(93, 22, -53));
+
 	//TutorialGame::AddPlayerToWorld(Vector3(90, 22, -50));
+
 	TutorialGame::AddPlayerToWorld(Vector3(0.0f, 20.0f, 0.0f));
-	TutorialGame::Loaditem(Vector3(0.0f, 25.0f, 0.0f));
+	TutorialGame::Loaditem(GetSpawnLocation(itemCount++));
 }
 
 #if EOSBUILD
@@ -327,7 +329,7 @@ GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket)
 
 GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket)
 	{ 
-	return TutorialGame::Loaditem(Vector3(0.0f, 20.0f, 0.0f), spawnPacket);
+	return TutorialGame::Loaditem(GetSpawnLocation(itemCount++), spawnPacket);
 }
 
 GameObject* NetworkedGame::GetGameManagerPrefab(NetworkSpawnData* spawnPacket)

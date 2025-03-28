@@ -88,7 +88,7 @@ GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensio
 
 	bounds->AddToIgnoredLayers(Layers::LayerID::Player);
 	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	dropZone->GetTransform().SetPosition(position).SetScale(dimensions * 2.0f);
+	dropZone->GetTransform().SetPosition(position - Vector3(0,5,0)).SetScale(dimensions * 2.0f);
 
 	dropZone->SetRenderObject(new RenderObject(&dropZone->GetTransform(), cubeMesh, basicTex, basicShader));
 	phys->SetPhysicsObject(new PhysicsObject(&dropZone->GetTransform()));

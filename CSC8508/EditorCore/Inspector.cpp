@@ -31,7 +31,7 @@ Inspector::Inspector() : positionInfo(new Vector3()),
 		"Tools",
 		0.0f,
 		ImGuiWindowFlags_NoResize);
-
+	PushSetPrimitive();
 	inspectorBar->PushToggle("GameObject:", isEnabled, 0.05f);
 	toolsBar->PushStatelessInputFieldElement("file", saveDestination);
 	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
@@ -52,8 +52,10 @@ Inspector::Inspector() : positionInfo(new Vector3()),
 
 	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
 		[this]() {
-			GameObject* loaded = new GameObject();
+			GameObject* loaded = NewGameObject();
 			GameWorld::Instance().AddGameObject(loaded);
+			EndFocus();
+			SetFocus(loaded);
 		});
 
 	PushAddParent();
@@ -64,6 +66,28 @@ Inspector::Inspector() : positionInfo(new Vector3()),
 	inspectorBar->PushVectorElement(positionInfo, 0.05f, "Position:");
 	inspectorBar->PushVectorElement(scaleInfo, 0.05f, "Scale");
 	inspectorBar->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
+}
+
+GameObject* Inspector::NewGameObject() {
+
+	Vector3 position = focus ? focus->GetTransform().GetPosition() : Vector3(0, 0, 0);
+	switch (primitive) {
+	case Empty: {
+		return new GameObject();
+		break;
+	}
+	case Cube: {
+		return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(1,1,1));
+		break;
+	}
+	case Sphere: {
+		return EditorGame::GetInstance()->AddSphereToWorld(position, 1);
+		break;
+	}
+	default: {
+		break;
+	}
+	}
 }
 
 void Inspector::PushLoadPfab() {
@@ -91,7 +115,7 @@ void Inspector::PushAddParent() {
 	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Parent",
 		[this]() {
 			if (!focus) return;
-			GameObject* loaded = new GameObject();
+			GameObject* loaded = NewGameObject();
 			loaded->AddChild(focus);
 			GameWorld::Instance().RemoveGameObject(focus);
 			GameWorld::Instance().AddGameObject(loaded);
@@ -102,7 +126,7 @@ void Inspector::PushAddChild() {
 	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
 		[this]() {
 			if (!focus) return;
-			GameObject* loaded = new GameObject();
+			GameObject* loaded = NewGameObject();
 			focus->AddChild(loaded);
 			GameWorld::Instance().RemoveGameObject(focus);
 			GameWorld::Instance().AddGameObject(focus);
@@ -119,6 +143,15 @@ void Inspector::PushLoadChild() {
 			GameWorld::Instance().RemoveGameObject(focus);
 			GameWorld::Instance().AddGameObject(focus);
 		});
+}
+
+void Inspector::PushSetPrimitive() {
+	std::vector<std::pair<int*, std::string>> enumOptions = {
+		{reinterpret_cast<int*>(&primitive), "Cube"},
+		{reinterpret_cast<int*>(&primitive), "Sphere"},
+		{reinterpret_cast<int*>(&primitive), "Empty"}
+	};
+	toolsBar->PushEnumElement("Component to add", enumOptions);
 }
 
 void Inspector::PushAddComponentField() {

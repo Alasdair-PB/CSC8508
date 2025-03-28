@@ -40,6 +40,8 @@ public:
 		RenderIComponents();
 	}
 
+	GameObject* NewGameObject();
+
 	void RenderIComponents();
 
 	void EndFocus() {
@@ -53,6 +55,8 @@ public:
 	UIElementsGroup* inspectorBar;
 	UIElementsGroup* toolsBar;
 
+	enum Primitives {Cube, Sphere, Empty};
+
 private:
 	GameObject* focus;
 	Vector3* positionInfo;
@@ -60,6 +64,7 @@ private:
 	Vector4* orientationInfo;
 	ComponentAssemblyDefiner::ComponentMapId mapId;
 	Tags::Tag tagId;
+	Primitives primitive;
 	bool* isEnabled;
 	bool clearWorld;
 	std::string* saveDestination;
@@ -70,6 +75,7 @@ private:
 	void PushLoadPfab();
 	void PushAddChild();
 	void PushAddComponentField();
+	void PushSetPrimitive();
 	void PushTagField();
 	void PushFocusParent();
 	void PushAddParent();

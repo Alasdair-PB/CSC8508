@@ -20,6 +20,7 @@
 #include "DamageableComponent.h"
 #include "GameManagerComponent.h"
 #include "DamageableNetworkComponent.h"
+#include "../CSC8508CoreClasses/GameNetworkedManagerComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -52,19 +53,24 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 
 
 GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
-	GameObject* myObjectToLoad = new GameObject();
-#
-	myObjectToLoad->AddComponent<GameManagerComponent>();/*
+	GameObject* gm = new GameObject();
+	
 	if (spawnData)
 	{
-		int pFabId = spawnData->pfab;
 		int componentIdCount = 0;
-		FullTransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<FullTransformNetworkComponent>(
-			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
-	}*/
-	world->AddGameObject(myObjectToLoad);
 
-	return myObjectToLoad;
+		int pFabId = spawnData->pfab;
+		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
+		gm->AddComponent<GameNetworkedManagerComponent>(spawnData->objId,
+			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+	}
+	else {
+
+		gm->AddComponent<GameManagerComponent>();
+	}
+	world->AddGameObject(gm);
+
+	return gm;
 }
 
 GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag) {

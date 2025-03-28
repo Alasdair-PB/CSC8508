@@ -8,6 +8,7 @@
 #include "DamageableComponent.h"
 #include "PauseUI.h"
 #include "UISystem.h"
+#include "TimerComponent.h"
 
 namespace NCL::CSC8508 {
 
@@ -17,22 +18,29 @@ namespace NCL::CSC8508 {
 	};
 
 
-	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent> {
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent>, public EventListener<OverTimeEvent> {
 	protected:
 		int quota;
 		int bankedCurrency;
 		int terminationFee;
 		int casualties = 0;
+		int successState = InGame;
+		enum SuccessStates {
+			InGame,
+			Loss,
+			Win
+		};
+
 
 		inline static GameManagerComponent* instance = nullptr;
 
-		void OnPauseEvent(PauseEvent* e);
+		virtual void OnPauseEvent(PauseEvent* e);
 
 		UI::PauseUI* pauseUI = new UI::PauseUI;
 
 	public:
 		GameManagerComponent(GameObject& gameObject)
-			: IComponent(gameObject), quota(0), bankedCurrency(0), terminationFee(50) {
+			: IComponent(gameObject), quota(0), bankedCurrency(0), terminationFee(9) {
 			instance = this;
 			pauseUI->PushButtonElement(PauseReturnButton(), "Unpause");
 			/*pauseUI->PushButtonElement(ExitButton(), "Exit");*/
@@ -44,41 +52,23 @@ namespace NCL::CSC8508 {
 			return instance;
 		}
 
-		void OnAwake() override {
+		virtual void OnAwake() override {
 			EventManager::RegisterListener<DeathEvent>(this);
 			EventManager::RegisterListener<ExitEvent>(this);
 			EventManager::RegisterListener<PauseEvent>(this);
 			EventManager::RegisterListener<DebugEvent>(this);
+			EventManager::RegisterListener<OverTimeEvent>(this);
 		}
 
 		void Update(float dt) override {
 
 		}
 
-		
-		void OnEvent(DeathEvent* e) override {
-			CheckPlayerInstance(e);
-		}
-
-		void OnEvent(ExitEvent* e) override {
-			OnExitEvent(e);
-		}
-
-		void OnEvent(PauseEvent* e) override {
-			OnPauseEvent(e);
-		}
-
-		void OnEvent(DebugEvent* e) override {
-			std::cout << "Debug event!" << std::endl;
-		}
-
 
 		virtual void CheckPlayerInstance(DeathEvent* e);
 
-		virtual void OnExitEvent(ExitEvent* e);
 
-
-		void OnMissionEnd() {
+		virtual void OnMissionEnd() {
 			std::cout << "Mission ended! Game Over!" << std::endl;
 			if (bankedCurrency >= quota) {
 				OnMissionSuccessful();
@@ -100,14 +90,14 @@ namespace NCL::CSC8508 {
 		}
 
 		void OnMissionSuccessful() {
-			std::cout << "Mission successful! Victory!" << std::endl;
+			successState = Win;
 			GameOverEvent* e = new GameOverEvent();
 			EventManager::Call<GameOverEvent>(e);
 
 		}
 
 		void OnMissionFailure() {
-			std::cout << "Mission failed! You lost!" << std::endl;
+			successState = Loss;
 			GameOverEvent* e = new GameOverEvent();
 			EventManager::Call<GameOverEvent>(e);
 		}
@@ -139,6 +129,28 @@ namespace NCL::CSC8508 {
 				};
 			return func;
 		}*/
+
+		private:
+			virtual void OnEvent(DeathEvent* e) override {
+				CheckPlayerInstance(e);
+			}
+
+			virtual void OnEvent(ExitEvent* e) override {
+				OnMissionEnd();
+			}
+
+			virtual void OnEvent(PauseEvent* e) override {
+				OnPauseEvent(e);
+			}
+
+			virtual void OnEvent(DebugEvent* e) override {
+				std::cout << "Debug event!" << std::endl;
+			}
+
+			virtual void OnEvent(OverTimeEvent* e) override {
+				OnMissionEnd();
+			}
+
 
 	};
 }

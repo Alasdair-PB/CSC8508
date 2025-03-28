@@ -108,8 +108,6 @@ namespace NCL::CSC8508
 			return GetDerivedTypes().count(std::type_index(typeInfo)) > 0;
 		}
 
-		//virtual IComponent* Copy() = 0;
-
 		/// <summary>
 		/// Loads the IComponent save data into this IComponent
 		/// </summary>

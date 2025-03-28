@@ -8,6 +8,13 @@
 #include "DamageableComponent.h"
 
 namespace NCL::CSC8508 {
+
+	class GameOverEvent : Event {
+	public:
+		GameOverEvent() {};
+	}
+
+
 	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent> {
 	protected:
 		int quota;
@@ -88,10 +95,15 @@ namespace NCL::CSC8508 {
 
 		void OnMissionSuccessful() {
 			std::cout << "Mission successful! Victory!" << std::endl;
+			GameOverEvent* e = new GameOverEvent();
+			EventManager::Call<GameOverEvent>(e);
+
 		}
 
 		void OnMissionFailure() {
 			std::cout << "Mission failed! You lost!" << std::endl;
+			GameOverEvent* e = new GameOverEvent();
+			EventManager::Call<GameOverEvent>(e);
 		}
 
 		void AddToBank(int amount) {

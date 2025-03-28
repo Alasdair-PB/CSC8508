@@ -188,7 +188,6 @@ bool PlayerComponent::InteractExit() {
 	if (inExit) {
         ExitEvent* e = new ExitEvent();
         EventManager::Call<ExitEvent>(e);
-		std::cout << "Exit" << std::endl;
 		return true;
 	}
 	return false;

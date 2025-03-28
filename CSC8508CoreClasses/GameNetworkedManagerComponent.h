@@ -37,31 +37,46 @@ namespace NCL::CSC8508 {
 			return types;
 		}
 
-		void OnAwake() override {
-		}
-
-		void Update(float dt) override {
-
-		}
-
-
 		bool ReadEventPacket(INetworkPacket& p) override {
 			if (p.packetSubType == None) {
-
 				GameManagerPacket* packet = &(GameManagerPacket&)p;
 
 				casualties = packet->casualties;
 				bankedCurrency = packet->bankedCurrency;
+				successState = packet->successState;
 
-
+				if (successState == Win)
+					OnMissionSuccessful();
+				else
+					OnMissionFailure();
 				return true;
 			}
 			return false;
 		}
 
-		void CheckPlayerInstance(DeathEvent* e) override;
-		void OnExitEvent(ExitEvent* e) override;
+		void OnMissionEnd() override{
+			if (!IsOwner()) return;
+			GameManagerComponent::OnMissionEnd();
+			SendManagerPacket();
+		}
 
+		void SendManagerPacket() {
+			GameManagerPacket* packet = new GameManagerPacket();
+			packet->casualties = this->casualties;
+			packet->bankedCurrency = this->bankedCurrency;
+			packet->successState = successState;
+			SendEventPacket(packet);
+		}
+
+		void OnPauseEvent(PauseEvent* e) override {
+			if (!IsOwner()) return;
+			GameManagerComponent::OnPauseEvent(e);
+		}
+
+		void CheckPlayerInstance(DeathEvent* e) override {
+			if (!IsOwner()) return;
+			GameManagerComponent::CheckPlayerInstance(e);
+		}
 	};
 }
 

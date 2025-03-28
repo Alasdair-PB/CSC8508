@@ -20,9 +20,6 @@ namespace NCL::CSC8508
 		}
 	};
 
-
-
-
 	class TimerNetworkComponent : public TimerComponent, public INetworkComponent
 	{
 	public:
@@ -37,10 +34,8 @@ namespace NCL::CSC8508
 				TimerComponent::Update(dt);
 				SendTimerPacket();
 			}
-			else {
-				std::cout << "Timer Component Updated" << std::endl;
-				std::cout << "Remaining Time: " << remainingTime << std::endl;
-			}
+			else
+				UpdateUI();
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
@@ -67,7 +62,6 @@ namespace NCL::CSC8508
 			timerPacket->isComplete = isComplete;
 			timerPacket->remainingTime = remainingTime;
 			SendEventPacket(timerPacket);
-			std::cout << "Timer Packet Sent" << std::endl;
 		}
 	};
 

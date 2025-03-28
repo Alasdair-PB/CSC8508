@@ -9,7 +9,9 @@
 #include "PauseUI.h"
 #include "FramerateUI.h"
 #include "GameOverUI.h"
+#include "GameVictoryUI.h"
 #include "UISystem.h"
+#include "TimerComponent.h"
 
 namespace NCL::CSC8508 {
 
@@ -18,28 +20,56 @@ namespace NCL::CSC8508 {
 		GameOverEvent() {};
 	};
 
-
-	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent> {
+	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent>, public EventListener<OverTimeEvent> {
 	protected:
 		int quota;
 		int bankedCurrency = 0;
 		int terminationFee;
 		int casualties = 0;
 		int framerateDelay;
-		
+		int successState = InGame;
+		enum SuccessStates { InGame, Loss, Win};
+
 		bool debugMode = false;
-
 		inline static GameManagerComponent* instance = nullptr;
-
-		void OnPauseEvent(PauseEvent* e);
 
 		UI::PauseUI* pauseUI = new UI::PauseUI;
 		UI::FramerateUI* framerate = new UI::FramerateUI;
 		UI::GameOverUI* gameOverUI = new UI::GameOverUI;
+		UI::GameVictoryUI* gameVicUI = new UI::GameVictoryUI;
+
+
+		void OnEvent(DeathEvent* e) override {
+			CheckPlayerInstance(e);
+		}
+
+		void OnEvent(ExitEvent* e) override {
+			OnMissionEnd();
+		}
+
+		void OnEvent(PauseEvent* e) override {
+			OnPauseEvent(e);
+		}
+
+		void OnEvent(DebugEvent* e) override {
+			if (debugMode == false) {
+				debugMode = true;
+				UI::UISystem::GetInstance()->PushNewStack(framerate->frameUI, "Framerate");
+			}
+			else {
+				debugMode = false;
+				UI::UISystem::GetInstance()->RemoveStack("Framerate");
+			}
+		}
+
+		virtual void OnEvent(OverTimeEvent* e) override {
+			OnMissionEnd();
+		}
 
 	public:
+
 		GameManagerComponent(GameObject& gameObject)
-			: IComponent(gameObject), quota(0), bankedCurrency(0), terminationFee(50) {
+			: IComponent(gameObject), quota(0), bankedCurrency(0), terminationFee(9) {
 			instance = this;
 			pauseUI->PushButtonElement(PauseReturnButton(), "Unpause");
 			/*pauseUI->PushButtonElement(ExitButton(), "Exit");*/
@@ -51,11 +81,12 @@ namespace NCL::CSC8508 {
 			return instance;
 		}
 
-		void OnAwake() override {
+		virtual void OnAwake() override {
 			EventManager::RegisterListener<DeathEvent>(this);
 			EventManager::RegisterListener<ExitEvent>(this);
 			EventManager::RegisterListener<PauseEvent>(this);
 			EventManager::RegisterListener<DebugEvent>(this);
+			EventManager::RegisterListener<OverTimeEvent>(this);
 		}
 
 		void Update(float dt) override {
@@ -67,49 +98,14 @@ namespace NCL::CSC8508 {
 			}
 		}
 
-		
-		void OnEvent(DeathEvent* e) override {
-			UI::UISystem::GetInstance()->PushNewStack(gameOverUI->gameOverUI, "Game Over");
-			gameOverUI->PushElement(GameOverCurrency());
-			CheckPlayerInstance(e);
-		}
-
-		void OnEvent(ExitEvent* e) override {
-			UI::UISystem::GetInstance()->PushNewStack(gameOverUI->gameOverUI, "Game Over");
-			gameOverUI->PushElement(GameOverCurrency());
-			OnExitEvent(e);
-		}
-
-		void OnEvent(PauseEvent* e) override {
-			OnPauseEvent(e);
-		}
-
-		void OnEvent(DebugEvent* e) override {
-			std::cout << "Debug event!" << std::endl;
-			if (debugMode == false) {
-				debugMode = true;
-				UI::UISystem::GetInstance()->PushNewStack(framerate->frameUI, "Framerate");
-			}
-			else {
-				debugMode = false;
-				UI::UISystem::GetInstance()->RemoveStack("Framerate");
-			}
-		}
-
-
+		virtual void OnPauseEvent(PauseEvent* e);
 		virtual void CheckPlayerInstance(DeathEvent* e);
 
-		virtual void OnExitEvent(ExitEvent* e);
-
-
-		void OnMissionEnd() {
-			std::cout << "Mission ended! Game Over!" << std::endl;
-			if (bankedCurrency >= quota) {
+		virtual void OnMissionEnd() {
+			if (bankedCurrency >= quota)
 				OnMissionSuccessful();
-			}
-			else {
+			else
 				OnMissionFailure();
-			}
 		}
 
 		int GetTotalQuota();
@@ -123,17 +119,26 @@ namespace NCL::CSC8508 {
 			return true;
 		}
 
+		void OnMissionFeedBack() {
+			GameWorld::Instance().ToggleWorldPauseState();
+		}
+
 		void OnMissionSuccessful() {
-			std::cout << "Mission successful! Victory!" << std::endl;
+			successState = Win;
 			GameOverEvent* e = new GameOverEvent();
 			EventManager::Call<GameOverEvent>(e);
-
+			UI::UISystem::GetInstance()->PushNewStack(gameVicUI->gameOverUI, "Game victory");
+			gameVicUI->PushElement(GameOverCurrency());
+			OnMissionFeedBack();
 		}
 
 		void OnMissionFailure() {
-			std::cout << "Mission failed! You lost!" << std::endl;
+			successState = Loss;
 			GameOverEvent* e = new GameOverEvent();
 			EventManager::Call<GameOverEvent>(e);
+			UI::UISystem::GetInstance()->PushNewStack(gameOverUI->gameOverUI, "Game Over");
+			gameOverUI->PushElement(GameOverCurrency());
+			OnMissionFeedBack();
 		}
 
 		void AddToBank(int amount) {
@@ -168,15 +173,6 @@ namespace NCL::CSC8508 {
 				};
 			return func;
 		}
-
-		/*std::function<CSC8508::PushdownState::PushdownResult()> ExitButton() {
-			std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
-				
-				return CSC8508::PushdownState::PushdownResult::NoChange;
-				};
-			return func;
-		}*/
-
 	};
 }
 #endif

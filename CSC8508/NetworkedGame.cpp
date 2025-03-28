@@ -38,7 +38,7 @@ struct SpawnPacket : public GamePacket {
 };
 
 const Vector3 itemPos = Vector3(15.0f, 15.0f, 0.0f);
-void NetworkedGame::StartClientCallBack() { StartAsClient(10, 70, 33, 111); } //IP config
+void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { 
 	TutorialGame::LoadGameManager(Vector3(93, 22, -53));

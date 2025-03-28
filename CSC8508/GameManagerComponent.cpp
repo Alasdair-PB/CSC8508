@@ -32,18 +32,6 @@ int GameManagerComponent::GetTotalQuota() {
 	return amount;
 }
 
-
-void GameManagerComponent::OnExitEvent(ExitEvent* e) {
-	std::cout << "Mission ended! Game Over!" << std::endl;
-	GameWorld::Instance().ToggleWorldPauseState();
-	if (bankedCurrency >= quota) {
-		OnMissionSuccessful();
-	}
-	else {
-		OnMissionFailure();
-	}
-}
-
 void GameManagerComponent::OnPauseEvent(PauseEvent* e) {
 	GameWorld::Instance().ToggleWorldPauseState();
 	UI::UISystem::GetInstance()->PushNewStack(pauseUI->pauseUI, "Pause");

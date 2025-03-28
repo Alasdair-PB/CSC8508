@@ -32,7 +32,6 @@ namespace NCL::CSC8508 {
 		}
 	};
 
-
 	class InventoryNetworkManagerComponent : public InventoryManagerComponent, public INetworkDeltaComponent {
 
 	public:
@@ -51,6 +50,8 @@ namespace NCL::CSC8508 {
 			};
 			return types;
 		}
+
+		void PushUI() override {}
 
 		vector<GamePacket*> WritePacket();
 		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override { return WritePacket(); }

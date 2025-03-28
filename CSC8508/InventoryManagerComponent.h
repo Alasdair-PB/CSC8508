@@ -18,10 +18,14 @@ namespace NCL {
                 itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset)
             {
                 maxItemStorage = std::max(1, maxStorage);
+                PushUI();
+            }
 
+            virtual void PushUI() {
                 UI::UISystem::GetInstance()->PushNewStack(inventoryUI->inventoryUI, "Inventory");
                 inventoryUI->PushInventoryElement(InventoryMenu());
             }
+
             ~InventoryManagerComponent() = default;
 
             bool PushItemToInventory(ItemComponent* item) {

@@ -57,8 +57,9 @@ GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnD
 	
 	if (spawnData)
 	{
-		int componentIdCount = 0;
+		gm->AddComponent<TimerComponent>(300);
 
+		int componentIdCount = 0;
 		int pFabId = spawnData->pfab;
 		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
 		gm->AddComponent<GameNetworkedManagerComponent>(spawnData->objId,

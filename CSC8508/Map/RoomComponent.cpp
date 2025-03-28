@@ -30,9 +30,9 @@ bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
 
             // Put the roomB GameObject in the test position
             Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
-            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue; // Enforce flipping around the Y axis (no tilting the rooms)
+            // Enforce flipping around the Y axis (no tilting the rooms)
+            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
             transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
-            //transformB.SetOrientation(orientationDifference);
             transformB.SetPosition(
                 transformA.GetPosition()
                 + transformA.GetOrientation() * aDoorLoc.pos * transformA.GetScale()
@@ -40,8 +40,8 @@ bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
                 );
 
             // Check if roomB's GameObject collides with any other object in the dungeon
-            auto info = NCL::CollisionDetection::CollisionInfo();
-            if (!NCL::CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), GetDungeonGameObject(), info)) {
+            auto info = CollisionDetection::CollisionInfo();
+            if (!CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), GetDungeonGameObject(), info)) {
 
                 // Success (no collision)
                 this->nextDoorRooms.push_back(&roomB);

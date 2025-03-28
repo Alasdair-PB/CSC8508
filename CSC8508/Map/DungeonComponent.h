@@ -36,7 +36,7 @@ public:
 private:
     DoorLocation entrancePosition = DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));
 
-    unsigned int seed = 14; // TODO: This needs to be smarter
+    unsigned int seed = 14;
 
     bool GenerateRoom() const;
 };

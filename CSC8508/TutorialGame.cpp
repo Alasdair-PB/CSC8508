@@ -186,8 +186,8 @@ void TutorialGame::InitWorld()
 	//roomB->SetEnabled(true);
 	//world->AddGameObject(roomB);
 
-	std::string assetPath = GetAssetPath("myScene.pfab");
-	LoadWorld(assetPath);
+	//std::string assetPath = GetAssetPath("myScene.pfab");
+	//LoadWorld(assetPath);
 
 	LoadDungeon(Vector3());
 }

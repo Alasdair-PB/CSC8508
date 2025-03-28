@@ -14,6 +14,8 @@
 void DungeonComponent::Generate(int const roomCount) const {
     int failures = 0;
 
+    std::srand(GetSeed());
+
     // Generate the first room
     auto* entryRoom = new GameObject(true);
     RoomPrefab* prefab = RoomManager::GetRandom();

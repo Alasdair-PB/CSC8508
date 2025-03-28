@@ -15,8 +15,8 @@ public:
 
 	void UpdateMouseGameWorldPitchYaw() {
 
-		mousePitch -= controller->GetNamedAxis("YLook");
-		mouseYaw -= controller->GetNamedAxis("XLook");
+		mousePitch -= controller->GetNamedAxis("YLook") * sensitivity;
+		mouseYaw -= controller->GetNamedAxis("XLook") * sensitivity;
 
 		mousePitch = std::min(mousePitch, 90.0f);
 		mousePitch = std::max(mousePitch, -90.0f);
@@ -56,6 +56,7 @@ protected:
 	Camera* camera;
 	float cameraSpeed = 10.0f;
 	float mouseYaw = 0;
+	float sensitivity = 0.5f;
 	float mousePitch = 0;
 
 };

@@ -42,8 +42,8 @@ namespace NCL::CSC8508
 		Camera& camera;
 		Transform& transform;
 		InputComponent& inputComponent;			
-		const float yOffset = 20;
-		const float forwardOffset = 30;
+		const float yOffset = 3;
+		const float forwardOffset = 10;
 		const float lerpSpeed = 0.1f;
 
 		void LerpPosition(Vector3& currentPos, Vector3& nextPos) {

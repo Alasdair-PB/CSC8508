@@ -12,7 +12,7 @@ namespace NCL::CSC8508 {
 	class GameOverEvent : Event {
 	public:
 		GameOverEvent() {};
-	}
+	};
 
 
 	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent> {

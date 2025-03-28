@@ -31,9 +31,6 @@ void DungeonComponent::Generate(int const roomCount) const {
         - entryTransform.GetOrientation() * doorLoc.pos * entryTransform.GetScale()
         );
 
-    Quaternion rotation = entryRoom->GetTransform().GetOrientation();
-
-
     // Generate subsequent rooms
     for (int i = 0; i < roomCount - 1; i++) {
         if (!GenerateRoom()) {

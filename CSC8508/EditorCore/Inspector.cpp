@@ -157,15 +157,45 @@ void Inspector::PushTagField() {
 			focus->SetTag(tagId);
 		});
 
-
 	inspectorBar->PushStaticTextElement("Tags on Object");
 	for (Tags::Tag tag : focus->GetTags()) {
 		std::string tagName = "Unknown";
-		for (const auto& pair : enumTagOptions) {
-			if (*pair.first == static_cast<int>(tag)) {
-				tagName = pair.second;
-				break;
-			}
+		switch (tag) {
+		case Tags::Default: {
+			tagName = "Default";			
+			break;
+		}
+		case Tags::Player: {
+			tagName = "Player";			
+			break;
+		}
+		case  Tags::Enemy: {
+			tagName = "Enemy";
+			break;
+		}
+		case  Tags::DropZone: {
+			tagName = "DropZone";
+			break;
+		}
+		case  Tags::CursorCast: {
+			tagName = "CursorCast";
+			break;
+		}
+		case  Tags::Ground: {
+			tagName = "Ground";
+			break;
+		}
+		case  Tags::DepositZone: {
+			tagName = "DepositZone";
+			break;
+		}
+		case  Tags::Exit: {
+			tagName = "Exit";
+			break;
+		}
+		default: {
+			break;
+		}
 		}
 		inspectorBar->PushStaticTextElement(tagName);
 	}

@@ -41,7 +41,7 @@ namespace NCL::CSC8508 {
 			InventoryManagerComponent(gameObject, maxStorage, carryOffset, dropOffset),
 			INetworkDeltaComponent(objId, ownId, componId, pfabID, clientOwned, new InventoryNetworkState()) {
 		}
-
+		~InventoryNetworkManagerComponent() = default;
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
 			static std::unordered_set<std::type_index> types = {
 				std::type_index(typeid(IComponent)),

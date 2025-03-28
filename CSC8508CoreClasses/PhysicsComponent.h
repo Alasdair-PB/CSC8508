@@ -62,6 +62,8 @@ namespace NCL::CSC8508
 		void SetInitType(InitType type, PhysicsObject* phyObj);
 		void CopyComponent(GameObject* gameObject) override;
 
+		void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
+
 	protected:
 		PhysicsObject* physicsObject;
 		InitType initiType;

@@ -70,12 +70,21 @@ namespace NCL::CSC8508
 		CollisionVolume* CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		auto GetDerivedSerializedFields() const;
 
+		void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
+
+
 	protected:
 		CollisionVolume* boundingVolume;
 		PhysicsComponent* physicsComponent;
 		Vector3 broadphaseAABB;
 		vector<Layers::LayerID> ignoreLayers;
 		Vector3 GetBoundsScale();
+
+#if EDITOR
+		VolumeType expectingVolumeType = VolumeType::AABB;
+		bool* isTrigger = new bool();
+		Vector3* expectingBoundsSize = new Vector3();
+#endif
 	};
 }
 

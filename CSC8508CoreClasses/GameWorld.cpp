@@ -34,6 +34,8 @@ GameWorld& GameWorld::Instance() {
 void GameWorld::Clear() {
 	gameObjects.clear();
 	constraints.clear();
+	boundsComponents.clear();
+	physicsComponents.clear();
 	worldIDCounter		= 0;
 	worldStateCounter	= 0;
 }
@@ -173,7 +175,7 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 
 
 void GameWorld::UpdateWorld(float dt){
-
+	if (paused) return;
 	ComponentManager::OperateOnAllIComponentBufferOperators(
 		[&](IComponent* c) {
 			if (c->IsEnabled())

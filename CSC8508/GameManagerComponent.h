@@ -23,6 +23,8 @@ namespace NCL::CSC8508 {
 			instance = this;
 		}
 
+		~GameManagerComponent() = default;
+
 		static GameManagerComponent* GetInstance() {
 			return instance;
 		}

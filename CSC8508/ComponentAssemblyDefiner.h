@@ -21,10 +21,13 @@ namespace NCL {
                 void OnEvent(AddComponentEvent* e) override {
                     AddComponent(e->GetEntry(), e->GetGameObject());
                 }
+                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable };   
+                bool AddComponentFromEnum(ComponentMapId mapId, GameObject& object);
+
             protected:
-                enum ComponentMapId { Error, Bounds, Physics, NavMesh, Animation, Damageable };
                 std::unordered_map<size_t, ComponentMapId> componentMap;
                 bool AddComponent(size_t t, GameObject& object);
+                bool AddComponentByMap(ComponentMapId mapId, GameObject& object);
 
                 /// <summary>
                 /// Initializes the IComponent type map of type T as a hash for IComponents type paired with their corresponding enum

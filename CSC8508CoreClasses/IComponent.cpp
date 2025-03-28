@@ -42,3 +42,10 @@ size_t IComponent::Save(std::string assetPath, size_t* allocationStart)
 void IComponent::Load(std::string assetPath, size_t allocationStart){
 	ComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<ComponentDataStruct>(assetPath, allocationStart);
 }
+
+
+void IComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) { 
+	std::string name = GetName();
+	elementsGroup.PushStaticTextElement(name);
+	elementsGroup.PushToggle("Enabled:", &enabled, scale);
+}

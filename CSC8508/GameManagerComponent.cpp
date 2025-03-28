@@ -45,4 +45,5 @@ void GameManagerComponent::OnExitEvent(ExitEvent* e) {
 
 void GameManagerComponent::OnPauseEvent(PauseEvent* e) {
 	GameWorld::Instance().SetWorldPauseState(true);
+	UI::UISystem::GetInstance()->PushNewStack(pauseUI->pauseUI, "Pause");
 }

@@ -4,6 +4,7 @@
 #include "INetworkComponent.h"
 #include "CollisionDetection.h"
 #include "QuadTree.h"
+#include "UISystem.h"
 
 namespace NCL {
 		class Camera;

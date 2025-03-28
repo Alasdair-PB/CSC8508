@@ -108,7 +108,6 @@ void LoadControllerMappings(Controller* controller)
 void EditorGame::InitialiseGame() {
 
 	componentAssembly = new ComponentAssemblyDefiner();
-
 	componentAssembly->InitializeMap();
 
 	world->GetMainCamera().SetController(*controller);
@@ -146,7 +145,6 @@ EditorGame::EditorGame()
 #endif
 	
 	physics = new PhysicsSystem(*world);
-
 	InitialiseGame();
 }
 

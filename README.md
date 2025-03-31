@@ -1,14 +1,18 @@
 # CSC8508
 ## Team 2's Group Project
+
+### Branch history
+This branch Submission-CSC8508 was created as an easy access way to pull the version submitted when the tag was created. While this branch was created after the submission, only the read me file has changed since the date of submission. 
+
+### Submission
+A tag has been created for the submitted release of this project. Tag::`Submission1.0` was the final submssion for this coursework and is the one intended for marking. While the project may continue to have changes after this time of submssion the release was submitted before the deadline and will remain unedited. 
+
 ### Controls
 -Use WASD to move forwards, backwards, left or right respectively
 -Use the mouse to look around and control the camera
 -Use the spacebar to jump
 -Use the e key to interact with objects including picking up items
 -Use the l key to toggle debug mode, showing the framerate counter
-
-### Submission
-A tag has been created for the submitted release of this project. Tag::`Submission1.0` was the final submssion for this coursework and is the one intended for marking. While the project may continue to have changes after this time of submssion the release was submitted before the deadline and will remain unedited. 
 
 ### Objectives
 You must navigate through the dungeon, finding items, picking them up and bringing them back to the starting room where you drop them on the green pads to earn currency.

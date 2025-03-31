@@ -1,5 +1,5 @@
 # CSC8508
- ## Team 2's Group Project
+## Team 2's Group Project
 ### Controls
 -Use WASD to move forwards, backwards, left or right respectively
 -Use the mouse to look around and control the camera
@@ -8,7 +8,7 @@
 -Use the l key to toggle debug mode, showing the framerate counter
 
 ### Submission
-A tag has been created for the submitted release of this project. Tag::`Submission1.0` was the final submssion for this coursework and is the one intended for marking. 
+A tag has been created for the submitted release of this project. Tag::`Submission1.0` was the final submssion for this coursework and is the one intended for marking. While the project may continue to have changes after this time of submssion the release was submitted before the deadline and will remain unedited. 
 
 ### Objectives
 You must navigate through the dungeon, finding items, picking them up and bringing them back to the starting room where you drop them on the green pads to earn currency.

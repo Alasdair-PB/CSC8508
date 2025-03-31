@@ -19,5 +19,12 @@ Interacting with the red pad will exit the game.
 If one player starts as the server from the main menu, another player can start as client to join their game and play multiplayer.
 You will be able to hear the other players through voice chat.
 
-### Video Demonstration 
+### Video Demonstrations
+
+#### Gameplay Loop
 https://youtu.be/-x3eM8zoQJ0
+#### Custom Editor
+https://youtu.be/CDocuHMd9Sw 
+#### EOS lobby system
+
+#### Voice chat Demonstration

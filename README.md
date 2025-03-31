@@ -28,3 +28,15 @@ https://youtu.be/CDocuHMd9Sw
 #### EOS lobby system
 
 #### Voice chat Demonstration
+
+### Submission Known issues
+Please note the issues listed were not fixed due to task priorities while finishing the project and time pressure, not due to task complexity.
+#### Editor
+* Loading a world file as a Pfab will cause the Editor to crash.
+* Loading a Pfab file as a world will cause the Editor to crash- The default file set on load up is a World file, please do not load this as a Pfab while testing.
+* Incorrect file paths are not supported causing the Editor to crash if the file asset is spelt incorrectly. 
+* Not a bug, but usability note:: saving as PFab saves the object selected. If a room Pfab is loaded- please use the focus parent button to select the parent for saving- otherwise the save file will be changed to only the selected object. 
+
+#### Game
+* Health & stamina UI was not incorporated into the network infrastructure. Multiple UI elements may be overlayed causing an incorrect values to be displayed when playing with multiple clients.
+* The Game Over screen does not reflect the victory state of the player and may use the same end state regardless of player success. 

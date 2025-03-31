@@ -9,6 +9,7 @@
 
 ### Submission
 A tag has been created for the submitted release of this project. Tag::`Submission1.0` was the final submssion for this coursework and is the one intended for marking. While the project may continue to have changes after this time of submssion the release was submitted before the deadline and will remain unedited. 
+To view the submitted version either checkout the release tag 'Submission1.0' from main or view branch::[CSC8508 Submission](https://github.com/Alasdair-PB/CSC8508/tree/Submission-Csc8505). This branch was created after the final submission however only has changes to the readme file and will not be edited in any other way. 
 
 ### Objectives
 You must navigate through the dungeon, finding items, picking them up and bringing them back to the starting room where you drop them on the green pads to earn currency.

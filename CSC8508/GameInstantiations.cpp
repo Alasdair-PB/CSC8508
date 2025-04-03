@@ -20,9 +20,10 @@
 #include "DamageableComponent.h"
 #include "GameManagerComponent.h"
 #include "DamageableNetworkComponent.h"
+#include "StaminaNetworkComponent.h"
 #include "TimerNetworkComponent.h"
 
-#include "../CSC8508CoreClasses/GameNetworkedManagerComponent.h"
+#include "GameNetworkedManagerComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -37,7 +38,7 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
 	myObjectToLoad->GetTransform().SetPosition(position);
-	myObjectToLoad->AddComponent<ItemComponent>(10, 10.0f);
+	myObjectToLoad->AddComponent<ItemComponent>(300, 10.0f);
 	myObjectToLoad->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	if (spawnData)
 	{
@@ -52,20 +53,24 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 
 GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
 	GameObject* gm = new GameObject();
+	int quota = 500;
+	int terminationFee = 60;
+	int initAllowance = 300;
+	int allowedTime = 300;
+
 	if (spawnData)
 	{
 		int componentIdCount = 0;
 		int pFabId = spawnData->pfab;
 		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
-		gm->AddComponent<GameNetworkedManagerComponent>(spawnData->objId,
+		gm->AddComponent<GameNetworkedManagerComponent>(quota, terminationFee, initAllowance, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
-
-		gm->AddComponent<TimerNetworkComponent>(300, spawnData->objId,
+		gm->AddComponent<TimerNetworkComponent>(allowedTime, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 	}
 	else {
-		gm->AddComponent<TimerComponent>(300);
-		gm->AddComponent<GameManagerComponent>();
+		gm->AddComponent<TimerComponent>(allowedTime);
+		gm->AddComponent<GameManagerComponent>(quota, terminationFee, initAllowance);
 	}
 	world->AddGameObject(gm);
 
@@ -128,16 +133,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetTag(Tags::Player);
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
 
-	StaminaComponent* stamina = player->AddComponent<StaminaComponent>(100, 100, 3);
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
 	FallDamageComponent* fdc = player->AddComponent<FallDamageComponent>(24,20);
-
-	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
-	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
-	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
-	pc->SetBindingDebug(controller->GetButtonHashId("Debug"));
 	DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
-
 	AnimationComponent* animator = player->AddComponent<AnimationComponent>();
 
 	AnimState* walk = new AnimState(new Rendering::MeshAnimation("Walk.anm"));
@@ -179,6 +177,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	BoundsComponent* bounds = player->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
 
 	int componentIdCount = 0;
+	StaminaComponent* stamina;
 
 	if (spawnData)
 	{
@@ -204,6 +203,9 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		DamageableNetworkComponent* dc = player->AddComponent<DamageableNetworkComponent>(100, 100, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
+		stamina = player->AddComponent<StaminaNetworkComponent>(100, 100, 3, spawnData->objId,
+			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
+
 		if (spawnData->clientOwned)
 			CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 		else
@@ -214,14 +216,18 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 		DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
+		stamina = player->AddComponent<StaminaComponent>(100, 100, 3);
 		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
 		listenerComp->RecordMic();
 		pc->SetBindingPause(controller->GetButtonHashId("Pause"));
 	}
 
+	pc->SetBindingDash(controller->GetButtonHashId("Dash"), stamina);
+	pc->SetBindingJump(controller->GetButtonHashId("Jump"), stamina);
+	pc->SetBindingInteract(controller->GetButtonHashId("Interact"));
+	pc->SetBindingDebug(controller->GetButtonHashId("Debug"));
 
 	phys->SetPhysicsObject(new PhysicsObject(&player->GetTransform()));
-
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
 

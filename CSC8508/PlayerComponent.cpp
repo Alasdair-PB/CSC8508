@@ -61,15 +61,12 @@ void PlayerComponent::OnEvent(CollisionEvent* collisionEvent)
 {
     if (CheckTag(Tag::Ground, collisionEvent))
         collidedTags.push(Tag::Ground);
-    if (CheckTag(Tag::DropZone, collisionEvent)) {
+    if (CheckTag(Tag::DropZone, collisionEvent))
         collidedTags.push(Tag::DropZone);
-    }
-    if (CheckTag(Tag::DepositZone, collisionEvent)) {
+    if (CheckTag(Tag::DepositZone, collisionEvent))
         collidedTags.push(Tag::DepositZone);
-    }
-	if (CheckTag(Tag::Exit, collisionEvent)) {
+	if (CheckTag(Tag::Exit, collisionEvent))
 		collidedTags.push(Tag::Exit);
-	}
 }
 
 void PlayerComponent::OnEvent(DeathEvent* deathEvent) {
@@ -124,7 +121,6 @@ void PlayerComponent::OnJump(float deltaTime) {
     if (jumpDuration < 0.2f)
         SetLinearVelocity(jumpDuration);
     else {
-        
         if (isGrounded) { isJumping = false; }
     }
 }
@@ -146,7 +142,7 @@ bool PlayerComponent::DropItemToFloor() {
 }
 
 bool PlayerComponent::DropItemToDropZone() {
-    float sellValue = inventoryComponent->SellAllItems();
+    inventoryComponent->SellAllItems();
     return true;
 }
 
@@ -224,6 +220,7 @@ void PlayerComponent::OnPlayerMove() {
     dir += yawRotation * Vector3(inputComponent->GetNamedAxis("Sidestep"), 0, 0);
     Matrix3 offsetRotation = Matrix::RotationMatrix3x3(0.0f, Vector3(0, 1, 0));
     dir = offsetRotation * dir;
+
     physicsObj->AddForce(dir * speed * weightModifier * (isDashing ? dashMultiplier : 1.0f));
     physicsObj->RotateTowardsVelocity();
 }
@@ -250,19 +247,16 @@ void PlayerComponent::CheckInputStack() {
             OnJumpInput();
         else if (inputStack.top() == onItemInteractBinding)
             OnItemInteract();
-        else if (inputStack.top() == onPauseBinding) {
+        else if (inputStack.top() == onPauseBinding)
             OnPauseInput();
-        }
-		else if (inputStack.top() == onDebugBinding) {
+		else if (inputStack.top() == onDebugBinding)
 			OnDebugInput();
-		}
         inputStack.pop();
     }
 }
 
 void PlayerComponent::UpdateStates(float deltaTime) {
     isDashing = false;
-
     isGrounded = !isJumping ? true : false;
     inDropZone = false;
 	inBank = false;
@@ -278,14 +272,13 @@ void PlayerComponent::AddDownWardsVelocity() {
     Vector3 force = physicsObj->GetForce();
     Vector3 velocity = physicsObj->GetLinearVelocity();
 
-    if (Vector::Length(velocity) > Vector::Length(maxVelocity) && !isDashing) {
+    if (Vector::Length(velocity) > Vector::Length(maxVelocity)) {
         physicsObj->ClearForces();
         physicsObj->SetLinearVelocity(Vector3(
             std::min(maxVelocity.x, velocity.x),
             std::min(maxVelocity.y, velocity.y),
             std::min(maxVelocity.z, velocity.z)));
     }
-
 }
 
 void PlayerComponent::Update(float deltaTime)
@@ -293,8 +286,9 @@ void PlayerComponent::Update(float deltaTime)
     if (physicsObj == nullptr || physicsComponent == nullptr || inputComponent == nullptr || staminaComponent == nullptr)
         return;
     CheckTagStack();
-    OnPlayerMove();
     CheckInputStack();
+
+    OnPlayerMove();
     OnJump(deltaTime);
     AddDownWardsVelocity();
     UpdateStates(deltaTime);

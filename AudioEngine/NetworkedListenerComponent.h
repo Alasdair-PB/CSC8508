@@ -61,11 +61,8 @@ namespace NCL::CSC8508 {
 				encodeThreadRunning = true;
 				StartNetworkedEncodeThread();
 			}
-			else {
+			else
 				decoder = OpenDecoder();
-			}
-
-			std::cout << "Listener ID: " << objectID << ", awake!" << std::endl;
 		}
 
 		void Update(float deltaTime) override {
@@ -73,12 +70,7 @@ namespace NCL::CSC8508 {
 
 			if(clientOwned){
 				Vector3 pos = transform->GetPosition();
-				//std::cout << "Listener " << objectID << " pos: " << std::to_string(pos.x) << ", " << std::to_string(pos.z) << std::endl;
-
 				Vector3 forward = Vector3(fForward.x, fForward.y, fForward.z);
-				//std::cout << "Listener " << objectID << " forward: " << std::to_string(forward.x) << ", " << std::to_string(forward.z) << std::endl;
-
-
 				AudioListenerComponent::Update(deltaTime);
 			}
 			else {

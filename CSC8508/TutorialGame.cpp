@@ -127,7 +127,7 @@ void TutorialGame::InitialiseAssets() {
 
 	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
 	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
-	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));
+	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter400.png"));
 	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
 	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
 
@@ -213,7 +213,6 @@ Vector3 TutorialGame::GetSpawnLocation(int index) {
 
 	Vector3 local = locals[selectedIndex];
 	locals.erase(locals.begin() + selectedIndex);
-	std::cout << "lc" << local.x << ", " << local.y << std::endl;
 	return local;
 }
 

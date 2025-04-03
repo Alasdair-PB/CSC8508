@@ -18,12 +18,16 @@ namespace NCL {
                 itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset)
             {
                 maxItemStorage = std::max(1, maxStorage);
-                PushUI();
             }
 
-            virtual void PushUI() {
+            virtual void InitInventoryUI() {
                 UI::UISystem::GetInstance()->PushNewStack(inventoryUI->inventoryUI, "Inventory");
                 inventoryUI->PushInventoryElement(InventoryMenu());
+            }
+
+            virtual void OnAwake() override
+            {
+                InitInventoryUI();
             }
 
             ~InventoryManagerComponent() = default;
@@ -106,7 +110,6 @@ namespace NCL {
                 }
                 storedItems.clear();
                 wallet += itemTotal;
-                std::cout << "Sold::" << itemTotal << std::endl;
                 return itemTotal;
             }
 
@@ -149,10 +152,12 @@ namespace NCL {
                 storedItems.erase(storedItems.begin() + inventoryIndex);
             }
 
-            void DepositWalletToQuota() {
+            virtual void DepositWalletToQuota() {
 				deposited += wallet;
 				wallet = 0;
             }
+
+            int GetDepositedSum() { return deposited; }
 
         protected:
             int maxItemStorage;

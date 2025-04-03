@@ -51,8 +51,8 @@ if(PS5)
 	source_group("Texture Files" FILES ${ALL_TEXTURES})
 	
 	set(ALL_FILES
-    ${Header_Files}
-    ${Source_Files}
+    	${Header_Files}
+    	${Source_Files}
 	${PS5_Files}
 	${Legacy_Files}
 	${ALL_SHADERS}

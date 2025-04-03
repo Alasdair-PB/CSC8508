@@ -5,12 +5,12 @@
 #include "StaminaComponent.h"
 #include "CollisionEvent.h"
 #include "SightComponent.h"
-#include "../DamageableComponent.h"
+#include "DamageableComponent.h"
 #include "EventListener.h"
 #include "EventManager.h"
 #include "CollisionDetection.h"
-#include "../InventoryNetworkManagerComponent.h"
-#include "../UISystem/UISystem.h"
+#include "InventoryNetworkManagerComponent.h"
+#include "UISystem.h"
 
 namespace NCL {
     namespace CSC8508 {
@@ -82,7 +82,7 @@ namespace NCL {
             Vector3 GetForwardsDirection();
             void GetWeightModifier();
 
-            float speed = 15.0f;
+            float speed = 7.0f;
             float dashMultiplier = 2.5f;
             float jumpForce = 10.0f;
             float jumpDuration = 0;

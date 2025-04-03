@@ -1,5 +1,5 @@
 #include "Room.h"
-#include "dungeon.h"
+#include "Dungeon.h"
 #include "GameObject.h"
 
 using namespace NCL::CSC8508::DungeonGen;
@@ -17,21 +17,7 @@ int Room::MainDun() {
 
     Dungeon dungeon(dungeonWidth, dungeonHeight);
 
-    dungeon.generateRooms(10, 5, 15);
-    dungeon.connectRooms();
-    dungeon.printDungeon();
-
-
-    if (!dungeon.rooms.empty()) {
-        auto [startX, startY] = dungeon.rooms.front()->center();
-        Player player(startX, startY);
-        std::cout << "Player starting at (" << startX << ", " << startY << ")" << std::endl;
-
-        player.move(1, 0);
-        player.move(0, 1);
-    }
-
-    std::cout << "Press any key to exit..." << std::endl;
-    std::cin.get();
+    dungeon.GenerateRooms(10, 5, 15);
+    dungeon.ConnectRooms();
     return 0;
 }

@@ -37,7 +37,7 @@ namespace NCL {
                 /// <param name="roomCount"></param>
                 /// <param name="minSize"></param>
                 /// <param name="maxSize"></param>
-                void generateRooms(int roomCount, int minSize, int maxSize) {
+                void GenerateRooms(int roomCount, int minSize, int maxSize) {
                     int attempts = 0;
 
                     while (rooms.size() < static_cast<size_t>(roomCount) && attempts < roomCount * 5) {
@@ -54,7 +54,7 @@ namespace NCL {
 
                         bool overlap = false;
                         for (auto room : rooms) {
-                            if (checkOverlap(newRoom, room)) {
+                            if (CheckOverlap(newRoom, room)) {
                                 overlap = true;
                                 break;
                             }
@@ -75,7 +75,7 @@ namespace NCL {
                 /// <param name="a"></param>
                 /// <param name="b"></param>
                 /// <returns></returns>
-                bool checkOverlap(Room* a, Room* b) {
+                bool CheckOverlap(Room* a, Room* b) {
                     return !(a->x + a->width <= b->x || b->x + b->width <= a->x ||
                         a->y + a->height <= b->y || b->y + b->height <= a->y);
                 }
@@ -87,7 +87,7 @@ namespace NCL {
                 /// Add them to each other's neighbor list
                 /// Calls a function to creat corridor between rooms and record path in corridor map
                 /// </summary>
-                void connectRooms() {
+                void ConnectRooms() {
                     if (rooms.empty()) return;
 
                     std::sort(rooms.begin(), rooms.end(), [](Room* a, Room* b) {
@@ -101,97 +101,14 @@ namespace NCL {
                         roomA->neighbors.push_back(roomB);
                         roomB->neighbors.push_back(roomA);
 
-                        createCorridor(roomA, roomB);
+                        CreateCorridor(roomA, roomB);
                     }
                 }
 
-                void createCorridor(Room* a, Room* b) {
+                void CreateCorridor(Room* a, Room* b) {
                     auto [ax, ay] = a->center();
                     auto [bx, by] = b->center();
-                    std::cout << "Corridor between (" << ax << ", " << ay << ") and ("
-                        << bx << ", " << by << ")" << std::endl;
-
                 }
-
-                void printDungeon() {
-                    std::cout << "Dungeon Info:" << std::endl;
-                    for (auto room : rooms) {
-                        room->print();
-                        if (!room->neighbors.empty()) {
-                            std::cout << "  Connected to: ";
-                            for (auto neighbor : room->neighbors) {
-                                std::cout << "(" << neighbor->x << ", " << neighbor->y << ") ";
-                            }
-                            std::cout << std::endl;
-                        }
-                    }
-                }
-            };
-
-            class Player
-            {
-            public:
-                int posX, posY;
-
-                Player(int x, int y) : posX(x), posY(y) {}
-
-                void move(int dx, int dy) {
-                    posX += dx;
-                    posY += dy;
-                    std::cout << "Player moved to (" << posX << ", " << posY << ")" << std::endl;
-                }
-            };
-
-            /// <summary>
-            /// collider: Box, Sphere, Capsule
-            /// tags: e.g. "Room", "Corridor", "Door"
-            /// </summary>
-            struct Prefab {
-                std::string name; 
-                std::string modelPath;
-                std::string collider; 
-                bool isWalkable;         
-                float width, height, depth; 
-                std::vector<std::string> tags; 
-
-                Prefab(std::string _name, std::string _model, std::string _collider,
-                    bool _walkable, float w, float h, float d, std::vector<std::string> _tags)
-                    : name(_name), modelPath(_model), collider(_collider), isWalkable(_walkable),
-                    width(w), height(h), depth(d), tags(_tags) {
-                }
-            };
-
-            class PrefabManager {
-            private:
-                std::vector<Prefab> prefabs;
-
-            public:
-                /// <summary>
-                /// Loads prefab from a JSON configuration file
-                /// </summary>
-                void loadPrefabs() {
-                    prefabs.push_back(Prefab("SmallRoom", "models/small_room.obj", "Box", true, 5, 3, 5, { "Room" }));
-                    prefabs.push_back(Prefab("Corridor", "models/corridor.obj", "Box", true, 3, 3, 10, { "Corridor" }));
-                    prefabs.push_back(Prefab("Door", "models/door.obj", "Box", true, 1, 2, 0.1, { "Door" }));
-                    prefabs.push_back(Prefab("Table", "models/table.obj", "Box", false, 2, 1, 2, { "Furniture" }));
-                }
-
-                /// <summary>
-                /// Sets room type as a Prefab
-                /// </summary>
-                /// <param name="tag"></param>
-                /// <returns>Filtered Rooms</returns>
-                Prefab* getRandomPrefabByTag(const std::string& tag) {
-                    std::vector<Prefab*> filtered;
-                    for (auto& p : prefabs) {
-                        if (std::find(p.tags.begin(), p.tags.end(), tag) != p.tags.end()) {
-                            filtered.push_back(&p);
-                        }
-                    }
-                    if (filtered.empty()) return nullptr;
-                    return filtered[rand() % filtered.size()];
-                }
-
             };
         }
 	}

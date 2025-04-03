@@ -2,7 +2,7 @@
 #include "Controller.h"
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
-#include "Legacy/MainMenu.h"
+#include "MainMenu.h"
 #include "Math.h"
 #include "GameTechRendererInterface.h"
 #include "UISystem.h"
@@ -10,7 +10,7 @@
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
-#include "Legacy/PlayerComponent.h"
+#include "PlayerComponent.h"
 #include "BoundsComponent.h"
 #include <vector>
 #include "SaveManager.h"

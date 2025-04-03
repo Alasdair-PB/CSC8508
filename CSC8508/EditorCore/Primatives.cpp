@@ -4,7 +4,6 @@
 #include "INetworkComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
-#include "StaminaComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
 #include "AnimationComponent.h"
@@ -178,7 +177,10 @@ GameObject* EditorGame::AddSphereToWorld(const Vector3& position, float radius, 
 	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
+	phys->GetPhysicsObject()->SetInverseMass(0);
 	phys->SetInitType(PhysicsComponent::Sphere);
+
+	sphere->SetLayerID(Layers::LayerID::Default);
 	return sphere;
 }
 
@@ -200,5 +202,8 @@ GameObject* EditorGame::AddCubeToWorld(const Vector3& position, Vector3 dimensio
 
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitCubeInertia();
+	phys->GetPhysicsObject()->SetInverseMass(0);
+	cube->SetLayerID(Layers::LayerID::Default);
+
 	return cube;
 }

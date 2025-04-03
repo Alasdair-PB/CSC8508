@@ -1,20 +1,19 @@
-#ifndef INSPECTOR_H
-#define INSPECTOR_H
+#ifndef TOOLS_H
+#define TOOLS_H
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
-#include "EditorWindow.h"
-
 #include "../ComponentAssemblyDefiner.h"
+#include "EditorWindow.h"
 
 using namespace NCL;
 using namespace CSC8508;
 using namespace UI;
 
-class Inspector : EditorWindow {
+class ToolsBar : EditorWindow {
 public:
-	Inspector();
-	~Inspector();
+	ToolsBar();
+	~ToolsBar();
 
 	void SetFocus(GameObject* object) {
 		if (!object) return;
@@ -46,15 +45,7 @@ public:
 
 	GameObject* NewGameObject();
 
-	void RenderIComponents();
-
-	void EndFocus() {
-		focus = nullptr;
-		*isEnabled = true;
-		SetVector(positionInfo);
-		SetVector(scaleInfo);
-		SetQuaternion(orientationInfo);
-	}
+	void OnFocusEnd() override {}
 
 	UIElementsGroup* inspectorBar;
 	UIElementsGroup* toolsBar;
@@ -95,4 +86,4 @@ private:
 };
 
 
-#endif // INSPECTOR_H
+#endif // TOOLS_H

@@ -1,20 +1,19 @@
-#ifndef INSPECTOR_H
-#define INSPECTOR_H
+#ifndef HIERARCHY_H
+#define HIERARCHY_H
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
-#include "EditorWindow.h"
-
 #include "../ComponentAssemblyDefiner.h"
+#include "EditorWindow.h"
 
 using namespace NCL;
 using namespace CSC8508;
 using namespace UI;
 
-class Inspector : EditorWindow {
+class Hierarchy : EditorWindow {
 public:
-	Inspector();
-	~Inspector();
+	Hierarchy();
+	~Hierarchy();
 
 	void SetFocus(GameObject* object) {
 		if (!object) return;
@@ -89,10 +88,8 @@ private:
 	void PushLoadChild();
 	void PushRemoveGameObject();
 
-	void InitInspector();
-	void InitTools();
 	void InitHierachy();
 };
 
 
-#endif // INSPECTOR_H
+#endif // HIERARCHY_H

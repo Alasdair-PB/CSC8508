@@ -262,6 +262,12 @@ namespace NCL::CSC8508 {
 		void SetTag(Tags::Tag newTag) {  tags.push_back(newTag);}
 		vector<Tags::Tag> GetTags() const { return tags;}
 
+	#if EDITOR
+		void SetName(std::string name) { this->name = name; }
+		std::string GetName() { return name; }
+
+	#endif
+
 	protected:
 		bool isEnabled;
 		const bool isStatic;
@@ -272,6 +278,12 @@ namespace NCL::CSC8508 {
 		GameObject* parent;
 		vector<IComponent*> components; 
 		vector<GameObject*> children;
+
+
+		// To move into Editor folder on reorg
+		#if EDITOR
+			std::string name = "Default";
+		#endif
 
 		Layers::LayerID	layerID;
 		vector<Tags::Tag> tags;
@@ -343,8 +355,6 @@ namespace NCL::CSC8508 {
 	protected:
 		GameObject& gameObject;
 		size_t entry;
-
-
 	};
 
 }

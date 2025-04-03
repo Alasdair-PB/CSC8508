@@ -200,14 +200,14 @@ void EditorGame::DeleteSelectionObject() {
 	physics->Clear();
 }
 
-const bool load = true;
+//const bool load = true;
 
 void EditorGame::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-	std::string assetPath = GetAssetPath("myScene.pfab"); 
-	load ? LoadWorld(assetPath) : SaveWorld(assetPath);
+	//std::string assetPath = GetAssetPath("myScene.pfab"); 
+	//load ? LoadWorld(assetPath) : SaveWorld(assetPath);
 }
 
 void EditorGame::SelectObject(BoundsComponent* newSelection) {

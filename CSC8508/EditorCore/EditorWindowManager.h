@@ -3,18 +3,18 @@
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
-#include "EditorWindow.h"
-
 #include "../ComponentAssemblyDefiner.h"
+#include "EditorWindow.h"
 
 using namespace NCL;
 using namespace CSC8508;
 using namespace UI;
 
-class Inspector : EditorWindow {
+
+class EditorWindowManager {
 public:
-	Inspector();
-	~Inspector();
+	EditorWindowManager();
+	~EditorWindowManager();
 
 	void SetFocus(GameObject* object) {
 		if (!object) return;
@@ -26,7 +26,12 @@ public:
 		SetQuaternion(orientationInfo, object->GetTransform().GetLocalOrientation());
 		*isEnabled = object->IsEnabled();
 		*name = focus->GetName();
+
+		for (EditorWindow* window : windows)
+			window->OnSetFocus(focus);
 	}
+
+	static EditorWindowManager& Instance();
 	
 	void ClearGameWorld();
 
@@ -41,12 +46,13 @@ public:
 				orientationInfo->z, orientationInfo->w).Normalised());
 		focus->SetEnabled(*isEnabled);
 		focus->SetName(*name);
-		RenderIComponents();
+
+		for (EditorWindow* window : windows)
+			window->OnRenderFocus(focus);
 	}
 
 	GameObject* NewGameObject();
 
-	void RenderIComponents();
 
 	void EndFocus() {
 		focus = nullptr;
@@ -56,17 +62,21 @@ public:
 		SetQuaternion(orientationInfo);
 	}
 
-	UIElementsGroup* inspectorBar;
+	vector<UIElementsGroup*> inspectorBar;
 	UIElementsGroup* toolsBar;
 	UIElementsGroup* hierarchy;
 
 	enum Primitives {Cube, Sphere, Empty};
 
 private:
+
+	vector<EditorWindow*> windows;
 	GameObject* focus;
+
 	Vector3* positionInfo;
 	Vector3* scaleInfo;
 	Vector4* orientationInfo;
+
 	ComponentAssemblyDefiner::ComponentMapId mapId;
 	Tags::Tag tagId;
 	Primitives primitive;
@@ -79,19 +89,7 @@ private:
 	std::string GetAssetPath(std::string pfabName);
 	void SetVector(Vector3* vector, Vector3 values = Vector3());
 	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
-	void PushLoadPfab();
-	void PushAddChild();
-	void PushAddComponentField();
-	void PushSetPrimitive();
-	void PushTagField();
-	void PushFocusParent();
-	void PushAddParent();
-	void PushLoadChild();
-	void PushRemoveGameObject();
-
-	void InitInspector();
-	void InitTools();
-	void InitHierachy();
+	void AddWindow(EditorWindow* window);
 };
 
 

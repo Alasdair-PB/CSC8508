@@ -7,6 +7,7 @@ using namespace NCL;
 using namespace UI;
 
 PauseUI::PauseUI() {
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 	std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
 		ImGui::Text("Paused");
 		return CSC8508::PushdownState::PushdownResult::NoChange;

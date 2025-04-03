@@ -5,6 +5,8 @@ if(PS5)
 project(PS5CSC8508 CXX)
 file(COPY ${CMAKE_SOURCE_DIR}/Assets/ 
      DESTINATION ${CMAKE_SOURCE_DIR}/build/Assets)
+file(COPY ${CMAKE_SOURCE_DIR}/sce_module/ 
+ DESTINATION ${CMAKE_SOURCE_DIR}/build/sce_module)
 else ()
     if (Editor)
         project(EDITOR CXX)

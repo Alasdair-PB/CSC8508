@@ -3,7 +3,7 @@
 #include "GameManagerComponent.h"
 #include "ComponentManager.h"
 #include "EventManager.h"
-#include "Legacy/PlayerComponent.h"
+#include "PlayerComponent.h"
 
 using namespace NCL::CSC8508;
 

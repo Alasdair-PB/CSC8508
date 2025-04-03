@@ -30,8 +30,6 @@ set(AI_State_Machine
     "StateTransition.h"
     "IState.h"
     "IStateTransition.h"
-    "WaitState.h"
-    "JumpState.h"
 )
 source_group("AI\\State Machine" FILES ${AI_State_Machine})
 
@@ -134,17 +132,12 @@ set(Components
     "BoundsComponent.cpp"
     "StateComponent.cpp"
     "StateComponent.h"
-	"IStateComponent.cpp"
+    "IStateComponent.cpp"
     "IStateComponent.h"
-    "StaminaComponent.h"
-    "StaminaComponent.cpp"
     "AnimationComponent.cpp"
     "AnimationComponent.h"
     "SightComponent.h"
     "SightComponent.cpp"
-    "FallDamageComponent.h"
-    "FallDamageComponent.cpp"
-    "TimerComponent.h"
 )
 source_group("Components" FILES ${Components})
 
@@ -152,11 +145,6 @@ set(NetworkComponents
     "InputNetworkComponent.h"
     "TransformNetworkComponent.h"
     "FullTransformNetworkComponent.h"
-    "DamageableNetworkComponent.h"
-    "DamageableNetworkComponent.cpp"
-    "TimerNetworkComponent.h"
-    "GameNetworkedManagerComponent.h"
-    "GameNetworkedManagerComponent.cpp"
 )
 source_group("NetworkComponents" FILES ${NetworkComponents})
 

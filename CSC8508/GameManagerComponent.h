@@ -4,7 +4,7 @@
 #include "IComponent.h"
 #include <iostream>
 #include "EventManager.h"
-#include "../CSC8508/Legacy/PlayerComponent.h"
+#include "PlayerComponent.h"
 #include "DamageableComponent.h"
 #include "PauseUI.h"
 #include "FramerateUI.h"

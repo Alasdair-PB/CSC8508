@@ -22,7 +22,7 @@
 #include "DamageableNetworkComponent.h"
 #include "TimerNetworkComponent.h"
 
-#include "../CSC8508CoreClasses/GameNetworkedManagerComponent.h"
+#include "GameNetworkedManagerComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
 
@@ -59,7 +59,6 @@ GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnD
 		int unqiueId = GetUniqueId(spawnData->objId, componentIdCount);
 		gm->AddComponent<GameNetworkedManagerComponent>(spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
-
 		gm->AddComponent<TimerNetworkComponent>(300, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 	}

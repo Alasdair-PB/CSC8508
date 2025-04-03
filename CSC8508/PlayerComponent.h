@@ -5,12 +5,12 @@
 #include "StaminaComponent.h"
 #include "CollisionEvent.h"
 #include "SightComponent.h"
-#include "../DamageableComponent.h"
+#include "DamageableComponent.h"
 #include "EventListener.h"
 #include "EventManager.h"
 #include "CollisionDetection.h"
-#include "../InventoryNetworkManagerComponent.h"
-#include "../UISystem/UISystem.h"
+#include "InventoryNetworkManagerComponent.h"
+#include "UISystem.h"
 
 namespace NCL {
     namespace CSC8508 {

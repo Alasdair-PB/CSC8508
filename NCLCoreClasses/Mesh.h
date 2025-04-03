@@ -10,7 +10,7 @@ https://research.ncl.ac.uk/game/
 #include <cstdint>
 #include "Vector.h"
 #include "Matrix.h"
-
+#include <memory>
 namespace NCL::Rendering {
 	class RendererBase;
 	
@@ -157,10 +157,10 @@ namespace NCL::Rendering {
 		void SetInverseBindPose(const std::vector<Matrix4>& newMats);
 		void CalculateInverseBindPose();
 
-		bool	GetVertexIndicesForTri(unsigned int i, unsigned int& a, unsigned int& b, unsigned int& c) const;
-		bool	GetTriangle(unsigned int i, Vector3& a, Vector3& b, Vector3& c) const;
-		bool	GetNormalForTri(unsigned int i, Vector3& n) const;
-		bool	HasTriangle(unsigned int i) const;
+		bool GetVertexIndicesForTri(unsigned int i, unsigned int& a, unsigned int& b, unsigned int& c) const;
+		bool GetTriangle(unsigned int i, Vector3& a, Vector3& b, Vector3& c) const;
+		bool GetNormalForTri(unsigned int i, Vector3& n) const;
+		bool HasTriangle(unsigned int i) const;
 
 		const std::vector<Vector3>&		GetPositionData()		const { return positions;	}
 		const std::vector<Vector2>&		GetTextureCoordData()	const { return texCoords;	}

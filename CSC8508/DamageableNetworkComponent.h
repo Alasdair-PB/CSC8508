@@ -45,12 +45,7 @@ namespace NCL::CSC8508
 			return types;
 		}
 
-		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override
-		{
-
-
-			return WriteFullPacket();
-		}
+		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override { return WriteFullPacket();}
 
 		vector<GamePacket*> WriteFullPacket() override
 		{

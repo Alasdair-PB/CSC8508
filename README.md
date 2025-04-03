@@ -130,4 +130,4 @@ Please note the issues listed were not fixed due to task priorities while finish
   
 ### Submission
 A tag has been created for the submitted release of this project. Tag::`Submission` was the final submssion for this coursework and is the one intended for marking. While the project may continue to have changes after this time of submssion the release was submitted before the deadline and will remain unedited. 
-To view the submitted version either checkout the release tag 'Submission' from main or view branch::[CSC8508 Submission](https://github.com/Alasdair-PB/CSC8508/tree/Submission-Csc8505). 
+To view the submitted version either checkout the release tag 'Submission' from main or view branch::[CSC8508 Submission](https://github.com/Alasdair-PB/CSC8508/tree/Submission-CSC8508). 

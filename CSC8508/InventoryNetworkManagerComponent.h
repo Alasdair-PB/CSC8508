@@ -5,12 +5,15 @@
 namespace NCL::CSC8508 {
 	const int MAX_INVENTORY_ITEMS = 5;
 
+	enum InventorySubPacketType {Sell, Deposit};
+
 	class InventoryNetworkState : public INetworkState {
 	public:
 		InventoryNetworkState() {}
 		~InventoryNetworkState() = default;
 		int inventory[MAX_INVENTORY_ITEMS];
 		int wallet;
+		int deposited;
 	};
 
 	struct InvFullPacket : public IFullNetworkPacket {
@@ -24,10 +27,19 @@ namespace NCL::CSC8508 {
 
 	struct SellInventoryPacket : INetworkPacket {
 		int soldInventory[MAX_INVENTORY_ITEMS];
-
 		SellInventoryPacket() {
 			type = Component_Event;
-			packetSubType = None;
+			packetSubType = Sell;
+			size = sizeof(SellInventoryPacket) - sizeof(GamePacket);
+		}
+	};
+
+	struct DepositWalletPacket : INetworkPacket {
+		int wallet;
+		int despoited;
+		DepositWalletPacket() {
+			type = Component_Event;
+			packetSubType = Deposit;
 			size = sizeof(SellInventoryPacket) - sizeof(GamePacket);
 		}
 	};
@@ -38,20 +50,29 @@ namespace NCL::CSC8508 {
 		InventoryNetworkManagerComponent(GameObject& gameObject, int maxStorage, float carryOffset, float dropOffset, int objId, int ownId, int componId, int pfabID, bool clientOwned)
 			:
 			InventoryManagerComponent(gameObject, maxStorage, carryOffset, dropOffset),
-			INetworkDeltaComponent(objId, ownId, componId, pfabID, clientOwned, new InventoryNetworkState()) {
-		}
+			INetworkDeltaComponent(objId, ownId, componId, pfabID, clientOwned, new InventoryNetworkState()) {}
 		~InventoryNetworkManagerComponent() = default;
+
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
 			static std::unordered_set<std::type_index> types = {
 				std::type_index(typeid(IComponent)),
 				std::type_index(typeid(INetworkComponent)),
 				std::type_index(typeid(InventoryManagerComponent)),
+				std::type_index(typeid(InventoryNetworkManagerComponent)),
 				std::type_index(typeid(INetworkDeltaComponent))
 			};
 			return types;
 		}
 
-		void PushUI() override {}
+		void InitInventoryUI() override {
+			if (!IsOwner()) return;
+			InventoryManagerComponent::InitInventoryUI();
+		}
+
+		void OnAwake() override
+		{
+			InitInventoryUI();
+		}
 
 		vector<GamePacket*> WritePacket();
 		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override { return WritePacket(); }
@@ -61,6 +82,7 @@ namespace NCL::CSC8508 {
 		void TrySetStoredItems(InventoryNetworkState* lastInvFullState, int i);
 		bool ReadPacket() {}
 		bool ReadSellInventoryPacket(SellInventoryPacket pck);
+		bool ReadDepositWalletPacket(DepositWalletPacket pck);
 		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override { return false; }
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override;
 		bool ReadEventPacket(INetworkPacket& p) override;
@@ -68,6 +90,8 @@ namespace NCL::CSC8508 {
 		void DisableSoldItemInWorld(SellInventoryPacket& pck, int i);
 		bool InventoryIsMatch(SellInventoryPacket& pck);
 		float SellAllItems() override;
+		void DepositWalletToQuota() override;
+
 	};
 
 }

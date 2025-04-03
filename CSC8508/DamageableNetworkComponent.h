@@ -10,7 +10,6 @@ namespace NCL::CSC8508
 	public:
 		DamageableNetworkState() : health(0){}
 		~DamageableNetworkState() = default;
-
 		int health;
 	};
 
@@ -22,7 +21,6 @@ namespace NCL::CSC8508
 			size = sizeof(DamFullPacket) - sizeof(GamePacket);
 		}
 	};
-
 
 	class DamageableNetworkComponent : public DamageableComponent, public INetworkDeltaComponent {
 	public:
@@ -43,6 +41,18 @@ namespace NCL::CSC8508
 				std::type_index(typeid(INetworkDeltaComponent))
 			};
 			return types;
+		}
+
+		void InitHealthUI() override {
+			if (!IsOwner()) return;
+			DamageableComponent::InitHealthUI();
+		}
+
+		void OnAwake() override{ InitHealthUI(); }
+
+		void Update(float deltaTime) override {
+			if (!IsOwner()) return;
+			DamageableComponent::Update(deltaTime);
 		}
 
 		vector<GamePacket*> WriteDeltaPacket(bool* deltaFrame) override { return WriteFullPacket();}
@@ -67,10 +77,7 @@ namespace NCL::CSC8508
 			return packets;
 		}
 
-		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override
-		{
-			return true;
-		}
+		bool ReadDeltaPacket(IDeltaNetworkPacket& idp) override {return true;}
 
 		bool ReadFullPacket(IFullNetworkPacket& ifp) override {
 			int newStateId = 0;

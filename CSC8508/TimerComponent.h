@@ -24,11 +24,15 @@ namespace NCL::CSC8508
 		TimerComponent(GameObject& gameObject, float timeRemaining) : IComponent(gameObject) {
 			isComplete = false;
 			remainingTime = timeRemaining;
-			InititUI();
 		}
 
 		~TimerComponent() {
 			UI::UISystem::GetInstance()->RemoveStack("Timer");
+		}
+
+		virtual void OnAwake() override
+		{
+			InititUI();
 		}
 
 		void InititUI() {
@@ -46,9 +50,6 @@ namespace NCL::CSC8508
 
 		void UpdateUI() {
 			timerUI->UpdateTimer(remainingTime);
-		}
-
-		void OnAwake() override {
 		}
 
 		void SetTime(float time) {

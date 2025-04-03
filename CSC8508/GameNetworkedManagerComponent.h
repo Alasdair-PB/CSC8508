@@ -24,8 +24,8 @@ namespace NCL::CSC8508 {
 
 	class GameNetworkedManagerComponent : public GameManagerComponent, public INetworkComponent {
 	public:
-		GameNetworkedManagerComponent(GameObject& gameObject, int objId, int ownId, int componentID, int pfabId, bool clientOwned)
-			: GameManagerComponent(gameObject), INetworkComponent(objId, ownId, componentID, pfabId, clientOwned) {
+		GameNetworkedManagerComponent(GameObject& gameObject, int quota, int terminationFee, int initAllowance, int objId, int ownId, int componentID, int pfabId, bool clientOwned)
+			: GameManagerComponent(gameObject, quota, terminationFee, initAllowance), INetworkComponent(objId, ownId, componentID, pfabId, clientOwned) {
 		}
 
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {

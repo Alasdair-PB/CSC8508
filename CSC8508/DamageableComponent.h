@@ -27,22 +27,30 @@ namespace NCL::CSC8508
         DamageableComponent(GameObject& gameObject, int initialHealth, int initialMaxHealth)
             : IComponent(gameObject), owner(gameObject),
             health(std::max(0, initialHealth)),
-            maxHealth(std::max(1, initialMaxHealth)) 
+            maxHealth(std::max(1, initialMaxHealth)) {
+        }
+
+        ~DamageableComponent() = default;
+
+        virtual void OnAwake() override
         {
+            InitHealthUI();
+        }
+
+        virtual void InitHealthUI() {
             UI::UISystem::GetInstance()->PushNewStack(healthbar->healthbar, "Healthbar");
             health = std::min(health, maxHealth);
             healthbar->UpdateHealth(health);
         }
 
-        ~DamageableComponent() = default;
+        virtual void Update(float deltaTime) override{
+            healthbar->UpdateHealth(health);
+        }
 
         void Damage(int damage) {
-            if (damage > 0) {
-                health = std::max(0, health - damage);
-                healthbar->UpdateHealth(health);
-                if (health <= 0)
-                    InvokeDeathEvent();
-            }
+            if (damage <= 0) return;
+            health = std::max(0, health - damage);
+            if (health <= 0) InvokeDeathEvent();
         }
 
         void Heal(int healthRegain) {

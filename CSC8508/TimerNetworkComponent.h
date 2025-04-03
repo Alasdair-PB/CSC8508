@@ -38,6 +38,11 @@ namespace NCL::CSC8508
 				UpdateUI();
 		}
 
+		void OnAwake() override
+		{
+			InititUI();
+		}
+
 		virtual std::unordered_set<std::type_index>& GetDerivedTypes() const override {
 			static std::unordered_set<std::type_index> derivedTypes = {
 				typeid(TimerComponent),

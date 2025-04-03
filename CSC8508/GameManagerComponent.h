@@ -21,58 +21,12 @@ namespace NCL::CSC8508 {
 	};
 
 	class GameManagerComponent : public IComponent, public EventListener<DeathEvent>, public EventListener<ExitEvent>, public EventListener<PauseEvent>, public EventListener<DebugEvent>, public EventListener<OverTimeEvent> {
-	protected:
-		int quota;
-		int bankedCurrency = 0;
-		int terminationFee;
-		int casualties = 0;
-		int framerateDelay;
-		int successState = InGame;
-		enum SuccessStates { InGame, Loss, Win};
-
-		bool debugMode = false;
-		inline static GameManagerComponent* instance = nullptr;
-
-		UI::PauseUI* pauseUI = new UI::PauseUI;
-		UI::FramerateUI* framerate = new UI::FramerateUI;
-		UI::GameOverUI* gameOverUI = new UI::GameOverUI;
-		UI::GameVictoryUI* gameVicUI = new UI::GameVictoryUI;
-
-
-		void OnEvent(DeathEvent* e) override {
-			CheckPlayerInstance(e);
-		}
-
-		void OnEvent(ExitEvent* e) override {
-			OnMissionEnd();
-		}
-
-		void OnEvent(PauseEvent* e) override {
-			OnPauseEvent(e);
-		}
-
-		void OnEvent(DebugEvent* e) override {
-			if (debugMode == false) {
-				debugMode = true;
-				UI::UISystem::GetInstance()->PushNewStack(framerate->frameUI, "Framerate");
-			}
-			else {
-				debugMode = false;
-				UI::UISystem::GetInstance()->RemoveStack("Framerate");
-			}
-		}
-
-		virtual void OnEvent(OverTimeEvent* e) override {
-			OnMissionEnd();
-		}
-
 	public:
-
-		GameManagerComponent(GameObject& gameObject)
-			: IComponent(gameObject), quota(0), bankedCurrency(0), terminationFee(9) {
+		GameManagerComponent(GameObject& gameObject, int quota, int terminationFee, int initAllowance)
+			: IComponent(gameObject), quota(quota), bankedCurrency(initAllowance), casualties(0),
+				terminationFee(terminationFee) {
 			instance = this;
 			pauseUI->PushButtonElement(PauseReturnButton(), "Unpause");
-			/*pauseUI->PushButtonElement(ExitButton(), "Exit");*/
 		}
 
 		~GameManagerComponent() = default;
@@ -91,24 +45,23 @@ namespace NCL::CSC8508 {
 
 		void Update(float dt) override {
 			framerateDelay += 1;
-
 			if (framerateDelay > 10) {
 				framerate->UpdateFramerate(Window::GetTimer().GetTimeDeltaSeconds());
 				framerateDelay = 0;
 			}
 		}
 
+		int GetBankedTotal();
 		virtual void OnPauseEvent(PauseEvent* e);
 		virtual void CheckPlayerInstance(DeathEvent* e);
 
 		virtual void OnMissionEnd() {
+			bankedCurrency += GetBankedTotal();
 			if (bankedCurrency >= quota)
 				OnMissionSuccessful();
 			else
 				OnMissionFailure();
 		}
-
-		int GetTotalQuota();
 
 		bool TryRespawnPlayer() {
 			bankedCurrency -= terminationFee;
@@ -172,6 +125,50 @@ namespace NCL::CSC8508 {
 				return CSC8508::PushdownState::PushdownResult::NoChange;
 				};
 			return func;
+		}
+
+	protected:
+		int quota;
+		int bankedCurrency;
+		int terminationFee;
+		int casualties;
+		int framerateDelay;
+		int successState = InGame;
+		enum SuccessStates { InGame, Loss, Win };
+
+		bool debugMode = false;
+		inline static GameManagerComponent* instance = nullptr;
+
+		UI::PauseUI* pauseUI = new UI::PauseUI;
+		UI::FramerateUI* framerate = new UI::FramerateUI;
+		UI::GameOverUI* gameOverUI = new UI::GameOverUI;
+		UI::GameVictoryUI* gameVicUI = new UI::GameVictoryUI;
+
+		void OnEvent(DeathEvent* e) override {
+			CheckPlayerInstance(e);
+		}
+
+		void OnEvent(ExitEvent* e) override {
+			OnMissionEnd();
+		}
+
+		void OnEvent(PauseEvent* e) override {
+			OnPauseEvent(e);
+		}
+
+		void OnEvent(DebugEvent* e) override {
+			if (debugMode == false) {
+				debugMode = true;
+				UI::UISystem::GetInstance()->PushNewStack(framerate->frameUI, "Framerate");
+			}
+			else {
+				debugMode = false;
+				UI::UISystem::GetInstance()->RemoveStack("Framerate");
+			}
+		}
+
+		virtual void OnEvent(OverTimeEvent* e) override {
+			OnMissionEnd();
 		}
 	};
 }

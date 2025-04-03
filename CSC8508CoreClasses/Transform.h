@@ -5,9 +5,6 @@
 
 #pragma once
 #include <vector>
-
-using std::vector;
-
 using namespace NCL::Maths;
 
 namespace NCL::CSC8508 {

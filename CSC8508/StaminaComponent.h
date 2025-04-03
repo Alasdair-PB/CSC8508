@@ -13,23 +13,33 @@ namespace NCL {
                 this->maxStamina = std::max(1.0f, maxStam);
                 this->stamina = std::min(initStam, maxStamina);
                 this->sRegen = std::max(1.0f, sRegen);
-                UI::UISystem::GetInstance()->PushNewStack(staminaBar->staminaBar, "Stamina Bar");
-                staminaBar->UpdateStamina(stamina);
             }
             ~StaminaComponent() = default;
 
             void Update(float dt)override {
                 stamina = std::min(stamina + (sRegen * dt), maxStamina);
+                UpdateStaminaUI();
+            }
+
+            virtual void OnAwake() override
+            {
+                InitStaminaUI();
+            }
+
+            virtual void InitStaminaUI() {
+                UI::UISystem::GetInstance()->PushNewStack(staminaBar->staminaBar, "Stamina Bar");
+                staminaBar->UpdateStamina(stamina);
+            }
+
+            virtual void UpdateStaminaUI() {
                 staminaBar->UpdateStamina(stamina);
             }
 
             void IncreaseStamina(float regen) {
                 stamina = std::min(stamina + abs(regen), maxStamina);
-                staminaBar->UpdateStamina(stamina);
             }
             void DecreaseStamina(float regen) {
                 stamina = std::max(stamina - abs(regen), 0.0f);
-                staminaBar->UpdateStamina(stamina);
             }
 
             void SetStaminaAction(uint32_t a, float s) {
@@ -38,10 +48,7 @@ namespace NCL {
 
             bool CanPerformAction(uint32_t a) {
                 if (staminaActionMap.find(a) == staminaActionMap.end()) { return false; }
-                if (stamina - staminaActionMap[a] < 0.0f) {
-                    std::cout << "no stamina::" <<std::endl;
-                    return false; 
-                }
+                if (stamina - staminaActionMap[a] < 0.0f) return false; 
                 return true;
             }
 
@@ -55,8 +62,8 @@ namespace NCL {
 
             void SetStamina(float s) {
                 stamina = std::min(stamina, maxStamina);
-                staminaBar->UpdateStamina(stamina);
             }
+
             void SetStaminaRegain(float r) {
                 sRegen = r;
             }

@@ -18,6 +18,8 @@ void InventoryNetworkManagerComponent::TrySetStoredItems(InventoryNetworkState* 
 	if (itemDelta != nullptr) {
 		ComponentManager::OperateOnBufferContents<InventoryManagerComponent>(
 			[&itemDelta](InventoryManagerComponent* o) { o->RemoveItemEntry(itemDelta);});
+		ComponentManager::OperateOnBufferContents<InventoryNetworkManagerComponent>(
+			[&itemDelta](InventoryNetworkManagerComponent* o) { o->RemoveItemEntry(itemDelta); });
 		if (i < storedItems.size())
 			storedItems[i] = itemDelta;
 		else
@@ -53,9 +55,27 @@ void InventoryNetworkManagerComponent::DisableSoldItemsInWorld(SellInventoryPack
 }
 
 bool InventoryNetworkManagerComponent::ReadEventPacket(INetworkPacket& p) {
-	if (p.packetSubType == None)
+	if (p.packetSubType == Sell)
 		return ReadSellInventoryPacket((SellInventoryPacket&)p);
+	else if (p.packetSubType == Deposit)
+		return ReadDepositWalletPacket((DepositWalletPacket&)p);
 	return false;
+}
+
+
+// Worthing coming back to this and determining
+// if this needs to do anything on non-owners as it will 
+// will get set on network events or will be rolled back on missed packets
+// This may be fighting with itself for no reason
+void InventoryNetworkManagerComponent::DepositWalletToQuota(){
+	if (IsOwner()) {
+		InventoryManagerComponent::DepositWalletToQuota();
+		DepositWalletPacket* pck = new DepositWalletPacket();
+		pck->despoited = deposited;
+		pck->wallet = wallet;
+		SendEventPacket(pck);
+		delete pck;
+	}
 }
 
 float InventoryNetworkManagerComponent::SellAllItems() {
@@ -73,9 +93,18 @@ float InventoryNetworkManagerComponent::SellAllItems() {
 			}
 		}
 		SendEventPacket(pck);
-		delete pck;
-	}	
-	return InventoryManagerComponent::SellAllItems();
+		delete pck;	
+		return InventoryManagerComponent::SellAllItems();
+	}
+	return 0;
+}
+
+// Will need a revision if Deposit allows for variable amounts instead of only full despoit
+bool InventoryNetworkManagerComponent::ReadDepositWalletPacket(DepositWalletPacket pck)
+{
+	wallet = pck.wallet;
+	deposited = pck.despoited;
+	return true;
 }
 
 bool InventoryNetworkManagerComponent::ReadSellInventoryPacket(SellInventoryPacket pck)
@@ -125,10 +154,8 @@ bool InventoryNetworkManagerComponent::ReadFullPacket(IFullNetworkPacket& ifp) {
 		else
 			TrySetStoredItems(lastInvFullState, i);
 	}
-
-	if (wallet != p.fullState.wallet)
-		std::cout << "Rollback Sold::" << p.fullState.wallet << std::endl;
 	wallet = p.fullState.wallet;
+	deposited = p.fullState.deposited;
 	return true;
 }
 
@@ -154,6 +181,9 @@ vector<GamePacket*> InventoryNetworkManagerComponent::WritePacket() {
 	}
 	state->wallet = wallet;
 	fp->fullState.wallet = wallet;
+	state->deposited = deposited;
+	fp->fullState.deposited = deposited;
+
 	fp->fullState.stateID = state->stateID;
 	if (clientOwned && state->stateID >= MAX_PACKETID)
 		state->stateID = 0;

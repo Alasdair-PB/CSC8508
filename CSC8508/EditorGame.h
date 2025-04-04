@@ -39,58 +39,51 @@ namespace NCL {
 			~EditorGame();
 			virtual void UpdateGame(float dt);
 			void DeleteSelectionObject();
+			static EditorGame* GetInstance() {return instance;}
 
 			ComponentAssemblyDefiner* GetDefiner();
-
-			static EditorGame* GetInstance() {
-				return instance;
-			}
-
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
+
 		protected:
-			inline static EditorGame* instance = nullptr;
 			void InitialiseAssets();
 			void InitWorld();
 			void InitialiseGame();
 			void SelectObject(BoundsComponent* newSelection);
 			bool TrySelectObject();
-
-			void TestSaveGameObject(std::string assetPath);
-			void TestLoadGameObject(std::string assetPath);
 			void SaveWorld(std::string assetPath);
 			void LoadWorld(std::string assetPath);
-			void TestSave();
 			void UpdateUI();
-			void TestSaveByType();
+			std::string GetAssetPath(std::string pfabName);
 
-			GameObject* CreateChildInstance(Vector3 offset, bool isStatic);
 			GameObject* AddFloorToWorld(const Vector3& position);
-			
 			GameObject* AddNavMeshToWorld(std::string navMeshFilePath, std::string meshId, const Vector3& position, Vector3 dimensions);
-			void SaveUnityNavMeshPrefab(std::string assetPath, std::string navMeshObPath, std::string navMeshNavPath);
 
+			void SaveUnityNavMeshPrefab(std::string assetPath, std::string navMeshObPath, std::string navMeshNavPath);
 			void  CalculateCubeTransformations(const std::vector<Vector3>& vertices, Vector3& position, Vector3& scale, Quaternion& rotation);
 			std::vector<Vector3>  GetVertices(Mesh* navigationMesh, int i);
 
+			bool inSelectionMode;
+			inline static EditorGame* instance = nullptr;
+
 			ComponentAssemblyDefiner* componentAssembly;
-			std::string GetAssetPath(std::string pfabName);
-#ifdef USEVULKAN
-			GameTechVulkanRenderer*	renderer;
-#else
-			GameTechRendererInterface* renderer;
-#endif
 			PhysicsSystem* physics;
 			GameWorld* world;
 			Controller* controller;
 			EditorWindowManager& windowManager;
 			EditorCamera* editorCamera;
 
-			bool inSelectionMode;
 			BoundsComponent* selectionObject = nullptr;
 			NavigationPath outPath;
 			NavigationMesh* navMesh = nullptr;
 			UI::UISystem* uiSystem;
+
+#ifdef USEVULKAN
+			GameTechVulkanRenderer*	renderer;
+#else
+			GameTechRendererInterface* renderer;
+#endif
+			
 		};
 	}
 }

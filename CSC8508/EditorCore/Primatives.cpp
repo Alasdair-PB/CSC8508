@@ -8,10 +8,26 @@
 #include "MaterialManager.h"
 #include "AnimationComponent.h"
 #include "MeshAnimation.h"
+#include "Assets.h"
 
 using namespace NCL;
 using namespace CSC8508;
 
+const static std::string folderPath = NCL::Assets::PFABDIR;
+
+std::string EditorGame::GetAssetPath(std::string pfabName) {
+	return folderPath + pfabName;
+}
+
+void EditorGame::LoadWorld(std::string assetPath) {
+	world->Load(assetPath);
+}
+
+void EditorGame::SaveWorld(std::string assetPath) {
+	auto x = AddNavMeshToWorld("NavMeshObject.msh", "smalltest.navmesh", Vector3(0, 0, 0), Vector3(1, 1, 1));
+	delete x;
+	world->Save(assetPath);
+}
 
 int navMeshCounter;
 void EditorGame::SaveUnityNavMeshPrefab(std::string assetPath, std::string navMeshObPath, std::string navMeshNavPath) {

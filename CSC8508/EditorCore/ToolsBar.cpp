@@ -8,38 +8,19 @@
 #include "EditorWindowManager.h"
 #include "../EditorGame.h"
 
-ToolsBar::ToolsBar() : editorManager(EditorWindowManager::Instance()), gameWorld(GameWorld::Instance())
-{
+ToolsBar::ToolsBar() : 
+	editorManager(EditorWindowManager::Instance()), 
+	gameWorld(GameWorld::Instance())
+{ 
 	InitTools();
 }
 
 ToolsBar::~ToolsBar() {}
 
-void ToolsBar::OnSetFocus(GameObject* focus){}
+void ToolsBar::OnSetFocus(GameObject* focus) {}
 void ToolsBar::OnRenderFocus(GameObject* focus) {}
 void ToolsBar::OnFocusEnd() {}
 void ToolsBar::OnInit() {}
-
-GameObject* ToolsBar::NewGameObject(GameObject* focus) {
-	Vector3 position = focus ? focus->GetTransform().GetPosition() : Vector3(0, 0, 0);
-	switch (primitive) {
-	case Empty: {
-		return new GameObject();
-		break;
-	}
-	case Cube: {
-		return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(0.5f, 0.5f, 0.5f));
-		break;
-	}
-	case Sphere: {
-		return EditorGame::GetInstance()->AddSphereToWorld(position, 1);
-		break;
-	}
-	default: {
-		break;
-	}
-	}
-}
 
 void ToolsBar::InitTools() {
 	window = new UIElementsGroup(
@@ -49,30 +30,74 @@ void ToolsBar::InitTools() {
 		"Tools",
 		0.0f,
 		ImGuiWindowFlags_NoResize);
+	PushTools();
+}
 
+void ToolsBar::PushTools() {
 	std::string* fileName = editorManager.GetFileName();
 	GameObject** focus = editorManager.GetFocus();
 
 	PushSetPrimitive();
+	PushSavePfab(fileName, focus);
+	PushLoadPfab(fileName);
+	PushLoadWorld(fileName);
+	PushSaveWorld(fileName);
+	PushClearWorld();
+	PushRemoveGameObject(focus);
+	PushAddGameObject(focus);
+	PushAddParent(focus);
+	PushAddChild(focus);
+	PushCopyGameObject(focus);
+	PushFocusParent(focus);
+}
+
+GameObject* ToolsBar::NewGameObject(GameObject* focus) {
+	Vector3 position = focus ? focus->GetTransform().GetPosition() : Vector3(0, 0, 0);
+	switch (primitive) {
+		case Empty: {
+			return new GameObject();
+			break;
+		}
+		case Cube: {
+			return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(0.5f, 0.5f, 0.5f));
+			break;
+		}
+		case Sphere: {
+			return EditorGame::GetInstance()->AddSphereToWorld(position, 1);
+			break;
+		}
+		default: { break; }
+	}
+}
+
+void ToolsBar::PushSavePfab(std::string* fileName, GameObject** focus) {
 	window->PushStatelessInputFieldElement("file", fileName);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
-		[this, focus, fileName]() { 
+		[this, focus, fileName]() {
 			if ((*focus)) (*focus)->Save(editorManager.GetAssetPath(*fileName));
 		});
-	PushLoadPfab(fileName);
+}
+void ToolsBar::PushLoadWorld(std::string* fileName) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
 		[fileName, this]() {
 			gameWorld.Load(editorManager.GetAssetPath(*fileName));
 		});
+}
+void ToolsBar::PushSaveWorld(std::string* fileName) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
 		[fileName, this]() {
 			gameWorld.Save(editorManager.GetAssetPath(*fileName));
 		});
+}
+void ToolsBar::PushClearWorld() {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Clear World",
 		[this]() {
 			editorManager.MarkWorldToClearWorld();
 		});
-	PushRemoveGameObject(focus);
+}
+
+
+void ToolsBar::PushAddGameObject(GameObject** focus) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
 		[this, focus]() {
 			editorManager.GetFileName();
@@ -80,15 +105,11 @@ void ToolsBar::InitTools() {
 			gameWorld.AddGameObject(loaded);
 			editorManager.SetFocus(loaded);
 		});
-	PushAddParent(focus);
-	PushAddChild(focus);
-	PushFocusParent(focus);
 }
 
 void ToolsBar::PushLoadPfab(std::string* fileName) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load PFab",
 		[fileName, this]() {
-			std::cout << editorManager.GetAssetPath(*fileName) << std::endl;
 			GameObject* loaded = new GameObject();
 			loaded->Load(editorManager.GetAssetPath(*fileName));
 			gameWorld.AddGameObject(loaded);
@@ -111,11 +132,8 @@ void ToolsBar::PushAddChild(GameObject** focus){
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
 		[this, focus]() {
 			if (!(*focus)) return;
-			gameWorld.RemoveGameObject(*focus);
 			GameObject* loaded = NewGameObject(*focus);
-			(*focus)->AddChild(loaded);
-			gameWorld.AddGameObject(*focus);
-			editorManager.SetFocus(loaded);
+			AddChildToParentInWorld(loaded, (*focus));
 		});
 }
 
@@ -143,11 +161,34 @@ void ToolsBar::PushAddParent(GameObject** focus) {
 		});
 }
 
+void ToolsBar::AddChildToParentInWorld(GameObject* child, GameObject* parent) {
+	gameWorld.RemoveGameObject(parent);
+	parent->AddChild(child);
+	gameWorld.AddGameObject(parent);
+	editorManager.SetFocus(child);
+}
+
+void ToolsBar::PushCopyGameObject(GameObject** focus) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Copy Obj",
+		[this, focus]() {
+			GameObject* focusObj = (*focus);
+
+			if (!focusObj) return;
+			GameObject* copy = focusObj->CopyGameObject();
+			GameObject* parent = focusObj->TryGetParent();
+
+			if (parent) AddChildToParentInWorld(copy, focusObj->TryGetParent());
+			else gameWorld.AddGameObject(copy);
+
+			editorManager.SetFocus(copy);
+		});
+}
+
 void ToolsBar::PushRemoveGameObject(GameObject** focus) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Obj",
 		[this, focus]() {
 			if (!(*focus)) return;
-			gameWorld.RemoveGameObject(*focus);
+			gameWorld.RemoveGameObject(*focus, false, true);
 			editorManager.EndFocus();
 		});
 }
@@ -172,5 +213,3 @@ void ToolsBar::PushSetPrimitive() {
 	};
 	window->PushEnumElement("Component to add", enumOptions);
 }
-
-const static std::string folderPath = ASSETROOTLOCATION;

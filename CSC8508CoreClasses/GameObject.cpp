@@ -287,6 +287,10 @@ void GameObject::CopyInstanceData(GameObject* gameObject) {
 	for (Tags::Tag tag:tags)
 		gameObject->SetTag(tag);
 
+	#if EDITOR
+		gameObject->SetName(name);
+	#endif
+
 	if (renderObject) {
 		RenderObject* copyRend = new RenderObject(&gameObject->GetTransform(),
 			renderObject->GetMesh(),

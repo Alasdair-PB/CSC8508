@@ -19,6 +19,7 @@ public:
 
 	void SetFocusVisual(GameObject* object, bool focused) {
 		RenderObject* renderObj = object->GetRenderObject();
+		if (!renderObj) return;
 		const Vector4 colour = focused ? Vector4(0, 1, 0, 1) : Vector4(1, 1, 1, 1);
 		renderObj->SetColour(colour);
 	}

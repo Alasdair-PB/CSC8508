@@ -33,12 +33,21 @@ private:
 	GameWorld& gameWorld;
 
 	void PushLoadPfab(std::string* filePath);
+	void PushCopyGameObject(GameObject** focus);
 	void PushAddChild(GameObject** focus);
 	void PushSetPrimitive();
 	void PushFocusParent(GameObject** focus);
 	void PushAddParent(GameObject** focus);
 	void PushLoadChild(GameObject** focus, std::string* filePath);
 	void PushRemoveGameObject(GameObject** focus);
+
+	void AddChildToParentInWorld(GameObject* child, GameObject* parent);
+	void PushSavePfab(std::string* fileName, GameObject** focus);
+	void PushLoadWorld(std::string* fileName);
+	void PushSaveWorld(std::string* fileName);
+	void PushClearWorld();
+	void PushAddGameObject(GameObject** focus);
+	void PushTools();
 
 	void InitTools();
 };

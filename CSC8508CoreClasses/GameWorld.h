@@ -33,7 +33,7 @@ namespace NCL {
 			void ClearAndErase();
 
 			void AddGameObject(GameObject* o);
-			void RemoveGameObject(GameObject* o, bool andDelete = false);
+			void RemoveGameObject(GameObject* o, bool andDelete = false, bool andRemoveChildren = false);
 
 			void AddConstraint(Constraint* c);
 			void RemoveConstraint(Constraint* c, bool andDelete = false);

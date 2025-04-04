@@ -136,9 +136,9 @@ void GameWorld::AddGameObject(GameObject* o) {
 	o->InvokeOnAwake();
 }
 
-void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
+void GameWorld::RemoveGameObject(GameObject* o, bool andDelete, bool andRemoveChildren) {
 	for (GameObject* child : o->GetChildren()) {
-		if (andDelete) o->RemoveChild(child);
+		if (andRemoveChildren) o->RemoveChild(child);
 		RemoveGameObject(child, andDelete);
 	}
 	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());

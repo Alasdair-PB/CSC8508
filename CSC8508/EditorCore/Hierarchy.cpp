@@ -13,13 +13,26 @@ Hierarchy::Hierarchy() : editorManager(EditorWindowManager::Instance()), gameWor
 	InitHierachy();
 }
 
-Hierarchy::~Hierarchy() {}
+Hierarchy::~Hierarchy() = default;
+
 void Hierarchy::OnSetFocus(GameObject* focus) {}
+void Hierarchy::OnFocusEnd() {}
+void Hierarchy::OnInit() {}
 
 void Hierarchy::OnRenderFocus(GameObject* focus)
 {
 	window->ClearAllElements();
 	PushGameObjects(focus);
+}
+
+void Hierarchy::InitHierachy() {
+	window = new UIElementsGroup(
+		ImVec2(0.03f, 0.3f),
+		ImVec2(0.1f, 0.5f),
+		1.0f,
+		"Hierarchy",
+		0.0f,
+		ImGuiWindowFlags_NoResize);
 }
 
 void Hierarchy::PushHierarchyLabel(GameObject* object, std::string objChildIndent) {
@@ -49,17 +62,4 @@ void Hierarchy::PushGameObjects(GameObject* focus) {
 		PushHierarchyLabel(object, "");
 		PushChildren(object, childIndent);
 	}
-}
-
-void Hierarchy::OnFocusEnd() {}
-void Hierarchy::OnInit() {}
-
-void Hierarchy::InitHierachy() {
-	window = new UIElementsGroup(
-		ImVec2(0.03f, 0.3f),
-		ImVec2(0.1f, 0.5f),
-		1.0f,
-		"Hierarchy",
-		0.0f,
-		ImGuiWindowFlags_NoResize);
 }

@@ -28,6 +28,7 @@ void Inspector::OnRenderFocus(GameObject* focus)
 	PushTagField(focus);
 	PushComponentInspector(focus); 
 }
+
 void Inspector::OnFocusEnd() {}
 void Inspector::OnInit() {}
 
@@ -40,7 +41,7 @@ void Inspector::InitInspector() {
 		0.0f,
 		ImGuiWindowFlags_NoResize);
 
-	GameObject* focus = editorManager.GetFocus();
+	GameObject** focus = editorManager.GetFocus();
 	std::string* name= editorManager.GetNameInfo();
 	bool* isEnabled = editorManager.GetEnabledInfo();
 	Vector3* positionInfo = editorManager.GetPositionInfo();
@@ -55,7 +56,7 @@ void Inspector::InitInspector() {
 	window->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
 }
 
-void Inspector::PushAddComponentField(GameObject* focus) {
+void Inspector::PushAddComponentField(GameObject** focus) {
 	std::vector<std::pair<int*, std::string>> enumOptions = {
 	{reinterpret_cast<int*>(&mapId), "None"},
 	{reinterpret_cast<int*>(&mapId), "Bounds"},
@@ -69,14 +70,14 @@ void Inspector::PushAddComponentField(GameObject* focus) {
 	window->PushEnumElement("Component to add", enumOptions);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",
 		[this, focus]() {
-			if (!focus) return;
-			EditorGame::GetInstance()->GetDefiner()->AddComponentFromEnum(mapId, *focus);
+			if (!(*focus)) return;
+			EditorGame::GetInstance()->GetDefiner()->AddComponentFromEnum(mapId, *(*focus));
 		});
 }
 
 void Inspector::PushTagElements(GameObject* focus) {
 	window->PushStaticTextElement("Tags on Object");
-	for (Tags::Tag tag : focus->GetTags()) {
+	for (Tags::Tag tag : (focus)->GetTags()) {
 		std::string tagName = "Unknown";
 		switch (tag) {
 		case Tags::Default: {
@@ -135,11 +136,11 @@ void Inspector::PushTagField(GameObject* focus) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Tag",
 		[this, focus]() {
 			if (!focus) return;
-			focus->SetTag(tagId);
+			(focus)->SetTag(tagId);
 		});
 }
 
 void Inspector::PushComponentInspector(GameObject* focus) {
-	for (IComponent* component : focus->GetAllComponents())
+	for (IComponent* component : (focus)->GetAllComponents())
 		component->PushIComponentElementsInspector(*window, 0.05f);
 }

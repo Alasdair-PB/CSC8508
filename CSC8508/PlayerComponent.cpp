@@ -203,7 +203,7 @@ void PlayerComponent::GetWeightModifier() {
     if (weight == 0) { 
         weightModifier = 1.0f; }
     else {
-        weightModifier = 1.0 - (weight / 100);
+        weightModifier = 1.0f - (weight / 100.0f);
     }
     return;
 }

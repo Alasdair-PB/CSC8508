@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "../ComponentAssemblyDefiner.h"
 #include "EditorWindow.h"
+#include "RenderObject.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -16,19 +17,26 @@ public:
 	EditorWindowManager();
 	~EditorWindowManager();
 
+	void SetFocusVisual(GameObject* object, bool focused) {
+		RenderObject* renderObj = object->GetRenderObject();
+		const Vector4 colour = focused ? Vector4(0, 1, 0, 1) : Vector4(1, 1, 1, 1);
+		renderObj->SetColour(colour);
+	}
+
 	void SetFocus(GameObject* object) {
 		if (!object) return;
-		focus = object;
-
+		EndFocus();
+		SetFocusVisual(object, true);
+		focusElement = object;
 		Vector3 posData = object->GetTransform().GetPosition();		
 		SetVector(positionInfo, object->GetTransform().GetLocalPosition());
 		SetVector(scaleInfo, object->GetTransform().GetLocalScale());
 		SetQuaternion(orientationInfo, object->GetTransform().GetLocalOrientation());
 		*isEnabled = object->IsEnabled();
-		*name = focus->GetName();
+		*name = focusElement->GetName();
 
 		for (EditorWindow* window : windows)
-			window->OnSetFocus(focus);
+			window->OnSetFocus(focusElement);
 	}
 
 	static EditorWindowManager& Instance();
@@ -36,21 +44,22 @@ public:
 
 	void RenderFocus() {
 		if (clearWorld) ClearGameWorld();
-		if (!focus) return;
-		focus->GetTransform().SetPosition(*positionInfo);
-		focus->GetTransform().SetScale(*scaleInfo);
-		focus->GetTransform().SetOrientation(
+
+		for (EditorWindow* window : windows)
+			window->OnRenderFocus(focusElement);
+
+		if (!focusElement) return;
+		focusElement->GetTransform().SetPosition(*positionInfo);
+		focusElement->GetTransform().SetScale(*scaleInfo);
+		focusElement->GetTransform().SetOrientation(
 			Quaternion(
 				orientationInfo->x, orientationInfo->y, 
 				orientationInfo->z, orientationInfo->w).Normalised());
-		focus->SetEnabled(*isEnabled);
-		focus->SetName(*name);
-
-		for (EditorWindow* window : windows)
-			window->OnRenderFocus(focus);
+		focusElement->SetEnabled(*isEnabled);
+		focusElement->SetName(*name);
 	}
 
-	GameObject* GetFocus() const { return focus; }
+	GameObject** GetFocus() const { return focus; }
 	Vector3* GetPositionInfo() const { return positionInfo;}
 	Vector3* GetScaleInfo() const { return scaleInfo;}
 	Vector4* GetOrientationInfo() const { return orientationInfo;}
@@ -58,6 +67,7 @@ public:
 	std::string* GetFileName() const { return saveDestination; }
 	std::string GetFilePathInfo() const { return GetAssetPath(*saveDestination); }
 	bool* GetEnabledInfo() const { return isEnabled; }
+	std::string GetAssetPath(const std::string pfabName) const;
 
 	void MarkWorldToClearWorld() { clearWorld = true; }
 	void AddWindow(EditorWindow* window);
@@ -65,7 +75,8 @@ public:
 	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
 
 	void EndFocus() {
-		focus = nullptr;
+		if (focusElement) SetFocusVisual(focusElement, false);
+		focusElement = nullptr;
 		*isEnabled = true;
 		SetVector(positionInfo);
 		SetVector(scaleInfo);
@@ -75,7 +86,8 @@ public:
 private:
 
 	vector<EditorWindow*> windows;
-	GameObject* focus;
+	GameObject* focusElement;
+	GameObject** focus;
 	Vector3* positionInfo;
 	Vector3* scaleInfo;
 	Vector4* orientationInfo;
@@ -85,9 +97,6 @@ private:
 
 	std::string* saveDestination;
 	std::string* name;
-
-	std::string GetAssetPath(const std::string pfabName) const;
-
 };
 
 

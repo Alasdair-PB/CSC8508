@@ -30,15 +30,15 @@ private:
 	Tags::Tag tagId;
 	Primitives primitive;
 	EditorWindowManager& editorManager;
-	GameWorld& gameWorld; 
+	GameWorld& gameWorld;
 
-	void PushLoadPfab(std::string filePath);
-	void PushAddChild(GameObject* focus);
+	void PushLoadPfab(std::string* filePath);
+	void PushAddChild(GameObject** focus);
 	void PushSetPrimitive();
-	void PushFocusParent(GameObject* focus);
-	void PushAddParent(GameObject* focus);
-	void PushLoadChild(GameObject* focus, std::string filePath);
-	void PushRemoveGameObject(GameObject* focus);
+	void PushFocusParent(GameObject** focus);
+	void PushAddParent(GameObject** focus);
+	void PushLoadChild(GameObject** focus, std::string* filePath);
+	void PushRemoveGameObject(GameObject** focus);
 
 	void InitTools();
 };

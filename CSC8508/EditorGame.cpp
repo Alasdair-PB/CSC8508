@@ -215,15 +215,7 @@ void EditorGame::InitWorld()
 
 void EditorGame::SelectObject(BoundsComponent* newSelection) {
 	if (!newSelection || newSelection == selectionObject) return; 
-	RenderObject* ro;
-	if (selectionObject) {
-		ro = selectionObject->GetGameObject().GetRenderObject();
-		ro->SetColour(Vector4(1, 1, 1, 1));
-		windowManager.EndFocus();
-	}
 	selectionObject = newSelection;
-	ro = selectionObject->GetGameObject().GetRenderObject();
-	ro->SetColour(Vector4(0, 1, 0, 1));
 	windowManager.SetFocus(&(selectionObject->GetGameObject()));
 }
 

@@ -220,14 +220,20 @@ void GameObject::OrderComponentsByDependencies() {
 }
 
 void GameObject::GetGameObjData(GameObjDataStruct& saveInfo) {
+	std::string savedName = "Default";
+
+	#if EDITOR
+		savedName = this->name;
+	#endif
+
 	saveInfo = renderObject == nullptr ?
 		GameObjDataStruct(isEnabled, transform.GetLocalOrientation(), transform.GetLocalPosition(), transform.GetLocalScale(),
-			Vector4(), 0, 0, 0, layerID, tags, "default") :
+			Vector4(), 0, 0, 0, layerID, tags, savedName) :
 		GameObjDataStruct(isEnabled, transform.GetLocalOrientation(), transform.GetLocalPosition(), transform.GetLocalScale(),
 			renderObject->GetColour(),
 			MaterialManager::GetMeshPointer(renderObject->GetMesh()),
 			MaterialManager::GetTexturePointer(renderObject->GetDefaultTexture()),
-			MaterialManager::GetShaderPointer(renderObject->GetShader()), layerID, tags, "");
+			MaterialManager::GetShaderPointer(renderObject->GetShader()), layerID, tags, savedName);
 }
 
 void GameObject::GetIComponentData(GameObjDataStruct& saveInfo, std::string assetPath, size_t* allocationStart) {
@@ -327,6 +333,10 @@ bool GameObject::HasChild(GameObject* child) {
 	return std::find(children.begin(), children.end(), child) != children.end();
 }
 
+bool GameObject::HasChildren() {
+	return children.size() > 0;
+}
+
 void GameObject::AddChild(GameObject* child)
 {
 	if (child == nullptr || HasChild(child) || child->TryGetParent() == this) return;
@@ -335,7 +345,7 @@ void GameObject::AddChild(GameObject* child)
 }
 
 void GameObject::RemoveChild(GameObject* child) {
-	if (child == nullptr || HasChild(child)) return;
+	if (child == nullptr || !HasChild(child)) return;
 	children.erase(std::remove(children.begin(), children.end(), child), children.end());
 }
 

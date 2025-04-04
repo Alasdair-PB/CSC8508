@@ -9,11 +9,11 @@ namespace NCL::CSC8508 {
 
 	class InventoryNetworkState : public INetworkState {
 	public:
-		InventoryNetworkState() {}
+		InventoryNetworkState() : inventory{ 0,0,0,0,0 }, wallet(0.0f), deposited(0.0f) {}
 		~InventoryNetworkState() = default;
 		int inventory[MAX_INVENTORY_ITEMS];
-		int wallet;
-		int deposited;
+		float wallet;
+		float deposited;
 	};
 
 	struct InvFullPacket : public IFullNetworkPacket {
@@ -27,7 +27,7 @@ namespace NCL::CSC8508 {
 
 	struct SellInventoryPacket : INetworkPacket {
 		int soldInventory[MAX_INVENTORY_ITEMS];
-		SellInventoryPacket() {
+		SellInventoryPacket() : soldInventory{0,0,0,0,0} {
 			type = Component_Event;
 			packetSubType = Sell;
 			size = sizeof(SellInventoryPacket) - sizeof(GamePacket);
@@ -35,9 +35,9 @@ namespace NCL::CSC8508 {
 	};
 
 	struct DepositWalletPacket : INetworkPacket {
-		int wallet;
-		int despoited;
-		DepositWalletPacket() {
+		float wallet;
+		float despoited;
+		DepositWalletPacket() : wallet(0.0f), despoited(0.0f) {
 			type = Component_Event;
 			packetSubType = Deposit;
 			size = sizeof(SellInventoryPacket) - sizeof(GamePacket);

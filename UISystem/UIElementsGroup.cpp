@@ -18,6 +18,12 @@ UIElementsGroup::~UIElementsGroup() {
 	elements.clear();
 }
 
+void UIElementsGroup::ClearAllElements() {
+	for (UIElement* element : elements)
+		delete element;
+	elements.clear();
+}
+
 void UIElementsGroup::RemoveElementsFromIndex(int cutOff) {
 	if (cutOff >= elements.size()) return;
 	for (size_t i = cutOff; i < elements.size(); i++)

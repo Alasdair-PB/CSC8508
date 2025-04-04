@@ -16,7 +16,9 @@ EditorWindowManager::EditorWindowManager() : positionInfo(new Vector3()),
 	isEnabled(new bool()),
 	saveDestination(new std::string("Default.pfab")), 
 	name(new std::string("")),
-	clearWorld(false)
+	focusElement(nullptr),
+	clearWorld(false), 
+	focus(&focusElement)
 {}
 
 EditorWindowManager& EditorWindowManager::Instance() {

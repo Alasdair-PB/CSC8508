@@ -137,6 +137,10 @@ void GameWorld::AddGameObject(GameObject* o) {
 }
 
 void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
+	for (GameObject* child : o->GetChildren()) {
+		if (andDelete) o->RemoveChild(child);
+		RemoveGameObject(child, andDelete);
+	}
 	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());
 	if (andDelete)
 		delete o;
@@ -151,7 +155,6 @@ void GameWorld::GetPhysicsIterators(
 	last = physicsComponents.end();
 }
 
-
 void GameWorld::GetBoundsIterators(
 	BoundsIterator& first,
 	BoundsIterator& last) const {
@@ -164,8 +167,8 @@ void GameWorld::GetObjectIterators(
 	GameObjectIterator& first,
 	GameObjectIterator& last) const {
 
-	first	= gameObjects.begin();
-	last	= gameObjects.end();
+	first = gameObjects.begin();
+	last = gameObjects.end();
 }
 
 void GameWorld::OperateOnContents(GameObjectFunc f) {

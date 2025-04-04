@@ -179,8 +179,6 @@ namespace NCL::CSC8508 {
 		/// <param name="allocationStart">The location this object is saved in the asset file </param>
 		void Load(std::string assetPath, size_t allocationStart = 0) override;
 
-
-
 		/// <summary>
 		/// Saves the gameobject and its components data into the assetPath file. 
 		/// </summary>
@@ -188,11 +186,30 @@ namespace NCL::CSC8508 {
 		/// <param name="allocationStart">The location this object is saved in the asset file </param>
 		size_t Save(std::string assetPath, size_t* = nullptr) override;
 
-
+		/// <summary>
+		/// Copies the data of this GameObject to new GameObject
+		/// </summary>
+		/// <returns>A new GameObject with matching data to this GameObject</returns>
 		GameObject* CopyGameObject();
+
+		/// <summary>
+		/// Copies the Children data of this GameObject to another
+		/// </summary>
+		/// <param name="gameObject">The GameObject to copy data into</param>
 		void CopyChildrenData(GameObject* gameObject);
+
+		/// <summary>
+		/// Copies the IComponent data of this GameObject to another
+		/// </summary>
+		/// <param name="gameObject">The GameObject to copy data into</param>
 		void CopyIcomponentData(GameObject* gameObject);
+
+		/// <summary>
+		/// Copies the instance data of this GameObject to another
+		/// </summary>
+		/// <param name="gameObject">The GameObject to copy data into</param>
 		void CopyInstanceData(GameObject* gameObject);
+
 		/// <summary>
 		/// Loads GameObject specific Data into this GameObject
 		/// </summary>
@@ -211,6 +228,12 @@ namespace NCL::CSC8508 {
 		/// <param name="child">The child GameObject to check</param>
 		/// <returns>true if this GameObject contains a reference to child in their children, otherwise returns false</returns>
 		bool HasChild(GameObject* child);
+
+		/// <summary>
+		/// Checks if any children are referenced by this GameObject
+		/// </summary>
+		/// <returns>If this GameObject contains references to any children</returns>
+		bool HasChildren();
 
 		/// <summary>
 		/// Removes a child GameObject from this GameObject

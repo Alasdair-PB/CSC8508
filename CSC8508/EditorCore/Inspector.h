@@ -32,7 +32,7 @@ private:
 	ComponentAssemblyDefiner::ComponentMapId mapId;
 	Tags::Tag tagId;
 
-	void PushAddComponentField(GameObject* focus);
+	void PushAddComponentField(GameObject** focus);
 	void PushTagField(GameObject* focus);
 	void PushTagElements(GameObject* focus);
 	void PushComponentInspector(GameObject* focus);

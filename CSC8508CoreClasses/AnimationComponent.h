@@ -61,7 +61,7 @@ namespace NCL {
 			void UpdateAnimation(float dt);
 			bool IsComplete() { return static_cast<AnimState*>(activeState)->IsComplete(); }
 			void resetTime() {
-				currentAnimFrame = 0.0f;
+				currentAnimFrame = 0;
 				animTime = 0;
 			}
 
@@ -71,7 +71,7 @@ namespace NCL {
 			}
 
         protected:
-			int currentAnimFrame = 0.0f;
+			int currentAnimFrame = 0;
 			float animTime = 0;
 			std::vector<Matrix4> skeleton;
 			RenderObject* ro;

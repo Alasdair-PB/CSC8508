@@ -10,14 +10,14 @@ namespace NCL {
 			StaminaBar();
 			~StaminaBar();
 
-			void UpdateStamina(int h) {
+			void UpdateStamina(float h) {
 				stamina = h;
 			}
 
-			UIElementsGroup* staminaBar = new UIElementsGroup(ImVec2(0.05f, 0.9f), ImVec2(0.4, 0.4), 1.0f, "Stamina Bar", 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+			UIElementsGroup* staminaBar = new UIElementsGroup(ImVec2(0.05f, 0.9f), ImVec2(0.4f, 0.4f), 1.0f, "Stamina Bar", 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
 
 		protected:
-			int stamina = 100;
+			float stamina = 100;
 		};
 	}
 }

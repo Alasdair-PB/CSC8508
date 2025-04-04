@@ -15,7 +15,7 @@ namespace NCL {
         public:
             InventoryManagerComponent(GameObject& gameObject, int maxStorage, float itemCarryOffset, float itemDropOffset)
                 : IComponent(gameObject), transform(gameObject.GetTransform()), 
-                itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset)
+                itemCarryOffset(itemCarryOffset), itemDropOffset(itemDropOffset), wallet(0.0f), deposited(0.0f)
             {
                 maxItemStorage = std::max(1, maxStorage);
             }
@@ -39,7 +39,7 @@ namespace NCL {
                 item->SetEnabledComponentStates(false);
                 storedItems.push_back(item);
                 item->GetGameObject().SetEnabled(true);
-                scrollIndex = storedItems.size() - 1;
+                scrollIndex = static_cast<int>(storedItems.size()) - 1;
                 return true;
             }
 
@@ -82,7 +82,7 @@ namespace NCL {
                     int index = 0;
                     ImGui::Text(("Wallet: " + std::to_string(wallet)).c_str());
                     for (auto const& item : storedItems) {
-                        ImGui::SetCursorPosY(0.04 * Window::GetWindow()->GetScreenSize().y);
+                        ImGui::SetCursorPosY(0.04f * Window::GetWindow()->GetScreenSize().y);
                         std::string name = item->GetName();
                         std::string sellVal = std::to_string(item->GetSaleValue());
                         if (index == scrollIndex) {
@@ -157,7 +157,7 @@ namespace NCL {
 				wallet = 0;
             }
 
-            int GetDepositedSum() { return deposited; }
+            float GetDepositedSum() { return deposited; }
 
         protected:
             int maxItemStorage;

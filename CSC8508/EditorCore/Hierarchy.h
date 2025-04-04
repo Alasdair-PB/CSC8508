@@ -25,6 +25,10 @@ public:
 	std::string GetName() const override { return "Hierarchy"; }
 
 private:
+	const std::string childIndent = "	";
+	void PushGameObjects(GameObject* focus);
+	void PushChildren(GameObject* object, std::string objChildIndent);
+	void PushHierarchyLabel(GameObject* object, std::string objChildIndent);
 	EditorWindowManager& editorManager;
 	GameWorld& gameWorld;
 	void InitHierachy();

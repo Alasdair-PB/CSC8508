@@ -20,7 +20,7 @@ namespace NCL::Rendering {
 		MeshAnimation(size_t jointCount, size_t frameCount, float frameRate, std::vector<Maths::Matrix4>& frames);
 		MeshAnimation(const std::string& filename);
 
-		virtual ~MeshAnimation();
+		virtual ~MeshAnimation() = default;
 
 		size_t GetJointCount() const {
 			return jointCount;

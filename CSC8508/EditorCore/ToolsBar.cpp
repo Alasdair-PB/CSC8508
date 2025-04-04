@@ -28,7 +28,7 @@ GameObject* ToolsBar::NewGameObject(GameObject* focus) {
 		break;
 	}
 	case Cube: {
-		return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(1,1,1));
+		return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(0.5f, 0.5f, 0.5f));
 		break;
 	}
 	case Sphere: {
@@ -43,7 +43,7 @@ GameObject* ToolsBar::NewGameObject(GameObject* focus) {
 
 void ToolsBar::InitTools() {
 	window = new UIElementsGroup(
-		ImVec2(0.075f, 0.3f),
+		ImVec2(0.2f, 0.3f),
 		ImVec2(0.1f, 0.5f),
 		1.0f,
 		"Tools",
@@ -51,33 +51,33 @@ void ToolsBar::InitTools() {
 		ImGuiWindowFlags_NoResize);
 
 	std::string* fileName = editorManager.GetFileName();
-	std::string filePath = editorManager.GetFilePathInfo();
-	GameObject* focus = editorManager.GetFocus();
+	GameObject** focus = editorManager.GetFocus();
 
 	PushSetPrimitive();
 	window->PushStatelessInputFieldElement("file", fileName);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
-		[focus, filePath]() { if (focus) focus->Save(filePath); });
-	PushLoadPfab(filePath);
+		[this, focus, fileName]() { 
+			if ((*focus)) (*focus)->Save(editorManager.GetAssetPath(*fileName));
+		});
+	PushLoadPfab(fileName);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
-		[filePath, this]() {
-			gameWorld.Load(filePath);
+		[fileName, this]() {
+			gameWorld.Load(editorManager.GetAssetPath(*fileName));
 		});
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
-		[filePath, this]() {
-			gameWorld.Save(filePath);
+		[fileName, this]() {
+			gameWorld.Save(editorManager.GetAssetPath(*fileName));
 		});
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Clear World",
 		[this]() {
-			EditorWindowManager::Instance().MarkWorldToClearWorld();
+			editorManager.MarkWorldToClearWorld();
 		});
 	PushRemoveGameObject(focus);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
 		[this, focus]() {
 			editorManager.GetFileName();
-			GameObject* loaded = NewGameObject(focus);
+			GameObject* loaded = NewGameObject(focus ? (*focus) : nullptr);
 			gameWorld.AddGameObject(loaded);
-			editorManager.EndFocus();
 			editorManager.SetFocus(loaded);
 		});
 	PushAddParent(focus);
@@ -85,69 +85,82 @@ void ToolsBar::InitTools() {
 	PushFocusParent(focus);
 }
 
-void ToolsBar::PushLoadPfab(std::string filePath) {
+void ToolsBar::PushLoadPfab(std::string* fileName) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load PFab",
-		[filePath, this]() {
+		[fileName, this]() {
+			std::cout << editorManager.GetAssetPath(*fileName) << std::endl;
 			GameObject* loaded = new GameObject();
-			loaded->Load(filePath);
+			loaded->Load(editorManager.GetAssetPath(*fileName));
 			gameWorld.AddGameObject(loaded);
+			editorManager.SetFocus(loaded);
 		});
 }
 
-void ToolsBar::PushFocusParent(GameObject* focus) {
+void ToolsBar::PushFocusParent(GameObject** focus) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Focus to Parent",
 		[this, focus]() {
-			if (!focus) return;
-			if (focus->HasParent()) {
-				GameObject* parent = focus->TryGetParent();
-				editorManager.EndFocus();
+			if (!(*focus)) return;
+			if ((*focus)->HasParent()) {
+				GameObject* parent = (*focus)->TryGetParent();
 				editorManager.SetFocus(parent);
 			}
 		});
 }
 
-void ToolsBar::PushAddParent(GameObject* focus) {
-	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Parent",
-		[this, focus]() {
-			if (!focus) return;
-			GameObject* loaded = NewGameObject(focus);
-			loaded->AddChild(focus);
-			gameWorld.RemoveGameObject(focus);
-			gameWorld.AddGameObject(loaded);
-		});
-}
-
-void ToolsBar::PushRemoveGameObject(GameObject* focus) {
-	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Obj",
-		[this, focus]() {
-			if (!focus) return;
-			gameWorld.RemoveGameObject(focus);
-			editorManager.EndFocus();
-		});
-}
-
-void ToolsBar::PushAddChild(GameObject* focus){
+void ToolsBar::PushAddChild(GameObject** focus){
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
 		[this, focus]() {
-			if (!focus) return;
-			GameObject* loaded = NewGameObject(focus);
-			focus->AddChild(loaded);
-			gameWorld.RemoveGameObject(focus);
-			gameWorld.AddGameObject(focus);
-			editorManager.EndFocus();
+			if (!(*focus)) return;
+			gameWorld.RemoveGameObject(*focus);
+			GameObject* loaded = NewGameObject(*focus);
+			(*focus)->AddChild(loaded);
+			gameWorld.AddGameObject(*focus);
 			editorManager.SetFocus(loaded);
 		});
 }
 
-void ToolsBar::PushLoadChild(GameObject* focus, std::string filePath) {
+void ToolsBar::PushAddParent(GameObject** focus) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Parent",
+		[this, focus]() {
+			GameObject* focusObj = (*focus);
+			if (!focusObj) return;
+			GameObject* loaded = NewGameObject(focusObj);
+			GameObject* parent = focusObj->TryGetParent();
+			loaded->AddChild(focusObj);
+
+			if (parent) {
+				parent->RemoveChild(focusObj);
+				parent->AddChild(loaded);
+				gameWorld.RemoveGameObject(focusObj);
+				gameWorld.RemoveGameObject(parent);
+				gameWorld.AddGameObject(parent);
+			}
+			else {
+				gameWorld.RemoveGameObject(focusObj);
+				gameWorld.AddGameObject(loaded);
+			}
+			editorManager.SetFocus(loaded);
+		});
+}
+
+void ToolsBar::PushRemoveGameObject(GameObject** focus) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Obj",
+		[this, focus]() {
+			if (!(*focus)) return;
+			gameWorld.RemoveGameObject(*focus);
+			editorManager.EndFocus();
+		});
+}
+
+void ToolsBar::PushLoadChild(GameObject** focus, std::string* fileName) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load Child",
-		[this, focus, filePath]() {
-			if (!focus) return;
+		[this, focus, fileName]() {
+			if (!(*focus)) return;
 			GameObject* loaded = new GameObject();
-			loaded->Load(filePath);
-			focus->AddChild(loaded);
-			gameWorld.RemoveGameObject(focus);
-			gameWorld.AddGameObject(focus);
+			loaded->Load(editorManager.GetAssetPath(*fileName));
+			(*focus)->AddChild(loaded);
+			gameWorld.RemoveGameObject(*focus);
+			gameWorld.AddGameObject(*focus);
 		});
 }
 

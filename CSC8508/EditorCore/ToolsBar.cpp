@@ -5,32 +5,22 @@
 #include <string>
 #include "ComponentManager.h"
 #include "GameWorld.h"
+#include "EditorWindowManager.h"
 #include "../EditorGame.h"
 
-#ifndef ASSETROOTLOCATION
-#define ASSETROOTLOCATION "../Assets/Pfabs"
-#endif
-
-ToolsBar::ToolsBar() : positionInfo(new Vector3()),
-	scaleInfo(new Vector3()), orientationInfo(new Vector4()),
-	isEnabled(new bool()),
-	saveDestination(new std::string("Default.pfab")), 
-	name(new std::string("")),
-	clearWorld(false)
+ToolsBar::ToolsBar() : editorManager(EditorWindowManager::Instance()), gameWorld(GameWorld::Instance())
 {
-	InitInspector();
 	InitTools();
-	InitHierachy();
 }
 
-ToolsBar::~ToolsBar() {
-	delete inspectorBar;
-	delete positionInfo;
-	delete scaleInfo;
-	delete orientationInfo;
-}
+ToolsBar::~ToolsBar() {}
 
-GameObject* ToolsBar::NewGameObject() {
+void ToolsBar::OnSetFocus(GameObject* focus){}
+void ToolsBar::OnRenderFocus(GameObject* focus) {}
+void ToolsBar::OnFocusEnd() {}
+void ToolsBar::OnInit() {}
+
+GameObject* ToolsBar::NewGameObject(GameObject* focus) {
 	Vector3 position = focus ? focus->GetTransform().GetPosition() : Vector3(0, 0, 0);
 	switch (primitive) {
 	case Empty: {
@@ -52,106 +42,112 @@ GameObject* ToolsBar::NewGameObject() {
 }
 
 void ToolsBar::InitTools() {
-	toolsBar = new UIElementsGroup(
+	window = new UIElementsGroup(
 		ImVec2(0.075f, 0.3f),
 		ImVec2(0.1f, 0.5f),
 		1.0f,
 		"Tools",
 		0.0f,
 		ImGuiWindowFlags_NoResize);
+
+	std::string* fileName = editorManager.GetFileName();
+	std::string filePath = editorManager.GetFilePathInfo();
+	GameObject* focus = editorManager.GetFocus();
+
 	PushSetPrimitive();
-	toolsBar->PushStatelessInputFieldElement("file", saveDestination);
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
-		[this]() { if (focus) focus->Save(GetAssetPath(*saveDestination)); });
-	PushLoadPfab();
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
-		[this]() {
-			GameWorld::Instance().Load(GetAssetPath(*saveDestination));
+	window->PushStatelessInputFieldElement("file", fileName);
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
+		[focus, filePath]() { if (focus) focus->Save(filePath); });
+	PushLoadPfab(filePath);
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
+		[filePath, this]() {
+			gameWorld.Load(filePath);
 		});
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
-		[this]() {
-			GameWorld::Instance().Save(GetAssetPath(*saveDestination));
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
+		[filePath, this]() {
+			gameWorld.Save(filePath);
 		});
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Clear World",
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Clear World",
 		[this]() {
-			clearWorld = true;
+			EditorWindowManager::Instance().MarkWorldToClearWorld();
 		});
-	PushRemoveGameObject();
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
-		[this]() {
-			GameObject* loaded = NewGameObject();
-			GameWorld::Instance().AddGameObject(loaded);
-			EndFocus();
-			SetFocus(loaded);
+	PushRemoveGameObject(focus);
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
+		[this, focus]() {
+			editorManager.GetFileName();
+			GameObject* loaded = NewGameObject(focus);
+			gameWorld.AddGameObject(loaded);
+			editorManager.EndFocus();
+			editorManager.SetFocus(loaded);
 		});
-	PushAddParent();
-	PushAddChild();
-	PushFocusParent();
+	PushAddParent(focus);
+	PushAddChild(focus);
+	PushFocusParent(focus);
 }
 
-void ToolsBar::PushLoadPfab() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load PFab",
-		[this]() {
+void ToolsBar::PushLoadPfab(std::string filePath) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load PFab",
+		[filePath, this]() {
 			GameObject* loaded = new GameObject();
-			loaded->Load(GetAssetPath(*saveDestination));
-			GameWorld::Instance().AddGameObject(loaded);
+			loaded->Load(filePath);
+			gameWorld.AddGameObject(loaded);
 		});
 }
 
-void ToolsBar::PushFocusParent() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Focus to Parent",
-		[this]() {
+void ToolsBar::PushFocusParent(GameObject* focus) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Focus to Parent",
+		[this, focus]() {
 			if (!focus) return;
 			if (focus->HasParent()) {
 				GameObject* parent = focus->TryGetParent();
-				EndFocus();
-				SetFocus(parent);
+				editorManager.EndFocus();
+				editorManager.SetFocus(parent);
 			}
 		});
 }
 
-void ToolsBar::PushAddParent() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Parent",
-		[this]() {
+void ToolsBar::PushAddParent(GameObject* focus) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Parent",
+		[this, focus]() {
 			if (!focus) return;
-			GameObject* loaded = NewGameObject();
+			GameObject* loaded = NewGameObject(focus);
 			loaded->AddChild(focus);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(loaded);
+			gameWorld.RemoveGameObject(focus);
+			gameWorld.AddGameObject(loaded);
 		});
 }
 
-void ToolsBar::PushRemoveGameObject() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Obj",
-		[this]() {
+void ToolsBar::PushRemoveGameObject(GameObject* focus) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Obj",
+		[this, focus]() {
 			if (!focus) return;
-			GameWorld::Instance().RemoveGameObject(focus);
-			EndFocus();
+			gameWorld.RemoveGameObject(focus);
+			editorManager.EndFocus();
 		});
 }
 
-void ToolsBar::PushAddChild() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
-		[this]() {
+void ToolsBar::PushAddChild(GameObject* focus){
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
+		[this, focus]() {
 			if (!focus) return;
-			GameObject* loaded = NewGameObject();
+			GameObject* loaded = NewGameObject(focus);
 			focus->AddChild(loaded);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(focus);
-			EndFocus();
-			SetFocus(loaded);
+			gameWorld.RemoveGameObject(focus);
+			gameWorld.AddGameObject(focus);
+			editorManager.EndFocus();
+			editorManager.SetFocus(loaded);
 		});
 }
 
-void ToolsBar::PushLoadChild() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load Child",
-		[this]() {
+void ToolsBar::PushLoadChild(GameObject* focus, std::string filePath) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load Child",
+		[this, focus, filePath]() {
 			if (!focus) return;
 			GameObject* loaded = new GameObject();
-			loaded->Load(GetAssetPath(*saveDestination));
+			loaded->Load(filePath);
 			focus->AddChild(loaded);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(focus);
+			gameWorld.RemoveGameObject(focus);
+			gameWorld.AddGameObject(focus);
 		});
 }
 
@@ -161,11 +157,7 @@ void ToolsBar::PushSetPrimitive() {
 		{reinterpret_cast<int*>(&primitive), "Sphere"},
 		{reinterpret_cast<int*>(&primitive), "Empty"}
 	};
-	toolsBar->PushEnumElement("Component to add", enumOptions);
+	window->PushEnumElement("Component to add", enumOptions);
 }
 
 const static std::string folderPath = ASSETROOTLOCATION;
-
-std::string ToolsBar::GetAssetPath(std::string pfabName) {
-	return folderPath + "/Pfabs/" + pfabName;
-}

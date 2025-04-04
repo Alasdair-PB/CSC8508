@@ -13,6 +13,9 @@
 #include "Assets.h"
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
+#include "EditorCore/Hierarchy.h"
+#include "EditorCore/Inspector.h"
+#include "EditorCore/ToolsBar.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -117,15 +120,15 @@ void EditorGame::InitialiseGame() {
 
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
-	inspectorBar = new Inspector();
-	uiSystem->PushNewStack(inspectorBar->inspectorBar, "InpsectorBar");
-	uiSystem->PushNewStack(inspectorBar->toolsBar, "ToolsBar");
+	windowManager.AddWindow(new Inspector());
+	windowManager.AddWindow(new Hierarchy());
+	windowManager.AddWindow(new ToolsBar());
 
 	inSelectionMode = false;
 	physics->UseGravity(true);
 }
 
-EditorGame::EditorGame()
+EditorGame::EditorGame() : windowManager(EditorWindowManager::Instance())
 {
 	instance = this;
 	world = &GameWorld::Instance(); 
@@ -179,7 +182,7 @@ void EditorGame::UpdateGame(float dt)
 	editorCamera->Update(dt);
 	UpdateUI();
 	renderer->Render();
-	inspectorBar->RenderFocus();
+	windowManager.RenderFocus();
 	Debug::UpdateRenderables(dt);
 	world->UpdateWorld(dt);
 	Window::GetWindow()->ShowOSPointer(true);
@@ -216,12 +219,12 @@ void EditorGame::SelectObject(BoundsComponent* newSelection) {
 	if (selectionObject) {
 		ro = selectionObject->GetGameObject().GetRenderObject();
 		ro->SetColour(Vector4(1, 1, 1, 1));
-		inspectorBar->EndFocus();
+		windowManager.EndFocus();
 	}
 	selectionObject = newSelection;
 	ro = selectionObject->GetGameObject().GetRenderObject();
 	ro->SetColour(Vector4(0, 1, 0, 1));
-	inspectorBar->SetFocus(&(selectionObject->GetGameObject()));
+	windowManager.SetFocus(&(selectionObject->GetGameObject()));
 }
 
 bool EditorGame::TrySelectObject() {

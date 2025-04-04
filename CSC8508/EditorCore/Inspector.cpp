@@ -5,201 +5,57 @@
 #include <string>
 #include "ComponentManager.h"
 #include "GameWorld.h"
+#include "EditorWindowManager.h"
 #include "../EditorGame.h"
 
-#ifndef ASSETROOTLOCATION
-#define ASSETROOTLOCATION "../Assets/Pfabs"
-#endif
-
-Inspector::Inspector() : positionInfo(new Vector3()),
-	scaleInfo(new Vector3()), orientationInfo(new Vector4()),
-	isEnabled(new bool()),
-	saveDestination(new std::string("Default.pfab")), 
-	name(new std::string("")),
-	clearWorld(false)
+Inspector::Inspector() : 
+	editorManager(EditorWindowManager::Instance()), 
+	gameWorld(GameWorld::Instance()), 
+	elementsCount(0)
 {
 	InitInspector();
-	InitTools();
-	InitHierachy();
 }
 
-void Inspector::ClearGameWorld() {
-	EndFocus();
-	EditorGame::GetInstance()->DeleteSelectionObject();
-	ComponentManager::CleanUp();
-	GameWorld::Instance().ClearAndErase();
-	clearWorld = false;
-}
+Inspector::~Inspector() {}
 
-Inspector::~Inspector() {
-	delete inspectorBar;
-	delete positionInfo;
-	delete scaleInfo;
-	delete orientationInfo;
-}
+void Inspector::OnSetFocus(GameObject* focus) {}
+void Inspector::OnRenderFocus(GameObject* focus)
+{ 
+	if (!focus) return;
+	window->RemoveElementsFromIndex(7);
 
-GameObject* Inspector::NewGameObject() {
-	Vector3 position = focus ? focus->GetTransform().GetPosition() : Vector3(0, 0, 0);
-	switch (primitive) {
-	case Empty: {
-		return new GameObject();
-		break;
-	}
-	case Cube: {
-		return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(1,1,1));
-		break;
-	}
-	case Sphere: {
-		return EditorGame::GetInstance()->AddSphereToWorld(position, 1);
-		break;
-	}
-	default: {
-		break;
-	}
-	}
+	PushTagElements(focus);
+	PushTagField(focus);
+	PushComponentInspector(focus); 
 }
+void Inspector::OnFocusEnd() {}
+void Inspector::OnInit() {}
 
 void Inspector::InitInspector() {
-	inspectorBar = new UIElementsGroup(
+	window = new UIElementsGroup(
 		ImVec2(0.7f, 0.3f),
 		ImVec2(0.3f, 0.5f),
 		1.0f,
 		"Inspector",
 		0.0f,
 		ImGuiWindowFlags_NoResize);
-	
-	inspectorBar->PushStatelessInputFieldElement("GameObject:", name);
-	inspectorBar->PushToggle("Enabled:", isEnabled, 0.05f);
-	PushAddComponentField();
-	inspectorBar->PushVectorElement(positionInfo, 0.05f, "Position:");
-	inspectorBar->PushVectorElement(scaleInfo, 0.05f, "Scale");
-	inspectorBar->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
+
+	GameObject* focus = editorManager.GetFocus();
+	std::string* name= editorManager.GetNameInfo();
+	bool* isEnabled = editorManager.GetEnabledInfo();
+	Vector3* positionInfo = editorManager.GetPositionInfo();
+	Vector3* scaleInfo = editorManager.GetScaleInfo();
+	Vector4* orientationInfo = editorManager.GetOrientationInfo();
+
+	window->PushStatelessInputFieldElement("GameObject:", name);
+	window->PushToggle("Enabled:", isEnabled, 0.05f);
+	PushAddComponentField(focus);
+	window->PushVectorElement(positionInfo, 0.05f, "Position:");
+	window->PushVectorElement(scaleInfo, 0.05f, "Scale");
+	window->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
 }
 
-void Inspector::InitTools() {
-	toolsBar = new UIElementsGroup(
-		ImVec2(0.075f, 0.3f),
-		ImVec2(0.1f, 0.5f),
-		1.0f,
-		"Tools",
-		0.0f,
-		ImGuiWindowFlags_NoResize);
-	PushSetPrimitive();
-	toolsBar->PushStatelessInputFieldElement("file", saveDestination);
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
-		[this]() { if (focus) focus->Save(GetAssetPath(*saveDestination)); });
-	PushLoadPfab();
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
-		[this]() {
-			GameWorld::Instance().Load(GetAssetPath(*saveDestination));
-		});
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
-		[this]() {
-			GameWorld::Instance().Save(GetAssetPath(*saveDestination));
-		});
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Clear World",
-		[this]() {
-			clearWorld = true;
-		});
-	PushRemoveGameObject();
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
-		[this]() {
-			GameObject* loaded = NewGameObject();
-			GameWorld::Instance().AddGameObject(loaded);
-			EndFocus();
-			SetFocus(loaded);
-		});
-	PushAddParent();
-	PushAddChild();
-	PushFocusParent();
-}
-
-void Inspector::InitHierachy() {
-	hierarchy = new UIElementsGroup(
-		ImVec2(0.09f, 0.3f),
-		ImVec2(0.1f, 0.5f),
-		1.0f,
-		"Hierarchy",
-		0.0f,
-		ImGuiWindowFlags_NoResize);
-}
-
-void Inspector::PushLoadPfab() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load PFab",
-		[this]() {
-			GameObject* loaded = new GameObject();
-			loaded->Load(GetAssetPath(*saveDestination));
-			GameWorld::Instance().AddGameObject(loaded);
-		});
-}
-
-void Inspector::PushFocusParent() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Focus to Parent",
-		[this]() {
-			if (!focus) return;
-			if (focus->HasParent()) {
-				GameObject* parent = focus->TryGetParent();
-				EndFocus();
-				SetFocus(parent);
-			}
-		});
-}
-
-void Inspector::PushAddParent() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Parent",
-		[this]() {
-			if (!focus) return;
-			GameObject* loaded = NewGameObject();
-			loaded->AddChild(focus);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(loaded);
-		});
-}
-
-void Inspector::PushRemoveGameObject() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Obj",
-		[this]() {
-			if (!focus) return;
-			GameWorld::Instance().RemoveGameObject(focus);
-			EndFocus();
-		});
-}
-
-void Inspector::PushAddChild() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
-		[this]() {
-			if (!focus) return;
-			GameObject* loaded = NewGameObject();
-			focus->AddChild(loaded);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(focus);
-			EndFocus();
-			SetFocus(loaded);
-		});
-}
-
-void Inspector::PushLoadChild() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load Child",
-		[this]() {
-			if (!focus) return;
-			GameObject* loaded = new GameObject();
-			loaded->Load(GetAssetPath(*saveDestination));
-			focus->AddChild(loaded);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(focus);
-		});
-}
-
-void Inspector::PushSetPrimitive() {
-	std::vector<std::pair<int*, std::string>> enumOptions = {
-		{reinterpret_cast<int*>(&primitive), "Cube"},
-		{reinterpret_cast<int*>(&primitive), "Sphere"},
-		{reinterpret_cast<int*>(&primitive), "Empty"}
-	};
-	toolsBar->PushEnumElement("Component to add", enumOptions);
-}
-
-void Inspector::PushAddComponentField() {
+void Inspector::PushAddComponentField(GameObject* focus) {
 	std::vector<std::pair<int*, std::string>> enumOptions = {
 	{reinterpret_cast<int*>(&mapId), "None"},
 	{reinterpret_cast<int*>(&mapId), "Bounds"},
@@ -210,43 +66,25 @@ void Inspector::PushAddComponentField() {
 	{reinterpret_cast<int*>(&mapId), "Room"}
 
 	};
-	inspectorBar->PushEnumElement("Component to add", enumOptions);
-	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",
-		[this]() {
+	window->PushEnumElement("Component to add", enumOptions);
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",
+		[this, focus]() {
 			if (!focus) return;
 			EditorGame::GetInstance()->GetDefiner()->AddComponentFromEnum(mapId, *focus);
 		});
 }
 
-void Inspector::PushTagField() {
-	std::vector<std::pair<int*, std::string>> enumTagOptions = {
-		{reinterpret_cast<int*>(&tagId), "Default"},
-		{reinterpret_cast<int*>(&tagId), "Player"},
-		{reinterpret_cast<int*>(&tagId), "Enemy"},
-		{reinterpret_cast<int*>(&tagId), "DropZone"},
-		{reinterpret_cast<int*>(&tagId), "CursorCast"},
-		{reinterpret_cast<int*>(&tagId), "Ground"},
-		{reinterpret_cast<int*>(&tagId), "DepositZone"},
-		{reinterpret_cast<int*>(&tagId), "Exit"}
-	};
-
-	inspectorBar->PushEnumElement("Tag to add", enumTagOptions);
-	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Tag",
-		[this]() {
-			if (!focus) return;
-			focus->SetTag(tagId);
-		});
-
-	inspectorBar->PushStaticTextElement("Tags on Object");
+void Inspector::PushTagElements(GameObject* focus) {
+	window->PushStaticTextElement("Tags on Object");
 	for (Tags::Tag tag : focus->GetTags()) {
 		std::string tagName = "Unknown";
 		switch (tag) {
 		case Tags::Default: {
-			tagName = "Default";			
+			tagName = "Default";
 			break;
 		}
 		case Tags::Player: {
-			tagName = "Player";			
+			tagName = "Player";
 			break;
 		}
 		case  Tags::Enemy: {
@@ -277,33 +115,31 @@ void Inspector::PushTagField() {
 			break;
 		}
 		}
-		inspectorBar->PushStaticTextElement(tagName);
+		window->PushStaticTextElement(tagName);
 	}
 }
-const static std::string folderPath = ASSETROOTLOCATION;
 
-std::string Inspector::GetAssetPath(std::string pfabName) {
-	return folderPath + "/Pfabs/" + pfabName;
+void Inspector::PushTagField(GameObject* focus) {
+	std::vector<std::pair<int*, std::string>> enumTagOptions = {
+		{reinterpret_cast<int*>(&tagId), "Default"},
+		{reinterpret_cast<int*>(&tagId), "Player"},
+		{reinterpret_cast<int*>(&tagId), "Enemy"},
+		{reinterpret_cast<int*>(&tagId), "DropZone"},
+		{reinterpret_cast<int*>(&tagId), "CursorCast"},
+		{reinterpret_cast<int*>(&tagId), "Ground"},
+		{reinterpret_cast<int*>(&tagId), "DepositZone"},
+		{reinterpret_cast<int*>(&tagId), "Exit"}
+	};
+
+	window->PushEnumElement("Tag to add", enumTagOptions);
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Tag",
+		[this, focus]() {
+			if (!focus) return;
+			focus->SetTag(tagId);
+		});
 }
 
-void Inspector::RenderIComponents() {
-	if (!focus) return;
-	inspectorBar->RemoveElementsFromIndex(7);
-
-	PushTagField();
+void Inspector::PushComponentInspector(GameObject* focus) {
 	for (IComponent* component : focus->GetAllComponents())
-		component->PushIComponentElementsInspector(*inspectorBar, 0.05f);
-}
-
-void Inspector::SetVector(Vector3* vector, Vector3 values) {
-	vector->x = values.x;
-	vector->y = values.y;
-	vector->z = values.z;
-}
-
-void Inspector::SetQuaternion(Vector4* quaternion, Quaternion values) {
-	quaternion->x = values.x;
-	quaternion->y = values.y;
-	quaternion->z = values.z;
-	quaternion->w = values.w;
+		component->PushIComponentElementsInspector(*window, 0.05f);
 }

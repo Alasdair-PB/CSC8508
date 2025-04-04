@@ -11,16 +11,17 @@ using namespace UI;
 
 class EditorWindow {
 public:
-	EditorWindow() : focus(nullptr), window(nullptr) {}
+	EditorWindow() : window(nullptr) {}
 	~EditorWindow() {}
 
 	virtual void OnSetFocus(GameObject* focus) {}
 	virtual void OnRenderFocus(GameObject* focus) {}
 	virtual void OnFocusEnd() {}
 	virtual void OnInit() {}
+	virtual std::string GetName() const { return "Default"; }
+	UIElementsGroup* GetWindow() { return window; }
 
 protected:
-	GameObject* focus;
 	UIElementsGroup* window;
 };
 #endif // EDITORWINDOW_H

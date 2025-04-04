@@ -18,7 +18,7 @@
 #include "UIElementsGroup.h"
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
-#include "EditorCore/Inspector.h"
+#include "EditorCore/EditorWindowManager.h"
 #include "EditorCore/EditorCamera.h"
 
 using std::vector;
@@ -38,14 +38,8 @@ namespace NCL {
 			EditorGame();
 			~EditorGame();
 			virtual void UpdateGame(float dt);
-
-			GameObject* GetFocusedObject();
-			bool SaveGameObject(GameObject& gameObject, std::string assetPath);
-			bool LoadGameObjectIntoScene(std::string assetPath);
-			bool LoadGameObjectAsPrefab(std::string assetPath);
-			bool LoadScene(std::string assetPath);
-			bool SaveScene(std::string assetPath);
 			void DeleteSelectionObject();
+
 			ComponentAssemblyDefiner* GetDefiner();
 
 			static EditorGame* GetInstance() {
@@ -89,23 +83,13 @@ namespace NCL {
 			PhysicsSystem* physics;
 			GameWorld* world;
 			Controller* controller;
-			Inspector* inspectorBar;
+			EditorWindowManager& windowManager;
 			EditorCamera* editorCamera;
+
 			bool inSelectionMode;
-
-
 			BoundsComponent* selectionObject = nullptr;
 			NavigationPath outPath;
 			NavigationMesh* navMesh = nullptr;
-
-			BoundsComponent* lockedObject	= nullptr;
-			Vector3 lockedOffset = Vector3(0, 14, 20);
-
-			void LockCameraToObject(BoundsComponent* o) {
-				lockedObject = o;
-			}
-
-			GameObject* objClosest = nullptr;
 			UI::UISystem* uiSystem;
 		};
 	}

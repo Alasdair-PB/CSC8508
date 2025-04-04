@@ -1,5 +1,5 @@
-#ifndef INSPECTOR_H
-#define INSPECTOR_H
+#ifndef EDITORMANAGER_H
+#define EDITORMANAGER_H
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
@@ -32,7 +32,6 @@ public:
 	}
 
 	static EditorWindowManager& Instance();
-	
 	void ClearGameWorld();
 
 	void RenderFocus() {
@@ -51,8 +50,19 @@ public:
 			window->OnRenderFocus(focus);
 	}
 
-	GameObject* NewGameObject();
+	GameObject* GetFocus() const { return focus; }
+	Vector3* GetPositionInfo() const { return positionInfo;}
+	Vector3* GetScaleInfo() const { return scaleInfo;}
+	Vector4* GetOrientationInfo() const { return orientationInfo;}
+	std::string* GetNameInfo() const { return name; }
+	std::string* GetFileName() const { return saveDestination; }
+	std::string GetFilePathInfo() const { return GetAssetPath(*saveDestination); }
+	bool* GetEnabledInfo() const { return isEnabled; }
 
+	void MarkWorldToClearWorld() { clearWorld = true; }
+	void AddWindow(EditorWindow* window);
+	void SetVector(Vector3* vector, Vector3 values = Vector3());
+	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
 
 	void EndFocus() {
 		focus = nullptr;
@@ -62,35 +72,23 @@ public:
 		SetQuaternion(orientationInfo);
 	}
 
-	vector<UIElementsGroup*> inspectorBar;
-	UIElementsGroup* toolsBar;
-	UIElementsGroup* hierarchy;
-
-	enum Primitives {Cube, Sphere, Empty};
-
 private:
 
 	vector<EditorWindow*> windows;
 	GameObject* focus;
-
 	Vector3* positionInfo;
 	Vector3* scaleInfo;
 	Vector4* orientationInfo;
 
-	ComponentAssemblyDefiner::ComponentMapId mapId;
-	Tags::Tag tagId;
-	Primitives primitive;
 	bool* isEnabled;
 	bool clearWorld;
+
 	std::string* saveDestination;
 	std::string* name;
 
+	std::string GetAssetPath(const std::string pfabName) const;
 
-	std::string GetAssetPath(std::string pfabName);
-	void SetVector(Vector3* vector, Vector3 values = Vector3());
-	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
-	void AddWindow(EditorWindow* window);
 };
 
 
-#endif // INSPECTOR_H
+#endif // EDITORMANAGER_H

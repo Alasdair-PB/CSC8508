@@ -27,6 +27,8 @@ EditorWindowManager& EditorWindowManager::Instance() {
 void EditorWindowManager::AddWindow(EditorWindow* window) {
 	if (!window) return;
 	windows.push_back(window);
+	UI::UISystem::GetInstance()->
+		PushNewStack(window->GetWindow(), window->GetName());
 }
 
 void EditorWindowManager::ClearGameWorld() {
@@ -41,37 +43,18 @@ EditorWindowManager::~EditorWindowManager() {
 	delete positionInfo;
 	delete scaleInfo;
 	delete orientationInfo;
+	UI::UISystem* uiSystem = UI::UISystem::GetInstance();
 
 	for (EditorWindow* window : windows) {
+		uiSystem->RemoveStack(window->GetName());
 		delete window;
 	}
 	windows.clear();
 }
 
-GameObject* EditorWindowManager::NewGameObject() {
-	Vector3 position = focus ? focus->GetTransform().GetPosition() : Vector3(0, 0, 0);
-	switch (primitive) {
-	case Empty: {
-		return new GameObject();
-		break;
-	}
-	case Cube: {
-		return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(1,1,1));
-		break;
-	}
-	case Sphere: {
-		return EditorGame::GetInstance()->AddSphereToWorld(position, 1);
-		break;
-	}
-	default: {
-		break;
-	}
-	}
-}
-
 const static std::string folderPath = ASSETROOTLOCATION;
 
-std::string EditorWindowManager::GetAssetPath(std::string pfabName) {
+std::string EditorWindowManager::GetAssetPath(const std::string pfabName) const {
 	return folderPath + "/Pfabs/" + pfabName;
 }
 

@@ -15,6 +15,7 @@
 #include "EditorCore/Hierarchy.h"
 #include "EditorCore/Inspector.h"
 #include "EditorCore/ToolsBar.h"
+#include "EditorCore/FileExplorer.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -89,6 +90,8 @@ void EditorGame::InitialiseGame() {
 	InitialiseAssets();
 	uiSystem = UI::UISystem::GetInstance();
 	windowManager.AddWindow(new Inspector());
+	windowManager.AddWindow(new FileExplorer());
+
 	windowManager.AddWindow(new Hierarchy());
 	windowManager.AddWindow(new ToolsBar());
 

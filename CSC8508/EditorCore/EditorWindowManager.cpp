@@ -8,7 +8,7 @@
 #include "../EditorGame.h"
 
 #ifndef ASSETROOTLOCATION
-#define ASSETROOTLOCATION "../Assets/Pfabs"
+#define ASSETROOTLOCATION "../Assets/"
 #endif
 
 EditorWindowManager::EditorWindowManager() : positionInfo(new Vector3()),
@@ -18,8 +18,11 @@ EditorWindowManager::EditorWindowManager() : positionInfo(new Vector3()),
 	name(new std::string("")),
 	focusElement(nullptr),
 	clearWorld(false), 
-	focus(&focusElement)
-{}
+	focus(&focusElement),
+	folderPath(new std::string())
+{
+	*folderPath = ASSETROOTLOCATION;
+}
 
 EditorWindowManager& EditorWindowManager::Instance() {
 	static EditorWindowManager instance;
@@ -54,10 +57,12 @@ EditorWindowManager::~EditorWindowManager() {
 	windows.clear();
 }
 
-const static std::string folderPath = ASSETROOTLOCATION;
+std::string EditorWindowManager::GetAssetRootDir() {
+	return ASSETROOTLOCATION;
+}
 
 std::string EditorWindowManager::GetAssetPath(const std::string pfabName) const {
-	return folderPath + "/Pfabs/" + pfabName;
+	return *folderPath + "/Pfabs/" + pfabName;
 }
 
 void EditorWindowManager::SetVector(Vector3* vector, Vector3 values) {

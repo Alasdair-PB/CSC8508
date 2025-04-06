@@ -6,6 +6,10 @@
 #include "../ComponentAssemblyDefiner.h"
 #include "EditorWindow.h"
 #include "GameWorld.h"
+#include <fstream>
+#include <filesystem>
+#include <iostream>
+#include <set>
 
 using namespace NCL;
 using namespace CSC8508;
@@ -25,11 +29,19 @@ public:
 	std::string GetName() const override { return "FileExplorer"; }
 
 private:
-	const std::string childIndent = "	";
-	void PushHierarchyLabel(GameObject* object, std::string objChildIndent);
+	bool loadObjectFlag;
+	std::string* flaggedAsset;
+
 	EditorWindowManager& editorManager;
 	GameWorld& gameWorld;
-	void InitHierachy();
+	void InitFileExplorer();
+	void PushDirectory(std::string* path);
+	std::string GetParentDirectory(std::string& path);
+	void PushOpenAsset(std::string* path, const std::filesystem::directory_entry entry);
+	void PushOpenFolder(std::string* path, const std::filesystem::directory_entry entry);
+	void PushFolderBack(std::string* path);
+
+	const std::set<std::string>& extensions = { ".Pfab", ".pfab" };
 };
 
 

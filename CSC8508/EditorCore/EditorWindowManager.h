@@ -65,10 +65,14 @@ public:
 	Vector3* GetScaleInfo() const { return scaleInfo;}
 	Vector4* GetOrientationInfo() const { return orientationInfo;}
 	std::string* GetNameInfo() const { return name; }
-	std::string* GetFileName() const { return saveDestination; }
+	std::string* GetFileName() const { return saveDestination;}
 	std::string GetFilePathInfo() const { return GetAssetPath(*saveDestination); }
+	std::string* GetFolderPath() const { return folderPath; }
+
 	bool* GetEnabledInfo() const { return isEnabled; }
+
 	std::string GetAssetPath(const std::string pfabName) const;
+	std::string GetAssetRootDir();
 
 	void MarkWorldToClearWorld() { clearWorld = true; }
 	void AddWindow(EditorWindow* window);
@@ -85,7 +89,6 @@ public:
 	}
 
 private:
-
 	vector<EditorWindow*> windows;
 	GameObject* focusElement;
 	GameObject** focus;
@@ -96,6 +99,7 @@ private:
 	bool* isEnabled;
 	bool clearWorld;
 
+	std::string* folderPath; 
 	std::string* saveDestination;
 	std::string* name;
 };

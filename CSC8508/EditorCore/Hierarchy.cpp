@@ -6,7 +6,7 @@
 #include "ComponentManager.h"
 #include "GameWorld.h"
 #include "EditorWindowManager.h"
-#include "../EditorGame.h"
+#include "EditorGame.h"
 
 Hierarchy::Hierarchy() : editorManager(EditorWindowManager::Instance()), gameWorld(GameWorld::Instance())
 {

@@ -6,7 +6,7 @@
 #include "ComponentManager.h"
 #include "GameWorld.h"
 #include "EditorWindowManager.h"
-#include "../EditorGame.h"
+#include "../Core/EditorGame.h"
 
 Inspector::Inspector() : 
 	editorManager(EditorWindowManager::Instance()), 

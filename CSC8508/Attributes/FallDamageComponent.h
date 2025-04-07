@@ -1,6 +1,6 @@
 #pragma once
 #include "IComponent.h"
-#include "../CSC8508/DamageableComponent.h"
+#include "DamageableComponent.h"
 #include "PhysicsComponent.h"
 #include "PhysicsObject.h"
 

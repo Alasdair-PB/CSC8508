@@ -197,37 +197,33 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 ]]
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
-	<fstream>
+    <fstream>
     <sstream>
-	<iostream>
-	<iosfwd>
-
+    <iostream>
+    <iosfwd>
     <memory>
-	<string>
-	<thread>
+    <string>
+    <thread>
     <filesystem>
     <functional>
-	<assert.h>
-	<chrono>
-
+    <assert.h>
+    <chrono>
     <unordered_set>
-	<set>
+    <set>
     <vector>
-	<stack>
-	<unordered_map>
+    <stack>
+    <unordered_map>
     <map>
-	<list>
-	<thread>
+    <list>
+    <thread>
     <atomic>
-	<functional>
-	<stack>
-
+    <functional>
+    <stack>
     "../NCLCoreClasses/Vector.h"
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
     "../NCLCoreClasses/GameTimer.h"
-
 )
 
 ################################################################################

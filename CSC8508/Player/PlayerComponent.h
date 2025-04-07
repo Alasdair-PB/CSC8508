@@ -2,14 +2,14 @@
 #include "PhysicsObject.h"
 #include "GameObject.h"
 #include "InputComponent.h"
-#include "StaminaComponent.h"
+#include "../Attributes/StaminaComponent.h"
 #include "CollisionEvent.h"
 #include "SightComponent.h"
-#include "DamageableComponent.h"
+#include "../Attributes/DamageableComponent.h"
 #include "EventListener.h"
 #include "EventManager.h"
 #include "CollisionDetection.h"
-#include "InventoryNetworkManagerComponent.h"
+#include "../Inventory/InventoryNetworkManagerComponent.h"
 #include "UISystem.h"
 
 namespace NCL {

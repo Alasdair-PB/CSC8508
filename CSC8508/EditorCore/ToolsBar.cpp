@@ -6,7 +6,7 @@
 #include "ComponentManager.h"
 #include "GameWorld.h"
 #include "EditorWindowManager.h"
-#include "../EditorGame.h"
+#include "EditorGame.h"
 
 ToolsBar::ToolsBar() : 
 	editorManager(EditorWindowManager::Instance()), 

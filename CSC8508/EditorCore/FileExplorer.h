@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
-#include "../ComponentAssemblyDefiner.h"
+#include "ComponentAssemblyDefiner.h"
 #include "EditorWindow.h"
 #include "GameWorld.h"
 #include <fstream>

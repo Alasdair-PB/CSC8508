@@ -12,10 +12,10 @@
 #include "OrientationConstraint.h"
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
-#include "EditorCore/Hierarchy.h"
-#include "EditorCore/Inspector.h"
-#include "EditorCore/ToolsBar.h"
-#include "EditorCore/FileExplorer.h"
+#include "Hierarchy.h"
+#include "Inspector.h"
+#include "ToolsBar.h"
+#include "FileExplorer.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"

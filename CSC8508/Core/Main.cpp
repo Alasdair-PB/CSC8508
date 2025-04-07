@@ -14,7 +14,7 @@
 #include <cstdlib>
 
 #include "Assets.h"
-#include "Map/RoomPrefab.h"
+#include "RoomPrefab.h"
 
 #ifdef USE_PS5
 #include "./PS5/GameTechAGCRenderer.h"

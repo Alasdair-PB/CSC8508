@@ -6,7 +6,7 @@
 #include "INetworkDeltaComponent.h"
 #include "INetworkComponent.h"
 #include "DamageableComponent.h"
-#include "Map/RoomPrefab.h"
+#include "RoomPrefab.h"
 
 using namespace NCL;
 using namespace CSC8508;

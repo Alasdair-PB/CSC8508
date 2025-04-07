@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
-#include "../ComponentAssemblyDefiner.h"
+#include "../Core/ComponentAssemblyDefiner.h"
 
 using namespace NCL;
 using namespace CSC8508;

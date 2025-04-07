@@ -4,7 +4,7 @@
 #define GameNetworkedManagerComponent_H
 
 #include "INetworkComponent.h"
-#include "../CSC8508/GameManagerComponent.h"
+#include "GameManagerComponent.h"
 	
 namespace NCL::CSC8508 {
 

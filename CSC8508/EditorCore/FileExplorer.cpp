@@ -5,7 +5,7 @@
 #include "ComponentManager.h"
 #include "GameWorld.h"
 #include "EditorWindowManager.h"
-#include "../EditorGame.h"
+#include "EditorGame.h"
 
 FileExplorer::FileExplorer() : 
 	editorManager(EditorWindowManager::Instance()), 

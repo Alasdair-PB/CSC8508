@@ -10,13 +10,13 @@
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
-#include "PlayerComponent.h"
+#include "../Player/PlayerComponent.h"
 #include "BoundsComponent.h"
 #include <vector>
 #include "SaveManager.h"
 #include "ComponentAssemblyDefiner.h"
 #include "UIElementsGroup.h"
-#include "Map/DoorLocation.h"
+#include "../DungeonGeneration/DoorLocation.h"
 
 #if EOSBUILD
 #include "MainMenuUI.h"

@@ -2,7 +2,7 @@
 #define ITEM_COMPONENT_H
 
 #include "IComponent.h"
-#include "DamageableComponent.h"
+#include "../Attributes/DamageableComponent.h"
 #include "../Event/EventManager.h"
 #include "../Event/Event.h"
 

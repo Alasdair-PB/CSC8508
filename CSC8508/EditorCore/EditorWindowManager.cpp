@@ -5,7 +5,7 @@
 #include <string>
 #include "ComponentManager.h"
 #include "GameWorld.h"
-#include "../EditorGame.h"
+#include "EditorGame.h"
 
 #ifndef ASSETROOTLOCATION
 #define ASSETROOTLOCATION "../Assets/"

@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 */////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "RendererBase.h"
-#include "../CSC8508/GameTechRendererInterface.h"
+#include "../CSC8508/Core/GameTechRendererInterface.h"
 
 #ifdef _WIN32
 #include "windows.h"

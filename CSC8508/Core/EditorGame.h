@@ -2,7 +2,7 @@
 #include "Controller.h"
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
-#include "MainMenu.h"
+#include "../UI/MainMenu.h"
 #include "Math.h"
 #include "GameTechRendererInterface.h"
 #include "UISystem.h"
@@ -10,7 +10,7 @@
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
-#include "PlayerComponent.h"
+#include "../Player/PlayerComponent.h"
 #include "BoundsComponent.h"
 #include <vector>
 #include "SaveManager.h"
@@ -18,8 +18,8 @@
 #include "UIElementsGroup.h"
 #include "FramerateUI.h"
 #include "MainMenuUI.h"
-#include "EditorCore/EditorWindowManager.h"
-#include "EditorCore/EditorCamera.h"
+#include "../EditorCore/EditorWindowManager.h"
+#include "../EditorCore/EditorCamera.h"
 
 using std::vector;
 

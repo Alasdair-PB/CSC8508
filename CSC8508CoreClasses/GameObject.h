@@ -282,8 +282,18 @@ namespace NCL::CSC8508 {
 
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
-		void SetTag(Tags::Tag newTag) {  tags.push_back(newTag);}
+
+		void AddTag(Tags::Tag newTag) {  tags.push_back(newTag);}
+
+		void RemoveTag() {
+			if (!tags.empty())
+				tags.pop_back();
+		}
+
 		vector<Tags::Tag> GetTags() const { return tags;}
+		Layers::LayerID* GetLayerIDInfo() { return (&layerID); }
+		vector<Tags::Tag>& GetTagInfo() { return tags; }
+
 
 	#if EDITOR
 		void SetName(std::string name) { this->name = name; }

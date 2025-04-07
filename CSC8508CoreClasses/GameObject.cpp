@@ -285,7 +285,7 @@ void GameObject::CopyInstanceData(GameObject* gameObject) {
 	gameObject->SetEnabled(isEnabled);
 
 	for (Tags::Tag tag:tags)
-		gameObject->SetTag(tag);
+		gameObject->AddTag(tag);
 
 	#if EDITOR
 		gameObject->SetName(name);

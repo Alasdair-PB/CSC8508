@@ -48,6 +48,7 @@ private:
 	void PushClearWorld();
 	void PushAddGameObject(GameObject** focus);
 	void PushTools();
+	GameObject* GetFocusParent(GameObject* focus);
 
 	void InitTools();
 };

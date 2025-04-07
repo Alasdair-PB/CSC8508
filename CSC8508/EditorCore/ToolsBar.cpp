@@ -67,11 +67,18 @@ GameObject* ToolsBar::NewGameObject(GameObject* focus) {
 	}
 }
 
+GameObject* ToolsBar::GetFocusParent(GameObject* focus) {
+	GameObject* parent = focus->TryGetParent();
+	if (parent) return GetFocusParent(parent);
+	return focus;
+}
+
 void ToolsBar::PushSavePfab(std::string* fileName, GameObject** focus) {
 	window->PushStatelessInputFieldElement("file", fileName);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
 		[this, focus, fileName]() {
-			if ((*focus)) (*focus)->Save(editorManager.GetAssetPath(*fileName));
+			if (!(*focus)) return;
+			GetFocusParent(*focus)->Save(editorManager.GetAssetPath(*fileName));
 		});
 }
 void ToolsBar::PushLoadWorld(std::string* fileName) {

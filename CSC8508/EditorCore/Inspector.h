@@ -30,11 +30,10 @@ private:
 	int elementsCount;
 
 	ComponentAssemblyDefiner::ComponentMapId mapId;
-	Tags::Tag tagId;
 
 	void PushAddComponentField(GameObject** focus);
 	void PushTagField(GameObject* focus);
-	void PushTagElements(GameObject* focus);
+	void PushLayerField(GameObject* focus);
 	void PushComponentInspector(GameObject* focus);
 
 	void InitInspector();

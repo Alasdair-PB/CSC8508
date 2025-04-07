@@ -24,8 +24,8 @@ void Inspector::OnRenderFocus(GameObject* focus)
 	if (!focus) return;
 	window->RemoveElementsFromIndex(7);
 
-	PushTagElements(focus);
 	PushTagField(focus);
+	PushLayerField(focus);
 	PushComponentInspector(focus); 
 }
 
@@ -75,68 +75,47 @@ void Inspector::PushAddComponentField(GameObject** focus) {
 		});
 }
 
-void Inspector::PushTagElements(GameObject* focus) {
-	window->PushStaticTextElement("Tags on Object");
-	for (Tags::Tag tag : (focus)->GetTags()) {
-		std::string tagName = "Unknown";
-		switch (tag) {
-		case Tags::Default: {
-			tagName = "Default";
-			break;
-		}
-		case Tags::Player: {
-			tagName = "Player";
-			break;
-		}
-		case  Tags::Enemy: {
-			tagName = "Enemy";
-			break;
-		}
-		case  Tags::DropZone: {
-			tagName = "DropZone";
-			break;
-		}
-		case  Tags::CursorCast: {
-			tagName = "CursorCast";
-			break;
-		}
-		case  Tags::Ground: {
-			tagName = "Ground";
-			break;
-		}
-		case  Tags::DepositZone: {
-			tagName = "DepositZone";
-			break;
-		}
-		case  Tags::Exit: {
-			tagName = "Exit";
-			break;
-		}
-		default: {
-			break;
-		}
-		}
-		window->PushStaticTextElement(tagName);
-	}
+void Inspector::PushLayerField(GameObject* focus) {
+	Layers::LayerID* layerId = focus->GetLayerIDInfo();
+
+	std::vector<std::pair<int*, std::string>> enumTagOptions = {
+		{reinterpret_cast<int*>(layerId), "Default"},
+		{reinterpret_cast<int*>(layerId), "Ignore_RayCast"},
+		{reinterpret_cast<int*>(layerId), "UI"},
+		{reinterpret_cast<int*>(layerId), "Player"},
+		{reinterpret_cast<int*>(layerId), "Enemy"},
+		{reinterpret_cast<int*>(layerId), "Ignore_Collisions"}
+	};
+	window->PushEnumElement("Layer to add", enumTagOptions);
 }
 
 void Inspector::PushTagField(GameObject* focus) {
-	std::vector<std::pair<int*, std::string>> enumTagOptions = {
-		{reinterpret_cast<int*>(&tagId), "Default"},
-		{reinterpret_cast<int*>(&tagId), "Player"},
-		{reinterpret_cast<int*>(&tagId), "Enemy"},
-		{reinterpret_cast<int*>(&tagId), "DropZone"},
-		{reinterpret_cast<int*>(&tagId), "CursorCast"},
-		{reinterpret_cast<int*>(&tagId), "Ground"},
-		{reinterpret_cast<int*>(&tagId), "DepositZone"},
-		{reinterpret_cast<int*>(&tagId), "Exit"}
-	};
 
-	window->PushEnumElement("Tag to add", enumTagOptions);
+	vector<Tags::Tag>& tags = focus->GetTagInfo();
+
+	for (Tags::Tag& tag : tags){
+		std::vector<std::pair<int*, std::string>> enumTagOptions = {
+			{reinterpret_cast<int*>(&tag), "Default"},
+			{reinterpret_cast<int*>(&tag), "Player"},
+			{reinterpret_cast<int*>(&tag), "Enemy"},
+			{reinterpret_cast<int*>(&tag), "DropZone"},
+			{reinterpret_cast<int*>(&tag), "CursorCast"},
+			{reinterpret_cast<int*>(&tag), "Ground"},
+			{reinterpret_cast<int*>(&tag), "DepositZone"},
+			{reinterpret_cast<int*>(&tag), "Exit"}
+		};
+		window->PushEnumElement("Tag to add", enumTagOptions);
+	}
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Tag",
 		[this, focus]() {
 			if (!focus) return;
-			(focus)->SetTag(tagId);
+			(focus)->AddTag(Tags::Default);
+		});
+
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Tag",
+		[this, focus]() {
+			if (!focus) return;
+			(focus)->RemoveTag();
 		});
 }
 

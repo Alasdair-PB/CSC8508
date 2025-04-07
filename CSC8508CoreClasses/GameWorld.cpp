@@ -109,7 +109,7 @@ size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
 		*allocationStart = nextMemoryLocation;
 	}
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<WorldSaveData>(saveInfo);
-	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart);
+	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart, true, SaveManager::Scene);
 
 	if (clearMemory)
 		delete allocationStart;

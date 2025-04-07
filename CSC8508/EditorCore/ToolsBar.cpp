@@ -80,7 +80,7 @@ void ToolsBar::PushSavePfab(std::string* fileName, GameObject** focus) {
 			if (!(*focus)) return;
 			GameObject* priorFocus = (*focus);
 			editorManager.EndFocus();
-			GetFocusParent(priorFocus)->Save(editorManager.GetAssetPath(*fileName));
+			GetFocusParent(priorFocus)->Save(editorManager.GetAssetPath(*fileName) + ".pfab");
 		});
 }
 void ToolsBar::PushLoadWorld(std::string* fileName) {
@@ -92,7 +92,7 @@ void ToolsBar::PushLoadWorld(std::string* fileName) {
 void ToolsBar::PushSaveWorld(std::string* fileName) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
 		[fileName, this]() {
-			gameWorld.Save(editorManager.GetAssetPath(*fileName));
+			gameWorld.Save(editorManager.GetAssetPath(*fileName) + ".wrld");
 		});
 }
 void ToolsBar::PushClearWorld() {

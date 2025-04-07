@@ -10,32 +10,45 @@
 FileExplorer::FileExplorer() : 
 	editorManager(EditorWindowManager::Instance()), 
 	gameWorld(GameWorld::Instance()),
-	loadObjectFlag(false),
+	loadFlag(NoFlag),
 	flaggedAsset(new std::string())
 {
 	InitFileExplorer();
 }
 
 FileExplorer::~FileExplorer() = default;
-
 void FileExplorer::OnSetFocus(GameObject* focus) {}
 void FileExplorer::OnFocusEnd() {}
 void FileExplorer::OnInit() {}
 
 void FileExplorer::OnRenderFocus(GameObject* focus)
 {
-	if (loadObjectFlag) {
-		// Change to enum flag to load multiple asset types
-		loadObjectFlag = false;
+	OnLoadFlag();
+	window->ClearAllElements();
+	std::string* path = EditorWindowManager::Instance().GetFolderPath();
+	PushDirectory(path);
+}
+
+void FileExplorer::OnLoadFlag() {
+	switch (loadFlag) {
+	case NoFlag: {
+		return;
+		break;
+	}
+	case Object: {
 		GameObject* loaded = new GameObject();
 		loaded->Load(*flaggedAsset);
 		gameWorld.AddGameObject(loaded);
 		editorManager.SetFocus(loaded);
-		//gameWorld.Load(*flaggedAsset);
+		break;
 	}
-	window->ClearAllElements();
-	std::string* path = EditorWindowManager::Instance().GetFolderPath();
-	PushDirectory(path);
+	case World: {
+		gameWorld.Load(*flaggedAsset);
+		break;
+	}
+	default: { break; }
+	}
+	loadFlag = NoFlag;
 }
 
 void FileExplorer::InitFileExplorer() {
@@ -68,7 +81,9 @@ void FileExplorer::PushOpenAsset(std::string* path, const std::filesystem::direc
 			[path, asset, this]() {
 				editorManager.MarkWorldToClearWorld();
 				*flaggedAsset = (*path) + asset;
-				loadObjectFlag = true;
+				std::string fileExtension = (*flaggedAsset).substr((*flaggedAsset).find_last_of(".") + 1);
+				if (fileExtension == "pfab") loadFlag = Object;
+				else if (fileExtension == "wrld") loadFlag = World;
 			});
 	}
 }

@@ -29,9 +29,10 @@ public:
 	std::string GetName() const override { return "FileExplorer"; }
 
 private:
-	bool loadObjectFlag;
 	std::string* flaggedAsset;
+	enum LoadFlag {NoFlag, Object, World};
 
+	LoadFlag loadFlag;
 	EditorWindowManager& editorManager;
 	GameWorld& gameWorld;
 	void InitFileExplorer();
@@ -40,8 +41,8 @@ private:
 	void PushOpenAsset(std::string* path, const std::filesystem::directory_entry entry);
 	void PushOpenFolder(std::string* path, const std::filesystem::directory_entry entry);
 	void PushFolderBack(std::string* path);
-
-	const std::set<std::string>& extensions = { ".Pfab", ".pfab" };
+	void OnLoadFlag();
+	const std::set<std::string>& extensions = { ".Pfab", ".pfab", ".wrld", ".Wrld"};
 };
 
 

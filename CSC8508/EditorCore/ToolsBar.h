@@ -38,7 +38,6 @@ private:
 	void PushSetPrimitive();
 	void PushFocusParent(GameObject** focus);
 	void PushAddParent(GameObject** focus);
-	void PushLoadChild(GameObject** focus, std::string* filePath);
 	void PushRemoveGameObject(GameObject** focus);
 
 	void AddChildToParentInWorld(GameObject* child, GameObject* parent);

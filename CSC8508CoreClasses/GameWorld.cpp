@@ -141,8 +141,12 @@ void GameWorld::RemoveGameObject(GameObject* o, bool andDelete, bool andRemoveCh
 		if (andRemoveChildren) o->RemoveChild(child);
 		RemoveGameObject(child, andDelete);
 	}
+	if (andRemoveChildren || andDelete) {
+		GameObject* parent = o->TryGetParent();
+		if (parent) parent->RemoveChild(o);
+	}
 	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());
-	if (andDelete)
+	if (andDelete) 
 		delete o;
 	worldStateCounter++;
 }

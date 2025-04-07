@@ -77,6 +77,9 @@ namespace NCL {
                 return FindKeyByValue<Texture>(texturePointer, allTextureIdMap);
             }
 
+            static std::unordered_map<std::string, Mesh*>& GetMeshMap() {
+                return allMeshesNameMap;
+            }
 
             static void CleanUp() {
                 for (auto texture : allTextureNameMap)
@@ -92,7 +95,6 @@ namespace NCL {
                 allTextureIdMap.clear();
                 allShadersNameMap.clear();
                 allShadersIdMap.clear();
-
             }
 
         private:

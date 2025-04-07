@@ -24,8 +24,8 @@ void ToolsBar::OnInit() {}
 
 void ToolsBar::InitTools() {
 	window = new UIElementsGroup(
-		ImVec2(0.2f, 0.3f),
-		ImVec2(0.1f, 0.5f),
+		ImVec2(0.15f, 0.3f),
+		ImVec2(0.1f, 0.3f),
 		1.0f,
 		"Tools",
 		0.0f,

@@ -40,9 +40,6 @@ public:
 			window->OnSetFocus(focusElement);
 	}
 
-	static EditorWindowManager& Instance();
-	void ClearGameWorld();
-
 	void RenderFocus() {
 		if (clearWorld) ClearGameWorld();
 
@@ -60,25 +57,6 @@ public:
 		focusElement->SetName(*name);
 	}
 
-	GameObject** GetFocus() const { return focus; }
-	Vector3* GetPositionInfo() const { return positionInfo;}
-	Vector3* GetScaleInfo() const { return scaleInfo;}
-	Vector4* GetOrientationInfo() const { return orientationInfo;}
-	std::string* GetNameInfo() const { return name; }
-	std::string* GetFileName() const { return saveDestination;}
-	std::string GetFilePathInfo() const { return GetAssetPath(*saveDestination); }
-	std::string* GetFolderPath() const { return folderPath; }
-
-	bool* GetEnabledInfo() const { return isEnabled; }
-
-	std::string GetAssetPath(const std::string pfabName) const;
-	std::string GetAssetRootDir();
-
-	void MarkWorldToClearWorld() { clearWorld = true; }
-	void AddWindow(EditorWindow* window);
-	void SetVector(Vector3* vector, Vector3 values = Vector3());
-	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
-
 	void EndFocus() {
 		if (focusElement) SetFocusVisual(focusElement, false);
 		focusElement = nullptr;
@@ -87,6 +65,25 @@ public:
 		SetVector(scaleInfo);
 		SetQuaternion(orientationInfo);
 	}
+
+	static EditorWindowManager& Instance();
+	void ClearGameWorld();
+	GameObject** GetFocus() const { return focus; }
+	Vector3* GetPositionInfo() const { return positionInfo;}
+	Vector3* GetScaleInfo() const { return scaleInfo;}
+	Vector4* GetOrientationInfo() const { return orientationInfo;}
+	std::string* GetNameInfo() const { return name; }
+	std::string* GetFileName() const { return saveDestination;}
+	std::string GetFilePathInfo() const { return GetAssetPath(*saveDestination); }
+	std::string* GetFolderPath() const { return folderPath; }
+	std::string GetAssetPath(const std::string pfabName) const;
+	std::string GetAssetRootDir();
+
+	bool* GetEnabledInfo() const { return isEnabled; }
+	void MarkWorldToClearWorld() { clearWorld = true; }
+	void AddWindow(EditorWindow* window);
+	void SetVector(Vector3* vector, Vector3 values = Vector3());
+	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
 
 private:
 	vector<EditorWindow*> windows;

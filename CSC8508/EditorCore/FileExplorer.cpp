@@ -16,7 +16,10 @@ FileExplorer::FileExplorer() :
 	InitFileExplorer();
 }
 
-FileExplorer::~FileExplorer() = default;
+FileExplorer::~FileExplorer() {
+	delete flaggedAsset;
+}
+
 void FileExplorer::OnSetFocus(GameObject* focus) {}
 void FileExplorer::OnFocusEnd() {}
 void FileExplorer::OnInit() {}
@@ -53,7 +56,7 @@ void FileExplorer::OnLoadFlag() {
 
 void FileExplorer::InitFileExplorer() {
 	window = new UIElementsGroup(
-		ImVec2(0.2f, 0.7f),
+		ImVec2(0.15f, 0.65f),
 		ImVec2(0.5f, 0.3f),
 		1.0f,
 		"Explorer",

@@ -62,7 +62,7 @@ std::string EditorWindowManager::GetAssetRootDir() {
 }
 
 std::string EditorWindowManager::GetAssetPath(const std::string pfabName) const {
-	return *folderPath + "/Pfabs/" + pfabName;
+	return *folderPath + pfabName;
 }
 
 void EditorWindowManager::SetVector(Vector3* vector, Vector3 values) {

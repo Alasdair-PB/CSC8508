@@ -2,7 +2,7 @@
 
 #include "IComponent.h"
 #include "INetworkDeltaComponent.h"
-#include "../CSC8508/DamageableComponent.h"
+#include "DamageableComponent.h"
 
 namespace NCL::CSC8508
 {

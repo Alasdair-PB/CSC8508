@@ -1,4 +1,4 @@
-#include "../EditorGame.h"
+#include "EditorGame.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"

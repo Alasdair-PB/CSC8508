@@ -2,7 +2,7 @@
 
 #include "IComponent.h"
 #include "INetworkDeltaComponent.h"
-#include "../CSC8508/StaminaComponent.h"
+#include "StaminaComponent.h"
 
 namespace NCL::CSC8508
 {

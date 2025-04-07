@@ -10,8 +10,8 @@
 #include "PhysicsComponent.h"
 #include "BoundsComponent.h"
 #include "ItemComponent.h"
-#include "Map/RoomManager.h"
-#include "Map/DungeonComponent.h"
+#include "RoomManager.h"
+#include "DungeonComponent.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"

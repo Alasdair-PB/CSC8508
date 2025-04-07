@@ -10,7 +10,7 @@
 #include "../AudioEngine/NetworkedListenerComponent.h"
 #include "AnimationComponent.h"
 #include "MeshAnimation.h"
-#include "Map/DungeonComponent.h"
+#include "DungeonComponent.h"
 #include "TransformNetworkComponent.h"
 #include "FullTransformNetworkComponent.h"
 #include "SightComponent.h"

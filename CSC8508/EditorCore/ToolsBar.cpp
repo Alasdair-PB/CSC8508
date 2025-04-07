@@ -39,8 +39,6 @@ void ToolsBar::PushTools() {
 
 	PushSetPrimitive();
 	PushSavePfab(fileName, focus);
-	PushLoadPfab(fileName);
-	PushLoadWorld(fileName);
 	PushSaveWorld(fileName);
 	PushClearWorld();
 	PushRemoveGameObject(focus);
@@ -48,7 +46,6 @@ void ToolsBar::PushTools() {
 	PushAddParent(focus);
 	PushAddChild(focus);
 	PushCopyGameObject(focus);
-	PushFocusParent(focus);
 }
 
 GameObject* ToolsBar::NewGameObject(GameObject* focus) {
@@ -95,7 +92,6 @@ void ToolsBar::PushClearWorld() {
 			editorManager.MarkWorldToClearWorld();
 		});
 }
-
 
 void ToolsBar::PushAddGameObject(GameObject** focus) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",

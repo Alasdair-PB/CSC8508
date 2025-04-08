@@ -10,8 +10,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "glad\gl.h"
 
 namespace NCL::Rendering {	
-	using UniqueOGLMesh		= std::unique_ptr<class OGLMesh>;
-	using SharedOGLMesh		= std::shared_ptr<class OGLMesh>;
+	using UniqueOGLMesh = std::unique_ptr<class OGLMesh>;
+	using SharedOGLMesh = std::shared_ptr<class OGLMesh>;
 
 	class OGLMesh : public Mesh	{
 	public:

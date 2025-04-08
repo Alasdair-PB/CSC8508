@@ -16,6 +16,7 @@
 #include "Inspector.h"
 #include "ToolsBar.h"
 #include "FileExplorer.h"
+#include "AssetManager.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -100,14 +101,7 @@ void EditorGame::InitialiseGame() {
 }
 
 void EditorGame::InitialiseAssets() {
-	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
-	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
-	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
-	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
-	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
-	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
-	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
+	AssetManager::LoadMaterials(renderer);
 	InitWorld();
 }
 

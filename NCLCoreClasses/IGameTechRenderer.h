@@ -14,7 +14,7 @@ namespace NCL {
 
 namespace NCL::CSC8508 {
 	class UISystem;
-	class GameTechRendererInterface
+	class IGameTechRenderer
 	{
 	public:
 		virtual NCL::Rendering::Mesh* LoadMesh(const std::string& name) = 0;

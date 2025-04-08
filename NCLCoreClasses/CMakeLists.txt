@@ -23,16 +23,14 @@ source_group("Header Files" FILES ${Header_Files})
 set(Maths
     "Maths.cpp"
     "Maths.h"
-
-	"Axis.h"
+    "Axis.h"
     "Plane.cpp"
     "Plane.h"
-	"Frustum.cpp"
+    "Frustum.cpp"
     "Frustum.h"
     "Quaternion.cpp"
     "Quaternion.h"
-
-	"Vector.h"
+    "Vector.h"
     "Matrix.h"
 )
 source_group("Maths" FILES ${Maths})
@@ -42,16 +40,15 @@ set(Rendering
     "MeshAnimation.h"
     "Mesh.cpp"
     "Mesh.h"
-
     "Buffer.h"
-	
-	"MshLoader.cpp"
+    "MshLoader.cpp"
     "MshLoader.h"
-	
     "MeshMaterial.cpp"
     "MeshMaterial.h"
     "RendererBase.cpp"
     "RendererBase.h"
+    "IGameTechRenderer.cpp"
+    "IGameTechRenderer.h"
     "Shader.cpp"
     "Shader.h"
     "Texture.cpp"
@@ -73,9 +70,9 @@ set(Windowing_and_Input
     "Mouse.h"
     "Window.cpp"
     "Window.h"
-	"Controller.cpp"
+    "Controller.cpp"
     "Controller.h"
-	"KeyboardMouseController.cpp"
+    "KeyboardMouseController.cpp"
     "KeyboardMouseController.h"
 )
 source_group("Windowing and Input" FILES ${Windowing_and_Input})

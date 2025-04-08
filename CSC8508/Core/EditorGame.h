@@ -4,7 +4,7 @@
 #include "NavigationMesh.h"
 #include "../UI/MainMenu.h"
 #include "Math.h"
-#include "GameTechRendererInterface.h"
+#include "IGameTechRenderer.h"
 #include "UISystem.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
@@ -81,7 +81,7 @@ namespace NCL {
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;
 #else
-			GameTechRendererInterface* renderer;
+			IGameTechRenderer* renderer;
 #endif
 			
 		};

@@ -3,12 +3,9 @@
 //
 
 #include "DungeonComponent.h"
-
 #include "CollisionDetection.h"
 #include "RoomManager.h"
-
 #include "INetworkDeltaComponent.h" // Needed to use GameObject::AddComponent<>()
-
 #include "../../CSC8508CoreClasses/Util.cpp"
 
 void DungeonComponent::Generate(int const roomCount) const {
@@ -16,16 +13,16 @@ void DungeonComponent::Generate(int const roomCount) const {
 
     std::srand(GetSeed());
 
-    // Generate the first room
-    auto* entryRoom = new GameObject(true);
-    RoomPrefab* prefab = RoomManager::GetRandom();
-    entryRoom->AddComponent<RoomComponent>(prefab);
-    GetGameObject().AddChild(entryRoom);
+    GameObject* prefab = RoomManager::GetRandom();
+    RoomPrefab* roomPrefab = prefab->TryGetComponent<RoomPrefab>();
+
+    prefab->AddComponent<RoomComponent>(roomPrefab);
+    GetGameObject().AddChild(prefab);
 
     // Line up the entry room with the dungeon entrance
-    DoorLocation const doorLoc = prefab->GetDoorLocations().at(0);
+    DoorLocation const doorLoc = roomPrefab->GetDoorLocations().at(0);
     Quaternion const orientationDifference = Quaternion::VectorsToQuaternion(doorLoc.dir, -entrancePosition.dir);
-    Transform entryTransform = entryRoom->GetTransform();
+    Transform entryTransform = prefab->GetTransform();
     entryTransform.SetOrientation(orientationDifference);
     entryTransform.SetPosition(
         GetGameObject().GetTransform().GetPosition()
@@ -47,18 +44,17 @@ void DungeonComponent::Generate(int const roomCount) const {
 }
 
 bool DungeonComponent::GenerateRoom() const {
-
-    // 1: Pick a random prefab and create the game object for it
-    auto* roomB = new GameObject(true);
-    RoomPrefab* prefab = RoomManager::GetRandom();
-    auto* component = roomB->AddComponent<RoomComponent>(prefab);
-
+    GameObject* roomB = RoomManager::GetRandom();
+    RoomPrefab* roomPrefabInfo = roomB->TryGetComponent<RoomPrefab>();
+    RoomComponent* component = roomB->AddComponent<RoomComponent>(roomPrefabInfo);
     // 2: Randomly order the rooms and attempt to generate a new room in each until one succeeds
     for (auto const rooms = Util::RandomiseVector(GetRooms()); RoomComponent* r : rooms) {
         if (r->TryGenerateNewRoom(*component)) return true;
     }
-
-    delete roomB;
+    std::cout << "this happens" << std::endl;
+    GetGameObject().RemoveChild(roomB);
+    roomB->SetEnabled(false);
+    //delete roomB;
     return false;
 }
 

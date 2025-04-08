@@ -106,13 +106,14 @@ void EditorGame::InitialiseAssets() {
 
 void EditorGame::UpdateGame(float dt)
 {	
-	TrySelectObject();
 	editorCamera->Update(dt);
 	UpdateUI();
 	renderer->Render();
-	windowManager.RenderFocus();
 	Debug::UpdateRenderables(dt);
+
+	TrySelectObject();
 	world->UpdateWorld(dt);
+	windowManager.RenderFocus();
 	Window::GetWindow()->ShowOSPointer(true);
 }
 

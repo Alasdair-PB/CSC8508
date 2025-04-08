@@ -22,7 +22,6 @@
 #include "DamageableNetworkComponent.h"
 #include "StaminaNetworkComponent.h"
 #include "TimerNetworkComponent.h"
-
 #include "GameNetworkedManagerComponent.h"
 
 float CantorPairing(int objectId, int index) { return (objectId + index) * (objectId + index + 1) / 2 + index;}
@@ -34,7 +33,7 @@ int GetUniqueId(int objectId, int& componentCount) {
 }
 
 GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
-	std::string gameObjectPath = GetAssetPath("object_data.pfab");
+	std::string gameObjectPath = GetAssetPath("item.pfab");
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
 	myObjectToLoad->GetTransform().SetPosition(position);
@@ -73,16 +72,11 @@ GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnD
 		gm->AddComponent<GameManagerComponent>(quota, terminationFee, initAllowance);
 	}
 	world->AddGameObject(gm);
-
 	return gm;
 }
 
 GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag) {
-
-	//std::string gameObjectPath = GetAssetPath("object_data.pfab");
 	GameObject* dropZone = new GameObject();
-	//myObjectToLoad->Load(gameObjectPath);
-
 	OBBVolume* volume = new OBBVolume(dimensions);
 	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
 	Texture* basicTex = MaterialManager::GetTexture("basic");
@@ -99,7 +93,7 @@ GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensio
 	phys->SetPhysicsObject(new PhysicsObject(&dropZone->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(0);
 	phys->GetPhysicsObject()->InitCubeInertia();
-	dropZone->SetTag(tag);
+	dropZone->AddTag(tag);
 	if (tag == Tags::DropZone)
 		dropZone->GetRenderObject()->SetColour(Vector4(0, 1, 0, 0.3f));
 	else if (tag == Tags::Exit)
@@ -120,7 +114,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	GameObject* player = new GameObject();
 	CapsuleVolume* volume = new CapsuleVolume(0.5f, 0.5f);
 
-	Mesh* playerMesh = MaterialManager::GetMesh("player");
+	Mesh* playerMesh = MaterialManager::GetMesh("astronaut");
 	Texture* basicTex = MaterialManager::GetTexture("player");
 	Shader* playerShader = MaterialManager::GetShader("anim");
 
@@ -130,7 +124,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	player->SetLayerID(Layers::Player);
 	player->GetTransform().SetScale(Vector3(meshSize, meshSize, meshSize)).SetPosition(position);
 	player->SetLayerID(Layers::LayerID::Player);
-	player->SetTag(Tags::Player);
+	player->AddTag(Tags::Player);
 	player->SetRenderObject(new RenderObject(&player->GetTransform(), playerMesh, basicTex, playerShader));
 
 	PlayerComponent* pc = player->AddComponent<PlayerComponent>();
@@ -239,10 +233,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 GameObject* TutorialGame::AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int const roomCount) {
 	auto* dungeon = new GameObject();
 	dungeon->GetTransform() = transform;
-
-	auto const* dc = dungeon->AddComponent<DungeonComponent>(entryPosition);
-	dc->Generate(roomCount);
-
+	DungeonComponent* dc = dungeon->AddComponent<DungeonComponent>(entryPosition, roomCount);
 	world->AddGameObject(dungeon);
 	return dungeon;
 }

@@ -12,6 +12,7 @@
 #include "ItemComponent.h"
 #include "RoomManager.h"
 #include "DungeonComponent.h"
+#include "AssetManager.h"
 
 #ifdef USE_PS5
 #include "../PS5Starter/GameTechAGCRenderer.h"
@@ -26,7 +27,6 @@
 #if EOSBUILD
 #include "EOSLobbyFunctions.h"
 #endif
-
 
 using namespace NCL;
 using namespace CSC8508;
@@ -56,9 +56,8 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapButton(8, "Dash"); //Ps5 relevant buttons
 	controller->MapButton(2, "Jump"); // Keep names
 	controller->MapButton(1, "Interact");
-  controller->MapButton(10, "Pause");
+	controller->MapButton(10, "Pause");
 	controller->MapButton(11, "Debug");
-
 #else
 	controller->MapAxis(0, "Sidestep");
 	controller->MapAxis(2, "Forward");
@@ -86,9 +85,6 @@ void TutorialGame::InitialiseGame() {
 
 	uiSystem->PushNewStack(audioSliders->audioSlidersUI, "Audio Sliders");
 	uiSystem->PushNewStack(mainMenuUI->menuUI, "Main Menu");
-	//uiSystem->PushNewStack(inventoryUI->inventoryUI, "Inventory");
-
-	/*uiSystem->PushNewStack(lobbySearchField->lobbySearchField, "Lobby Search Field");*/
 	inSelectionMode = false;
 	physics->UseGravity(true);
 }
@@ -112,34 +108,18 @@ TutorialGame::TutorialGame()
 	renderer = new GameTechRenderer(*world);
 #endif
 #endif
-	
 	physics = new PhysicsSystem(*world);
-
 	InitialiseGame();
 }
 
 void TutorialGame::InitialiseAssets() {
-	MaterialManager::PushMesh("cube", renderer->LoadMesh("cube.msh"));
-	MaterialManager::PushMesh("capsule", renderer->LoadMesh("capsule.msh"));
-	MaterialManager::PushMesh("sphere", renderer->LoadMesh("sphere.msh"));
-	MaterialManager::PushMesh("Role_T", renderer->LoadMesh("Role_T.msh"));
-	MaterialManager::PushMesh("navMesh", renderer->LoadMesh("NavMeshObject.msh"));
-
-	MaterialManager::PushMesh("player", renderer->LoadMesh("Astronaut.msh"));
-	MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
-	MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter400.png"));
-	MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
-	MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
-
+	AssetManager::LoadMaterials(renderer);
 	RoomManager::LoadPrefabs();
-
 	lockedObject = nullptr;
 	InitWorld();
 }
 
-TutorialGame::~TutorialGame()	
-{
-}
+TutorialGame::~TutorialGame(){}
 
 void TutorialGame::UpdateGame(float dt)
 {
@@ -154,16 +134,13 @@ void TutorialGame::UpdateGame(float dt)
 }
 
 void TutorialGame::LoadWorld(std::string assetPath) {
-	LoadDropZone(GetSpawnLocation(1), Vector3(3, 1, 3), Tags::DropZone);
-	LoadDropZone(GetSpawnLocation(2), Vector3(3,1,3), Tags::DepositZone);
-	LoadDropZone(GetSpawnLocation(3), Vector3(3,1,3), Tags::Exit);
 	world->Load(assetPath);
 }
 
 void TutorialGame::LoadDungeon(Vector3 const offset) {
-
 	auto t = Transform();
 	t.SetPosition(offset);
+	t.SetScale(Vector3(1, 1, 1));
 	DoorLocation const loc(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
 	AddDungeonToWorld(t, loc, 3);
 }
@@ -173,16 +150,9 @@ void TutorialGame::InitWorld()
 	world->ClearAndErase();
 	physics->Clear();
 
-	//GameObject* room = LoadRoomPfab("room_A.pfab", Vector3(90, 90, -50));
-	//GameObject* roomB = room->CopyGameObject();
-	//room->SetEnabled(true);
-	//roomB->GetTransform().SetPosition(Vector3(90, 60, -50));
-	//roomB->SetEnabled(true);
-	//world->AddGameObject(roomB);
-
 	//std::string assetPath = GetAssetPath("myScene.pfab");
 	//LoadWorld(assetPath);
-
+	
 	LoadDungeon(Vector3());
 	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::DropZone);
 	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::DepositZone);
@@ -276,6 +246,5 @@ void TutorialGame::UpdateUI() {
 	}
 
 #endif
-
 	uiSystem->RenderFrame();
 }

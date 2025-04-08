@@ -4,7 +4,7 @@
 #include "NavigationMesh.h"
 #include "MainMenu.h"
 #include "Math.h"
-#include "GameTechRendererInterface.h"
+#include "IGameTechRenderer.h"
 #include "UISystem.h"
 #ifdef USEVULKAN
 #include "GameTechVulkanRenderer.h"
@@ -77,7 +77,7 @@ namespace NCL {
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;
 #else
-			GameTechRendererInterface* renderer;
+			IGameTechRenderer* renderer;
 #endif
 			PhysicsSystem* physics;
 			AudioEngine* audioEngine = nullptr;

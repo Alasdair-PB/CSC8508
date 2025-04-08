@@ -35,7 +35,7 @@ namespace NCL::CSC8508 {
 		/// </summary>
 		/// <returns>True if this GameObject is enabled otherwise returns false</returns>
 		bool IsEnabled() const { 
-			return parent ? isEnabled && parent->IsEnabled() : isEnabled;
+			return parent ? (isEnabled && parent->IsEnabled()) : isEnabled;
 		}
 
 		/// <summary>

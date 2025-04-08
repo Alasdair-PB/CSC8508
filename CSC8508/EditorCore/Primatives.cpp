@@ -163,10 +163,9 @@ GameObject* EditorGame::AddFloorToWorld(const Vector3& position)
 	BoundsComponent* bounds = floor->AddComponent<BoundsComponent>((CollisionVolume*) volume, phys);
 
 	floor->GetTransform().SetScale(floorSize * 2.0f).SetPosition(position);
-
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&floor->GetTransform()));
 
+	phys->SetPhysicsObject(new PhysicsObject(&floor->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(0);
 	phys->GetPhysicsObject()->InitCubeInertia();
 
@@ -216,10 +215,8 @@ GameObject* EditorGame::AddCubeToWorld(const Vector3& position, Vector3 dimensio
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
 	phys->SetPhysicsObject(new PhysicsObject(&cube->GetTransform()));
 
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitCubeInertia();
 	phys->GetPhysicsObject()->SetInverseMass(0);
 	cube->SetLayerID(Layers::LayerID::Default);
-
 	return cube;
 }

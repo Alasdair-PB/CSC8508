@@ -41,12 +41,14 @@ struct SpawnPacket : public GamePacket {
 };
 
 const Vector3 itemPos = Vector3(15.0f, 15.0f, 0.0f);
+const Vector3 playerPos = Vector3(0.0f, 6.0f, 0.0f);
+
 void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 
 void NetworkedGame::StartOfflineCallBack() { 
 	TutorialGame::LoadGameManager(Vector3());
-	TutorialGame::AddPlayerToWorld(Vector3(0.0f, 20.0f, 0.0f));
+	TutorialGame::AddPlayerToWorld(playerPos);
 	TutorialGame::Loaditem(GetSpawnLocation(itemCount++));
 }
 
@@ -309,7 +311,7 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 // To change to Pfab managed system in the future where all pfabs 
 // are loaded as disabled GameObjects that can be copied to new objects during runtime
 GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) { 
-	return TutorialGame::AddPlayerToWorld(Vector3(0.0f, 20.0f, 0.0f), spawnPacket);
+	return TutorialGame::AddPlayerToWorld(playerPos, spawnPacket);
 }
 
 GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket){ 

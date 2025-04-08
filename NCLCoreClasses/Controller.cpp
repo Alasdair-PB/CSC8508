@@ -53,6 +53,15 @@ uint32_t Controller::GetNamedAxisBinding(const std::string& axis) const {
 	return -1;
 }
 
+uint32_t Controller::GetNamedButtonBinding(const std::string& button) const {
+	auto a = buttonMappings.find(button);
+	if (a != buttonMappings.end()) {
+		return a->second;
+	}
+	return -1;
+}
+
+
 vector<uint32_t> Controller::GetBoundButtons() const {
 	vector<uint32_t> boundButtons;
 	for (auto binding : buttonMappings)

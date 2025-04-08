@@ -76,8 +76,7 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapAxis(2, "Forward");
 	controller->MapAxis(3, "XLook");
 	controller->MapAxis(4, "YLook");
-	controller->MapButton(KeyCodes::SHIFT, "Dash");
-	controller->MapButton(KeyCodes::SPACE, "Jump");
+	controller->MapButton(KeyCodes::Q, "Pan");
 }
 
 void EditorGame::InitialiseGame() {

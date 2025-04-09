@@ -5,40 +5,64 @@
 #include "RoomPrefab.h"
 
 struct RoomPrefab::RoomPrefabDataStruct : ISerializedData{
-    std::vector<Vector3> possibleItemSpawnLocations;
     std::vector<DoorLocation> doorLocations;
+    std::vector<SpawnLocation> itemSpawnLocations;
+    std::vector<SpawnLocation> enemySpawnLocations;
 
-    RoomPrefabDataStruct() : possibleItemSpawnLocations(std::vector<Vector3>()), doorLocations(std::vector<DoorLocation>()) {}
-    RoomPrefabDataStruct(std::vector<Vector3> const& possibleItemSpawnLocations, std::vector<DoorLocation> const& doorLocations)
-        : possibleItemSpawnLocations(possibleItemSpawnLocations), doorLocations(doorLocations) {}
+    RoomType roomType;
+    int spawnProbability;
+
+    RoomPrefabDataStruct() : 
+        itemSpawnLocations(std::vector<SpawnLocation>()), 
+        enemySpawnLocations(std::vector<SpawnLocation>()),
+        doorLocations(std::vector<DoorLocation>()),
+        roomType(Empty),
+        spawnProbability(0) {}
+    RoomPrefabDataStruct(
+        std::vector<SpawnLocation> const& itemSpawnLocations, 
+        std::vector<SpawnLocation> const& enemySpawnLocations,
+        std::vector<DoorLocation> const& doorLocations,
+        RoomType roomType,
+        int spawnProbability)
+        : 
+        itemSpawnLocations(itemSpawnLocations), 
+        enemySpawnLocations(enemySpawnLocations),
+        doorLocations(doorLocations),
+        roomType(roomType),
+        spawnProbability(spawnProbability){}
 
     static auto GetSerializedFields() {
         return std::make_tuple(
-            SERIALIZED_FIELD(RoomPrefabDataStruct, possibleItemSpawnLocations),
-            SERIALIZED_FIELD(RoomPrefabDataStruct, doorLocations)
-            );
+            SERIALIZED_FIELD(RoomPrefabDataStruct, itemSpawnLocations),
+            SERIALIZED_FIELD(RoomPrefabDataStruct, enemySpawnLocations),
+            SERIALIZED_FIELD(RoomPrefabDataStruct, doorLocations),
+            SERIALIZED_FIELD(RoomPrefabDataStruct, roomType),
+            SERIALIZED_FIELD(RoomPrefabDataStruct, spawnProbability)
+        );
     }
 };
 
 size_t RoomPrefab::Save(std::string const assetPath, size_t* allocationStart) {
-    RoomPrefabDataStruct const saveInfo(possibleItemSpawnLocations, doorLocations);
+    RoomPrefabDataStruct const saveInfo(itemSpawnLocations, enemySpawnLocations, doorLocations, roomType, spawnProbability);
     SaveManager::GameData const saveData = ISerializedData::CreateGameData<RoomPrefabDataStruct>(saveInfo);
     return SaveManager::SaveGameData(assetPath, saveData, allocationStart, true);
 }
 
 void RoomPrefab::Load(std::string const assetPath, size_t const allocationStart) {
     auto const loadedSaveData = ISerializedData::LoadISerializable<RoomPrefabDataStruct>(assetPath, allocationStart);
-    possibleItemSpawnLocations = loadedSaveData.possibleItemSpawnLocations;
+    itemSpawnLocations = loadedSaveData.itemSpawnLocations;
     doorLocations = loadedSaveData.doorLocations;
 }
 
 void RoomPrefab::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale)
 {
-    for (int i = 0; i < possibleItemSpawnLocations.size(); i++)
-        elementsGroup.PushVectorElement(&possibleItemSpawnLocations[i], scale, "ItemSpawn");
+    for (int i = 0; i < itemSpawnLocations.size(); i++) {
+        elementsGroup.PushVectorElement(&itemSpawnLocations[i].location, scale, "Position");
+        elementsGroup.PushFloatElement(&itemSpawnLocations[i].probability, scale, "Probability");
+    }
 
     elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale / 2), "Add new Item Spawn",
-        [this]() {possibleItemSpawnLocations.push_back(Vector3());});
+        [this]() {itemSpawnLocations.push_back(SpawnLocation());});
 
     for (int i = 0; i < doorLocations.size(); i++) {
         elementsGroup.PushVectorElement(&(doorLocations[i].dir), scale, "Dir");

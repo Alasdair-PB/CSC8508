@@ -18,8 +18,8 @@ void RoomComponent::SetTransform(const Transform& transformA, Transform& transfo
     transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
     transformB.SetPosition(
         transformA.GetPosition()
-        + transformA.GetOrientation() * aDoorLoc.pos * transformA.GetScale()
-        - transformB.GetOrientation() * bDoorLoc.pos * transformB.GetScale()
+        + transformA.GetOrientation() * (transformA.GetScale() * aDoorLoc.pos)
+        - transformB.GetOrientation() * (transformB.GetScale() * bDoorLoc.pos)
     );
 }
 

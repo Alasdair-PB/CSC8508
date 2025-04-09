@@ -85,6 +85,7 @@ namespace NCL::CSC8508
 		int expectingVolumeType = 0;
 		bool* isTrigger = new bool();
 		Vector3* expectingBoundsSize = new Vector3();
+		int GetParentCount(GameObject* object);
 
 		std::map<int, VolumeType> enumVolumeCast = {
 			{0, VolumeType::AABB},

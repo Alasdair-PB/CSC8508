@@ -10,7 +10,6 @@
 
 bool DungeonComponent::Generate(int const roomCount) const {
     int failures = 0;
-
     std::srand(GetSeed());
 
     GameObject* prefab = RoomManager::GetRandom();
@@ -36,8 +35,10 @@ bool DungeonComponent::Generate(int const roomCount) const {
             i--;
             failures++;
         }
-        if (failures >= MAX_FAILURES) 
+        if (failures >= MAX_FAILURES) {
+            std::cout << "failed" << std::endl;
             return false;
+        }
     }
     return true;
 }
@@ -68,8 +69,8 @@ void DungeonComponent::GetAllItemSpawnLocations(std::vector<Vector3>& locations)
         Transform const& transform = r->GetTransform();
         RoomComponent const* roomComponent = r->TryGetComponent<RoomComponent>();
         if (!roomComponent) continue;
-        for (RoomPrefab prefab = roomComponent->GetPrefab(); Vector3 const loc : prefab.GetItemSpawnLocations()) {
-            Vector3 const outLoc = transform.GetOrientation() * (transform.GetScale() * loc)  + transform.GetPosition();
+        for (RoomPrefab prefab = roomComponent->GetPrefab(); SpawnLocation const loc : prefab.GetItemSpawnLocations()) {
+            Vector3 const outLoc = transform.GetOrientation() * (transform.GetScale() * loc.location)  + transform.GetPosition();
             locations.push_back(outLoc);
         }
     }

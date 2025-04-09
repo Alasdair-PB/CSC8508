@@ -19,4 +19,12 @@ struct DoorLocation : NCL::CSC8508::ISerializedData{
         : pos(position), dir(direction) { }
 };
 
+struct SpawnLocation {
+    float probability;
+    Vector3 location;
+};
+
+enum RoomType { Empty };
+
+
 #endif //DOORLOCATION_H

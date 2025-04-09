@@ -16,22 +16,23 @@ public:
 
     struct RoomPrefabDataStruct;
 
-    struct SpawnLocation {
-        int probability;
-        Vector3 location;
-    };
-
     explicit RoomPrefab(
         GameObject& roomObject,
-        std::vector<Vector3> const& possibleItemSpawnLocations = std::vector<Vector3>(),
-        std::vector<DoorLocation> const& doorLocations = std::vector<DoorLocation>()
+        std::vector<SpawnLocation> const& itemSpawnLocations = std::vector<SpawnLocation>(),
+        std::vector<SpawnLocation> const& enemySpawnLocations = std::vector<SpawnLocation>(),
+        std::vector<DoorLocation> const& doorLocations = std::vector<DoorLocation>(),
+        RoomType roomType = Empty,
+        float spawnProbability = 1
         )
     : IComponent(roomObject), 
-        possibleItemSpawnLocations(possibleItemSpawnLocations), 
+        itemSpawnLocations(itemSpawnLocations),
+        enemySpawnLocations(enemySpawnLocations),
+        spawnProbability(spawnProbability),
         doorLocations(doorLocations),
-        required(false) {}
+        roomType(roomType)
+    {}
 
-    [[nodiscard]] std::vector<Vector3> const& GetItemSpawnLocations() const { return possibleItemSpawnLocations; }
+    [[nodiscard]] std::vector<SpawnLocation> const& GetItemSpawnLocations() const { return itemSpawnLocations; }
     [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return doorLocations; }
 
     size_t Save(std::string assetPath, size_t* allocationStart) override;
@@ -39,13 +40,11 @@ public:
     void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
 
 protected:
-    std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>();
     std::vector<DoorLocation> doorLocations = std::vector<DoorLocation>();
-
     std::vector<SpawnLocation> itemSpawnLocations = std::vector<SpawnLocation>();
     std::vector<SpawnLocation> enemySpawnLocations = std::vector<SpawnLocation>();
-    bool required;
-    int spawnProbability;
-};
 
+    RoomType roomType;
+    float spawnProbability;
+};
 #endif //ROOMPREFAB_H

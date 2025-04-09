@@ -24,7 +24,7 @@ struct SpawnLocation {
     Vector3 location;
 };
 
-enum RoomType { Empty };
+enum RoomType { Empty, Bank, Vender, Exit };
 
 
 #endif //DOORLOCATION_H

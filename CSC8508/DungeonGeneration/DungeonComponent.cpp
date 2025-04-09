@@ -5,7 +5,7 @@
 #include "DungeonComponent.h"
 #include "CollisionDetection.h"
 #include "RoomManager.h"
-#include "INetworkDeltaComponent.h" // Needed to use GameObject::AddComponent<>()
+#include "INetworkDeltaComponent.h"
 #include "../../CSC8508CoreClasses/Util.cpp"
 
 bool DungeonComponent::Generate(int const roomCount) const {
@@ -50,8 +50,6 @@ bool DungeonComponent::GenerateRoom() const {
     for (auto const rooms = Util::RandomiseVector(GetRooms()); RoomComponent* r : rooms) {
         if (r->TryGenerateNewRoom(*component)) return true;
     }
-    std::cout << "this happens" << std::endl;
-    GetGameObject().RemoveChild(roomB);
     roomB->SetEnabled(false);
     //delete roomB;
     return false;

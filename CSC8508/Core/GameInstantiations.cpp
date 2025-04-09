@@ -1,4 +1,4 @@
-#include "TutorialGame.h"
+#include "GameCore.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "../AudioEngine/AudioSourceComponent.h"
@@ -32,7 +32,7 @@ int GetUniqueId(int objectId, int& componentCount) {
 	return unqiueId;
 }
 
-GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
+GameObject* GameCore::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
 	std::string gameObjectPath = GetAssetPath("item.pfab");
 	GameObject* myObjectToLoad = new GameObject();
 	myObjectToLoad->Load(gameObjectPath);
@@ -50,7 +50,7 @@ GameObject* TutorialGame::Loaditem(const Vector3& position, NetworkSpawnData* sp
 	return myObjectToLoad;
 }
 
-GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
+GameObject* GameCore::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
 	GameObject* gm = new GameObject();
 	int quota = 500;
 	int terminationFee = 60;
@@ -75,7 +75,7 @@ GameObject* TutorialGame::LoadGameManager(const Vector3& position, NetworkSpawnD
 	return gm;
 }
 
-GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag) {
+GameObject* GameCore::LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag) {
 	GameObject* dropZone = new GameObject();
 	OBBVolume* volume = new OBBVolume(dimensions);
 	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
@@ -107,7 +107,7 @@ GameObject* TutorialGame::LoadDropZone(const Vector3& position, Vector3 dimensio
 	return dropZone;
 }
 
-GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
+GameObject* GameCore::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
 	float meshSize = 0.25f;
 	float inverseMass = 0.5f;
 
@@ -230,7 +230,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, NetworkSpawn
 	return player;
 }
 
-GameObject* TutorialGame::AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int const roomCount) {
+GameObject* GameCore::AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int const roomCount) {
 	auto* dungeon = new GameObject();
 	dungeon->GetTransform() = transform;
 	DungeonComponent* dc = dungeon->AddComponent<DungeonComponent>(entryPosition, roomCount);

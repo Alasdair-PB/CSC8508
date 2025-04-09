@@ -13,40 +13,39 @@ using namespace NCL::CSC8508;
 
 class RoomPrefab : public IComponent {
 public:
-    struct RoomPrefabDataStruct : ISerializedData {
-        std::vector<Vector3> possibleItemSpawnLocations;
-        std::vector<DoorLocation> possibleDoorLocations;
 
-        RoomPrefabDataStruct() : possibleItemSpawnLocations(std::vector<Vector3>()), possibleDoorLocations(std::vector<DoorLocation>()) { }
-        RoomPrefabDataStruct(std::vector<Vector3> const& possibleItemSpawnLocations, std::vector<DoorLocation> const& possibleDoorLocations)
-            : possibleItemSpawnLocations(possibleItemSpawnLocations), possibleDoorLocations(possibleDoorLocations) { }
+    struct RoomPrefabDataStruct;
 
-        static auto GetSerializedFields() {
-            return std::make_tuple(
-                SERIALIZED_FIELD(RoomPrefabDataStruct, possibleItemSpawnLocations),
-                SERIALIZED_FIELD(RoomPrefabDataStruct, possibleDoorLocations)
-                );
-        }
+    struct SpawnLocation {
+        int probability;
+        Vector3 location;
     };
 
     explicit RoomPrefab(
         GameObject& roomObject,
         std::vector<Vector3> const& possibleItemSpawnLocations = std::vector<Vector3>(),
-        std::vector<DoorLocation> const& possibleDoorLocations = std::vector<DoorLocation>()
+        std::vector<DoorLocation> const& doorLocations = std::vector<DoorLocation>()
         )
-    : IComponent(roomObject), possibleItemSpawnLocations(possibleItemSpawnLocations), possibleDoorLocations(possibleDoorLocations) { }
+    : IComponent(roomObject), 
+        possibleItemSpawnLocations(possibleItemSpawnLocations), 
+        doorLocations(doorLocations),
+        required(false) {}
 
     [[nodiscard]] std::vector<Vector3> const& GetItemSpawnLocations() const { return possibleItemSpawnLocations; }
-    [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return possibleDoorLocations; }
+    [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return doorLocations; }
 
     size_t Save(std::string assetPath, size_t* allocationStart) override;
     void Load(std::string assetPath, size_t allocationStart) override;
     void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
 
-
 protected:
     std::vector<Vector3> possibleItemSpawnLocations = std::vector<Vector3>();
-    std::vector<DoorLocation> possibleDoorLocations = std::vector<DoorLocation>();
+    std::vector<DoorLocation> doorLocations = std::vector<DoorLocation>();
+
+    std::vector<SpawnLocation> itemSpawnLocations = std::vector<SpawnLocation>();
+    std::vector<SpawnLocation> enemySpawnLocations = std::vector<SpawnLocation>();
+    bool required;
+    int spawnProbability;
 };
 
 #endif //ROOMPREFAB_H

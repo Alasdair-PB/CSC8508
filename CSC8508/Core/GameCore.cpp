@@ -1,4 +1,4 @@
-#include "TutorialGame.h"
+#include "GameCore.h"
 #include "GameWorld.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -33,11 +33,11 @@ using namespace CSC8508;
 
 const static std::string folderPath = NCL::Assets::PFABDIR;
 
-std::string TutorialGame::GetAssetPath(std::string pfabName) {
+std::string GameCore::GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
 }
 
-GameObject* TutorialGame::LoadRoomPfab(std::string assetPath, Vector3 offset) {
+GameObject* GameCore::LoadRoomPfab(std::string assetPath, Vector3 offset) {
 	GameObject* myObjectToLoad = new GameObject(true);
 	std::string pfabPath = GetAssetPath(assetPath);
 	myObjectToLoad->Load(pfabPath);
@@ -72,7 +72,7 @@ void LoadControllerMappings(Controller* controller)
 	controller->BindMappingsToHashIds();
 }
 
-void TutorialGame::InitialiseGame() {
+void GameCore::InitialiseGame() {
 
 	componentAssembly = new ComponentAssemblyDefiner();
 	componentAssembly->InitializeMap();
@@ -89,7 +89,7 @@ void TutorialGame::InitialiseGame() {
 	physics->UseGravity(true);
 }
 
-TutorialGame::TutorialGame()
+GameCore::GameCore()
 {
 	world = &GameWorld::Instance();
 #ifdef USE_PS5
@@ -112,16 +112,16 @@ TutorialGame::TutorialGame()
 	InitialiseGame();
 }
 
-void TutorialGame::InitialiseAssets() {
+void GameCore::InitialiseAssets() {
 	AssetManager::LoadMaterials(renderer);
 	RoomManager::LoadPrefabs();
 	lockedObject = nullptr;
 	InitWorld();
 }
 
-TutorialGame::~TutorialGame(){}
+GameCore::~GameCore(){}
 
-void TutorialGame::UpdateGame(float dt)
+void GameCore::UpdateGame(float dt)
 {
 	world->UpdateWorld(dt);
 	UpdateUI();
@@ -133,11 +133,11 @@ void TutorialGame::UpdateGame(float dt)
 	audioEngine->Update();
 }
 
-void TutorialGame::LoadWorld(std::string assetPath) {
+void GameCore::LoadWorld(std::string assetPath) {
 	world->Load(assetPath);
 }
 
-void TutorialGame::LoadDungeon(Vector3 const offset) {
+void GameCore::LoadDungeon(Vector3 const offset) {
 	auto t = Transform();
 	t.SetPosition(offset);
 	t.SetScale(Vector3(1, 1, 1));
@@ -145,7 +145,7 @@ void TutorialGame::LoadDungeon(Vector3 const offset) {
 	AddDungeonToWorld(t, loc, 3);
 }
 
-void TutorialGame::InitWorld()
+void GameCore::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
@@ -159,7 +159,7 @@ void TutorialGame::InitWorld()
 	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::Exit);
 }
 
-void TutorialGame::RefreshSpawnLocals() {
+void GameCore::RefreshSpawnLocals() {
 	vector<Vector3> locals;
 	int seed;
 	ComponentManager::OperateOnBufferContents<DungeonComponent>(
@@ -172,7 +172,7 @@ void TutorialGame::RefreshSpawnLocals() {
 	this->seed = seed;
 }
 
-Vector3 TutorialGame::GetSpawnLocation(int index) {
+Vector3 GameCore::GetSpawnLocation(int index) {
 	if (locals.empty())
 		RefreshSpawnLocals();
 	if (locals.empty()) return Vector3();
@@ -187,7 +187,7 @@ Vector3 TutorialGame::GetSpawnLocation(int index) {
 }
 
 
-void TutorialGame::UpdateUI() {
+void GameCore::UpdateUI() {
 	uiSystem->StartFrame();
 #if !EOSBUILD
 	if (mainMenuUI->GetMenuOption() != 0) {

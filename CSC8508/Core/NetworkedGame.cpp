@@ -47,9 +47,9 @@ void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); } //IP 
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 
 void NetworkedGame::StartOfflineCallBack() { 
-	TutorialGame::LoadGameManager(Vector3());
-	TutorialGame::AddPlayerToWorld(playerPos);
-	TutorialGame::Loaditem(GetSpawnLocation(itemCount++));
+	GameCore::LoadGameManager(Vector3());
+	GameCore::AddPlayerToWorld(playerPos);
+	GameCore::Loaditem(GetSpawnLocation(itemCount++));
 }
 
 #if EOSBUILD
@@ -136,7 +136,7 @@ NetworkedGame::NetworkedGame()	{
 NetworkedGame::~NetworkedGame()	{
 	if(thisServer) delete thisServer;
 	if (thisClient) delete thisClient;
-	TutorialGame::~TutorialGame();
+	GameCore::~GameCore();
 }
 
 void NetworkedGame::StartAsServer() 
@@ -248,7 +248,7 @@ void NetworkedGame::UpdateGame(float dt)
 		thisServer->UpdateServer();
 	else if (thisClient) 
 		thisClient->UpdateClient();
-	TutorialGame::UpdateGame(dt);
+	GameCore::UpdateGame(dt);
 }
 
 void NetworkedGame::UpdatePackets(float dt)
@@ -311,15 +311,15 @@ void NetworkedGame::BroadcastOwnedObjects(bool deltaFrame)
 // To change to Pfab managed system in the future where all pfabs 
 // are loaded as disabled GameObjects that can be copied to new objects during runtime
 GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) { 
-	return TutorialGame::AddPlayerToWorld(playerPos, spawnPacket);
+	return GameCore::AddPlayerToWorld(playerPos, spawnPacket);
 }
 
 GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket){ 
-	return TutorialGame::Loaditem(GetSpawnLocation(itemCount++), spawnPacket);
+	return GameCore::Loaditem(GetSpawnLocation(itemCount++), spawnPacket);
 }
 
 GameObject* NetworkedGame::GetGameManagerPrefab(NetworkSpawnData* spawnPacket) {
-	return TutorialGame::LoadGameManager(Vector3(93, 22, -53), spawnPacket);
+	return GameCore::LoadGameManager(Vector3(93, 22, -53), spawnPacket);
 }
 
 GameObject* NetworkedGame::GetObjectFromPfab(size_t pfab, NetworkSpawnData data) {

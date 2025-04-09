@@ -8,7 +8,6 @@
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-#include "NetworkObject.h"
 #include "INetworkDeltaComponent.h"
 #include "Debug.h"
 
@@ -143,13 +142,16 @@ struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 void BoundsComponent::CopyComponent(GameObject* gameObject) {
 	BoundsComponent* component = gameObject->AddComponent<BoundsComponent>(nullptr, nullptr);
 	component->SetEnabled(IsEnabled());
-	CollisionVolume* volume;
 	if (boundingVolume) {
-		volume = CopyVolume(boundingVolume->isTrigger, boundingVolume->type, GetBoundsScale());
+		CollisionVolume* volume = CopyVolume(boundingVolume->isTrigger, boundingVolume->type, GetBoundsScale());
 		if (volume) component->SetBoundingVolume(volume);
 	}
 	if (physicsComponent)
 		component->SetPhysicsComponent(gameObject->TryGetComponent<PhysicsComponent>());
+
+	#if EDITOR
+		component->SetEditorData();
+	#endif
 }
 
 Vector3 BoundsComponent::GetBoundsScale() {
@@ -250,7 +252,6 @@ void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 }
 
 void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
-	IComponent::PushIComponentElementsInspector(elementsGroup, scale);
 #if EDITOR
 	elementsGroup.PushStaticTextElement("Bounds Component");
 	for (Layers::LayerID& layer : ignoreLayers) {

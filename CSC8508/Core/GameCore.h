@@ -46,10 +46,10 @@ namespace NCL {
 			bool clientOwned;
 		};
 
-		class TutorialGame {
+		class GameCore {
 		public:
-			TutorialGame();
-			~TutorialGame();
+			GameCore();
+			~GameCore();
 			virtual void UpdateGame(float dt);
 		protected:
 			void InitialiseAssets();

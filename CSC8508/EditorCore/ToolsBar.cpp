@@ -105,7 +105,6 @@ void ToolsBar::PushClearWorld() {
 void ToolsBar::PushAddGameObject(GameObject** focus) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
 		[this, focus]() {
-			editorManager.GetFileName();
 			GameObject* loaded = NewGameObject(focus ? (*focus) : nullptr);
 			gameWorld.AddGameObject(loaded);
 			editorManager.SetFocus(loaded);

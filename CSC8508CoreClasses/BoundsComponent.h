@@ -71,6 +71,9 @@ namespace NCL::CSC8508
 		CollisionVolume* CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		auto GetDerivedSerializedFields() const;
 		void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
+#if EDITOR
+		void SetEditorData();
+#endif
 
 	protected:
 		CollisionVolume* boundingVolume;
@@ -82,7 +85,6 @@ namespace NCL::CSC8508
 		int expectingVolumeType = 0;
 		bool* isTrigger = new bool();
 		Vector3* expectingBoundsSize = new Vector3();
-		void SetEditorData();
 
 		std::map<int, VolumeType> enumVolumeCast = {
 			{0, VolumeType::AABB},

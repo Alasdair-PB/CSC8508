@@ -26,11 +26,12 @@ void Inspector::OnSetFocus(GameObject* focus) {
 void Inspector::OnRenderFocus(GameObject* focus)
 { 
 	if (!focus) return;
-	window->RemoveElementsFromIndex(7);
+	window->RemoveElementsFromIndex(5);
 
 	PushTagField(focus);
 	PushLayerField(focus);
 	PushRenderObject(focus);
+	PushAddComponentField(focus);
 	PushComponentInspector(focus); 
 }
 
@@ -47,6 +48,9 @@ void Inspector::InitInspector() {
 		ImGuiWindowFlags_NoResize);
 
 	GameObject** focus = editorManager.GetFocus();
+	
+	if (!focus) return;
+
 	std::string* name= editorManager.GetNameInfo();
 	bool* isEnabled = editorManager.GetEnabledInfo();
 	Vector3* positionInfo = editorManager.GetPositionInfo();
@@ -55,7 +59,6 @@ void Inspector::InitInspector() {
 
 	window->PushStatelessInputFieldElement("GameObject:", name);
 	window->PushToggle("Enabled:", isEnabled, 0.05f);
-	PushAddComponentField(focus);
 	window->PushVectorElement(positionInfo, 0.05f, "Position:");
 	window->PushVectorElement(scaleInfo, 0.05f, "Scale");
 	window->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
@@ -77,7 +80,7 @@ void Inspector::InitMaterial(GameObject* focus) {
 	}
 }
 
-void Inspector::PushAddComponentField(GameObject** focus) {
+void Inspector::PushAddComponentField(GameObject* focus) {
 	std::vector<std::pair<int*, std::string>> enumOptions = {
 	{reinterpret_cast<int*>(&mapId), "None"},
 	{reinterpret_cast<int*>(&mapId), "Bounds"},
@@ -91,8 +94,8 @@ void Inspector::PushAddComponentField(GameObject** focus) {
 	window->PushEnumElement("Component to add", enumOptions);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",
 		[this, focus]() {
-			if (!(*focus)) return;
-			EditorGame::GetInstance()->GetDefiner()->AddComponentFromEnum(mapId, *(*focus));
+			if (!focus) return;
+			EditorGame::GetInstance()->GetDefiner()->AddComponentFromEnum(mapId, *focus);
 		});
 }
 
@@ -174,9 +177,7 @@ void Inspector::PushRenderObject(GameObject* focus) {
 }
 
 void Inspector::PushTagField(GameObject* focus) {
-
 	vector<Tags::Tag>& tags = focus->GetTagInfo();
-
 	for (Tags::Tag& tag : tags){
 		std::vector<std::pair<int*, std::string>> enumTagOptions = {
 			{reinterpret_cast<int*>(&tag), "Default"},
@@ -188,7 +189,7 @@ void Inspector::PushTagField(GameObject* focus) {
 			{reinterpret_cast<int*>(&tag), "DepositZone"},
 			{reinterpret_cast<int*>(&tag), "Exit"}
 		};
-		window->PushEnumElement("Tag to add", enumTagOptions);
+		window->PushEnumElement("", enumTagOptions);
 	}
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Tag",
 		[this, focus]() {
@@ -204,6 +205,11 @@ void Inspector::PushTagField(GameObject* focus) {
 }
 
 void Inspector::PushComponentInspector(GameObject* focus) {
-	for (IComponent* component : (focus)->GetAllComponents())
+	for (IComponent* component : (focus)->GetAllComponents()) {
+		component->IComponent::PushIComponentElementsInspector(*window, 0.05f);
 		component->PushIComponentElementsInspector(*window, 0.05f);
+
+		window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Component", 
+			[focus, component]() {focus->DetatchComponent(component); });
+	}
 }

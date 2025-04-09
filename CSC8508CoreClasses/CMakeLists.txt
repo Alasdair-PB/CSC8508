@@ -51,11 +51,11 @@ set(Collision_Detection
     "CollisionDetection.h"
     "CollisionDetection.cpp"
     "CollisionEvent.h"
-	"KDTree/KDTree.h"
-	"KDTree/KDTreeBranch.h"
-	"KDTree/KDTreeEntry.h"
-	"KDTree/KDTreeLeaf.h"
-	"KDTree/KDTreeNode.h"
+    "KDTree/KDTree.h"
+    "KDTree/KDTreeBranch.h"
+    "KDTree/KDTreeEntry.h"
+    "KDTree/KDTreeLeaf.h"
+    "KDTree/KDTreeNode.h"
     "OBBVolume.h"
     "QuadTree.h"
     "QuadTree.cpp"
@@ -71,8 +71,6 @@ set(Networking
     "GameServer.cpp"
     "NetworkBase.h"
     "NetworkBase.cpp"
-    "NetworkObject.h"
-    "NetworkObject.cpp"
     "NetworkState.h"
     "NetworkState.cpp"
 )
@@ -89,7 +87,7 @@ set(Physics
     "PhysicsObject.h"
     "PhysicsSystem.cpp"
     "PhysicsSystem.h"
-	"Util.cpp"
+    "Util.cpp"
 )
 source_group("Physics" FILES ${Physics})
 

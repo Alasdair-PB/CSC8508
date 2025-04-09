@@ -74,7 +74,6 @@ public:
 	Vector4* GetOrientationInfo() const { return orientationInfo;}
 	std::string* GetNameInfo() const { return name; }
 	std::string* GetFileName() const { return saveDestination;}
-	std::string GetFilePathInfo() const { return GetAssetPath(*saveDestination); }
 	std::string* GetFolderPath() const { return folderPath; }
 	std::string GetAssetPath(const std::string pfabName) const;
 	std::string GetAssetRootDir();

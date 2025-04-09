@@ -283,6 +283,7 @@ void GameObject::CopyInstanceData(GameObject* gameObject) {
 	gameObject->GetTransform().SetScale(transform.GetLocalScale());
 	gameObject->GetTransform().SetOrientation(transform.GetLocalOrientation());
 	gameObject->SetEnabled(isEnabled);
+	gameObject->ClearTags();
 
 	for (Tags::Tag tag:tags)
 		gameObject->AddTag(tag);
@@ -368,3 +369,12 @@ void GameObject::OperateOnChildren(std::function<void(GameObject*)> func) {
 	for (GameObject* child : children)
 		func(child);
 }
+
+void GameObject::DetatchComponent(IComponent* component){
+	component->SetEnabled(false);
+	components.erase(
+		std::remove(components.begin(), components.end(), component),
+		components.end()
+	);
+}
+

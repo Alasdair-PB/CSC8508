@@ -280,6 +280,7 @@ namespace NCL::CSC8508 {
 			return false;
 		}
 
+		void DetatchComponent(IComponent* component);
 		void SetLayerID(Layers::LayerID newID) { layerID = newID;}
 		Layers::LayerID GetLayerID() const {return layerID; }
 
@@ -289,6 +290,8 @@ namespace NCL::CSC8508 {
 			if (!tags.empty())
 				tags.pop_back();
 		}
+
+		void ClearTags() { tags.clear(); }
 
 		vector<Tags::Tag> GetTags() const { return tags;}
 		Layers::LayerID* GetLayerIDInfo() { return (&layerID); }

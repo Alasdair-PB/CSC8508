@@ -3,7 +3,7 @@
 #if EDITOR
 #include "EditorGame.h"
 #else 
-#include "TutorialGame.h"
+#include "GameCore.h"
 #include "NetworkedGame.h"
 #endif
 

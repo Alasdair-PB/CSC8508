@@ -1,5 +1,5 @@
 #pragma once
-#include "TutorialGame.h"
+#include "GameCore.h"
 #include "NetworkBase.h"
 #include "EventListener.h"
 
@@ -31,7 +31,7 @@ namespace NCL {
 		};
 
 		class NetworkedGame : 
-			public TutorialGame,
+			public GameCore,
 			public PacketReceiver, 
 			public EventListener<NetworkEvent>, 
 			public EventListener<ClientConnectedEvent>,

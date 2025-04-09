@@ -32,7 +32,7 @@ private:
 	ComponentAssemblyDefiner::ComponentMapId mapId;
 
 	void PushRenderObject(GameObject* focus);
-	void PushAddComponentField(GameObject** focus);
+	void PushAddComponentField(GameObject* focus);
 	void PushTagField(GameObject* focus);
 	void PushLayerField(GameObject* focus);
 	void PushComponentInspector(GameObject* focus);

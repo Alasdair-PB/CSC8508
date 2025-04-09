@@ -24,8 +24,7 @@ void FileExplorer::OnSetFocus(GameObject* focus) {}
 void FileExplorer::OnFocusEnd() {}
 void FileExplorer::OnInit() {}
 
-void FileExplorer::OnRenderFocus(GameObject* focus)
-{
+void FileExplorer::OnRenderFocus(GameObject* focus) {
 	OnLoadFlag();
 	window->ClearAllElements();
 	std::string* path = EditorWindowManager::Instance().GetFolderPath();
@@ -33,24 +32,26 @@ void FileExplorer::OnRenderFocus(GameObject* focus)
 }
 
 void FileExplorer::OnLoadFlag() {
+	std::string path = (*flaggedAsset);
 	switch (loadFlag) {
-	case NoFlag: {
-		return;
-		break;
+		case NoFlag: {
+			return;
+		break;}
+		case Object: {
+			GameObject* loaded = new GameObject();
+			loaded->Load(path);
+			gameWorld.AddGameObject(loaded);
+			editorManager.SetFocus(loaded);
+		break;}
+		case World: {
+			gameWorld.Load(path);
+		break;}
+		default: { break; }
 	}
-	case Object: {
-		GameObject* loaded = new GameObject();
-		loaded->Load(*flaggedAsset);
-		gameWorld.AddGameObject(loaded);
-		editorManager.SetFocus(loaded);
-		break;
-	}
-	case World: {
-		gameWorld.Load(*flaggedAsset);
-		break;
-	}
-	default: { break; }
-	}
+	std::string* fileName = editorManager.GetFileName();
+	std::string fileAsset = path.substr(path.find_last_of("/\\") + 1);
+	std::string nameWithoutExtension = fileAsset.substr(0, fileAsset.find_last_of('.'));
+	(*fileName) = nameWithoutExtension;
 	loadFlag = NoFlag;
 }
 

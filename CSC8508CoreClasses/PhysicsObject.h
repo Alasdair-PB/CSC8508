@@ -39,7 +39,6 @@ namespace NCL {
 				return inverseMass;
 			}
 
-
 			float GetRestitution() { return cRestitution; }
 			void SetRestitution(float newRestitution) { cRestitution = newRestitution; }
 

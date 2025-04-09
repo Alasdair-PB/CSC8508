@@ -20,7 +20,19 @@ Inspector::Inspector() :
 Inspector::~Inspector() { delete meshIndex; }
 
 void Inspector::OnSetFocus(GameObject* focus) {
+	if (!focus) return;
 	InitMaterial(focus);
+	std::string* name = editorManager.GetNameInfo();
+	bool* isEnabled = editorManager.GetEnabledInfo();
+	Vector3* positionInfo = editorManager.GetPositionInfo();
+	Vector3* scaleInfo = editorManager.GetScaleInfo();
+	Vector4* orientationInfo = editorManager.GetOrientationInfo();
+
+	window->PushStatelessInputFieldElement("GameObject:", name);
+	window->PushToggle("Enabled:", isEnabled, 0.05f);
+	window->PushVectorElement(positionInfo, 0.05f, "Position:");
+	window->PushVectorElement(scaleInfo, 0.05f, "Scale");
+	window->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
 }
 
 void Inspector::OnRenderFocus(GameObject* focus)
@@ -35,7 +47,8 @@ void Inspector::OnRenderFocus(GameObject* focus)
 	PushComponentInspector(focus); 
 }
 
-void Inspector::OnFocusEnd() {}
+void Inspector::OnFocusEnd() { window->ClearAllElements(); }
+
 void Inspector::OnInit() {}
 
 void Inspector::InitInspector() {
@@ -46,22 +59,6 @@ void Inspector::InitInspector() {
 		"Inspector",
 		0.0f,
 		ImGuiWindowFlags_NoResize);
-
-	GameObject** focus = editorManager.GetFocus();
-	
-	if (!focus) return;
-
-	std::string* name= editorManager.GetNameInfo();
-	bool* isEnabled = editorManager.GetEnabledInfo();
-	Vector3* positionInfo = editorManager.GetPositionInfo();
-	Vector3* scaleInfo = editorManager.GetScaleInfo();
-	Vector4* orientationInfo = editorManager.GetOrientationInfo();
-
-	window->PushStatelessInputFieldElement("GameObject:", name);
-	window->PushToggle("Enabled:", isEnabled, 0.05f);
-	window->PushVectorElement(positionInfo, 0.05f, "Position:");
-	window->PushVectorElement(scaleInfo, 0.05f, "Scale");
-	window->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
 }
 
 void Inspector::InitMaterial(GameObject* focus) {

@@ -86,6 +86,7 @@ void ToolsBar::PushSavePfab(std::string* fileName, GameObject** focus) {
 void ToolsBar::PushLoadWorld(std::string* fileName) {
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
 		[fileName, this]() {
+			editorManager.EndFocus();
 			gameWorld.Load(editorManager.GetAssetPath(*fileName));
 		});
 }

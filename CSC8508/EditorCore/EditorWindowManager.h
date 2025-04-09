@@ -61,9 +61,13 @@ public:
 		if (focusElement) SetFocusVisual(focusElement, false);
 		focusElement = nullptr;
 		*isEnabled = true;
+		*name = "";
 		SetVector(positionInfo);
 		SetVector(scaleInfo);
 		SetQuaternion(orientationInfo);
+
+		for (EditorWindow* window : windows)
+			window->OnFocusEnd();
 	}
 
 	static EditorWindowManager& Instance();

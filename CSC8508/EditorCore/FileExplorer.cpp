@@ -38,12 +38,14 @@ void FileExplorer::OnLoadFlag() {
 			return;
 		break;}
 		case Object: {
+			editorManager.EndFocus();
 			GameObject* loaded = new GameObject();
 			loaded->Load(path);
 			gameWorld.AddGameObject(loaded);
 			editorManager.SetFocus(loaded);
 		break;}
 		case World: {
+			editorManager.EndFocus();
 			gameWorld.Load(path);
 		break;}
 		default: { break; }

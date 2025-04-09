@@ -8,7 +8,7 @@
 #include "INetworkDeltaComponent.h" // Needed to use GameObject::AddComponent<>()
 #include "../../CSC8508CoreClasses/Util.cpp"
 
-void DungeonComponent::Generate(int const roomCount) const {
+bool DungeonComponent::Generate(int const roomCount) const {
     int failures = 0;
 
     std::srand(GetSeed());
@@ -36,11 +36,10 @@ void DungeonComponent::Generate(int const roomCount) const {
             i--;
             failures++;
         }
-        if (failures >= MAX_FAILURES) {
-            std::cout << "DungeonComponent::Generate roomCount exceeded max attempts!\n";
-            return;
-        }
+        if (failures >= MAX_FAILURES) 
+            return false;
     }
+    return true;
 }
 
 bool DungeonComponent::GenerateRoom() const {

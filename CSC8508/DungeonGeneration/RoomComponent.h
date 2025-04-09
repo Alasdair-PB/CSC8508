@@ -42,6 +42,9 @@ private:
     RoomPrefab* prefab;
     std::vector<Vector3> doorLocations = std::vector<Vector3>();
     std::vector<RoomComponent*> nextDoorRooms = std::vector<RoomComponent*>();
+
+    void SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference,
+        const DoorLocation aDoorLoc, const DoorLocation bDoorLoc);
 };
 
 #endif //ROOMCOMPONENT_H

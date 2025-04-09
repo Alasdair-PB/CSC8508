@@ -17,8 +17,7 @@ class RoomPrefab;
 
 class DungeonComponent final : public IComponent {
 public:
-    explicit DungeonComponent(GameObject& gameObject) : IComponent(gameObject) { }
-
+    DungeonComponent(GameObject& gameObject) : IComponent(gameObject) { }
     DungeonComponent(GameObject& gameObject, DoorLocation const& entrancePosition, int roomCount)
         : IComponent(gameObject), entrancePosition(entrancePosition), roomCount(roomCount) { }
 
@@ -26,7 +25,7 @@ public:
      * Procedurally generates rooms to fill the dungeon
      * @param roomCount int number of rooms to generate in this dungeon
      */
-    void Generate(int roomCount) const;
+    bool Generate(int roomCount) const;
 
     void OnAwake() override {
         Generate(roomCount);

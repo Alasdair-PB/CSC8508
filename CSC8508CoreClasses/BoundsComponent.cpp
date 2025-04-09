@@ -119,13 +119,14 @@ void BoundsComponent::UpdateBroadphaseAABB() {
 
 struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 	BoundsComponentDataStruct() : enabled(true), isTrigger(false), hasPhysics(false), volumeType(VolumeType::AABB), boundsSize(Vector3(1, 1, 1)) {}
-	BoundsComponentDataStruct(bool enabled, bool isTrigger, bool hasPhysics, VolumeType volumeType, Vector3 boundsSize) :
-		enabled(enabled), isTrigger(isTrigger), hasPhysics(hasPhysics), volumeType(volumeType), boundsSize(boundsSize) {}
+	BoundsComponentDataStruct(bool enabled, bool isTrigger, bool hasPhysics, VolumeType volumeType, Vector3 boundsSize, vector<Layers::LayerID> ignoreLayers) :
+		enabled(enabled), isTrigger(isTrigger), hasPhysics(hasPhysics), volumeType(volumeType), boundsSize(boundsSize), ignoreLayers(ignoreLayers){}
 	bool enabled;
 	bool isTrigger;
 	bool hasPhysics;
 	VolumeType volumeType;
 	Vector3 boundsSize;
+	vector<Layers::LayerID> ignoreLayers;
 
 	static auto GetSerializedFields() {
 		return std::make_tuple(
@@ -133,7 +134,8 @@ struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 			SERIALIZED_FIELD(BoundsComponentDataStruct, isTrigger),
 			SERIALIZED_FIELD(BoundsComponentDataStruct, hasPhysics),
 			SERIALIZED_FIELD(BoundsComponentDataStruct, volumeType),
-			SERIALIZED_FIELD(BoundsComponentDataStruct, boundsSize)
+			SERIALIZED_FIELD(BoundsComponentDataStruct, boundsSize),
+			SERIALIZED_FIELD(BoundsComponentDataStruct, ignoreLayers)
 		);
 	}
 };
@@ -229,7 +231,7 @@ size_t BoundsComponent::Save(std::string assetPath, size_t* allocationStart)
 {
 	BoundsComponentDataStruct saveInfo;
 	saveInfo = boundingVolume == nullptr ? BoundsComponentDataStruct() :
-		BoundsComponentDataStruct(IsEnabled(), boundingVolume->isTrigger, (physicsComponent != nullptr), boundingVolume->type, GetBoundsScale());
+		BoundsComponentDataStruct(IsEnabled(), boundingVolume->isTrigger, (physicsComponent != nullptr), boundingVolume->type, GetBoundsScale(), ignoreLayers);
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<BoundsComponentDataStruct>(saveInfo);
 	return SaveManager::SaveGameData(assetPath, saveData, allocationStart, false);
 }
@@ -238,6 +240,7 @@ void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 	BoundsComponentDataStruct loadedSaveData = ISerializedData::LoadISerializable<BoundsComponentDataStruct>(assetPath, allocationStart);
 	LoadVolume(loadedSaveData.isTrigger, loadedSaveData.volumeType, loadedSaveData.boundsSize, boundingVolume);
 	SetEnabled(loadedSaveData.enabled);
+	ignoreLayers = loadedSaveData.ignoreLayers;
 
 #if EDITOR
 	SetEditorData();
@@ -249,6 +252,23 @@ void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
 	IComponent::PushIComponentElementsInspector(elementsGroup, scale);
 #if EDITOR
+	elementsGroup.PushStaticTextElement("Bounds Component");
+	for (Layers::LayerID& layer : ignoreLayers) {
+		std::vector<std::pair<int*, std::string>> enumTagOptions = {
+			{reinterpret_cast<int*>(&layer), "Default"},
+			{reinterpret_cast<int*>(&layer), "Ignore_RayCast"},
+			{reinterpret_cast<int*>(&layer), "UI"},
+			{reinterpret_cast<int*>(&layer), "Player"},
+			{reinterpret_cast<int*>(&layer), "Enemy"},
+			{reinterpret_cast<int*>(&layer), "Ignore_Collisions"}
+		};
+		elementsGroup.PushEnumElement("Ignored Layer", enumTagOptions);
+	}
+	elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Add Layer",
+		[this]() { AddToIgnoredLayers(Layers::Default);});
+	elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Remove Layer",
+		[this]() { if (!ignoreLayers.empty()) ignoreLayers.pop_back();});
+
 	if (!physicsComponent) {
 		elementsGroup.PushStatelessButtonElement(ImVec2(scale, scale/2), "Link PhysicsComponent",
 			[this]() {SetPhysicsComponent(GetGameObject().TryGetComponent<PhysicsComponent>()); });

@@ -25,15 +25,11 @@ bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
     std::cout << "Try generate?" << std::endl;
 
     for (DoorLocation aDoorLoc : aDoorLocations) {
-        std::cout << "door a?" << std::endl;
-
         for (DoorLocation bDoorLoc : bDoorLocations) {
-            std::cout << "door b?" << std::endl;
-
             // Put the roomB GameObject in the test position
             Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
             // Enforce flipping around the Y axis (no tilting the rooms)
-            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
+            //if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
             transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
             transformB.SetPosition(
                 transformA.GetPosition()
@@ -44,13 +40,11 @@ bool RoomComponent::TryGenerateNewRoom(RoomComponent& roomB) {
             auto info = CollisionDetection::CollisionInfo();
             if (!CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), GetDungeonGameObject(), info)) {
                 // Success (no collision)
-                std::cout << "success?" << std::endl;
                 this->nextDoorRooms.push_back(&roomB);
                 roomB.GetNextDoorRooms().push_back(this);
                 GetDungeonGameObject()->AddChild(&roomB.GetGameObject());
                 return true;
             }
-            std::cout << "collision" << std::endl;
             // Else repeat until valid placement found
         }
     }

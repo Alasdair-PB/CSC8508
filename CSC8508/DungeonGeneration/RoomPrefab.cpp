@@ -7,54 +7,7 @@
 #include "CollisionDetection.h"
 #include "DoorLocation.h"
 #include "RoomManager.h"
-#include "../../CSC8508CoreClasses/Util.cpp"
 #include "INetworkDeltaComponent.h"
-
-
-void RoomPrefab::SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference,
-    const DoorLocation aDoorLoc, const DoorLocation bDoorLoc) {
-    transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
-    transformB.SetPosition(
-        transformA.GetPosition()
-        + transformA.GetOrientation() * (transformA.GetScale() * aDoorLoc.pos)
-        - transformB.GetOrientation() * (transformB.GetScale() * bDoorLoc.pos)
-    );
-}
-
-bool RoomPrefab::TryGenerateNewRoom(RoomPrefab& roomB) {
-    // Randomly order door locations
-    auto const aDoorLocations = Util::RandomiseVector(GetDoorLocations());
-    auto const bDoorLocations = Util::RandomiseVector(roomB.GetDoorLocations());
-
-    // Keep checking each combination until it finds a valid room
-    Transform const& transformA = GetGameObject().GetTransform();
-    Transform& transformB = roomB.GetGameObject().GetTransform();
-
-    for (const DoorLocation& aDoorLoc : aDoorLocations) {
-        for (const DoorLocation& bDoorLoc : bDoorLocations) {
-            Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
-            // Enforce flipping around the Y axis (no tilting the rooms)
-            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
-            SetTransform(transformA, transformB, orientationDifference, aDoorLoc, bDoorLoc);
-            // Check if roomB's GameObject collides with any other object in the dungeon
-            auto info = CollisionDetection::CollisionInfo();
-            if (!CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), GetDungeonGameObject(), info)) {
-                GameObject* copiedPrefab = roomB.GetGameObject().CopyGameObject();
-                RoomPrefab* roomPrefab = copiedPrefab->TryGetComponent<RoomPrefab>();
-                this->nextDoorRooms.push_back(roomPrefab);
-                roomPrefab->GetNextDoorRooms().push_back(this);
-                GetDungeonGameObject()->AddChild(copiedPrefab);
-                RoomManager::ReturnPrefab(&roomB.GetGameObject());
-                return true;
-            }
-        }
-    }
-    RoomManager::ReturnPrefab(&roomB.GetGameObject());
-    // If no combination is valid, reset transform and return false
-    transformB.SetOrientation(Quaternion());
-    transformB.SetPosition(Vector3());
-    return false;
-}
 
 struct RoomPrefab::RoomPrefabDataStruct : ISerializedData{
     std::vector<DoorLocation> doorLocations;

@@ -37,9 +37,11 @@ bool DungeonComponent::Generate(int const roomCount) const {
         }
         if (failures >= MAX_FAILURES) {
             std::cout << "failed" << std::endl;
+            RoomManager::ClearPrefabs();
             return false;
         }
     }
+    RoomManager::ClearPrefabs();
     return true;
 }
 
@@ -49,10 +51,8 @@ bool DungeonComponent::GenerateRoom() const {
 
     // 2: Randomly order the rooms and attempt to generate a new room in each until one succeeds
     for (auto const rooms = Util::RandomiseVector(GetRooms()); RoomPrefab* r : rooms) {
-        if (r->TryGenerateNewRoom(*roomPrefabInfo)) return true;
+        if (TryGenerateNewRoom(*r, *roomPrefabInfo)) return true;
     }
-    roomB->SetEnabled(false);
-    //delete roomB;
     return false;
 }
 
@@ -69,10 +69,55 @@ void DungeonComponent::GetAllItemSpawnLocations(std::vector<Vector3>& locations)
         Transform const& transform = r->GetTransform();
         RoomPrefab const* roomComponent = r->TryGetComponent<RoomPrefab>();
         if (!roomComponent) continue;
-
         for (SpawnLocation const loc : roomComponent->GetItemSpawnLocations()) {
             Vector3 const outLoc = transform.GetOrientation() * (transform.GetScale() * loc.location)  + transform.GetPosition();
             locations.push_back(outLoc);
         }
     }
+}
+
+void DungeonComponent::SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference,
+    const DoorLocation aDoorLoc, const DoorLocation bDoorLoc) const {
+    transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
+    transformB.SetPosition(
+        transformA.GetPosition()
+        + transformA.GetOrientation() * (transformA.GetScale() * aDoorLoc.pos)
+        - transformB.GetOrientation() * (transformB.GetScale() * bDoorLoc.pos)
+    );
+}
+
+bool DungeonComponent::TryGenerateNewRoom(RoomPrefab& roomA, RoomPrefab& roomB) const {
+    // Randomly order door locations
+    auto const aDoorLocations = Util::RandomiseVector(roomA.GetDoorLocations());
+    auto const bDoorLocations = Util::RandomiseVector(roomB.GetDoorLocations());
+
+    // Keep checking each combination until it finds a valid room
+    Transform const& transformA = roomA.GetGameObject().GetTransform();
+    Transform& transformB = roomB.GetGameObject().GetTransform();
+
+    for (const DoorLocation& aDoorLoc : aDoorLocations) {
+        for (const DoorLocation& bDoorLoc : bDoorLocations) {
+            Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
+            // Enforce flipping around the Y axis (no tilting the rooms)
+            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
+            SetTransform(transformA, transformB, orientationDifference, aDoorLoc, bDoorLoc);
+            auto info = CollisionDetection::CollisionInfo();
+
+            if (!CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), &GetGameObject(), info)) {
+                GameObject* copiedPrefab = roomB.GetGameObject().CopyGameObject();
+                RoomPrefab* roomPrefab = copiedPrefab->TryGetComponent<RoomPrefab>();
+
+                roomA.GetNextDoorRooms().push_back(roomPrefab);
+                roomPrefab->GetNextDoorRooms().push_back(&roomA);
+                GetGameObject().AddChild(copiedPrefab);
+                RoomManager::ReturnPrefab(&roomB.GetGameObject());
+                return true;
+            }
+        }
+    }
+    // If no combination is valid, reset transform and return false
+    RoomManager::ReturnPrefab(&roomB.GetGameObject());
+    transformB.SetOrientation(Quaternion());
+    transformB.SetPosition(Vector3());
+    return false;
 }

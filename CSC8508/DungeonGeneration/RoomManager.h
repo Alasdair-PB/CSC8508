@@ -20,6 +20,7 @@ public:
      */
     static GameObject* GetRandom();
     static void ReturnPrefab(GameObject* prefab);
+    static void ClearPrefabs();
 
     [[nodiscard]] static unsigned int GetSeed() { return seed; }
     [[nodiscard]] static std::vector<std::string> const& GetPrefabPaths() { return prefabPaths; }

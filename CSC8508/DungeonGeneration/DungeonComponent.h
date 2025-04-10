@@ -16,7 +16,7 @@ class RoomPrefab;
 
 class DungeonComponent final : public IComponent {
 public:
-    DungeonComponent(GameObject& gameObject) : IComponent(gameObject) { }
+    DungeonComponent(GameObject& gameObject) : IComponent(gameObject), roomCount(12) { }
     DungeonComponent(GameObject& gameObject, DoorLocation const& entrancePosition, int roomCount)
         : IComponent(gameObject), entrancePosition(entrancePosition), roomCount(roomCount) { }
 
@@ -37,6 +37,9 @@ public:
 
 private:
     DoorLocation entrancePosition = DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));
+    bool TryGenerateNewRoom(RoomPrefab& roomA, RoomPrefab& roomB) const;
+    void SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference, 
+        const DoorLocation aDoorLoc, const DoorLocation bDoorLoc) const;
 
     unsigned int seed = 14;
     int roomCount;

@@ -136,7 +136,6 @@ bool DungeonComponent::ForceGenerateRooms(RoomPrefab& roomA, RoomPrefab& roomB) 
                 GetGameObject().AddChild(copiedPrefab);
                 SetNeighbours(roomPrefab);
                 forced = true;
-                std::cout << "forced generation" << std::endl;
             }
         }
     }

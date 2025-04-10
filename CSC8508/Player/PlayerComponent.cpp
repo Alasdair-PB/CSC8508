@@ -200,7 +200,7 @@ void PlayerComponent::OnItemInteract() {
 void PlayerComponent::GetWeightModifier() {
     weightModifier = 1.0f;
     float weight = inventoryComponent->GetItemCombinedWeight();
-    weightModifier = 1.0f - std::min((weight / 100.0f), 0.0f);
+    weightModifier = 1.0f - std::min((weight / 100.0f), 1.0f);
     return;
 }
 

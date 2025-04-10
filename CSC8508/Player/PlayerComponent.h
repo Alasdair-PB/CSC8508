@@ -82,8 +82,8 @@ namespace NCL {
             Vector3 GetForwardsDirection();
             void GetWeightModifier();
 
-            float speed = 2.5f;
-            float dashMultiplier = 2.5f;
+            float speed = 3.75f;
+            float dashMultiplier = 1.75f;
             float jumpForce = 10.0f;
             float jumpDuration = 0;
             float downwardsVelocityMod = 50.0f;

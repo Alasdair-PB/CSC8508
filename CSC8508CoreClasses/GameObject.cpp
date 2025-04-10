@@ -261,8 +261,8 @@ void GameObject::GetChildData(GameObjDataStruct& saveInfo, std::string assetPath
 void GameObject::LoadChildInstanceData(GameObjDataStruct& loadedSaveData, std::string assetPath){
 	for (int i = 0; i < loadedSaveData.childrenPointers.size(); i++) {
 		GameObject* object = new GameObject(isStatic);
-		object->Load(assetPath, loadedSaveData.childrenPointers[i]);
 		AddChild(object);
+		object->Load(assetPath, loadedSaveData.childrenPointers[i]);
 	}
 }
 

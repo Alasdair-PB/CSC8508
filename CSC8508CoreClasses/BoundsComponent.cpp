@@ -18,7 +18,6 @@ BoundsComponent::BoundsComponent(GameObject& gameObject, CollisionVolume* collis
 	this->boundingVolume = collisionVolume;
 	this->physicsComponent = physicsComponent;
 	vector<Layers::LayerID> ignoreLayers = vector<Layers::LayerID>();
-
 #if EDITOR
 	SetEditorData();
 #endif
@@ -34,14 +33,14 @@ BoundsComponent::~BoundsComponent() {
 
 #if EDITOR
 
-int BoundsComponent::GetParentCount(GameObject* object) {
-	int i = 0;
-	GameObject* parent = object->TryGetParent();
-	if (parent) {
-		i += 1;
-		i += GetParentCount(parent);
-	}
-	return i;
+void BoundsComponent::SetBoundsInspectorScale(Vector3 scale){
+	Vector3 objScale = GetGameObject().GetTransform().GetScale();
+	scale =  (scale * 2.0f) / GetGameObject().GetTransform().GetScale();
+	(*expectingBoundsSize) = scale;
+}
+
+Vector3 BoundsComponent::GetBoundsWorldScale() {
+	return ((*expectingBoundsSize) * GetGameObject().GetTransform().GetScale())/2.0f;
 }
 
 void BoundsComponent::SetEditorData() {
@@ -91,8 +90,7 @@ void BoundsComponent::SetEditorData() {
 				return;
 			}
 		}
-		scale = GetGameObject().GetTransform().GetScale() / (scale * (2.0f));
-		(*expectingBoundsSize) = scale;
+		SetBoundsInspectorScale(scale);
 	}
 }
 #endif
@@ -162,18 +160,19 @@ struct BoundsComponent::BoundsComponentDataStruct : public ISerializedData {
 };
 
 void BoundsComponent::CopyComponent(GameObject* gameObject) {
-	BoundsComponent* component = gameObject->AddComponent<BoundsComponent>(nullptr, nullptr);
-	component->SetEnabled(IsEnabled());
-	if (boundingVolume) {
-		CollisionVolume* volume = CopyVolume(boundingVolume->isTrigger, boundingVolume->type, GetBoundsScale());
-		if (volume) component->SetBoundingVolume(volume);
-	}
+	CollisionVolume* volume = nullptr;
+	PhysicsComponent* physics = nullptr;
+	if (boundingVolume)
+		volume = CopyVolume(boundingVolume->isTrigger, boundingVolume->type, GetBoundsScale());
 	if (physicsComponent)
-		component->SetPhysicsComponent(gameObject->TryGetComponent<PhysicsComponent>());
+		physics = gameObject->TryGetComponent<PhysicsComponent>();
 
-	#if EDITOR
-		component->SetEditorData();
-	#endif
+	BoundsComponent* component = gameObject->AddComponent<BoundsComponent>(volume, physics);
+	component->SetEnabled(IsEnabled());
+
+#if EDITOR
+	SetEditorData();
+#endif
 }
 
 Vector3 BoundsComponent::GetBoundsScale() {
@@ -255,7 +254,7 @@ size_t BoundsComponent::Save(std::string assetPath, size_t* allocationStart)
 {
 	BoundsComponentDataStruct saveInfo;
 	saveInfo = boundingVolume == nullptr ? BoundsComponentDataStruct() :
-		BoundsComponentDataStruct(IsEnabled(), boundingVolume->isTrigger, (physicsComponent != nullptr), boundingVolume->type, GetBoundsScale(), ignoreLayers);
+	BoundsComponentDataStruct(IsEnabled(), boundingVolume->isTrigger, (physicsComponent != nullptr), boundingVolume->type, GetBoundsScale(), ignoreLayers);
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<BoundsComponentDataStruct>(saveInfo);
 	return SaveManager::SaveGameData(assetPath, saveData, allocationStart, false);
 }
@@ -265,12 +264,11 @@ void BoundsComponent::Load(std::string assetPath, size_t allocationStart) {
 	LoadVolume(loadedSaveData.isTrigger, loadedSaveData.volumeType, loadedSaveData.boundsSize, boundingVolume);
 	SetEnabled(loadedSaveData.enabled);
 	ignoreLayers = loadedSaveData.ignoreLayers;
-
-#if EDITOR
-	SetEditorData();
-#endif
 	if (loadedSaveData.hasPhysics)
 		physicsComponent = GetGameObject().TryGetComponent<PhysicsComponent>();
+	#if EDITOR
+		SetEditorData();
+	#endif
 }
 
 void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
@@ -316,7 +314,7 @@ void BoundsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsG
 
 		bool boundsMatch = true;
 		VolumeType type = enumVolumeCast[expectingVolumeType];
-		Vector3 convertedScale = (GetGameObject().GetTransform().GetScale() * ((*expectingBoundsSize))/ (2.0f));
+		Vector3 convertedScale = GetBoundsWorldScale();
 
 		switch (boundingVolume->type) {
 			case VolumeType::AABB: {

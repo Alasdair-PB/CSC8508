@@ -11,7 +11,6 @@ using namespace NCL;
 using namespace CSC8508;
 using namespace UI;
 
-
 class EditorWindowManager {
 public:
 	EditorWindowManager();

@@ -27,9 +27,10 @@ public:
 private:
 	EditorWindowManager& editorManager;
 	GameWorld& gameWorld;
+	ComponentAssemblyDefiner::ComponentMapId mapId;
+
 	int elementsCount;
 	int* meshIndex;
-	ComponentAssemblyDefiner::ComponentMapId mapId;
 
 	void PushRenderObject(GameObject* focus);
 	void PushAddComponentField(GameObject* focus);
@@ -40,9 +41,9 @@ private:
 	void CheckChangeMesh(int currentMeshIndex, Mesh* meshAtIndex, GameObject* focus, RenderObject* renderObject);
 	void PushMesh(GameObject* focus, RenderObject* renderObject);
 	void PushRenderObject(GameObject* focus, RenderObject* renderObject);
+
 	std::vector<std::pair<std::string, Mesh*>> GetMeshesSorted() const;
 	std::vector<std::pair<int*, std::string>> GetMeshInfo(Mesh** meshAtIndex, Mesh* currentMesh, int* currentMeshIndex);
-
 	void InitInspector();
 };
 

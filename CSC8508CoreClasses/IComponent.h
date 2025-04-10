@@ -128,7 +128,6 @@ namespace NCL::CSC8508
 		virtual size_t Save(std::string assetPath, size_t* allocationStart) override;
 
 		virtual void CopyComponent(GameObject* gameObject);
-
 		virtual void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale);
 
 	protected:

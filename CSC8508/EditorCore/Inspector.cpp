@@ -79,14 +79,13 @@ void Inspector::InitMaterial(GameObject* focus) {
 
 void Inspector::PushAddComponentField(GameObject* focus) {
 	std::vector<std::pair<int*, std::string>> enumOptions = {
-	{reinterpret_cast<int*>(&mapId), "None"},
-	{reinterpret_cast<int*>(&mapId), "Bounds"},
-	{reinterpret_cast<int*>(&mapId), "Physics"},
-	{reinterpret_cast<int*>(&mapId), "NavMesh"},
-	{reinterpret_cast<int*>(&mapId), "Animation"},
-	{reinterpret_cast<int*>(&mapId), "Damageable"},
-	{reinterpret_cast<int*>(&mapId), "Room"}
-
+		{reinterpret_cast<int*>(&mapId), "None"},
+		{reinterpret_cast<int*>(&mapId), "Bounds"},
+		{reinterpret_cast<int*>(&mapId), "Physics"},
+		{reinterpret_cast<int*>(&mapId), "NavMesh"},
+		{reinterpret_cast<int*>(&mapId), "Animation"},
+		{reinterpret_cast<int*>(&mapId), "Damageable"},
+		{reinterpret_cast<int*>(&mapId), "Room"}
 	};
 	window->PushEnumElement("Component to add", enumOptions);
 	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",

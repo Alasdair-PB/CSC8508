@@ -85,8 +85,6 @@ namespace NCL::CSC8508
 		int expectingVolumeType = 0;
 		bool* isTrigger = new bool();
 		Vector3* expectingBoundsSize = new Vector3();
-		int GetParentCount(GameObject* object);
-
 		std::map<int, VolumeType> enumVolumeCast = {
 			{0, VolumeType::AABB},
 			{1, VolumeType::OBB},
@@ -96,6 +94,8 @@ namespace NCL::CSC8508
 			{5, VolumeType::Compound},
 			{6, VolumeType::Invalid}
 		};
+		void SetBoundsInspectorScale(Vector3 scale);
+		Vector3 GetBoundsWorldScale();
 #endif
 	};
 }

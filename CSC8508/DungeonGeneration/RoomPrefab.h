@@ -46,6 +46,7 @@ public:
     void Load(std::string assetPath, size_t allocationStart) override;
     void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
     [[nodiscard]] GameObject* GetDungeonGameObject() const { return this->GetGameObject().TryGetParent(); }
+    void CopyComponent(GameObject* gameObject) override;
 
 protected:
     std::vector<DoorLocation> doorLocations = std::vector<DoorLocation>();

@@ -8,6 +8,8 @@
 #include "DoorLocation.h"
 #include "RoomManager.h"
 #include "../../CSC8508CoreClasses/Util.cpp"
+#include "INetworkDeltaComponent.h"
+
 
 void RoomPrefab::SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference,
     const DoorLocation aDoorLoc, const DoorLocation bDoorLoc) {
@@ -28,8 +30,8 @@ bool RoomPrefab::TryGenerateNewRoom(RoomPrefab& roomB) {
     Transform const& transformA = GetGameObject().GetTransform();
     Transform& transformB = roomB.GetGameObject().GetTransform();
 
-    for (const DoorLocation aDoorLoc : aDoorLocations) {
-        for (const DoorLocation bDoorLoc : bDoorLocations) {
+    for (const DoorLocation& aDoorLoc : aDoorLocations) {
+        for (const DoorLocation& bDoorLoc : bDoorLocations) {
             Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
             // Enforce flipping around the Y axis (no tilting the rooms)
             if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
@@ -37,13 +39,17 @@ bool RoomPrefab::TryGenerateNewRoom(RoomPrefab& roomB) {
             // Check if roomB's GameObject collides with any other object in the dungeon
             auto info = CollisionDetection::CollisionInfo();
             if (!CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), GetDungeonGameObject(), info)) {
-                this->nextDoorRooms.push_back(&roomB);
-                roomB.GetNextDoorRooms().push_back(this);
-                GetDungeonGameObject()->AddChild(&roomB.GetGameObject());
+                GameObject* copiedPrefab = roomB.GetGameObject().CopyGameObject();
+                RoomPrefab* roomPrefab = copiedPrefab->TryGetComponent<RoomPrefab>();
+                this->nextDoorRooms.push_back(roomPrefab);
+                roomPrefab->GetNextDoorRooms().push_back(this);
+                GetDungeonGameObject()->AddChild(copiedPrefab);
+                RoomManager::ReturnPrefab(&roomB.GetGameObject());
                 return true;
             }
         }
     }
+    RoomManager::ReturnPrefab(&roomB.GetGameObject());
     // If no combination is valid, reset transform and return false
     transformB.SetOrientation(Quaternion());
     transformB.SetPosition(Vector3());
@@ -92,6 +98,17 @@ size_t RoomPrefab::Save(std::string const assetPath, size_t* allocationStart) {
     RoomPrefabDataStruct const saveInfo(itemSpawnLocations, enemySpawnLocations, doorLocations, roomType, spawnProbability);
     SaveManager::GameData const saveData = ISerializedData::CreateGameData<RoomPrefabDataStruct>(saveInfo);
     return SaveManager::SaveGameData(assetPath, saveData, allocationStart, true);
+}
+
+void RoomPrefab::CopyComponent(GameObject* gameObject) {
+    RoomPrefab* component = gameObject->AddComponent<RoomPrefab>();
+    component->SetEnabled(IsEnabled());
+    component->doorLocations = doorLocations;
+    component->enemySpawnLocations = enemySpawnLocations;
+    component->itemSpawnLocations = itemSpawnLocations;
+    component->spawnProbability = spawnProbability;
+    component->roomType = roomType;
+    component->nextDoorRooms = nextDoorRooms;
 }
 
 void RoomPrefab::Load(std::string const assetPath, size_t const allocationStart) {

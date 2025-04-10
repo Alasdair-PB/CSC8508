@@ -169,6 +169,7 @@ void BoundsComponent::CopyComponent(GameObject* gameObject) {
 
 	BoundsComponent* component = gameObject->AddComponent<BoundsComponent>(volume, physics);
 	component->SetEnabled(IsEnabled());
+	component->ignoreLayers = ignoreLayers;
 
 #if EDITOR
 	SetEditorData();

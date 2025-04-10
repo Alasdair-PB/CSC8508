@@ -62,7 +62,6 @@ namespace NCL {
 
 			std::string GetAssetPath(std::string pfabName);
 			void LoadDungeon(Vector3 offset);
-			GameObject* LoadRoomPfab(std::string assetPath, Vector3 offset);
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData = nullptr);

@@ -133,6 +133,9 @@ void GameObject::LoadGameObjectInstanceData(GameObjDataStruct loadedSaveData) {
 		renderObject = new RenderObject(&GetTransform(), mesh, basicTex, basicShader);
 		renderObject->SetColour(loadedSaveData.colour);
 	}
+	else {
+		renderObject = nullptr;
+	}
 }
 
 void GameObject::Load(std::string assetPath, size_t allocationStart) {

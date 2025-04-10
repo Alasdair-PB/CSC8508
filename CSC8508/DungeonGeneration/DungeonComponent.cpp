@@ -13,13 +13,15 @@ bool DungeonComponent::Generate(int const roomCount) const {
     std::srand(GetSeed());
 
     GameObject* prefab = RoomManager::GetRandom();
-    RoomPrefab* roomPrefab = prefab->TryGetComponent<RoomPrefab>();
-    GetGameObject().AddChild(prefab);
+    GameObject* copy = prefab->CopyGameObject();
+    RoomManager::ReturnPrefab(prefab);
+    RoomPrefab* roomPrefab = copy->TryGetComponent<RoomPrefab>();
+    GetGameObject().AddChild(copy);
 
     // Line up the entry room with the dungeon entrance
     DoorLocation const doorLoc = roomPrefab->GetDoorLocations().at(0);
     Quaternion const orientationDifference = Quaternion::VectorsToQuaternion(doorLoc.dir, -entrancePosition.dir);
-    Transform entryTransform = prefab->GetTransform();
+    Transform entryTransform = copy->GetTransform();
     entryTransform.SetOrientation(orientationDifference);
     entryTransform.SetPosition(
         GetGameObject().GetTransform().GetPosition()
@@ -44,6 +46,7 @@ bool DungeonComponent::Generate(int const roomCount) const {
 bool DungeonComponent::GenerateRoom() const {
     GameObject* roomB = RoomManager::GetRandom();
     RoomPrefab* roomPrefabInfo = roomB->TryGetComponent<RoomPrefab>();
+
     // 2: Randomly order the rooms and attempt to generate a new room in each until one succeeds
     for (auto const rooms = Util::RandomiseVector(GetRooms()); RoomPrefab* r : rooms) {
         if (r->TryGenerateNewRoom(*roomPrefabInfo)) return true;

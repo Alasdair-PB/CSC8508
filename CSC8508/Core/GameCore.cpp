@@ -37,15 +37,6 @@ std::string GameCore::GetAssetPath(std::string pfabName) {
 	return folderPath + pfabName;
 }
 
-GameObject* GameCore::LoadRoomPfab(std::string assetPath, Vector3 offset) {
-	GameObject* myObjectToLoad = new GameObject(true);
-	std::string pfabPath = GetAssetPath(assetPath);
-	myObjectToLoad->Load(pfabPath);
-	myObjectToLoad->GetTransform().SetPosition(offset);
-	world->AddGameObject(myObjectToLoad);
-	return myObjectToLoad;
-}
-
 void LoadControllerMappings(Controller* controller)
 {
 #ifdef USE_PS5
@@ -114,7 +105,6 @@ GameCore::GameCore()
 
 void GameCore::InitialiseAssets() {
 	AssetManager::LoadMaterials(renderer);
-	RoomManager::LoadPrefabs();
 	lockedObject = nullptr;
 	InitWorld();
 }
@@ -138,6 +128,7 @@ void GameCore::LoadWorld(std::string assetPath) {
 }
 
 void GameCore::LoadDungeon(Vector3 const offset) {
+	RoomManager::LoadPrefabs();
 	auto t = Transform();
 	t.SetPosition(offset);
 	t.SetScale(Vector3(1, 1, 1));

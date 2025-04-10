@@ -142,21 +142,16 @@ void GameCore::LoadDungeon(Vector3 const offset) {
 	t.SetPosition(offset);
 	t.SetScale(Vector3(1, 1, 1));
 	DoorLocation const loc(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
-	AddDungeonToWorld(t, loc, 3);
+	AddDungeonToWorld(t, loc, 16);
 }
 
 void GameCore::InitWorld()
 {
 	world->ClearAndErase();
 	physics->Clear();
-
 	//std::string assetPath = GetAssetPath("myScene.pfab");
 	//LoadWorld(assetPath);
-	
 	LoadDungeon(Vector3());
-	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::DropZone);
-	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::DepositZone);
-	LoadDropZone(GetSpawnLocation(itemCount++), Vector3(3, 1, 3), Tags::Exit);
 }
 
 void GameCore::RefreshSpawnLocals() {

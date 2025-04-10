@@ -42,7 +42,7 @@ namespace NCL::CSC8508
 		Camera& camera;
 		Transform& transform;
 		InputComponent& inputComponent;			
-		const float yOffset = 2;
+		const float yOffset = 1.5f;
 		const float forwardOffset = 3;
 		const float lerpSpeed = 0.2f;
 

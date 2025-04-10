@@ -1,8 +1,55 @@
 ﻿//
-// Contributors: Alfie
+// Contributors: Alfie & Alasdair
 //
 
 #include "RoomPrefab.h"
+#include <random>
+#include "CollisionDetection.h"
+#include "DoorLocation.h"
+#include "RoomManager.h"
+#include "../../CSC8508CoreClasses/Util.cpp"
+
+void RoomPrefab::SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference,
+    const DoorLocation aDoorLoc, const DoorLocation bDoorLoc) {
+    transformB.SetOrientation(orientationDifference * transformA.GetOrientation());
+    transformB.SetPosition(
+        transformA.GetPosition()
+        + transformA.GetOrientation() * (transformA.GetScale() * aDoorLoc.pos)
+        - transformB.GetOrientation() * (transformB.GetScale() * bDoorLoc.pos)
+    );
+}
+
+bool RoomPrefab::TryGenerateNewRoom(RoomPrefab& roomB) {
+
+    // Randomly order door locations
+    auto const aDoorLocations = Util::RandomiseVector(GetDoorLocations());
+    auto const bDoorLocations = Util::RandomiseVector(roomB.GetDoorLocations());
+
+    // Keep checking each combination until it finds a valid room
+    Transform const& transformA = GetGameObject().GetTransform();
+    Transform& transformB = roomB.GetGameObject().GetTransform();
+
+    for (const DoorLocation aDoorLoc : aDoorLocations) {
+        for (const DoorLocation bDoorLoc : bDoorLocations) {
+            Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
+            // Enforce flipping around the Y axis (no tilting the rooms)
+            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
+            SetTransform(transformA, transformB, orientationDifference, aDoorLoc, bDoorLoc);
+            // Check if roomB's GameObject collides with any other object in the dungeon
+            auto info = CollisionDetection::CollisionInfo();
+            if (!CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), GetDungeonGameObject(), info)) {
+                this->nextDoorRooms.push_back(&roomB);
+                roomB.GetNextDoorRooms().push_back(this);
+                GetDungeonGameObject()->AddChild(&roomB.GetGameObject());
+                return true;
+            }
+        }
+    }
+    // If no combination is valid, reset transform and return false
+    transformB.SetOrientation(Quaternion());
+    transformB.SetPosition(Vector3());
+    return false;
+}
 
 struct RoomPrefab::RoomPrefabDataStruct : ISerializedData{
     std::vector<DoorLocation> doorLocations;
@@ -51,7 +98,11 @@ size_t RoomPrefab::Save(std::string const assetPath, size_t* allocationStart) {
 void RoomPrefab::Load(std::string const assetPath, size_t const allocationStart) {
     auto const loadedSaveData = ISerializedData::LoadISerializable<RoomPrefabDataStruct>(assetPath, allocationStart);
     itemSpawnLocations = loadedSaveData.itemSpawnLocations;
+    enemySpawnLocations = loadedSaveData.enemySpawnLocations;
     doorLocations = loadedSaveData.doorLocations;
+
+    roomType = loadedSaveData.roomType;
+    spawnProbability = loadedSaveData.spawnProbability;
 }
 
 void RoomPrefab::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale)

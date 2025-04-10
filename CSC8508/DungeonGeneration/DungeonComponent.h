@@ -9,7 +9,6 @@
 
 #include "DoorLocation.h"
 #include "IComponent.h"
-#include "RoomComponent.h"
 
 using namespace NCL::CSC8508;
 
@@ -34,7 +33,7 @@ public:
     void GetAllItemSpawnLocations(std::vector<Vector3>& locations) const;
 
     [[nodiscard]] unsigned int GetSeed() const { return seed; }
-    [[nodiscard]] std::vector<RoomComponent*> GetRooms() const;
+    [[nodiscard]] std::vector<RoomPrefab*> GetRooms() const;
 
 private:
     DoorLocation entrancePosition = DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));

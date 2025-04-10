@@ -14,8 +14,6 @@ bool DungeonComponent::Generate(int const roomCount) const {
 
     GameObject* prefab = RoomManager::GetRandom();
     RoomPrefab* roomPrefab = prefab->TryGetComponent<RoomPrefab>();
-
-    prefab->AddComponent<RoomComponent>(roomPrefab);
     GetGameObject().AddChild(prefab);
 
     // Line up the entry room with the dungeon entrance
@@ -46,20 +44,19 @@ bool DungeonComponent::Generate(int const roomCount) const {
 bool DungeonComponent::GenerateRoom() const {
     GameObject* roomB = RoomManager::GetRandom();
     RoomPrefab* roomPrefabInfo = roomB->TryGetComponent<RoomPrefab>();
-    RoomComponent* component = roomB->AddComponent<RoomComponent>(roomPrefabInfo);
     // 2: Randomly order the rooms and attempt to generate a new room in each until one succeeds
-    for (auto const rooms = Util::RandomiseVector(GetRooms()); RoomComponent* r : rooms) {
-        if (r->TryGenerateNewRoom(*component)) return true;
+    for (auto const rooms = Util::RandomiseVector(GetRooms()); RoomPrefab* r : rooms) {
+        if (r->TryGenerateNewRoom(*roomPrefabInfo)) return true;
     }
     roomB->SetEnabled(false);
     //delete roomB;
     return false;
 }
 
-std::vector<RoomComponent*> DungeonComponent::GetRooms() const {
-    std::vector<RoomComponent*> out;
+std::vector<RoomPrefab*> DungeonComponent::GetRooms() const {
+    std::vector<RoomPrefab*> out;
     for (GameObject const* c : GetGameObject().GetChildren()) {
-        if (auto* component = c->TryGetComponent<RoomComponent>()) out.push_back(component);
+        if (auto* component = c->TryGetComponent<RoomPrefab>()) out.push_back(component);
     }
     return out;
 }
@@ -67,9 +64,10 @@ std::vector<RoomComponent*> DungeonComponent::GetRooms() const {
 void DungeonComponent::GetAllItemSpawnLocations(std::vector<Vector3>& locations) const {
     for (GameObject* r : GetGameObject().GetChildren()) {
         Transform const& transform = r->GetTransform();
-        RoomComponent const* roomComponent = r->TryGetComponent<RoomComponent>();
+        RoomPrefab const* roomComponent = r->TryGetComponent<RoomPrefab>();
         if (!roomComponent) continue;
-        for (RoomPrefab prefab = roomComponent->GetPrefab(); SpawnLocation const loc : prefab.GetItemSpawnLocations()) {
+
+        for (SpawnLocation const loc : roomComponent->GetItemSpawnLocations()) {
             Vector3 const outLoc = transform.GetOrientation() * (transform.GetScale() * loc.location)  + transform.GetPosition();
             locations.push_back(outLoc);
         }

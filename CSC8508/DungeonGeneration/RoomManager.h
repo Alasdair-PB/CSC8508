@@ -19,6 +19,7 @@ public:
      * @return Random prefab
      */
     static GameObject* GetRandom();
+    static GameObject* GetRandom(RoomType type);
     static void ReturnPrefab(GameObject* prefab);
     static void ClearPrefabs();
 
@@ -29,6 +30,7 @@ protected:
     static unsigned int seed; // TODO: This needs to be smarter
 
     static std::vector<std::string> prefabPaths;
+    static std::unordered_map<RoomType, vector<GameObject*>> prefabsByType;
     static vector<GameObject*> prefabs;
     static GameObject* LoadPrefab(std::string path);
 };

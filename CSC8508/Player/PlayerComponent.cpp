@@ -200,11 +200,7 @@ void PlayerComponent::OnItemInteract() {
 void PlayerComponent::GetWeightModifier() {
     weightModifier = 1.0f;
     float weight = inventoryComponent->GetItemCombinedWeight();
-    if (weight == 0) { 
-        weightModifier = 1.0f; }
-    else {
-        weightModifier = 1.0f - (weight / 100.0f);
-    }
+    weightModifier = 1.0f - std::min((weight / 100.0f), 0.0f);
     return;
 }
 
@@ -221,7 +217,9 @@ void PlayerComponent::OnPlayerMove() {
     Matrix3 offsetRotation = Matrix::RotationMatrix3x3(0.0f, Vector3(0, 1, 0));
     dir = offsetRotation * dir;
 
-    physicsObj->AddForce(dir * speed * weightModifier * (isDashing ? dashMultiplier : 1.0f));
+    float yForce = physicsObj->GetLinearVelocity().y;
+    Vector3 movementForce = dir * speed * weightModifier * (isDashing ? dashMultiplier : 1.0f);
+    physicsObj->SetLinearVelocity(Vector3(movementForce.x, yForce, movementForce.z));
     physicsObj->RotateTowardsVelocity();
 }
 

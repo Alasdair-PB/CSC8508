@@ -28,6 +28,7 @@ public:
 
     void OnAwake() override {
         Generate(roomCount);
+        EndDungeonPaths();
     }
 
     void GetAllItemSpawnLocations(std::vector<Vector3>& locations) const;
@@ -38,12 +39,17 @@ public:
 private:
     DoorLocation entrancePosition = DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));
     bool TryGenerateNewRoom(RoomPrefab& roomA, RoomPrefab& roomB) const;
+    bool ForceGenerateRooms(RoomPrefab& roomA, RoomPrefab& roomB) const;
     void SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference, 
         const DoorLocation aDoorLoc, const DoorLocation bDoorLoc) const;
 
+    void SetNeighbours(RoomPrefab* roomPrefab) const;
     unsigned int seed = 14;
     int roomCount;
     bool GenerateRoom() const;
+    bool EndDungeonPaths();
+
+    const float threshold = 1.0f;
 };
 
 #endif //DUNGEONCOMPONENT_H

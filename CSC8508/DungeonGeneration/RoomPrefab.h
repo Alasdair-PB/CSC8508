@@ -33,10 +33,11 @@ public:
         roomType(roomType)
     {}
 
+    RoomType GetRoomType() const { return roomType; }
+
     [[nodiscard]] std::vector<SpawnLocation> const& GetItemSpawnLocations() const { return itemSpawnLocations; }
     [[nodiscard]] std::vector<DoorLocation> const& GetDoorLocations() const { return doorLocations; }
-
-    [[nodiscard]] std::vector<RoomPrefab*> GetNextDoorRooms() const { return nextDoorRooms; }
+    [[nodiscard]] std::vector<RoomPrefab*>& GetNextDoorRooms() { return nextDoorRooms; }
 
     size_t Save(std::string assetPath, size_t* allocationStart) override;
     void Load(std::string assetPath, size_t allocationStart) override;

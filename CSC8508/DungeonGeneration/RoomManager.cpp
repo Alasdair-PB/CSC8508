@@ -7,6 +7,7 @@
 #include "GameWorld.h"
 
 std::vector<GameObject*> RoomManager::prefabs = std::vector<GameObject*>();
+std::unordered_map<RoomType, vector<GameObject*>> RoomManager::prefabsByType = std::unordered_map<RoomType, vector<GameObject*>>();
 std::vector<std::string> RoomManager::prefabPaths = std::vector<std::string>();
 
 void RoomManager::LoadPrefabs(){
@@ -19,13 +20,13 @@ void RoomManager::LoadPrefabs(){
 
     for (std::string path : prefabPaths) {
         GameObject* prefab = LoadPrefab(path);
+        RoomType roomType = prefab->TryGetComponent<RoomPrefab>()->GetRoomType();
         prefabs.push_back(prefab);
-        //prefab->SetEnabled(false);
+        prefabsByType[roomType].push_back(prefab);
     }
 }
 
 void RoomManager::ReturnPrefab(GameObject* prefab) {
-    //prefab->SetEnabled(false);
     prefab->GetTransform().SetPosition(Vector3(-1000,-1000,-1000));
 }
 
@@ -35,11 +36,23 @@ void RoomManager::ClearPrefabs() {
     }
 }
 
+GameObject* RoomManager::GetRandom(RoomType type) {
+    if (prefabsByType[type].size() == 0)
+        return nullptr;
+    int const index = std::rand() % prefabsByType[type].size();
+    GameObject* randomPrefab = prefabsByType[type][index];
+    randomPrefab->SetEnabled(true);
+    randomPrefab->GetTransform().SetPosition(Vector3());
+    randomPrefab->GetTransform().SetOrientation(Quaternion());
+    return randomPrefab;
+}
+
 GameObject* RoomManager::GetRandom() {
     int const index = std::rand() % prefabs.size();
     GameObject* randomPrefab = prefabs[index];
     randomPrefab->SetEnabled(true);
-    randomPrefab->GetTransform().SetPosition(Vector3(0,0,0));
+    randomPrefab->GetTransform().SetPosition(Vector3());
+    randomPrefab->GetTransform().SetOrientation(Quaternion());
     return randomPrefab;
 }
 

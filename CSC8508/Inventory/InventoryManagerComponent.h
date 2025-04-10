@@ -125,9 +125,8 @@ namespace NCL {
 
            float GetItemCombinedWeight() {
                float itemCombinedWeight = 0.0f;
-               for (ItemComponent* item : storedItems) {
+               for (ItemComponent* item : storedItems)
                    itemCombinedWeight += item->GetItemWeight();
-               }
                return itemCombinedWeight;
            }
 

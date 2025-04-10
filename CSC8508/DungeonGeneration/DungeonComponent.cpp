@@ -56,6 +56,15 @@ bool DungeonComponent::GenerateRoom() const {
     return false;
 }
 
+bool DungeonComponent::EndDungeonPaths() {
+    GameObject* roomB = RoomManager::GetRandom(Exit);
+    RoomPrefab* roomPrefabInfo = roomB->TryGetComponent<RoomPrefab>();
+
+    for (auto const rooms = GetRooms(); RoomPrefab* r : rooms)
+        ForceGenerateRooms(*r, *roomPrefabInfo);
+    return true;
+}
+
 std::vector<RoomPrefab*> DungeonComponent::GetRooms() const {
     std::vector<RoomPrefab*> out;
     for (GameObject const* c : GetGameObject().GetChildren()) {
@@ -86,7 +95,62 @@ void DungeonComponent::SetTransform(const Transform& transformA, Transform& tran
     );
 }
 
+void DungeonComponent::SetNeighbours(RoomPrefab* roomPrefab) const {
+    for (RoomPrefab* room : GetRooms()) {
+        for (const DoorLocation& door : room->GetDoorLocations()) {
+            for (const DoorLocation& doorB : roomPrefab->GetDoorLocations()) {
+                Vector3 doorPosA = room->GetGameObject().GetTransform().GetPosition() + room->GetGameObject().GetTransform().GetOrientation() * door.pos;
+                Vector3 doorPosB = roomPrefab->GetGameObject().GetTransform().GetPosition() + roomPrefab->GetGameObject().GetTransform().GetOrientation() * doorB.pos;
+                float length = Vector::Length(doorPosA - doorPosB);
+                if (length < threshold) {
+                    roomPrefab->GetNextDoorRooms().push_back(room);
+                    room->GetNextDoorRooms().push_back(roomPrefab);
+                }
+            }
+        }
+    }
+}
+
+bool DungeonComponent::ForceGenerateRooms(RoomPrefab& roomA, RoomPrefab& roomB) const {
+    if (roomA.GetNextDoorRooms().size() > roomA.GetDoorLocations().size()) {
+        RoomManager::ReturnPrefab(&roomB.GetGameObject());
+        return false;
+    }
+    auto const aDoorLocations = roomA.GetDoorLocations();
+    auto const bDoorLocations = roomB.GetDoorLocations();
+
+    Transform const& transformA = roomA.GetGameObject().GetTransform();
+    Transform& transformB = roomB.GetGameObject().GetTransform();
+    bool forced = false;
+    for (const DoorLocation& aDoorLoc : aDoorLocations) {
+        for (const DoorLocation& bDoorLoc : bDoorLocations) {
+            Quaternion orientationDifference = Quaternion::VectorsToQuaternion(bDoorLoc.dir, -aDoorLoc.dir);
+            // Enforce flipping around the Y axis (no tilting the rooms)
+            if (fabs(orientationDifference.x) >= FLT_EPSILON || fabs(orientationDifference.z) >= FLT_EPSILON) continue;
+            SetTransform(transformA, transformB, orientationDifference, aDoorLoc, bDoorLoc);
+            auto info = CollisionDetection::CollisionInfo();
+
+            if (!CollisionDetection::ObjectIntersection(&roomB.GetGameObject(), &GetGameObject(), info)) {
+                GameObject* copiedPrefab = roomB.GetGameObject().CopyGameObject();
+                RoomPrefab* roomPrefab = copiedPrefab->TryGetComponent<RoomPrefab>();
+                GetGameObject().AddChild(copiedPrefab);
+                SetNeighbours(roomPrefab);
+                forced = true;
+                std::cout << "forced generation" << std::endl;
+            }
+        }
+    }
+    if (!forced) std::cout << "Room could not be generated at this door" << std::endl;
+    RoomManager::ReturnPrefab(&roomB.GetGameObject());
+    return true;
+}
+
 bool DungeonComponent::TryGenerateNewRoom(RoomPrefab& roomA, RoomPrefab& roomB) const {
+    if (roomA.GetNextDoorRooms().size() > roomA.GetDoorLocations().size()) {
+        RoomManager::ReturnPrefab(&roomB.GetGameObject());
+        return false;
+    }
+
     // Randomly order door locations
     auto const aDoorLocations = Util::RandomiseVector(roomA.GetDoorLocations());
     auto const bDoorLocations = Util::RandomiseVector(roomB.GetDoorLocations());
@@ -107,8 +171,7 @@ bool DungeonComponent::TryGenerateNewRoom(RoomPrefab& roomA, RoomPrefab& roomB) 
                 GameObject* copiedPrefab = roomB.GetGameObject().CopyGameObject();
                 RoomPrefab* roomPrefab = copiedPrefab->TryGetComponent<RoomPrefab>();
 
-                roomA.GetNextDoorRooms().push_back(roomPrefab);
-                roomPrefab->GetNextDoorRooms().push_back(&roomA);
+                SetNeighbours(roomPrefab);
                 GetGameObject().AddChild(copiedPrefab);
                 RoomManager::ReturnPrefab(&roomB.GetGameObject());
                 return true;
@@ -117,7 +180,5 @@ bool DungeonComponent::TryGenerateNewRoom(RoomPrefab& roomA, RoomPrefab& roomB) 
     }
     // If no combination is valid, reset transform and return false
     RoomManager::ReturnPrefab(&roomB.GetGameObject());
-    transformB.SetOrientation(Quaternion());
-    transformB.SetPosition(Vector3());
     return false;
 }

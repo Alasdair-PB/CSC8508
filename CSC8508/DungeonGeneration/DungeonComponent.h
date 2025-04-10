@@ -16,7 +16,7 @@ class RoomPrefab;
 
 class DungeonComponent final : public IComponent {
 public:
-    DungeonComponent(GameObject& gameObject) : IComponent(gameObject) { }
+    DungeonComponent(GameObject& gameObject) : IComponent(gameObject), prefabs(vector<GameObject*>()) { }
     DungeonComponent(GameObject& gameObject, DoorLocation const& entrancePosition, int roomCount)
         : IComponent(gameObject), entrancePosition(entrancePosition), roomCount(roomCount) { }
 
@@ -36,6 +36,7 @@ public:
     [[nodiscard]] std::vector<RoomPrefab*> GetRooms() const;
 
 private:
+    vector<GameObject*> prefabs;
     DoorLocation entrancePosition = DoorLocation(Vector3(0, 0, 0), Vector3(0, 0, -1));
 
     unsigned int seed = 14;

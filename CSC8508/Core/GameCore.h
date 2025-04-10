@@ -66,7 +66,6 @@ namespace NCL {
 			GameObject* AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* Loaditem(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
 			GameObject* LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData = nullptr);
-			GameObject* LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag);
 			GameObject* AddDungeonToWorld(Transform const& transform, DoorLocation const& entryPosition, int roomCount);
 
 			MainMenu* GetMainMenu() { return mainMenu; }

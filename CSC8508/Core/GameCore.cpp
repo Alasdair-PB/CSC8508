@@ -53,8 +53,8 @@ void LoadControllerMappings(Controller* controller)
 	controller->MapAxis(1, "Forward");
 	controller->MapAxis(2, "XLook");
 	controller->MapAxis(3 , "YLook");
-	controller->MapButton(8, "Dash"); //Ps5 relevant buttons
-	controller->MapButton(2, "Jump"); // Keep names
+	controller->MapButton(8, "Dash");
+	controller->MapButton(2, "Jump");
 	controller->MapButton(1, "Interact");
 	controller->MapButton(10, "Pause");
 	controller->MapButton(11, "Debug");

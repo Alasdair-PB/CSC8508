@@ -75,38 +75,6 @@ GameObject* GameCore::LoadGameManager(const Vector3& position, NetworkSpawnData*
 	return gm;
 }
 
-GameObject* GameCore::LoadDropZone(const Vector3& position, Vector3 dimensions, Tag tag) {
-	GameObject* dropZone = new GameObject();
-	OBBVolume* volume = new OBBVolume(dimensions);
-	Mesh* cubeMesh = MaterialManager::GetMesh("cube");
-	Texture* basicTex = MaterialManager::GetTexture("basic");
-	Shader* basicShader = MaterialManager::GetShader("basic");
-
-	PhysicsComponent* phys = dropZone->AddComponent<PhysicsComponent>();
-	BoundsComponent* bounds = dropZone->AddComponent<BoundsComponent>((CollisionVolume*)volume, phys);
-
-	bounds->AddToIgnoredLayers(Layers::LayerID::Player);
-	bounds->SetBoundingVolume((CollisionVolume*)volume);
-	dropZone->GetTransform().SetPosition(position - Vector3(0,3,0)).SetScale(dimensions * 2.0f);
-
-	dropZone->SetRenderObject(new RenderObject(&dropZone->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&dropZone->GetTransform()));
-	phys->GetPhysicsObject()->SetInverseMass(0);
-	phys->GetPhysicsObject()->InitCubeInertia();
-	dropZone->AddTag(tag);
-	if (tag == Tags::DropZone)
-		dropZone->GetRenderObject()->SetColour(Vector4(0, 1, 0, 0.3f));
-	else if (tag == Tags::Exit)
-		dropZone->GetRenderObject()->SetColour(Vector4(1, 0, 0, 0.3f));
-	else if (tag == Tags::DepositZone)
-		dropZone->GetRenderObject()->SetColour(Vector4(0, .2, 1, 0.3f));
-	else
-		dropZone->GetRenderObject()->SetColour(Vector4(1, 0, 1, 0.3f));
-
-	world->AddGameObject(dropZone);
-	return dropZone;
-}
-
 GameObject* GameCore::AddPlayerToWorld(const Vector3& position, NetworkSpawnData* spawnData) {
 	float meshSize = 0.25f;
 	float inverseMass = 0.5f;

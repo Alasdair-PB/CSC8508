@@ -29,6 +29,8 @@ namespace NCL {
 
             static void LoadMaterials(IGameTechRenderer* renderer) {
                 MaterialManager::PushTexture("basic", renderer->LoadTexture("checkerboard.png"));
+                MaterialManager::PushTexture("player", renderer->LoadTexture("MiiCharacter.png"));
+
                 MaterialManager::PushShader("basic", renderer->LoadShader("scene.vert", "scene.frag"));
                 MaterialManager::PushShader("anim", renderer->LoadShader("skinning.vert", "scene.frag"));
 

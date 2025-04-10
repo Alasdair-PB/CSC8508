@@ -20,7 +20,6 @@ void RoomPrefab::SetTransform(const Transform& transformA, Transform& transformB
 }
 
 bool RoomPrefab::TryGenerateNewRoom(RoomPrefab& roomB) {
-
     // Randomly order door locations
     auto const aDoorLocations = Util::RandomiseVector(GetDoorLocations());
     auto const bDoorLocations = Util::RandomiseVector(roomB.GetDoorLocations());

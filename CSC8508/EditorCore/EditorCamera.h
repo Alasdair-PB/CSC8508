@@ -10,10 +10,14 @@ using namespace CSC8508;
 class EditorCamera {
 public:
 	EditorCamera(Camera* camera, Controller* controller) : 
-		controller(controller), camera(camera){}
+		controller(controller), camera(camera) {
+		panBinding = controller->GetNamedButtonBinding("Pan");
+	}
 	~EditorCamera() = default;
 
 	void UpdateMouseGameWorldPitchYaw() {
+		if (!controller->GetBoundButton(panBinding))
+			return;
 
 		mousePitch -= controller->GetNamedAxis("YLook") * sensitivity;
 		mouseYaw -= controller->GetNamedAxis("XLook") * sensitivity;
@@ -54,6 +58,8 @@ public:
 protected:
 	Controller* controller;
 	Camera* camera;
+
+	uint32_t panBinding;
 	float cameraSpeed = 10.0f;
 	float mouseYaw = 0;
 	float sensitivity = 0.5f;

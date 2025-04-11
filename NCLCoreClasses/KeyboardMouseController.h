@@ -22,6 +22,7 @@ namespace NCL {
 
 		const uint32_t XAxisMouse = 3;
 		const uint32_t YAxisMouse = 4;
+
 	public:
 		KeyboardMouseController(const Keyboard& k, const Mouse& m) : keyboard(k), mouse(m) {
 		}

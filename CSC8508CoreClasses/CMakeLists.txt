@@ -51,11 +51,11 @@ set(Collision_Detection
     "CollisionDetection.h"
     "CollisionDetection.cpp"
     "CollisionEvent.h"
-	"KDTree/KDTree.h"
-	"KDTree/KDTreeBranch.h"
-	"KDTree/KDTreeEntry.h"
-	"KDTree/KDTreeLeaf.h"
-	"KDTree/KDTreeNode.h"
+    "KDTree/KDTree.h"
+    "KDTree/KDTreeBranch.h"
+    "KDTree/KDTreeEntry.h"
+    "KDTree/KDTreeLeaf.h"
+    "KDTree/KDTreeNode.h"
     "OBBVolume.h"
     "QuadTree.h"
     "QuadTree.cpp"
@@ -71,8 +71,6 @@ set(Networking
     "GameServer.cpp"
     "NetworkBase.h"
     "NetworkBase.cpp"
-    "NetworkObject.h"
-    "NetworkObject.cpp"
     "NetworkState.h"
     "NetworkState.cpp"
 )
@@ -89,7 +87,7 @@ set(Physics
     "PhysicsObject.h"
     "PhysicsSystem.cpp"
     "PhysicsSystem.h"
-	"Util.cpp"
+    "Util.cpp"
 )
 source_group("Physics" FILES ${Physics})
 
@@ -99,6 +97,7 @@ set(Header_Files
     "GameWorld.h"
     "RenderObject.h"
     "MaterialManager.h"
+    "AssetManager.h"
     "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -197,37 +196,33 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 ]]
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
-	<fstream>
+    <fstream>
     <sstream>
-	<iostream>
-	<iosfwd>
-
+    <iostream>
+    <iosfwd>
     <memory>
-	<string>
-	<thread>
+    <string>
+    <thread>
     <filesystem>
     <functional>
-	<assert.h>
-	<chrono>
-
+    <assert.h>
+    <chrono>
     <unordered_set>
-	<set>
+    <set>
     <vector>
-	<stack>
-	<unordered_map>
+    <stack>
+    <unordered_map>
     <map>
-	<list>
-	<thread>
+    <list>
+    <thread>
     <atomic>
-	<functional>
-	<stack>
-
+    <functional>
+    <stack>
     "../NCLCoreClasses/Vector.h"
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
     "../NCLCoreClasses/GameTimer.h"
-
 )
 
 ################################################################################

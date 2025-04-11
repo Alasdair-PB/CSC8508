@@ -55,7 +55,6 @@ namespace NCL {
                  Ray ray = Ray(position, rayVector);
                  RayCollision closestCollision;
 
-                 Debug::DrawLine(position , position + rayVector);
                  if (worldInstance.Raycast(ray, closestCollision, true)) {
                      if ((BoundsComponent*)closestCollision.node) {
                          GameObject& collidedObject = ((BoundsComponent*)closestCollision.node)->GetGameObject();

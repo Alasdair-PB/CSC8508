@@ -98,7 +98,6 @@ You will be able to hear the other players through voice chat.
 * InventoryManagerComponent
 * GameManagerComponent
 * Prepare 3D models and model them use blender
-* Create trouble for the team
 * respawn component
 
 #### Michael

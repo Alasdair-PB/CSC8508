@@ -19,7 +19,7 @@ namespace NCL {
 
 			~UIElementsGroup();
 			void RemoveElementsFromIndex(int cutOff);
-
+			void ClearAllElements();
 			void OnAwake() { return; }
 			CSC8508::PushdownState::PushdownResult Draw();
 

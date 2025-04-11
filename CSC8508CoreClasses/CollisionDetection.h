@@ -23,18 +23,22 @@ namespace NCL {
 			Vector3 localA;
 			Vector3 localB;
 			Vector3 normal;
-			float	penetration;
+			float penetration;
+
+			ContactPoint() : localA(Vector3()), 
+				localB(Vector3()),
+				normal(Vector3()) ,
+				penetration(0.0f)
+			{}
 		};
+
 		struct CollisionInfo {
 			BoundsComponent* a;
 			BoundsComponent* b;
-			int		framesLeft;
-
 			ContactPoint point;
 
-			CollisionInfo() {
-
-			}
+			int framesLeft;
+			CollisionInfo() : framesLeft(0), a(nullptr), b(nullptr) {}
 
 			void AddContactPoint(const Vector3& localA, const Vector3& localB, const Vector3& normal, float p) {
 				point.localA		= localA;

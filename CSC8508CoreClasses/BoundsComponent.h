@@ -71,7 +71,9 @@ namespace NCL::CSC8508
 		CollisionVolume* CopyVolume(bool isTrigger, VolumeType volumeType, Vector3 boundsSize);
 		auto GetDerivedSerializedFields() const;
 		void PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) override;
-
+#if EDITOR
+		void SetEditorData();
+#endif
 
 	protected:
 		CollisionVolume* boundingVolume;
@@ -79,11 +81,21 @@ namespace NCL::CSC8508
 		Vector3 broadphaseAABB;
 		vector<Layers::LayerID> ignoreLayers;
 		Vector3 GetBoundsScale();
-
 #if EDITOR
-		VolumeType expectingVolumeType = VolumeType::AABB;
+		int expectingVolumeType = 0;
 		bool* isTrigger = new bool();
 		Vector3* expectingBoundsSize = new Vector3();
+		std::map<int, VolumeType> enumVolumeCast = {
+			{0, VolumeType::AABB},
+			{1, VolumeType::OBB},
+			{2, VolumeType::Sphere},
+			{3, VolumeType::Mesh},
+			{4, VolumeType::Capsule},
+			{5, VolumeType::Compound},
+			{6, VolumeType::Invalid}
+		};
+		void SetBoundsInspectorScale(Vector3 scale);
+		Vector3 GetBoundsWorldScale();
 #endif
 	};
 }

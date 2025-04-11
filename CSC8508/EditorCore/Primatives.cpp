@@ -1,18 +1,33 @@
-#include "../EditorGame.h"
+#include "EditorGame.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "INetworkComponent.h"
 #include "InputNetworkComponent.h"
 #include "TransformNetworkComponent.h"
-#include "StaminaComponent.h"
 #include "CameraComponent.h"
 #include "MaterialManager.h"
 #include "AnimationComponent.h"
 #include "MeshAnimation.h"
+#include "Assets.h"
 
 using namespace NCL;
 using namespace CSC8508;
 
+const static std::string folderPath = NCL::Assets::PFABDIR;
+
+std::string EditorGame::GetAssetPath(std::string pfabName) {
+	return folderPath + pfabName;
+}
+
+void EditorGame::LoadWorld(std::string assetPath) {
+	world->Load(assetPath);
+}
+
+void EditorGame::SaveWorld(std::string assetPath) {
+	auto x = AddNavMeshToWorld("NavMeshObject.msh", "smalltest.navmesh", Vector3(0, 0, 0), Vector3(1, 1, 1));
+	delete x;
+	world->Save(assetPath);
+}
 
 int navMeshCounter;
 void EditorGame::SaveUnityNavMeshPrefab(std::string assetPath, std::string navMeshObPath, std::string navMeshNavPath) {
@@ -148,10 +163,9 @@ GameObject* EditorGame::AddFloorToWorld(const Vector3& position)
 	BoundsComponent* bounds = floor->AddComponent<BoundsComponent>((CollisionVolume*) volume, phys);
 
 	floor->GetTransform().SetScale(floorSize * 2.0f).SetPosition(position);
-
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
-	phys->SetPhysicsObject(new PhysicsObject(&floor->GetTransform()));
 
+	phys->SetPhysicsObject(new PhysicsObject(&floor->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(0);
 	phys->GetPhysicsObject()->InitCubeInertia();
 
@@ -178,7 +192,10 @@ GameObject* EditorGame::AddSphereToWorld(const Vector3& position, float radius, 
 	phys->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform()));
 	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitSphereInertia();
+	phys->GetPhysicsObject()->SetInverseMass(0);
 	phys->SetInitType(PhysicsComponent::Sphere);
+
+	sphere->SetLayerID(Layers::LayerID::Default);
 	return sphere;
 }
 
@@ -198,7 +215,8 @@ GameObject* EditorGame::AddCubeToWorld(const Vector3& position, Vector3 dimensio
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
 	phys->SetPhysicsObject(new PhysicsObject(&cube->GetTransform()));
 
-	phys->GetPhysicsObject()->SetInverseMass(inverseMass);
 	phys->GetPhysicsObject()->InitCubeInertia();
+	phys->GetPhysicsObject()->SetInverseMass(0);
+	cube->SetLayerID(Layers::LayerID::Default);
 	return cube;
 }

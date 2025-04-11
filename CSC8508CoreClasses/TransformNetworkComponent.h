@@ -33,7 +33,7 @@ namespace NCL::CSC8508
 
 	struct DeltaPacket : public IDeltaNetworkPacket {
 		float pos[3];
-		DeltaPacket() {
+		DeltaPacket() : pos{ 0.0f, 0.0f, 0.0f} {
 			type = Delta_State;
 			size = sizeof(DeltaPacket) - sizeof(GamePacket);
 		}

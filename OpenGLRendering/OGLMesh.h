@@ -10,8 +10,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "glad\gl.h"
 
 namespace NCL::Rendering {	
-	using UniqueOGLMesh		= std::unique_ptr<class OGLMesh>;
-	using SharedOGLMesh		= std::shared_ptr<class OGLMesh>;
+	using UniqueOGLMesh = std::unique_ptr<class OGLMesh>;
+	using SharedOGLMesh = std::shared_ptr<class OGLMesh>;
 
 	class OGLMesh : public Mesh	{
 	public:
@@ -25,7 +25,7 @@ namespace NCL::Rendering {
 		void UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount);
 
 	protected:
-		GLuint GetVAO() const { return vao;			}
+		GLuint GetVAO() const { return vao; }
 		void BindVertexAttribute(int attribSlot, int bufferID, int bindingID, int elementCount, int elementSize, int elementOffset);
 
 		GLuint vao;

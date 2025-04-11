@@ -5,276 +5,257 @@
 #include <string>
 #include "ComponentManager.h"
 #include "GameWorld.h"
-#include "../EditorGame.h"
+#include "EditorWindowManager.h"
+#include "../Core/EditorGame.h"
+#include "MaterialManager.h"
 
-#ifndef ASSETROOTLOCATION
-#define ASSETROOTLOCATION "../Assets/Pfabs"
-#endif
-
-Inspector::Inspector() : positionInfo(new Vector3()),
-	scaleInfo(new Vector3()), orientationInfo(new Vector4()),
-	isEnabled(new bool()),
-	saveDestination(new std::string("Default.pfab")), clearWorld(false)
+Inspector::Inspector() : 
+	editorManager(EditorWindowManager::Instance()), 
+	gameWorld(GameWorld::Instance()), 
+	elementsCount(0), meshIndex(new int()), textureIndex(new int())
 {
-	inspectorBar = new UIElementsGroup(
-		ImVec2(0.7f, 0.3f), 
-		ImVec2(0.3f, 0.5f),
-		1.0f, 
-		"Inspector",
-		0.0f, 
-		ImGuiWindowFlags_NoResize);
+	InitInspector();
+}
 
-	toolsBar = new UIElementsGroup(
-		ImVec2(0.075f, 0.3f),
-		ImVec2(0.1f, 0.5f),
+Inspector::~Inspector() {
+	delete meshIndex; 
+	delete textureIndex;
+}
+
+void Inspector::OnSetFocus(GameObject* focus) {
+	if (!focus) return;
+	InitMaterial(focus);
+	std::string* name = editorManager.GetNameInfo();
+	bool* isEnabled = editorManager.GetEnabledInfo();
+	Vector3* positionInfo = editorManager.GetPositionInfo();
+	Vector3* scaleInfo = editorManager.GetScaleInfo();
+	Vector4* orientationInfo = editorManager.GetOrientationInfo();
+
+	window->PushStatelessInputFieldElement("GameObject:", name);
+	window->PushToggle("Enabled:", isEnabled, 0.05f);
+	window->PushVectorElement(positionInfo, 0.05f, "Position:");
+	window->PushVectorElement(scaleInfo, 0.05f, "Scale");
+	window->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
+}
+
+void Inspector::OnRenderFocus(GameObject* focus)
+{ 
+	if (!focus) return;
+	window->RemoveElementsFromIndex(5);
+
+	PushTagField(focus);
+	PushLayerField(focus);
+	PushRenderObject(focus);
+	PushAddComponentField(focus);
+	PushComponentInspector(focus); 
+}
+
+void Inspector::OnFocusEnd() { window->ClearAllElements(); }
+
+void Inspector::OnInit() {}
+
+void Inspector::InitInspector() {
+	window = new UIElementsGroup(
+		ImVec2(0.7f, 0.3f),
+		ImVec2(0.3f, 0.5f),
 		1.0f,
-		"Tools",
+		"Inspector",
 		0.0f,
 		ImGuiWindowFlags_NoResize);
-	PushSetPrimitive();
-	inspectorBar->PushToggle("GameObject:", isEnabled, 0.05f);
-	toolsBar->PushStatelessInputFieldElement("file", saveDestination);
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save Pfab",
-		[this]() { if (focus) focus->Save(GetAssetPath(*saveDestination));});
-	PushLoadPfab();
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load World",
-		[this]() {
-			GameWorld::Instance().Load(GetAssetPath(*saveDestination));
-		});
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Save World",
-		[this]() {
-			GameWorld::Instance().Save(GetAssetPath(*saveDestination));
-		});
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Clear World",
-		[this]() { 
-			clearWorld = true;
-		});
-
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add GameObject",
-		[this]() {
-			GameObject* loaded = NewGameObject();
-			GameWorld::Instance().AddGameObject(loaded);
-			EndFocus();
-			SetFocus(loaded);
-		});
-
-	PushAddParent();
-	PushAddChild();
-	PushFocusParent();
-	PushAddComponentField();
-
-	inspectorBar->PushVectorElement(positionInfo, 0.05f, "Position:");
-	inspectorBar->PushVectorElement(scaleInfo, 0.05f, "Scale");
-	inspectorBar->PushQuaternionElement(orientationInfo, 0.05f, "Orientation");
 }
 
-GameObject* Inspector::NewGameObject() {
+void Inspector::InitMaterial(GameObject* focus) {
+	RenderObject* renderObject = focus->GetRenderObject();
+	if (!renderObject) return;
+	Mesh* currentMesh = renderObject->GetMesh();
+	Texture* currentTexture = renderObject->GetDefaultTexture();
 
-	Vector3 position = focus ? focus->GetTransform().GetPosition() : Vector3(0, 0, 0);
-	switch (primitive) {
-	case Empty: {
-		return new GameObject();
-		break;
-	}
-	case Cube: {
-		return EditorGame::GetInstance()->AddCubeToWorld(position, Vector3(1,1,1));
-		break;
-	}
-	case Sphere: {
-		return EditorGame::GetInstance()->AddSphereToWorld(position, 1);
-		break;
-	}
-	default: {
-		break;
-	}
-	}
-}
-
-void Inspector::PushLoadPfab() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load PFab",
-		[this]() {
-			GameObject* loaded = new GameObject();
-			loaded->Load(GetAssetPath(*saveDestination));
-			GameWorld::Instance().AddGameObject(loaded);
-		});
-}
-
-void Inspector::PushFocusParent() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Focus to Parent",
-		[this]() {
-			if (!focus) return;
-			if (focus->HasParent()) {
-				GameObject* parent = focus->TryGetParent();
-				EndFocus();
-				SetFocus(parent);
+	if (currentMesh) {
+		(*meshIndex) = 0;
+		std::vector<std::pair<std::string, Mesh*>> sortedMeshList = GetMeshesSorted();
+		for (int i = 0; i < sortedMeshList.size(); ++i) {
+			if (currentMesh == sortedMeshList[i].second) {
+				(*meshIndex) = i;
+				break;
 			}
-		});
+		}
+	}
+
+	if (currentTexture) {
+		(*textureIndex) = 0;
+		std::vector<std::pair<std::string, Texture*>> sortedTextureList = GetTexturesSorted();
+		for (int i = 0; i < sortedTextureList.size(); ++i) {
+			if (currentTexture == sortedTextureList[i].second) {
+				(*textureIndex) = i;
+				break;
+			}
+		}
+	}
 }
 
-void Inspector::PushAddParent() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Parent",
-		[this]() {
-			if (!focus) return;
-			GameObject* loaded = NewGameObject();
-			loaded->AddChild(focus);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(loaded);
-		});
-}
-
-void Inspector::PushAddChild() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Child",
-		[this]() {
-			if (!focus) return;
-			GameObject* loaded = NewGameObject();
-			focus->AddChild(loaded);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(focus);
-		});
-}
-
-void Inspector::PushLoadChild() {
-	toolsBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Load Child",
-		[this]() {
-			if (!focus) return;
-			GameObject* loaded = new GameObject();
-			loaded->Load(GetAssetPath(*saveDestination));
-			focus->AddChild(loaded);
-			GameWorld::Instance().RemoveGameObject(focus);
-			GameWorld::Instance().AddGameObject(focus);
-		});
-}
-
-void Inspector::PushSetPrimitive() {
+void Inspector::PushAddComponentField(GameObject* focus) {
 	std::vector<std::pair<int*, std::string>> enumOptions = {
-		{reinterpret_cast<int*>(&primitive), "Cube"},
-		{reinterpret_cast<int*>(&primitive), "Sphere"},
-		{reinterpret_cast<int*>(&primitive), "Empty"}
+		{reinterpret_cast<int*>(&mapId), "None"},
+		{reinterpret_cast<int*>(&mapId), "Bounds"},
+		{reinterpret_cast<int*>(&mapId), "Physics"},
+		{reinterpret_cast<int*>(&mapId), "NavMesh"},
+		{reinterpret_cast<int*>(&mapId), "Animation"},
+		{reinterpret_cast<int*>(&mapId), "Damageable"},
+		{reinterpret_cast<int*>(&mapId), "Room"}
 	};
-	toolsBar->PushEnumElement("Component to add", enumOptions);
-}
-
-void Inspector::PushAddComponentField() {
-	std::vector<std::pair<int*, std::string>> enumOptions = {
-	{reinterpret_cast<int*>(&mapId), "None"},
-	{reinterpret_cast<int*>(&mapId), "Bounds"},
-	{reinterpret_cast<int*>(&mapId), "Physics"},
-	{reinterpret_cast<int*>(&mapId), "NavMesh"},
-	{reinterpret_cast<int*>(&mapId), "Animation"},
-	{reinterpret_cast<int*>(&mapId), "Damageable"},
-	{reinterpret_cast<int*>(&mapId), "Room"}
-
-	};
-	inspectorBar->PushEnumElement("Component to add", enumOptions);
-	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",
-		[this]() {
+	window->PushEnumElement("Component to add", enumOptions);
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Component",
+		[this, focus]() {
 			if (!focus) return;
 			EditorGame::GetInstance()->GetDefiner()->AddComponentFromEnum(mapId, *focus);
 		});
 }
 
-void Inspector::PushTagField() {
+void Inspector::PushLayerField(GameObject* focus) {
+	Layers::LayerID* layerId = focus->GetLayerIDInfo();
+
 	std::vector<std::pair<int*, std::string>> enumTagOptions = {
-		{reinterpret_cast<int*>(&tagId), "Default"},
-		{reinterpret_cast<int*>(&tagId), "Player"},
-		{reinterpret_cast<int*>(&tagId), "Enemy"},
-		{reinterpret_cast<int*>(&tagId), "DropZone"},
-		{reinterpret_cast<int*>(&tagId), "CursorCast"},
-		{reinterpret_cast<int*>(&tagId), "Ground"},
-		{reinterpret_cast<int*>(&tagId), "DepositZone"},
-		{reinterpret_cast<int*>(&tagId), "Exit"}
+		{reinterpret_cast<int*>(layerId), "Default"},
+		{reinterpret_cast<int*>(layerId), "Ignore_RayCast"},
+		{reinterpret_cast<int*>(layerId), "UI"},
+		{reinterpret_cast<int*>(layerId), "Player"},
+		{reinterpret_cast<int*>(layerId), "Enemy"},
+		{reinterpret_cast<int*>(layerId), "Ignore_Collisions"}
 	};
+	window->PushEnumElement("Layer to add", enumTagOptions);
+}
 
-	inspectorBar->PushEnumElement("Tag to add", enumTagOptions);
-	inspectorBar->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Tag",
-		[this]() {
-			if (!focus) return;
-			focus->SetTag(tagId);
+std::vector<std::pair<std::string, Texture*>> Inspector::GetTexturesSorted() const {
+	std::unordered_map<std::string, Texture*>& textureMappings = MaterialManager::GetTextureMap();
+	std::vector<std::pair<std::string, Texture*>> sortedTextureList(textureMappings.begin(), textureMappings.end());
+	std::sort(sortedTextureList.begin(), sortedTextureList.end(),
+		[](const auto& a, const auto& b) {
+			return a.first < b.first;
 		});
+	return sortedTextureList;
+}
 
-	inspectorBar->PushStaticTextElement("Tags on Object");
-	for (Tags::Tag tag : focus->GetTags()) {
-		std::string tagName = "Unknown";
-		switch (tag) {
-		case Tags::Default: {
-			tagName = "Default";			
-			break;
-		}
-		case Tags::Player: {
-			tagName = "Player";			
-			break;
-		}
-		case  Tags::Enemy: {
-			tagName = "Enemy";
-			break;
-		}
-		case  Tags::DropZone: {
-			tagName = "DropZone";
-			break;
-		}
-		case  Tags::CursorCast: {
-			tagName = "CursorCast";
-			break;
-		}
-		case  Tags::Ground: {
-			tagName = "Ground";
-			break;
-		}
-		case  Tags::DepositZone: {
-			tagName = "DepositZone";
-			break;
-		}
-		case  Tags::Exit: {
-			tagName = "Exit";
-			break;
-		}
-		default: {
-			break;
-		}
-		}
-		inspectorBar->PushStaticTextElement(tagName);
+std::vector<std::pair<std::string, Mesh*>> Inspector::GetMeshesSorted() const {
+	std::unordered_map<std::string, Mesh*>& meshMappings = MaterialManager::GetMeshMap();
+	std::vector<std::pair<std::string, Mesh*>> sortedMeshList(meshMappings.begin(), meshMappings.end());
+	std::sort(sortedMeshList.begin(), sortedMeshList.end(),
+		[](const auto& a, const auto& b) {
+			return a.first < b.first;
+		});
+	return sortedMeshList;
+}
+
+std::vector<std::pair<int*, std::string>> Inspector::GetTextureInfo(Texture** textureAtIndex,
+	Texture* currentTexture, int* currentTextureIndex)
+{
+	std::vector<std::pair<int*, std::string>> textureOptions;
+	std::vector<std::pair<std::string, Texture*>> sortedTextureList = GetTexturesSorted();
+
+	for (int i = 0; i < sortedTextureList.size(); ++i) {
+		if (i == (*textureIndex)) (*textureAtIndex) = sortedTextureList[i].second;
+		if (currentTexture == sortedTextureList[i].second) (*currentTextureIndex) = i;
+		textureOptions.emplace_back(reinterpret_cast<int*>(textureIndex), sortedTextureList[i].first);
+	}
+	return textureOptions;
+}
+
+std::vector<std::pair<int*, std::string>> Inspector::GetMeshInfo(Mesh** meshAtIndex, 
+	Mesh* currentMesh, int* currentMeshIndex) 
+{
+	std::vector<std::pair<int*, std::string>> meshOptions;
+	std::vector<std::pair<std::string, Mesh*>> sortedMeshList = GetMeshesSorted();
+
+	for (int i = 0; i < sortedMeshList.size(); ++i) {
+		if (i == (*meshIndex)) (*meshAtIndex) = sortedMeshList[i].second;
+		if (currentMesh == sortedMeshList[i].second) (*currentMeshIndex) = i;
+		meshOptions.emplace_back(reinterpret_cast<int*>(meshIndex), sortedMeshList[i].first);
+	}
+	return meshOptions;
+}
+
+void Inspector::PushMaterial(GameObject* focus, RenderObject* renderObject) {
+	Mesh* currentMesh = renderObject->GetMesh();
+	Texture* currentTexture = renderObject->GetDefaultTexture();
+
+	if (!currentMesh && !currentTexture) return;
+
+	Mesh* meshAtIndex = nullptr;
+	Texture* textureAtIndex = nullptr;
+	int currentMeshIndex = 0;
+	int currentTextureIndex = 0;
+
+	std::vector<std::pair<int*, std::string>> meshOptions = GetMeshInfo(&meshAtIndex, currentMesh, &currentMeshIndex);
+	std::vector<std::pair<int*, std::string>> textureOptions = GetTextureInfo(&textureAtIndex, currentTexture, &currentTextureIndex);
+
+	window->PushEnumElement("Texture", textureOptions);
+	window->PushEnumElement("Mesh", meshOptions);
+	CheckChangeMaterial(currentMeshIndex, meshAtIndex, currentTextureIndex, textureAtIndex, focus, renderObject);
+}
+
+void Inspector::CheckChangeMaterial(int currentMeshIndex, Mesh* meshAtIndex, int currentTextureIndex, Texture* textureAtIndex, GameObject* focus, RenderObject* renderObject)
+{
+	if ((*textureIndex) != currentTextureIndex || (*meshIndex) != currentMeshIndex) {
+		RenderObject* newRenderObj = new RenderObject(&focus->GetTransform(),
+			meshAtIndex,
+			textureAtIndex,
+			renderObject->GetShader());
+		focus->SetRenderObject(newRenderObj);
+		delete renderObject;
 	}
 }
 
-void Inspector::ClearGameWorld() {
-	EndFocus();
-	EditorGame::GetInstance()->DeleteSelectionObject();
-	ComponentManager::CleanUp();
-	GameWorld::Instance().ClearAndErase();
-	clearWorld = false;
+void Inspector::PushRenderObject(GameObject* focus, RenderObject* renderObject) {
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Render Object",
+		[this, focus]() {
+			RenderObject* newRenderObj = new RenderObject(&focus->GetTransform(),
+				MaterialManager::GetMesh("cube"),
+				MaterialManager::GetTexture("basic"),
+				MaterialManager::GetShader("basic"));
+			focus->SetRenderObject(newRenderObj);
+		});
 }
 
-Inspector::~Inspector() { 
-	delete inspectorBar; 
-	delete positionInfo; 
-	delete scaleInfo;
-	delete orientationInfo;
+void Inspector::PushRenderObject(GameObject* focus) {
+	RenderObject* renderObject = focus->GetRenderObject();
+
+	if (renderObject) PushMaterial(focus, renderObject);
+	else PushRenderObject(focus, renderObject);
 }
 
-const static std::string folderPath = ASSETROOTLOCATION;
+void Inspector::PushTagField(GameObject* focus) {
+	vector<Tags::Tag>& tags = focus->GetTagInfo();
+	for (Tags::Tag& tag : tags){
+		std::vector<std::pair<int*, std::string>> enumTagOptions = {
+			{reinterpret_cast<int*>(&tag), "Default"},
+			{reinterpret_cast<int*>(&tag), "Player"},
+			{reinterpret_cast<int*>(&tag), "Enemy"},
+			{reinterpret_cast<int*>(&tag), "DropZone"},
+			{reinterpret_cast<int*>(&tag), "CursorCast"},
+			{reinterpret_cast<int*>(&tag), "Ground"},
+			{reinterpret_cast<int*>(&tag), "DepositZone"},
+			{reinterpret_cast<int*>(&tag), "Exit"}
+		};
+		window->PushEnumElement("", enumTagOptions);
+	}
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Add Tag",
+		[this, focus]() {
+			if (!focus) return;
+			(focus)->AddTag(Tags::Default);
+		});
 
-std::string Inspector::GetAssetPath(std::string pfabName) {
-	return folderPath + "/Pfabs/" + pfabName;
+	window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Tag",
+		[this, focus]() {
+			if (!focus) return;
+			(focus)->RemoveTag();
+		});
 }
 
-void Inspector::RenderIComponents() {
-	if (!focus) return;
-	inspectorBar->RemoveElementsFromIndex(6);
+void Inspector::PushComponentInspector(GameObject* focus) {
+	for (IComponent* component : (focus)->GetAllComponents()) {
+		component->IComponent::PushIComponentElementsInspector(*window, 0.05f);
+		component->PushIComponentElementsInspector(*window, 0.05f);
 
-	PushTagField();
-	for (IComponent* component : focus->GetAllComponents())
-		component->PushIComponentElementsInspector(*inspectorBar, 0.05f);
-}
-
-void Inspector::SetVector(Vector3* vector, Vector3 values) {
-	vector->x = values.x;
-	vector->y = values.y;
-	vector->z = values.z;
-}
-
-void Inspector::SetQuaternion(Vector4* quaternion, Quaternion values) {
-	quaternion->x = values.x;
-	quaternion->y = values.y;
-	quaternion->z = values.z;
-	quaternion->w = values.w;
+		window->PushStatelessButtonElement(ImVec2(0.05f, 0.025f), "Remove Component", 
+			[focus, component]() {focus->DetatchComponent(component); });
+	}
 }

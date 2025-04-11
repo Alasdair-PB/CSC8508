@@ -16,9 +16,9 @@ namespace NCL {
 		class Constraint;
 
 		typedef std::function<void(GameObject*)> GameObjectFunc;	
-		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
-
 		typedef std::function<void(PhysicsComponent*)> PhysicsComponentFunc;
+		
+		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
 		typedef std::vector<PhysicsComponent*>::const_iterator PhysicsIterator;
 		typedef std::vector<BoundsComponent*>::const_iterator BoundsIterator;
 
@@ -33,7 +33,7 @@ namespace NCL {
 			void ClearAndErase();
 
 			void AddGameObject(GameObject* o);
-			void RemoveGameObject(GameObject* o, bool andDelete = false);
+			void RemoveGameObject(GameObject* o, bool andDelete = false, bool andRemoveChildren = false);
 
 			void AddConstraint(Constraint* c);
 			void RemoveConstraint(Constraint* c, bool andDelete = false);
@@ -86,11 +86,11 @@ namespace NCL {
 				paused = !paused;
 			}
 
-			int GetGameObjectCount() const { return gameObjects.size(); }
+			int GetGameObjectCount() const { return static_cast<int>(gameObjects.size()); }
 			struct WorldSaveData;
 
 			size_t Save(std::string assetPath, size_t* allocationStart = 0);
-			void  Load(std::string assetPath, size_t allocationStart = 0);
+			void Load(std::string assetPath, size_t allocationStart = 0);
 			void LoadCameraInfo(float nearPlane, float farPlane, float pitch, float yaw, Vector3 position);
 
 		protected:

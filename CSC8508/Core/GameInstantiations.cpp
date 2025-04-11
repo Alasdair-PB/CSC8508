@@ -34,7 +34,7 @@ int GetUniqueId(int objectId, int& componentCount) {
 
 GameObject* GameCore::Loaditem(const Vector3& position, NetworkSpawnData* spawnData) {
 	std::string gameObjectPath = GetAssetPath("item.pfab");
-	GameObject* myObjectToLoad = new GameObject();
+	GameObject* myObjectToLoad = new GameObject(true);
 	myObjectToLoad->Load(gameObjectPath);
 	myObjectToLoad->GetTransform().SetPosition(position);
 	myObjectToLoad->AddComponent<ItemComponent>(300, 50.0f);
@@ -51,8 +51,8 @@ GameObject* GameCore::Loaditem(const Vector3& position, NetworkSpawnData* spawnD
 }
 
 GameObject* GameCore::LoadGameManager(const Vector3& position, NetworkSpawnData* spawnData) {
-	GameObject* gm = new GameObject();
-	int quota = 500;
+	GameObject* gm = new GameObject(true);
+	int quota = (static_cast<int>(std::round(static_cast<double>(itemCount) / 2)) * 300) + 300;
 	int terminationFee = 60;
 	int initAllowance = 300;
 	int allowedTime = 300;

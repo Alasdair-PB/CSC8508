@@ -4,6 +4,7 @@
 
 #include "IComponent.h"
 #include "ItemComponent.h"
+
 #include "UISystem.h"
 #include "InventoryUI.h"
 #include <vector>
@@ -77,10 +78,13 @@ namespace NCL {
                 item->GetGameObject().SetEnabled(false);
             }
 
+            int GetQuota();
+
             std::function<CSC8508::PushdownState::PushdownResult()> InventoryMenu() {
                 std::function<CSC8508::PushdownState::PushdownResult()> func = [this]() -> CSC8508::PushdownState::PushdownResult {
                     int index = 0;
                     ImGui::Text(("Wallet: " + std::to_string(wallet)).c_str());
+
                     for (auto const& item : storedItems) {
                         ImGui::SetCursorPosY(0.04f * Window::GetWindow()->GetScreenSize().y);
                         std::string name = item->GetName();
@@ -96,6 +100,9 @@ namespace NCL {
                             ImGui::Text(("Sell Value: " + sellVal).c_str());
                         }
                     }
+                    ImGui::Text(("DepositedFunds: " + std::to_string(deposited)).c_str());
+                    ImGui::Text(("Global Quota: " + std::to_string(GetQuota())).c_str());
+
                     index += 1;
                     return CSC8508::PushdownState::PushdownResult::NoChange;
                     };

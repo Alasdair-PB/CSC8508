@@ -72,6 +72,8 @@ namespace NCL::CSC8508 {
 			return true;
 		}
 
+		int GetQuota() const { return quota; }
+
 		void OnMissionFeedBack() {
 			GameWorld::Instance().ToggleWorldPauseState();
 		}

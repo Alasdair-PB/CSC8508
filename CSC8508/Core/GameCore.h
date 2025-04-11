@@ -108,7 +108,8 @@ namespace NCL {
 
 			float framerateDelay = 0;
 			int seed;
-			int itemCount; 
+			int itemCount = 15; 
+			int spawnedItemCount;
 
 #if EOSBUILD
 			UI::EOSMenuUI* eosMenuUI = new UI::EOSMenuUI;

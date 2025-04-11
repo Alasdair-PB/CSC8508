@@ -1,4 +1,5 @@
 #include "InventoryManagerComponent.h"
+#include "GameManagerComponent.h"
 
 using namespace NCL;
 using namespace CSC8508;
@@ -22,6 +23,10 @@ struct InventoryManagerComponent::InventoryManagerComponentDataStruct : public I
         );
     }
 };
+
+int InventoryManagerComponent::GetQuota() {
+   return GameManagerComponent::GetInstance()->GetQuota();
+}
 
 size_t InventoryManagerComponent::Save(std::string assetPath, size_t* allocationStart) {
     InventoryManagerComponentDataStruct saveInfo(maxItemStorage, itemCarryOffset, itemDropOffset);

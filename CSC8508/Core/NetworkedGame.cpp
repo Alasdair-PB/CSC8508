@@ -40,8 +40,7 @@ struct SpawnPacket : public GamePacket {
 	}
 };
 
-const Vector3 itemPos = Vector3(15.0f, 15.0f, 0.0f);
-const Vector3 playerPos = Vector3(0.0f, 6.0f, 0.0f);
+const Vector3 playerPos = Vector3(0.0f, 2.0f, 0.0f);
 
 void NetworkedGame::StartClientCallBack() { StartAsClient(127, 0, 0, 1); } //IP config
 void NetworkedGame::StartServerCallBack() { StartAsServer(); }
@@ -49,7 +48,9 @@ void NetworkedGame::StartServerCallBack() { StartAsServer(); }
 void NetworkedGame::StartOfflineCallBack() { 
 	GameCore::LoadGameManager(Vector3());
 	GameCore::AddPlayerToWorld(playerPos);
-	GameCore::Loaditem(GetSpawnLocation(itemCount++));
+
+	for (int i = 0; i < itemCount; i++)
+		GameCore::Loaditem(GetSpawnLocation(spawnedItemCount++));
 }
 
 #if EOSBUILD
@@ -151,7 +152,9 @@ void NetworkedGame::StartAsServer()
 
 	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Manager);
 	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Player);
-	SpawnObjectServer(thisServer->GetPeerId(), Prefab::Item);
+
+	for (int i = 0; i < itemCount; i++)
+		SpawnObjectServer(thisServer->GetPeerId(), Prefab::Item);
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) 
@@ -315,7 +318,7 @@ GameObject* NetworkedGame::GetPlayerPrefab(NetworkSpawnData* spawnPacket) {
 }
 
 GameObject* NetworkedGame::GetItemPrefab(NetworkSpawnData* spawnPacket){ 
-	return GameCore::Loaditem(GetSpawnLocation(itemCount++), spawnPacket);
+	return GameCore::Loaditem(GetSpawnLocation(spawnedItemCount++), spawnPacket);
 }
 
 GameObject* NetworkedGame::GetGameManagerPrefab(NetworkSpawnData* spawnPacket) {

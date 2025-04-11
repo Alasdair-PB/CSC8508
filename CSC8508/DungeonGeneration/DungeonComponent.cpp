@@ -61,7 +61,7 @@ bool DungeonComponent::GenerateRoom() const {
 }
 
 bool DungeonComponent::EndDungeonPaths() {
-    GameObject* roomB = RoomManager::GetRandom(Exit);
+    GameObject* roomB = RoomManager::GetRandom(Bank);
     RoomPrefab* roomPrefabInfo = roomB->TryGetComponent<RoomPrefab>();
 
     auto const x = GetRooms();

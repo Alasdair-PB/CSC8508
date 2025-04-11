@@ -17,7 +17,7 @@ bool DungeonComponent::Generate(int const roomCount) const {
     RoomManager::ReturnPrefab(prefab);
     RoomPrefab* roomPrefab = copy->TryGetComponent<RoomPrefab>();
 
-    SetEntranceTransform(roomPrefab, copy->GetTransform());
+    //SetEntranceTransform(roomPrefab, copy->GetTransform());
     GetGameObject().AddChild(copy);
 
     for (int i = 0; i < roomCount - 1; i++) {

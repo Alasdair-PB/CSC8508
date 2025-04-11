@@ -45,7 +45,7 @@ private:
 
     void SetEntranceTransform(RoomPrefab* roomPrefab, Transform& transformA) const;
     void SetNeighbours(RoomPrefab* roomPrefab) const;
-    unsigned int seed = 14;
+    unsigned int seed = 4;
     int roomCount;
     bool GenerateRoom() const;
     bool EndDungeonPaths();

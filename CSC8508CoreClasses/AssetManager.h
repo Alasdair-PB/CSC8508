@@ -41,6 +41,15 @@ namespace NCL {
                     if (entry.path().extension() == ".msh")
                         MaterialManager::PushMesh(filename, renderer->LoadMesh(filenameExt));
                 }  
+
+               path = NCL::Assets::ASSETROOT + "Textures/";
+                for (const auto& entry : fstream::directory_iterator(path)) {
+                    std::string filename = entry.path().stem().string();
+                    std::string filenameExt = entry.path().filename().string();
+                    if (entry.path().extension() == ".png")
+                        MaterialManager::PushTexture(filename, renderer->LoadTexture(filenameExt));
+                }
+
                 
                 //if (entry.path().extension() == ".png" || entry.path().extension() == ".PNG")
                     //    MaterialManager::PushTexture(filename, renderer->LoadTexture(filenameExt));

@@ -16,6 +16,10 @@ void RoomManager::LoadPrefabs(){
     prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RoomC.pfab");
     prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RoomD.pfab");
     prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RoomE.pfab");
+    prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RoomF.pfab");
+    prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RoomG.pfab");
+    prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/RoomH.pfab");
+
     prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/DepositRoom.pfab");
     prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/ExitRoom.pfab");
     prefabPaths.push_back(NCL::Assets::PFABDIR + "rooms/DropOffRoom.pfab");

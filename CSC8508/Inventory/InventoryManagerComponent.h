@@ -163,7 +163,7 @@ namespace NCL {
             int scrollIndex = 0;
             float itemCarryOffset;
             float itemDropOffset;
-            float carryYOffset = 3;
+            float carryYOffset = 2.2f;
             float wallet; 
             float deposited;
             Transform& transform;

@@ -45,6 +45,7 @@ GameObject* GameCore::Loaditem(const Vector3& position, NetworkSpawnData* spawnD
 		FullTransformNetworkComponent* networkTransform = myObjectToLoad->AddComponent<FullTransformNetworkComponent>(
 			spawnData->objId, spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 	}
+	myObjectToLoad->SetLayerID(Layers::LayerID::Player);
 	world->AddGameObject(myObjectToLoad);
 	return myObjectToLoad;
 }
@@ -164,7 +165,7 @@ GameObject* GameCore::AddPlayerToWorld(const Vector3& position, NetworkSpawnData
 		DamageableNetworkComponent* dc = player->AddComponent<DamageableNetworkComponent>(100, 100, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
-		stamina = player->AddComponent<StaminaNetworkComponent>(100, 100, 3, spawnData->objId,
+		stamina = player->AddComponent<StaminaNetworkComponent>(100, 100, 7, spawnData->objId,
 			spawnData->ownId, GetUniqueId(spawnData->objId, componentIdCount), pFabId, spawnData->clientOwned);
 
 		if (spawnData->clientOwned)
@@ -177,7 +178,7 @@ GameObject* GameCore::AddPlayerToWorld(const Vector3& position, NetworkSpawnData
 		InputComponent* input = player->AddComponent<InputComponent>(controller);
 		CameraComponent* cameraComponent = player->AddComponent<CameraComponent>(world->GetMainCamera(), *input);
 		DamageableComponent* dc = player->AddComponent<DamageableComponent>(100, 100);
-		stamina = player->AddComponent<StaminaComponent>(100, 100, 3);
+		stamina = player->AddComponent<StaminaComponent>(100, 100, 7);
 		AudioListenerComponent* listenerComp = player->AddComponent<AudioListenerComponent>(world->GetMainCamera());
 		listenerComp->RecordMic();
 		pc->SetBindingPause(controller->GetButtonHashId("Pause"));

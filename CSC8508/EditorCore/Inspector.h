@@ -31,6 +31,7 @@ private:
 
 	int elementsCount;
 	int* meshIndex;
+	int* textureIndex;
 
 	void PushRenderObject(GameObject* focus);
 	void PushAddComponentField(GameObject* focus);
@@ -38,11 +39,14 @@ private:
 	void PushLayerField(GameObject* focus);
 	void PushComponentInspector(GameObject* focus);
 	void InitMaterial(GameObject* focus);
-	void CheckChangeMesh(int currentMeshIndex, Mesh* meshAtIndex, GameObject* focus, RenderObject* renderObject);
-	void PushMesh(GameObject* focus, RenderObject* renderObject);
+	void CheckChangeMaterial(int currentMeshIndex, Mesh* meshAtIndex, int currentTextureIndex, Texture* textureAtIndex, GameObject* focus, RenderObject* renderObject);
+	void PushMaterial(GameObject* focus, RenderObject* renderObject);
 	void PushRenderObject(GameObject* focus, RenderObject* renderObject);
 
 	std::vector<std::pair<std::string, Mesh*>> GetMeshesSorted() const;
+	std::vector<std::pair<std::string, Texture*>> GetTexturesSorted() const;
+
+	std::vector<std::pair<int*, std::string>> GetTextureInfo(Texture** textureAtIndex, Texture* currentTexture, int* currentTextureIndex);
 	std::vector<std::pair<int*, std::string>> GetMeshInfo(Mesh** meshAtIndex, Mesh* currentMesh, int* currentMeshIndex);
 	void InitInspector();
 };

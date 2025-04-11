@@ -133,7 +133,7 @@ void GameCore::LoadDungeon(Vector3 const offset) {
 	t.SetPosition(offset);
 	t.SetScale(Vector3(1, 1, 1));
 	DoorLocation const loc(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
-	AddDungeonToWorld(t, loc, 16);
+	AddDungeonToWorld(t, loc, 16); //16
 }
 
 void GameCore::InitWorld()

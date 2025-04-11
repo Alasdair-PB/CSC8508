@@ -81,6 +81,10 @@ namespace NCL {
                 return allMeshesNameMap;
             }
 
+            static std::unordered_map<std::string, Texture*>& GetTextureMap() {
+                return allTextureNameMap;
+            }
+
             static void CleanUp() {
                 for (auto texture : allTextureNameMap)
                     delete texture.second;

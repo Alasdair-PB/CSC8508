@@ -12,12 +12,15 @@
 Inspector::Inspector() : 
 	editorManager(EditorWindowManager::Instance()), 
 	gameWorld(GameWorld::Instance()), 
-	elementsCount(0), meshIndex(new int())
+	elementsCount(0), meshIndex(new int()), textureIndex(new int())
 {
 	InitInspector();
 }
 
-Inspector::~Inspector() { delete meshIndex; }
+Inspector::~Inspector() {
+	delete meshIndex; 
+	delete textureIndex;
+}
 
 void Inspector::OnSetFocus(GameObject* focus) {
 	if (!focus) return;
@@ -65,14 +68,27 @@ void Inspector::InitMaterial(GameObject* focus) {
 	RenderObject* renderObject = focus->GetRenderObject();
 	if (!renderObject) return;
 	Mesh* currentMesh = renderObject->GetMesh();
-	if (!currentMesh) return;
-	(*meshIndex) = 0;
+	Texture* currentTexture = renderObject->GetDefaultTexture();
 
-	std::vector<std::pair<std::string, Mesh*>> sortedMeshList = GetMeshesSorted();
-	for (int i = 0; i < sortedMeshList.size(); ++i) {
-		if (currentMesh == sortedMeshList[i].second) {
-			(*meshIndex) = i;
-			break;
+	if (currentMesh) {
+		(*meshIndex) = 0;
+		std::vector<std::pair<std::string, Mesh*>> sortedMeshList = GetMeshesSorted();
+		for (int i = 0; i < sortedMeshList.size(); ++i) {
+			if (currentMesh == sortedMeshList[i].second) {
+				(*meshIndex) = i;
+				break;
+			}
+		}
+	}
+
+	if (currentTexture) {
+		(*textureIndex) = 0;
+		std::vector<std::pair<std::string, Texture*>> sortedTextureList = GetTexturesSorted();
+		for (int i = 0; i < sortedTextureList.size(); ++i) {
+			if (currentTexture == sortedTextureList[i].second) {
+				(*textureIndex) = i;
+				break;
+			}
 		}
 	}
 }
@@ -109,6 +125,16 @@ void Inspector::PushLayerField(GameObject* focus) {
 	window->PushEnumElement("Layer to add", enumTagOptions);
 }
 
+std::vector<std::pair<std::string, Texture*>> Inspector::GetTexturesSorted() const {
+	std::unordered_map<std::string, Texture*>& textureMappings = MaterialManager::GetTextureMap();
+	std::vector<std::pair<std::string, Texture*>> sortedTextureList(textureMappings.begin(), textureMappings.end());
+	std::sort(sortedTextureList.begin(), sortedTextureList.end(),
+		[](const auto& a, const auto& b) {
+			return a.first < b.first;
+		});
+	return sortedTextureList;
+}
+
 std::vector<std::pair<std::string, Mesh*>> Inspector::GetMeshesSorted() const {
 	std::unordered_map<std::string, Mesh*>& meshMappings = MaterialManager::GetMeshMap();
 	std::vector<std::pair<std::string, Mesh*>> sortedMeshList(meshMappings.begin(), meshMappings.end());
@@ -119,8 +145,23 @@ std::vector<std::pair<std::string, Mesh*>> Inspector::GetMeshesSorted() const {
 	return sortedMeshList;
 }
 
+std::vector<std::pair<int*, std::string>> Inspector::GetTextureInfo(Texture** textureAtIndex,
+	Texture* currentTexture, int* currentTextureIndex)
+{
+	std::vector<std::pair<int*, std::string>> textureOptions;
+	std::vector<std::pair<std::string, Texture*>> sortedTextureList = GetTexturesSorted();
+
+	for (int i = 0; i < sortedTextureList.size(); ++i) {
+		if (i == (*textureIndex)) (*textureAtIndex) = sortedTextureList[i].second;
+		if (currentTexture == sortedTextureList[i].second) (*currentTextureIndex) = i;
+		textureOptions.emplace_back(reinterpret_cast<int*>(textureIndex), sortedTextureList[i].first);
+	}
+	return textureOptions;
+}
+
 std::vector<std::pair<int*, std::string>> Inspector::GetMeshInfo(Mesh** meshAtIndex, 
-	Mesh* currentMesh, int* currentMeshIndex) {
+	Mesh* currentMesh, int* currentMeshIndex) 
+{
 	std::vector<std::pair<int*, std::string>> meshOptions;
 	std::vector<std::pair<std::string, Mesh*>> sortedMeshList = GetMeshesSorted();
 
@@ -132,26 +173,35 @@ std::vector<std::pair<int*, std::string>> Inspector::GetMeshInfo(Mesh** meshAtIn
 	return meshOptions;
 }
 
-void Inspector::CheckChangeMesh(int currentMeshIndex, Mesh* meshAtIndex, GameObject* focus, RenderObject* renderObject) {
-	if ((*meshIndex) != currentMeshIndex) {
+void Inspector::PushMaterial(GameObject* focus, RenderObject* renderObject) {
+	Mesh* currentMesh = renderObject->GetMesh();
+	Texture* currentTexture = renderObject->GetDefaultTexture();
+
+	if (!currentMesh && !currentTexture) return;
+
+	Mesh* meshAtIndex = nullptr;
+	Texture* textureAtIndex = nullptr;
+	int currentMeshIndex = 0;
+	int currentTextureIndex = 0;
+
+	std::vector<std::pair<int*, std::string>> meshOptions = GetMeshInfo(&meshAtIndex, currentMesh, &currentMeshIndex);
+	std::vector<std::pair<int*, std::string>> textureOptions = GetTextureInfo(&textureAtIndex, currentTexture, &currentTextureIndex);
+
+	window->PushEnumElement("Texture", textureOptions);
+	window->PushEnumElement("Mesh", meshOptions);
+	CheckChangeMaterial(currentMeshIndex, meshAtIndex, currentTextureIndex, textureAtIndex, focus, renderObject);
+}
+
+void Inspector::CheckChangeMaterial(int currentMeshIndex, Mesh* meshAtIndex, int currentTextureIndex, Texture* textureAtIndex, GameObject* focus, RenderObject* renderObject)
+{
+	if ((*textureIndex) != currentTextureIndex || (*meshIndex) != currentMeshIndex) {
 		RenderObject* newRenderObj = new RenderObject(&focus->GetTransform(),
 			meshAtIndex,
-			renderObject->GetDefaultTexture(),
+			textureAtIndex,
 			renderObject->GetShader());
 		focus->SetRenderObject(newRenderObj);
 		delete renderObject;
 	}
-}
-
-void Inspector::PushMesh(GameObject* focus, RenderObject* renderObject) {
-	Mesh* currentMesh = renderObject->GetMesh();
-	if (!currentMesh) return;
-
-	Mesh* meshAtIndex = nullptr;
-	int currentMeshIndex = 0;
-	std::vector<std::pair<int*, std::string>> meshOptions = GetMeshInfo(&meshAtIndex, currentMesh, &currentMeshIndex);
-	window->PushEnumElement("Mesh", meshOptions);
-	CheckChangeMesh(currentMeshIndex, meshAtIndex, focus, renderObject);
 }
 
 void Inspector::PushRenderObject(GameObject* focus, RenderObject* renderObject) {
@@ -168,7 +218,7 @@ void Inspector::PushRenderObject(GameObject* focus, RenderObject* renderObject) 
 void Inspector::PushRenderObject(GameObject* focus) {
 	RenderObject* renderObject = focus->GetRenderObject();
 
-	if (renderObject) PushMesh(focus, renderObject);
+	if (renderObject) PushMaterial(focus, renderObject);
 	else PushRenderObject(focus, renderObject);
 }
 

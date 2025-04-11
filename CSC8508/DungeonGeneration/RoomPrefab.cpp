@@ -81,7 +81,8 @@ void RoomPrefab::PushIComponentElementsInspector(UIElementsGroup& elementsGroup,
         {reinterpret_cast<int*>(&roomType), "Empty"},
         {reinterpret_cast<int*>(&roomType), "Bank"},
         {reinterpret_cast<int*>(&roomType), "Vender"},
-        {reinterpret_cast<int*>(&roomType), "Exit"}
+        {reinterpret_cast<int*>(&roomType), "Exit"},
+        {reinterpret_cast<int*>(&roomType), "Split"}
     };
     elementsGroup.PushEnumElement("", enumTagOptions);
     elementsGroup.PushFloatElement(&spawnProbability, scale, "Room spawn chance");

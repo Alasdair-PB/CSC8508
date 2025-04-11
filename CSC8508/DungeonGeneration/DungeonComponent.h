@@ -1,5 +1,5 @@
 ﻿//
-// Contributors: Alfie
+// Contributors: Alfie & Alasdair
 //
 
 #ifndef DUNGEONCOMPONENT_H
@@ -43,13 +43,18 @@ private:
     void SetTransform(const Transform& transformA, Transform& transformB, const Quaternion orientationDifference, 
         const DoorLocation aDoorLoc, const DoorLocation bDoorLoc) const;
 
+    void SetEntranceTransform(RoomPrefab* roomPrefab, Transform& transformA) const;
     void SetNeighbours(RoomPrefab* roomPrefab) const;
     unsigned int seed = 14;
     int roomCount;
     bool GenerateRoom() const;
     bool EndDungeonPaths();
-
-    const float threshold = 1.0f;
+    bool IsConnectedDoor(RoomPrefab& roomA, const DoorLocation& aDoorLoc) const;
+    bool TryCopyRoomToDungeon(RoomPrefab& roomB, const DoorLocation& aDoorLoc, const DoorLocation& bDoorLoc, 
+        Transform const& transformA, Transform& transformB) const;
+    bool TryCorrectDungeon(RoomPrefab& roomB, const std::vector<DoorLocation> bDoorLocations, const Transform& transformA,
+        Transform& transformB, const DoorLocation& aDoorLoc) const;
+    const float threshold = 0.2f;
 };
 
 #endif //DUNGEONCOMPONENT_H

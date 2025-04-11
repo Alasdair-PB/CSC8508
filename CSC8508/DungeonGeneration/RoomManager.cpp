@@ -39,6 +39,7 @@ void RoomManager::ReturnPrefab(GameObject* prefab) {
 void RoomManager::ClearPrefabs() {
     for (GameObject* prefab : prefabs) {
         prefab->GetTransform().SetPosition(Vector3(-1000, -1000, -1000));
+        prefab->SetEnabled(false);
     }
 }
 

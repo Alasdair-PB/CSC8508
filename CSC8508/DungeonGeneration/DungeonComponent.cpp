@@ -4,7 +4,6 @@
 
 #include "DungeonComponent.h"
 #include "CollisionDetection.h"
-#include "RoomManager.h"
 #include "INetworkDeltaComponent.h"
 #include "../../CSC8508CoreClasses/Util.cpp"
 
@@ -25,13 +24,9 @@ bool DungeonComponent::Generate(int const roomCount) const {
             i--;
             failures++;
         }
-        if (failures >= MAX_FAILURES) {
-            std::cout << "failed" << std::endl;
-            RoomManager::ClearPrefabs();
+        if (failures >= MAX_FAILURES)
             return false;
-        }
     }
-    RoomManager::ClearPrefabs();
     return true;
 }
 

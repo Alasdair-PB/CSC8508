@@ -6,6 +6,7 @@
 #define DUNGEONCOMPONENT_H
 
 #define MAX_FAILURES 30
+#include "RoomManager.h"
 
 #include "DoorLocation.h"
 #include "IComponent.h"
@@ -29,6 +30,7 @@ public:
     void OnAwake() override {
         Generate(roomCount);
         EndDungeonPaths();
+        RoomManager::ClearPrefabs();
     }
 
     void GetAllItemSpawnLocations(std::vector<Vector3>& locations) const;

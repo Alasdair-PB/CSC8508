@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 */////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "RendererBase.h"
-#include "../CSC8508/GameTechRendererInterface.h"
+#include "IGameTechRenderer.h"
 
 #ifdef _WIN32
 #include "windows.h"
@@ -29,7 +29,7 @@ namespace NCL::Rendering {
 
 	class SimpleFont;
 		
-	class OGLRenderer : public RendererBase, public CSC8508::GameTechRendererInterface {
+	class OGLRenderer : public RendererBase, public CSC8508::IGameTechRenderer {
 	public:
 		friend class OGLRenderer;
 		OGLRenderer(Window& w);

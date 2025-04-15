@@ -16,7 +16,7 @@ namespace NCL {
 		public:
 			RenderObject(Transform* inTransform, Mesh* inMesh, Texture* inTex, Shader* inShader) {
 				buffer = nullptr;
-
+				distanceFromCamera = 0;
 				transform = inTransform;
 				mesh = inMesh;
 				texture = inTex;

@@ -51,10 +51,6 @@ MeshAnimation::MeshAnimation(const std::string& filename) : MeshAnimation() {
 	}
 }
 
-MeshAnimation::~MeshAnimation() {
-
-}
-
 const Matrix4* MeshAnimation::GetJointData(size_t frame) const {
 	if (frame >= frameCount) {
 		return nullptr;

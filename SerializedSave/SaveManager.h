@@ -50,6 +50,8 @@ namespace NCL::CSC8508 {
         struct is_specialization<Template<T1, T2>, Template> : std::true_type {};
 
         const static uint32_t fileExtension = 0x70666162; // "pfab"
+        const static uint32_t worldExtension = 0x776C7264; // "wrld"
+
         const static uint32_t endConst = 0x454E4453; // "ends"
         const static uint32_t initConst = 0x696E6974; // "init"
 
@@ -82,6 +84,21 @@ namespace NCL::CSC8508 {
         }
         enum FileType {Prefab, Scene};
 
+        static uint32_t GetFileExtension(FileType fileType) {
+            switch (fileType) {
+            case Prefab: {
+                return fileExtension;
+                break;
+            }
+            case Scene: {
+                return worldExtension;
+                break;
+            }
+            default: { break; }
+            }
+            return fileExtension;
+        }
+
         /// <summary>
         /// Saves gameData as a .pfab file
         /// </summary>
@@ -111,7 +128,8 @@ namespace NCL::CSC8508 {
 
             file.seekp(start, std::ios::beg);
 
-            uint32_t magic = fileExtension;
+            
+            uint32_t magic = GetFileExtension(fileType);
             uint16_t version = 1;
 
             file.write(reinterpret_cast<char*>(&magic), sizeof(magic));
@@ -145,7 +163,7 @@ namespace NCL::CSC8508 {
                 std::cerr << "Error: Could not open file " << assetPath << std::endl;
                 return false;
             }
-            if (start == 0) 
+            if (start == 0)
                 file.seekg(ReadTOC(file, start), std::ios::beg);
             else 
                 file.seekg(start, std::ios::beg);
@@ -155,7 +173,7 @@ namespace NCL::CSC8508 {
             file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
             file.read(reinterpret_cast<char*>(&version), sizeof(version));
 
-            if (magic != fileExtension) {
+            if (magic != fileExtension && magic != worldExtension) {
                 std::cerr << "Error: Invalid file format!" << std::endl;
                 return false;
             }

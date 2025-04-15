@@ -2,7 +2,6 @@
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
-#include "NetworkObject.h"
 #include "INetworkDeltaComponent.h"
 
 
@@ -56,7 +55,6 @@ void PhysicsComponent::SetInitType(InitType type, PhysicsObject* phyObj) {
 }
 
 void PhysicsComponent::CopyComponent(GameObject* gameObject) {
-
 	PhysicsComponent* component = gameObject->AddComponent<PhysicsComponent>();
 	component->SetEnabled(IsEnabled());
 
@@ -65,7 +63,7 @@ void PhysicsComponent::CopyComponent(GameObject* gameObject) {
 	physObjCopy->SetFriction(physicsObject->GetFriction());
 	physObjCopy->SetRestitution(physicsObject->GetCRestitution());
 	component->SetPhysicsObject(physObjCopy);
-	SetInitType(initiType, physObjCopy);
+	component->SetInitType(initiType, physObjCopy);
 }
 
 auto PhysicsComponent::GetDerivedSerializedFields() const {
@@ -93,8 +91,6 @@ void PhysicsComponent::Load(std::string assetPath, size_t allocationStart) {
 }
 
 void PhysicsComponent::PushIComponentElementsInspector(UIElementsGroup& elementsGroup, float scale) {
-	IComponent::PushIComponentElementsInspector(elementsGroup, scale);
-
 	if (physicsObject){
 		elementsGroup.PushFloatElement(physicsObject->GetcRestRef(), scale, "CRestitution:");
 		elementsGroup.PushFloatElement(physicsObject->GetFrictionRef(), scale, "Friction:");

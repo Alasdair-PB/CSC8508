@@ -141,11 +141,9 @@ bool CollisionDetection::RaySphereIntersection(const Ray& r, const Transform& wo
 	return true;
 }
 
-
 bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& worldTransform, const CapsuleVolume& volume, RayCollision& collision) {
 	return false;
 }
-
 
 void GetChildBoundsComponent(GameObject* gameObject, std::vector<BoundsComponent*>& out) {
 	for (GameObject* c : gameObject->GetChildren()) {
@@ -154,9 +152,7 @@ void GetChildBoundsComponent(GameObject* gameObject, std::vector<BoundsComponent
 	}
 }
 
-
 bool CollisionDetection::ObjectIntersection(GameObject* gameObjectA, GameObject* gameObjectB, CollisionInfo& collisionInfo) {
-
 	// Gather all bounds components that need checking
 	std::vector<BoundsComponent*> aBounds, bBounds;
 	if (auto* aBoundsComponent = gameObjectA->TryGetComponent<BoundsComponent>()) aBounds.push_back(aBoundsComponent);
@@ -165,20 +161,17 @@ bool CollisionDetection::ObjectIntersection(GameObject* gameObjectA, GameObject*
 	GetChildBoundsComponent(gameObjectB, bBounds);
 
 	// Check for collision
-	for (BoundsComponent* a : aBounds) for (BoundsComponent* b : bBounds) {
+	for (BoundsComponent* a : aBounds) for (BoundsComponent* b : bBounds)
 		if (ObjectIntersection(a, b, collisionInfo)) return true;
-	}
 	return false;
 }
-
 
 bool CollisionDetection::ObjectIntersection(BoundsComponent* a, BoundsComponent* b, CollisionInfo& collisionInfo) {
 	const CollisionVolume* volA = a->GetBoundingVolume();
 	const CollisionVolume* volB = b->GetBoundingVolume();
 
-	if (!volA || !volB) {
+	if (!volA || !volB)
 		return false;
-	}
 
 	collisionInfo.a = a;
 	collisionInfo.b = b;
@@ -390,7 +383,6 @@ bool CollisionDetection::OBBIntersection(
 	if (Vector::Dot(collisionNormal, worldTransformB.GetPosition() - worldTransformA.GetPosition()) < 0) { collisionNormal = -collisionNormal; }
 
 	collisionInfo.AddContactPoint(localA, localB, collisionNormal, minPenetration);
-
 	return true;
 }
 

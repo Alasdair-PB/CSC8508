@@ -2,27 +2,33 @@ set(PROJECT_NAME CSC8508)
 set(EXE_NAME "CSC8505_Game")
 file(GLOB_RECURSE Header_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 file(GLOB_RECURSE Source_Files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-file(GLOB Legacy_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Legacy/*")
 file(GLOB PS5_Files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/PS5/*")
 file(GLOB_RECURSE EOS_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*EOS*")
-
-list(REMOVE_ITEM Source_Files ${Legacy_Files})
-list(REMOVE_ITEM Header_Files ${Legacy_Files})
 list(REMOVE_ITEM Source_Files ${PS5_Files})
 list(REMOVE_ITEM Header_Files ${PS5_Files})
 
-source_group("Header Files" FILES ${Header_Files})
-source_group("Source Files" FILES ${Source_Files})
-source_group("Legacy" FILES ${Legacy_Files})
+################################################################################
+# Source groups
+################################################################################
+
+file(GLOB_RECURSE Assets "${CMAKE_CURRENT_SOURCE_DIR}/*.*")
+
+foreach(file_path IN LISTS Assets)
+    file(RELATIVE_PATH relative_path "${CMAKE_CURRENT_SOURCE_DIR}" "${file_path}")
+    get_filename_component(dir "${relative_path}" DIRECTORY)
+    string(REPLACE "/" "\\" group_path "${dir}")
+    source_group("${group_path}" FILES "${file_path}")
+endforeach()
 
 if(USE_VULKAN)
 	file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
-	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
-	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.cpp)
+	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameTechRenderer.h)
+	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameTechRenderer.cpp)
 else()
-	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechVulkanRenderer.h)
-	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechVulkanRenderer.cpp)
+	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameTechVulkanRenderer.h)
+	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameTechVulkanRenderer.cpp)
 endif()
+
 
 if(PS5)
 	source_group("PS5 Files" FILES ${PS5_Files})
@@ -30,13 +36,13 @@ if(PS5)
 	file(GLOB_RECURSE ALL_SHADERS CONFIGURE_DEPENDS 
 	${COMPILE_ASSET_ROOT}Shaders/PSSL/*.pssl
 	)
-	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
-	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.cpp)
+	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameTechRenderer.h)
+	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameTechRenderer.cpp)
 	list(REMOVE_ITEM Source_Files ${EOS_FILES})
 	list(REMOVE_ITEM Header_Files ${EOS_FILES})
 
-	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.h)
-	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.cpp)
+	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/EditorGame.h)
+	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/EditorGame.cpp)
 	file(GLOB_RECURSE files_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/EditorCore/*")
 	list(REMOVE_ITEM Header_Files ${files_to_remove})
 	list(REMOVE_ITEM Source_Files ${files_to_remove})
@@ -59,28 +65,28 @@ if(PS5)
 	${ALL_TEXTURES}
 	)
 else()
-	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechAGCRenderer.h)
+	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameTechAGCRenderer.h)
 	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechAGCRenderer.cpp)
 
 	if (Editor)
-		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/TutorialGame.h)
-		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/NetworkedGame.h)
-		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/NetworkedGame.cpp)
-		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/TutorialGame.cpp)
-		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameInstantiations.cpp)
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameCore.h)
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/NetworkedGame.h)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/NetworkedGame.cpp)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameCore.cpp)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/GameInstantiations.cpp)
 	else()
-		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.h)
-		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/EditorGame.cpp)
+		list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/EditorGame.h)
+		list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/Core/EditorGame.cpp)
 		file(GLOB_RECURSE files_to_remove "${CMAKE_CURRENT_SOURCE_DIR}/EditorCore/*")
 		list(REMOVE_ITEM Header_Files ${files_to_remove})
 		list(REMOVE_ITEM Source_Files ${files_to_remove})
 	endif()
 	
-	set(ALL_FILES
+    set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
-	${Legacy_Files}
-	)
+    ${Legacy_Files}
+)
 endif()
 
 if(USE_VULKAN)
@@ -137,6 +143,16 @@ endif()
 # Target
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
+
+set(INCLUDE_DIRS "")
+foreach(file IN LISTS Header_Files Source_Files)
+    get_filename_component(dir "${file}" DIRECTORY)
+    list(APPEND INCLUDE_DIRS "${dir}")
+endforeach()
+list(REMOVE_DUPLICATES INCLUDE_DIRS)
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+
+
 set(ROOT_NAMESPACE CSC8508)
 
 if(PS5)
@@ -180,16 +196,15 @@ else()
     <map>
     <stack>
     <list>   
-	<set>   
-	<string>
+    <set>   
+    <string>
     <thread>
     <atomic>
     <functional>
     <iostream>
-	<chrono>
-	<sstream>
-	
-	"../NCLCoreClasses/Vector.h"
+    <chrono>
+    <sstream>
+    "../NCLCoreClasses/Vector.h"
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
@@ -247,14 +262,12 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     <VulkanMesh.h>
     <VulkanPipelineBuilder.h>
     <VulkanDynamicRenderBuilder.h>
-
     <VulkanTextureBuilder.h>
-
     <VulkanDescriptorSetLayoutBuilder.h>
     <VulkanRenderPassBuilder.h>
     <VulkanCompute.h>
     <VulkanComputePipelineBuilder.h>
-	<VulkanBufferBuilder.h>
+    <VulkanBufferBuilder.h>
 )
 endif()
 
@@ -297,29 +310,29 @@ if(MSVC AND NOT PS5)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC  "Winmm.lib")
 endif()
 if(PS5)
-	target_include_directories (${PROJECT_NAME} 
-	PUBLIC ${CMAKE_SOURCE_DIR}/PS5Core
+    target_include_directories (${PROJECT_NAME} 
+    PUBLIC ${CMAKE_SOURCE_DIR}/PS5Core
     PUBLIC ${CMAKE_SOURCE_DIR}/GLTFLoader
     PUBLIC ${CMAKE_SOURCE_DIR}/NCLCoreClasses
-	PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
-	PUBLIC ${CMAKE_SOURCE_DIR}/EOSFramework
-	PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
-	PUBLIC ${CMAKE_SOURCE_DIR}/Event
+    PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
+    PUBLIC ${CMAKE_SOURCE_DIR}/EOSFramework
+    PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
+    PUBLIC ${CMAKE_SOURCE_DIR}/Event
     PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
-	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
-	PUBLIC ${CMAKE_SOURCE_DIR}/SerializedSave
+    PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
+    PUBLIC ${CMAKE_SOURCE_DIR}/SerializedSave
 	)
 else()
-	target_include_directories (${PROJECT_NAME} 
-	PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
+    target_include_directories (${PROJECT_NAME} 
+    PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
     PUBLIC ${CMAKE_SOURCE_DIR}/NCLCoreClasses
-	PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
-	PUBLIC ${CMAKE_SOURCE_DIR}/EOSFramework
-	PUBLIC ${CMAKE_SOURCE_DIR}/Event
+    PUBLIC ${CMAKE_SOURCE_DIR}/CSC8508CoreClasses
+    PUBLIC ${CMAKE_SOURCE_DIR}/EOSFramework
+    PUBLIC ${CMAKE_SOURCE_DIR}/Event
     PUBLIC ${CMAKE_SOURCE_DIR}/ImGui
-	PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
-	PUBLIC ${CMAKE_SOURCE_DIR}/SerializedSave
-	)
+    PUBLIC ${CMAKE_SOURCE_DIR}/UISystem
+    PUBLIC ${CMAKE_SOURCE_DIR}/SerializedSave
+    )
 endif()
 
 if(PS5)
@@ -391,19 +404,18 @@ if(PS5)
     PRIVATE SceAgc_debug_nosubmission
     PRIVATE SceAgcCore_debug_nosubmission
     PRIVATE SceAgcGpuAddress_debug_nosubmission
+    PRIVATE ScePad_stub_weak
+    PRIVATE SceUserService_stub_weak
 	
-	PRIVATE ScePad_stub_weak
-	PRIVATE SceUserService_stub_weak
-	
-	PRIVATE SceNpUtility_stub_weak
-	PRIVATE SceCommonDialog_stub_weak
-	PRIVATE SceNetCtlApDialog_stub_weak
-	PRIVATE SceNetCtlAp_stub_weak
-	PRIVATE SceNetCtl_stub_weak
-	PRIVATE SceNet_stub_weak
-	PRIVATE ScePosix_stub_weak
-	)
-	include_directories(${COMPILE_ASSET_ROOT}) 
+    PRIVATE SceNpUtility_stub_weak
+    PRIVATE SceCommonDialog_stub_weak
+    PRIVATE SceNetCtlApDialog_stub_weak
+    PRIVATE SceNetCtlAp_stub_weak
+    PRIVATE SceNetCtl_stub_weak
+    PRIVATE SceNet_stub_weak
+    PRIVATE ScePosix_stub_weak
+    )
+    include_directories(${COMPILE_ASSET_ROOT}) 
 else() 
 	set(PROJECT_DEPENDENCIES
 		NCLCoreClasses

@@ -109,7 +109,7 @@ size_t GameWorld::Save(std::string assetPath, size_t* allocationStart)
 		*allocationStart = nextMemoryLocation;
 	}
 	SaveManager::GameData saveData = ISerializedData::CreateGameData<WorldSaveData>(saveInfo);
-	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart);
+	size_t nextMemoryLocation = SaveManager::SaveGameData(assetPath, saveData, allocationStart, true, SaveManager::Scene);
 
 	if (clearMemory)
 		delete allocationStart;
@@ -136,9 +136,17 @@ void GameWorld::AddGameObject(GameObject* o) {
 	o->InvokeOnAwake();
 }
 
-void GameWorld::RemoveGameObject(GameObject* o, bool andDelete) {
+void GameWorld::RemoveGameObject(GameObject* o, bool andDelete, bool andRemoveChildren) {
+	for (GameObject* child : o->GetChildren()) {
+		if (andRemoveChildren) o->RemoveChild(child);
+		RemoveGameObject(child, andDelete);
+	}
+	if (andRemoveChildren || andDelete) {
+		GameObject* parent = o->TryGetParent();
+		if (parent) parent->RemoveChild(o);
+	}
 	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());
-	if (andDelete)
+	if (andDelete) 
 		delete o;
 	worldStateCounter++;
 }
@@ -150,7 +158,6 @@ void GameWorld::GetPhysicsIterators(
 	first = physicsComponents.begin();
 	last = physicsComponents.end();
 }
-
 
 void GameWorld::GetBoundsIterators(
 	BoundsIterator& first,
@@ -164,8 +171,8 @@ void GameWorld::GetObjectIterators(
 	GameObjectIterator& first,
 	GameObjectIterator& last) const {
 
-	first	= gameObjects.begin();
-	last	= gameObjects.end();
+	first = gameObjects.begin();
+	last = gameObjects.end();
 }
 
 void GameWorld::OperateOnContents(GameObjectFunc f) {

@@ -3,83 +3,52 @@
 #include "imgui.h"
 #include "UIElementsGroup.h"
 #include "GameObject.h"
-#include "../ComponentAssemblyDefiner.h"
+#include "../Core/ComponentAssemblyDefiner.h"
+#include "EditorWindow.h"
+#include "GameWorld.h"
 
 using namespace NCL;
 using namespace CSC8508;
 using namespace UI;
 
-class Inspector {
+class EditorWindowManager;
+
+class Inspector : public EditorWindow {
 public:
 	Inspector();
 	~Inspector();
 
-	void SetFocus(GameObject* object) {
-		if (!object) return;
-		focus = object;
-
-		Vector3 posData = object->GetTransform().GetPosition();		
-		SetVector(positionInfo, object->GetTransform().GetLocalPosition());
-		SetVector(scaleInfo, object->GetTransform().GetLocalScale());
-		SetQuaternion(orientationInfo, object->GetTransform().GetLocalOrientation());
-		*isEnabled = object->IsEnabled();
-	}
-	
-	void ClearGameWorld();
-
-	void RenderFocus() {
-		if (clearWorld) ClearGameWorld();
-		if (!focus) return;
-		focus->GetTransform().SetPosition(*positionInfo);
-		focus->GetTransform().SetScale(*scaleInfo);
-		focus->GetTransform().SetOrientation(
-			Quaternion(
-				orientationInfo->x, orientationInfo->y, 
-				orientationInfo->z, orientationInfo->w).Normalised());
-		focus->SetEnabled(*isEnabled);
-		RenderIComponents();
-	}
-
-	GameObject* NewGameObject();
-
-	void RenderIComponents();
-
-	void EndFocus() {
-		focus = nullptr;
-		*isEnabled = true;
-		SetVector(positionInfo);
-		SetVector(scaleInfo);
-		SetQuaternion(orientationInfo);
-	}
-
-	UIElementsGroup* inspectorBar;
-	UIElementsGroup* toolsBar;
-
-	enum Primitives {Cube, Sphere, Empty};
+	void OnSetFocus(GameObject* focus) override;
+	void OnRenderFocus(GameObject* focus) override;
+	void OnFocusEnd() override;
+	void OnInit() override;
+	std::string GetName() const override { return "Inspector"; }
 
 private:
-	GameObject* focus;
-	Vector3* positionInfo;
-	Vector3* scaleInfo;
-	Vector4* orientationInfo;
+	EditorWindowManager& editorManager;
+	GameWorld& gameWorld;
 	ComponentAssemblyDefiner::ComponentMapId mapId;
-	Tags::Tag tagId;
-	Primitives primitive;
-	bool* isEnabled;
-	bool clearWorld;
-	std::string* saveDestination;
 
-	std::string GetAssetPath(std::string pfabName);
-	void SetVector(Vector3* vector, Vector3 values = Vector3());
-	void SetQuaternion(Vector4* quaternion, Quaternion values = Quaternion());
-	void PushLoadPfab();
-	void PushAddChild();
-	void PushAddComponentField();
-	void PushSetPrimitive();
-	void PushTagField();
-	void PushFocusParent();
-	void PushAddParent();
-	void PushLoadChild();
+	int elementsCount;
+	int* meshIndex;
+	int* textureIndex;
+
+	void PushRenderObject(GameObject* focus);
+	void PushAddComponentField(GameObject* focus);
+	void PushTagField(GameObject* focus);
+	void PushLayerField(GameObject* focus);
+	void PushComponentInspector(GameObject* focus);
+	void InitMaterial(GameObject* focus);
+	void CheckChangeMaterial(int currentMeshIndex, Mesh* meshAtIndex, int currentTextureIndex, Texture* textureAtIndex, GameObject* focus, RenderObject* renderObject);
+	void PushMaterial(GameObject* focus, RenderObject* renderObject);
+	void PushRenderObject(GameObject* focus, RenderObject* renderObject);
+
+	std::vector<std::pair<std::string, Mesh*>> GetMeshesSorted() const;
+	std::vector<std::pair<std::string, Texture*>> GetTexturesSorted() const;
+
+	std::vector<std::pair<int*, std::string>> GetTextureInfo(Texture** textureAtIndex, Texture* currentTexture, int* currentTextureIndex);
+	std::vector<std::pair<int*, std::string>> GetMeshInfo(Mesh** meshAtIndex, Mesh* currentMesh, int* currentMeshIndex);
+	void InitInspector();
 };
 
 

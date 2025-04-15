@@ -30,6 +30,8 @@ public:
 
 	virtual void Update(float dt = 0.0f) {}
 	uint32_t GetNamedAxisBinding(const std::string& name) const;
+	uint32_t GetNamedButtonBinding(const std::string& name) const;
+
 	virtual bool GetBoundButton(uint32_t keyId) const { return false; }
 
 	vector<uint32_t> GetBoundButtons() const;
